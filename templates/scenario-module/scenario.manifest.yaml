@@ -52,11 +52,14 @@ capabilities:
             retry_policy: none
 
 scenario_data:
-  domain_fact_types:
-    - object_type: example_profile
-      schema_version: 1
-      shared_across_workflows: true
-      repository_key: example.repositories.profile
+  context_ref_types:
+    - namespace: example
+      object_type: example_context_object
+      resolver_key: example.resolvers.context_object
+      owner_scope: workspace
+      canonical_required: false
+      scenario_local_allowed: true
+      snapshot_required: true
   run_start_requirements:
     - requirement_key: example_target
       schema_version: 1
@@ -138,23 +141,28 @@ handoffs:
 
 surface_mapping:
   chat_workflow_control:
+    adapter: example.chat_workflow_control_adapter
     recommendation_presenter: example.chat_workflow_control
     start_requirements_presenter: example.chat_start_requirements
     supports_strong_confirmation: true
   chat_dashboard_summary:
+    adapter: example.chat_workflow_control_adapter
     presenter: example.chat_dashboard_summary
     max_exposure_level: L1
   chat_citation:
+    adapter: example.chat_workflow_control_adapter
     presenter: example.chat_citation
     requires_indexing_gate: true
   web_domain_workbench:
     presenter: example.web_domain_workbench
     internal_api_allowed: true
   web_run_workbench:
+    adapter: example.web_run_workbench_adapter
     presenter: example.web_run_workbench
     internal_api_allowed: true
     supports_step_interventions: true
   mobile_dashboard:
+    adapter: example.mobile_dashboard_adapter
     card_presenter: example.dashboard_card
     max_exposure_level: L2
   forum_publication:
@@ -166,6 +174,7 @@ surface_mapping:
   notification_push:
     safe_payload_only: true
   admin_operator:
+    adapter: example.admin_operator_adapter
     governance_presenter: example.admin_summary
 
 internal_api:
@@ -177,6 +186,82 @@ internal_api:
       writes_workflow_facts: false
       handler_key: example.internal.import_preview
 
+event_registry:
+  standard_workflow_events:
+    - workflow.run.created
+    - workflow.run.updated
+    - workflow.step.started
+    - workflow.step.completed
+    - workflow.step.failed
+    - workflow.step.retry_requested
+    - workflow.step.manual_review_required
+    - workflow.approval.requested
+    - workflow.approval.resolved
+    - workflow.artifact.created
+    - workflow.artifact.updated
+    - workflow.artifact.deleted
+    - workflow.artifact.expired
+    - workflow.handoff.requested
+    - workflow.handoff.receipt_recorded
+    - workflow.handoff.invalidated
+    - workflow.context.bound
+    - workflow.context.rebind_required
+    - workflow.context.rebound
+    - workflow.evidence.recorded
+  scenario_internal_events:
+    - example.example_capability.artifact.generated
+    - example.example_capability.review.input_received
+  event_payload_policy:
+    signal_version: 1
+    body: no_body
+    pii: no_pii
+    status_in_payload: false
+    presenter_output_in_payload: false
+    idempotency_key: "{event_type}:{aggregate_id}:{aggregate_version}"
+  producers:
+    workflow.run.created:
+      owner: workflow_ledger
+      write_boundary: same_transaction
+    workflow.run.updated:
+      owner: workflow_ledger
+      write_boundary: same_transaction
+    workflow.approval.requested:
+      owner: approval_service
+      write_boundary: same_transaction
+    workflow.artifact.updated:
+      owner: artifact_service
+      write_boundary: same_transaction
+    workflow.handoff.requested:
+      owner: handoff_ledger
+      write_boundary: same_transaction
+    workflow.handoff.receipt_recorded:
+      owner: handoff_ledger
+      write_boundary: same_transaction
+    example.example_capability.artifact.generated:
+      owner: scenario_module
+      write_boundary: scenario_internal
+  consumers:
+    projection:
+      allowed_events:
+        - workflow.run.created
+        - workflow.run.updated
+        - workflow.artifact.updated
+      forbidden_events:
+        - example.example_capability.artifact.generated
+    notification_push:
+      allowed_events:
+        - workflow.run.updated
+        - workflow.approval.requested
+        - workflow.artifact.updated
+      forbidden_events:
+        - example.example_capability.artifact.generated
+    rag_knowledge:
+      allowed_events:
+        - workflow.handoff.requested
+        - workflow.handoff.receipt_recorded
+      forbidden_events:
+        - example.example_capability.artifact.generated
+
 governance:
   admin_actions:
     - enable_capability
@@ -186,10 +271,18 @@ governance:
     - dry_run_rebuild
   rollback: Disable capability and preserve canonical facts.
   projection_review_required: true
+  evidence_records:
+    - example.example_capability.run.approved
+    - example.example_capability.conflict.resolved
+    - example.example_capability.handoff.accepted
   outbox_events:
-    - example.example_capability.run.started
-    - example.example_capability.artifact.created
-    - example.example_capability.approval.requested
+    - workflow.run.created
+    - workflow.run.updated
+    - workflow.approval.requested
+    - workflow.artifact.updated
+    - workflow.handoff.requested
+    - workflow.handoff.receipt_recorded
+    - example.example_capability.artifact.generated
 
 verification:
   deterministic_tests:

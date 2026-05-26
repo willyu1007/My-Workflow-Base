@@ -2,8 +2,9 @@
 
 ## Ownership Boundary
 
-The workflow base owns contracts, identities, and validation boundaries. It does
-not own product-specific scenario behavior or downstream side effects.
+The workflow base defines template contracts, identity vocabulary, and
+validation boundaries. It is not a runtime service and does not own
+product-specific scenario behavior or downstream side effects.
 
 ```txt
 Scenario registry
@@ -14,7 +15,7 @@ Scenario registry
   -> host product consumption surfaces
 ```
 
-## Base Modules
+## Contract Modules
 
 ### Scenario registry
 Owns:
@@ -25,7 +26,7 @@ Owns:
 - manifest publication checks
 
 Does not own:
-- scenario domain tables
+- canonical domain object tables
 - product UX
 - downstream publication/indexing/delivery behavior
 
@@ -73,7 +74,7 @@ Own:
 - scenario/capability enablement
 - workflow version publication
 - exposure/action/handoff policy hook points
-- audit and rollback expectations
+- minimal evidence log and rollback expectations
 
 Do not own:
 - user-authored workflow builders
@@ -117,36 +118,42 @@ Scenario
   -> HandoffReceipt
 ```
 
-Scenario modules can attach domain refs to this spine, but they must not replace
-it.
+Scenario modules can attach domain context refs, snapshots, and bindings to this
+spine, but they must not replace it.
 
-## Scenario Data Boundary
+## Domain Context Boundary
 
-Scenario modules may define shared domain facts and domain events that multiple
-workflows can reference. They must distinguish:
-- `scenario_domain_facts`: versioned domain records shared within a scenario
+Canonical domain objects are maintained by a platform/domain registry outside
+workflow. Workflow can reference them only through the host
+`DomainContextResolver`. Scenario modules must distinguish:
+- `domain_context_ref`: stable workflow-facing pointer to a domain object or
+  scenario-local MVP record
+- `context_snapshot`: frozen safe view created for a run or step
+- `context_binding`: ledger dependency linking run/step/artifact/handoff to a
+  context ref and snapshot
 - `run_start_requirements`: pre-run or run-start inputs used to initialize a
   workflow
 - `step_interventions`: in-run manual operations owned by Web/Admin workbenches
 
-Chat can collect lightweight domain facts and run start requirements, but it is
-not a step intervention surface and should not remind users to perform
+Chat can collect allowed context refs and run start requirements, but it is not
+a step intervention surface and should not remind users to perform
 interventions. Chat dashboard output is summary-only.
 
 ## Internal API Boundary
 
 Internal APIs are allowed only for Web/Admin/operator workflows. They must:
-- be declared in the manifest
+- be declared in the manifest or equivalent TS contract
 - be namespaced by scenario
-- use canonical auth, audit, expected versions, and outbox rules
+- use canonical auth, evidence logging, expected versions, and outbox rules
 - avoid consumption by chat, mobile, forum, RAG, notification, public links, and
   external clients
 - avoid redefining run, approval, artifact, or handoff identity
 
 ## Handoff Boundary
 
-The base creates requests and records receipts. Downstream owners own reread,
-gate, transform, side effect, rollback, and receipt semantics.
+Concrete workflows create requests and record receipts according to this
+template. Downstream owners own reread, gate, transform, side effect, rollback,
+and receipt semantics.
 
 Handoff payloads are refs-only:
 - source refs
@@ -161,5 +168,6 @@ Private body content does not cross the handoff boundary.
 
 ## Key Architectural Risk
 The main risk is accidental second-system creation: a scenario or surface might
-introduce private APIs, private status, or private handoff semantics because it
-feels faster. The v0 matrix must make those shortcuts visibly invalid.
+introduce private APIs, private status, private domain stores, or private handoff
+semantics because it feels faster. The v0 matrix must make those shortcuts
+visibly invalid.

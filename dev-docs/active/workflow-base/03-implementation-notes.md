@@ -12,7 +12,7 @@
 - Split chat into workflow control, dashboard summary, and citation surfaces.
 - Removed chat ownership of step interventions and intervention reminders.
 - Split web into domain workbench and run workbench.
-- Added scenario data classes for shared domain facts, run start requirements,
+- Added scenario data classes for domain context refs, run start requirements,
   and web-owned step interventions.
 - Clarified that service-owned indexing follows sharing consent/policy and must
   not be exposed as a dashboard direct knowledge-base indexing action.

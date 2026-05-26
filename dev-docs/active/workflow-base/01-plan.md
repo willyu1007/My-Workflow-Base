@@ -24,8 +24,8 @@ Steps:
 2. Identify missing fields or overly broad fields.
 3. Update `module-contract.md` and template manifest only after the matrix is
    stable.
-4. Keep `scenario_data` explicit for domain facts, start requirements, and
-   step interventions.
+4. Keep `scenario_data` explicit for domain context refs, start requirements,
+   and step interventions.
 
 Acceptance:
 - Manifest declares all surfaces it supports.

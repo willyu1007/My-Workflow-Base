@@ -4,9 +4,12 @@
 This document is the base-template contract for how workflow facts are consumed,
 edited, projected, cited, and handed off across product surfaces.
 
-It is scenario-neutral. Education homework can be the first implementation, but
-later controlled scenarios must use the same surface contract instead of
-inventing one-off dashboard, chat, forum, or admin paths.
+The base template is not a runtime service. Concrete workflows implement these
+object, adapter, API, and handoff contracts in the host product.
+
+It is scenario-neutral. An education-like workflow can be the first
+implementation, but later controlled scenarios must use the same surface
+contract instead of inventing one-off dashboard, chat, forum, or admin paths.
 
 ## Scope
 In scope:
@@ -15,6 +18,7 @@ In scope:
 - editable workflow objects and action ownership
 - chat workflow control, dashboard summary, and citation boundaries
 - mobile dashboard, web domain workbench, and web run workbench boundaries
+- canonical domain registry consumption through domain context refs and resolver
 - generic handoff contract for forum, RAG/indexing, notification, and delivery
 - notification and push payload rules
 - admin governance boundaries
@@ -44,10 +48,12 @@ Scenario
   -> HandoffContract
 ```
 
-The platform owns the ledger shape. `Scenario` is canonical Postgres state, and
-the manifest is the versioned declaration attached to that state. Scenario
-modules own domain facts that sit beside the ledger, such as education
-assignments or future scenario-specific records.
+The template defines the ledger shape. The concrete workflow implementation owns
+the ledger in the host product. `Scenario` is canonical Postgres state, and the
+manifest or equivalent TS contract is the versioned declaration attached to that
+state. Canonical domain objects sit outside workflow in a platform/domain
+registry. Workflow stores only context refs, snapshots, and bindings to those
+objects.
 
 | Object | Canonical owner | Editable by | Notes |
 |---|---|---|---|
@@ -60,22 +66,45 @@ assignments or future scenario-specific records.
 | `WorkflowArtifact` | Command API/Postgres | Worker writes; user/admin may approve, suppress, hand off, or delete through commands | Raw private inputs are not artifacts unless explicitly modeled. |
 | `WorkflowApproval` | Command API/Postgres | User/admin through confirmation commands | Approval state must not live only in UI or projection. |
 | `ActionAvailability` | API presenter from Postgres policy/state | Not directly edited | UI renders these hints; Command API revalidates before write. |
-| `HandoffContract` | Workflow API plus downstream owner | Source surface starts handoff by canonical refs; downstream owner writes receipt | Base defines request/receipt shape only. Public draft, indexing, notification, and delivery own their gates. |
+| `HandoffContract` | Concrete workflow API plus downstream owner | Source surface starts handoff by canonical refs; downstream owner writes receipt | Template defines request/receipt shape only. Public draft, indexing, notification, and delivery own their gates. |
+| `DomainContextRef` | Workflow contract; canonical object owner remains external | Selected through concrete workflow API/adapter or Web domain workbench after policy checks | Stable pointer to a platform/domain object or scenario-local MVP record. |
+| `ContextSnapshot` | Workflow ledger, created through resolver | Created at run start or step execution | Frozen safe view for replay, evidence, and deterministic execution. |
+| `ContextBinding` | Workflow ledger | Created by Workflow API/worker runtime | Records which run, step, artifact, approval, or handoff depended on which context ref/snapshot/version. |
 
-Scenario domain facts are scenario-owned but must be referenced through stable
-refs and versions when workflow runs use them:
+Concrete workflow code never reads canonical domain object tables directly. It
+asks the host `DomainContextResolver` to resolve refs into policy-checked
+snapshots:
 
 ```ts
-type ScenarioDomainRef = {
-  scenario_key: string;
+type DomainContextRef = {
+  // canonical owner namespace, not the consuming scenario
+  namespace: string;
+  // optional consumer context for policy and presentation
+  consumer_scenario_key?: string;
   object_type: string;
   object_id: string;
-  version: number;
+  version?: number;
+  owner_scope: "workspace" | "organization" | "platform" | "external";
+  canonical_ref?: {
+    service: string;
+    object_type: string;
+    object_id: string;
+  };
+};
+
+type ResolvedDomainContext = {
+  ref: DomainContextRef;
+  resolved_version: number;
+  snapshot_id: string;
+  snapshot_schema_version: number;
+  safe_payload: unknown;
 };
 ```
 
-The base distinguishes:
-- `scenario_domain_facts`: long-lived facts shared by multiple workflows.
+The template distinguishes:
+- `domain_context_refs`: workflow-facing refs to domain objects.
+- `context_snapshots`: frozen safe views used by a run/step.
+- `context_bindings`: durable dependency records for evidence and replay.
 - `run_start_requirements`: refs and parameters needed to start one run.
 - `step_interventions`: human correction, override, or manual work during a
   running workflow.
@@ -86,16 +115,16 @@ actions, forbidden data, and downstream handoff.
 
 | Surface | Reads | Can edit or trigger | Must not do |
 |---|---|---|---|
-| Chat workflow control | API recommendation/read contracts plus Command API | Collect lightweight scenario facts, collect run start requirements, start workflow, and user-initiated approve/reject/confirm after strong confirmation | Perform step interventions, send intervention reminders, start workflow from a light hint, call internal APIs, write run state directly |
+| Chat workflow control | Standard chat adapter plus Command API | Select or submit allowed context refs, collect run start requirements, start workflow, and user-initiated approve/reject/confirm after strong confirmation | Perform step interventions, send intervention reminders, start workflow from a light hint, call internal APIs, mutate canonical domain objects directly, write run state directly |
 | Chat dashboard summary | Dashboard-safe summary DTOs | Open target links only | Mutate workflow facts, approve/reject from summary, remind about specific step interventions, expose private bodies |
 | Chat citation | RAG/knowledge retrieval through accepted downstream refs and PBR | Cite eligible workflow-derived sources with trust labels and source refs | Cite from projection, treat workflow output as human fact, cite private artifacts, skip lifecycle/PBR checks |
-| Web domain workbench | Scenario domain facts, schema/validation state, manifest-declared internal APIs | Create/update/validate/import/merge/archive scenario facts; manage sharing consent and run start requirements | Override running steps, bypass audit/permission/PBR, write projection directly, create private workflow identity |
-| Web run workbench | API/Postgres strong reads; run/step/artifact/approval detail; target domain refs | Step interventions, manual review, override, retry, cancel, suppress, approve/reject/confirm, create allowed handoffs | Become workflow builder/admin studio, bypass Command API, expose raw provider or prompt payloads, export internal API contracts to other surfaces |
+| Web domain workbench | Domain registry API, resolver previews, schema/validation state, contract-declared internal APIs | Create/update/validate/import/merge/archive canonical or scenario-local domain objects through Domain registry API; manage sharing consent and run start requirements | Override running steps, bypass evidence/permission/PBR, write projection directly, create private workflow identity, create a workflow-owned domain database |
+| Web run workbench | API/Postgres strong reads; run/step/artifact/approval detail; target context refs/snapshots/bindings | Step interventions, manual review, override, retry, cancel, suppress, approve/reject/confirm, create allowed handoffs | Become workflow builder/admin studio, bypass Command API, expose raw provider or prompt payloads, export internal API contracts to other surfaces |
 | Mobile dashboard | Display projection for cards; API/Postgres for confirmation reread | Open run, inspect safe previews, approve/reject/confirm/retry/cancel/create public-draft handoff where action availability allows | Mutate card state directly, queue offline durable actions, show L3/L4 private bodies, decide permission/PBR from projection, show direct knowledge-base indexing actions, request indexing handoff directly |
 | Forum | Public draft and forum command APIs | Publish only after public-ready draft, routing, and user confirmation | Publish workflow artifacts directly, use safe preview as public body, bypass redaction/risk review |
-| RAG/Knowledge | Knowledge/RAG API over eligible source refs | Index only artifacts marked eligible and passed through lifecycle/PBR/privacy gates; accept service-created indexing handoffs | Index raw submissions, private diagnosis, original uploads, prompt/provider payloads, or unreviewed private outputs; accept dashboard-triggered indexing commands |
-| Notification/push | Downstream notification API plus workflow handoff refs | Accept workflow notification handoff and push minimal target metadata | Put bodies, student data, object keys, approval policy, PBR details, prompts, or provider data in payloads; treat workflow as notification store |
-| Admin governance | API/Postgres strong reads and audited commands | Publish/deprecate versions, enable/disable capabilities, inspect exceptions, run dry-run rebuilds, adjust policy | Direct DB edits, edit user DAGs/prompts/toolchains, mutate projections as source of truth |
+| RAG/Knowledge | Knowledge/RAG API over eligible source refs | Index only artifacts marked eligible and passed through lifecycle/PBR/privacy gates; accept service-created indexing handoffs | Index raw submissions, private assessments, original uploads, prompt/provider payloads, or unreviewed private outputs; accept dashboard-triggered indexing commands |
+| Notification/push | Downstream notification API plus workflow handoff refs | Accept workflow notification handoff and push minimal target metadata | Put bodies, protected subject data, object keys, approval policy, PBR details, prompts, or provider data in payloads; treat workflow as notification store |
+| Admin governance | API/Postgres strong reads and evidence-backed commands | Publish/deprecate versions, enable/disable capabilities, inspect exceptions, run dry-run rebuilds, adjust policy | Direct DB edits, edit user DAGs/prompts/toolchains, mutate projections as source of truth |
 | Worker/runtime | Postgres claim/read/write plus outbox | Claim steps, write lifecycle, produce artifacts, emit events | Treat queue state as truth, carry raw private bodies in queue payloads, write downstream projections directly |
 
 ## Internal API boundary
@@ -104,16 +133,17 @@ as heavy editors, diagnostics, migration previews, import tools, and advanced
 detail panels.
 
 Rules:
-- Internal routes must be declared in the scenario manifest.
+- Internal routes must be declared in the scenario manifest or equivalent TS
+  contract.
 - Internal routes must be namespaced under the scenario.
-- Internal routes must use the same auth, audit, idempotency, expected-version,
+- Internal routes must use the same auth, evidence logging, idempotency, expected-version,
   and outbox rules as shared workflow commands.
 - Chat, mobile dashboard, forum, RAG, notification, public links, and external
   clients must not call internal routes.
 - Internal routes must not redefine run, step, approval, artifact, action, or
   handoff identity.
 - If an internal route changes workflow facts, it must write canonical state and
-  emit the same shared events a Workflow API command would emit.
+  emit the same shared events a standard workflow command would emit.
 
 ## Chat contract
 Chat interacts with workflow in three distinct modes.
@@ -126,7 +156,8 @@ user-initiated approval/confirmation actions only through a strong interaction:
 - restate visibility, destination, reversibility, and expected outputs
 - for approve/reject/confirm, restate target object, current version, impact,
   visibility, reversibility, and stale-state handling
-- call Command API with idempotency and correlation metadata
+- call the concrete workflow `ChatWorkflowAdapter` or equivalent Command API
+  with idempotency and correlation metadata
 
 Light hints such as suggestion chips may only escalate into this flow. They must
 not start workflow execution.
@@ -143,6 +174,57 @@ Chat may summarize dashboard state through safe summary DTOs:
 
 Chat dashboard summaries are not intervention reminders. They must not assign
 the user's next action, expose private bodies, or write workflow facts.
+
+### Chat conflict exposure
+Chat consumes only `ChatConflictSummary`.
+
+Allowed chat intents:
+- summarize blocked, unavailable, or review-needed workflow counts
+- block an unavailable action with a safe reason
+- link to the appropriate web/mobile target
+
+Chat must not receive or infer:
+- full `ConflictType` / `ConflictResolutionStatus`
+- domain context refs or raw domain payload
+- expected/actual version diff
+- resolver error detail
+- allowed resolution actions
+- evidence details
+
+Internal conflict statuses map to chat-safe status:
+
+| Internal status | Chat status | Chat behavior |
+|---|---|---|
+| `waiting_input` | `blocked` | Summarize and link to target. |
+| `manual_review_required` | `needs_review` | Summarize and link to web review. |
+| `action_denied` | `unavailable` | Explain unavailable state safely. |
+| `step_failed_retryable` | `unavailable` | Explain temporary unavailable state. |
+| `step_failed_final` | `blocked` | Summarize and link to target. |
+| `handoff_blocked` | `unavailable` | Explain downstream unavailable state. |
+| `continue_with_snapshot` | omitted by default | Show only if user asks for status details. |
+| `re_resolved_and_rebound` | omitted by default | Usually hidden. |
+
+## Resolution action ownership
+Resolution actions are Web/Admin operation-surface capabilities. Chat can link
+to the target surface, but it must not execute these actions.
+
+| Resolution action | Owner surface | Notes |
+|---|---|---|
+| `confirm_continue_snapshot` | Web run workbench | User confirms continued use of the existing snapshot. |
+| `reselect_context` | Web domain workbench / Web run workbench | User selects replacement context. |
+| `refresh_context` | Web run workbench | Workflow reruns resolver and binds a new snapshot. |
+| `edit_domain_object` | Web domain workbench | Must go through Domain registry API. |
+| `rerun_step` | Web run workbench / Admin | Requires expected version and evidence logging. |
+| `cancel_run` | Web run workbench / Mobile light action | Requires strong confirmation; not a conflict-resolution chat action. |
+| `suppress_artifact` | Web run workbench / Admin | High-risk action; no chat execution. |
+| `admin_repair` | Admin only | For snapshot missing, resolver drift, and policy migration. |
+
+Execution requirements:
+- every action includes target, conflict id, expected version, reason code,
+  actor/workspace ids, idempotency key, correlation id, and client surface
+- worker code cannot silently choose a resolution action
+- admin repair writes evidence separately from ordinary user actions
+- chat receives only the `target_link` in `ChatConflictSummary`
 
 ### Citation mode
 Chat may cite workflow output only after the artifact has entered an eligible
@@ -165,9 +247,9 @@ level explicitly allowed by the artifact policy and current authorization.
 | L3 `strong_read_detail` | Authorized full detail from API/Postgres | Web domain workbench, Web run workbench, Admin exception view |
 | L4 `not_previewable` | No UI body preview | All surfaces show unavailable state only |
 
-Original uploads, raw submissions, raw OCR text, private diagnosis, student-level
-feedback, prompt bodies, provider payloads, object keys, vectors, secrets, and
-tokens are never L0-L2 payloads.
+Original uploads, raw submissions, raw extracted text, private evaluation,
+protected subject feedback, prompt bodies, provider payloads, object keys,
+vectors, secrets, and tokens are never L0-L2 payloads.
 
 ## Action model
 UI surfaces display action availability, but commands own action decisions.
@@ -206,26 +288,26 @@ the shared action class where a product surface renders them.
 ## Public draft and forum boundary
 Workflow artifacts enter forum only through public-ready draft.
 
-The workflow base does not implement the public draft module. It creates a
-handoff request with canonical refs only:
+The base template does not implement the public draft module. A concrete
+workflow creates a handoff request with canonical refs only:
 - source refs such as `workflow_artifact_id`, `workflow_run_id`, and expected
   versions
 - `handoff_type=public_draft`
 - requested purpose and client surface
 - trace/correlation/idempotency ids
 
-The handoff must not send raw artifact body, private inputs, student names, raw
-answers, OCR text, feedback or diagnosis body, file URL/object key, prompt or
-provider data, routing choices, or pre-redacted public text.
+The handoff must not send raw artifact body, private inputs, protected subject
+data, raw extracted text, private evaluation body, file URL/object key, prompt
+or provider data, routing choices, or pre-redacted public text.
 
 The public draft module owns reread, PBR, redaction, privacy checks, risk
-marking, generation records, audit/outbox, user confirmation, routing, forum
+marking, generation records, evidence/outbox, user confirmation, routing, forum
 publication, and handoff receipt.
 
 ## RAG and indexing boundary
 Workflow artifacts are not retrievable by default.
 
-The workflow base creates `handoff_type=indexing` requests only from server-side
+Concrete workflows create `handoff_type=indexing` requests only from server-side
 policy, worker lifecycle, or admin/governance paths. Dashboards must not expose
 indexing as a direct knowledge-base workflow action. The indexing or knowledge
 owner decides whether to accept the request. Acceptance requires:
@@ -247,8 +329,8 @@ Products may expose a higher-level consent or setting such as
 ## Notification and projection boundary
 Workflow projection and notification surfaces are display-only.
 
-The workflow base may create notification handoff requests and bodyless events.
-It does not own push rendering, delivery retries, device token policy, or final
+Concrete workflows may create notification handoff requests and bodyless events.
+They do not own push rendering, delivery retries, device token policy, or final
 notification storage.
 
 Allowed projection fields:
@@ -262,15 +344,15 @@ Allowed projection fields:
 
 Forbidden projection and push fields:
 - raw workflow input
-- private/student/class details
-- raw answers or OCR text
+- private subject or grouping details
+- raw source or extracted text
 - original upload URLs or object keys
 - prompt bodies
 - provider request or response bodies
-- feedback or diagnosis bodies
+- private evaluation bodies
 - permission/PBR decision detail
 - approval policy internals
-- audit internals
+- evidence internals
 - private memory text
 - vectors, secrets, or tokens
 
@@ -284,14 +366,38 @@ Admin may:
 - inspect run, projection, indexing, and notification exceptions through
   allowlisted metadata
 - run dry-run-first rebuild or replay operations
-- adjust policy and eligibility gates through audited commands
+- adjust policy and eligibility gates through evidence-backed commands
 
 Admin must not:
 - edit user workflow DAGs, prompts, toolchains, or provider configuration
 - directly mutate projection, search, vector, or personalization stores as source
   of truth
 - inspect private bodies by default
-- bypass public-draft, PBR, privacy, safety, or audit gates
+- bypass public-draft, PBR, privacy, safety, or evidence gates
+
+## MVP evidence log boundary
+Evidence logging is the minimum compliance/debugging substrate for workflow
+writes. It is not a full audit product, review queue, reporting dashboard, or
+manual operating process.
+
+Write evidence only for P0/P1 actions:
+- high-risk or irreversible commands such as delete, withdraw, suppress,
+  publish, permission change, sharing-consent change, and admin repair
+- approve/reject/confirm commands that change workflow state
+- conflict resolution actions and denied resolution attempts
+- handoff request/receipt transitions
+- domain context mutation or rebinding that can affect multiple workflows
+
+Do not write evidence for ordinary reads, UI clicks, display-only projection
+refreshes, successful presenter renders, or every worker heartbeat. Evidence
+payloads contain ids, versions, reason codes, policy/resolver keys, and
+trace/correlation metadata only. They must not contain private bodies, prompt or
+provider payloads, object keys, vectors, secrets, or full before/after snapshots.
+
+Evidence log and outbox stay separate. Evidence explains authoritative actions;
+outbox reliably distributes downstream work. A command can append both in one
+Postgres transaction, but no consumer may treat one as a substitute for the
+other.
 
 ## Handoff contract
 All downstream integrations use the same handoff shape. The base guarantees
@@ -346,14 +452,14 @@ safe view.
 A new scenario may be added only after it defines these contracts:
 
 - scenario key, owner, launch phase, and allowed user classes
-- canonical `Scenario` record fields, status transitions, and manifest publish
+- canonical `Scenario` record fields, status transitions, and contract publish
   process
-- YAML manifest version and published manifest hash
-- TS handler/action/presenter/policy registry keys
+- YAML manifest or equivalent TS contract version and published hash
+- TS handler/action/adapter/presenter/policy registry keys
 - capability manifest with user-facing labels and enablement policy
 - workflow entrypoint manifest with immutable version metadata
 - input and output schemas with version numbers
-- domain facts and repository interfaces
+- domain context ref requirements and resolver bindings
 - Command API actions and expected version gates
 - worker step handlers and idempotency strategy
 - artifact types, exposure levels, and handoff eligibility
@@ -370,11 +476,18 @@ A new scenario may be added only after it defines these contracts:
 
 ## Non-negotiable rules
 - Postgres is canonical. Realtime stores are projection or transient state only.
-- Scenario is canonical state. A manifest can declare a scenario but cannot
-  activate one without a matching published `Scenario` record.
-- All durable writes go through Command API/Postgres plus outbox.
-- Permission, audit, billing, PBR, publication, and indexing decisions must read
-  Postgres canonical state.
+- Scenario is canonical state. A manifest or equivalent TS contract can declare
+  a scenario but cannot activate one without a matching published `Scenario`
+  record.
+- All durable writes go through the concrete workflow Command API/Postgres plus
+  outbox.
+- Outbox payloads are downstream signals only. They carry refs, versions,
+  purpose/reason, and trace metadata; downstream owners reread canonical state
+  before side effects.
+- Shared product consumers depend on platform events and standard `workflow.*`
+  events only; scenario internal events are not product API.
+- Permission, evidence/audit, billing, PBR, publication, and indexing decisions
+  must read Postgres canonical state.
 - Queue payloads, outbox payloads, projection rows, notification rows, and push
   payloads must not become hidden content stores.
 - Workflow output must be labeled as workflow-authored and must never

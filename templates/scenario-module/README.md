@@ -1,8 +1,12 @@
 # Scenario module template
 
-Use this template when adding a controlled scenario on top of the workflow base.
+Use this template when adding a controlled concrete workflow based on the
+workflow base contracts. The base repository is not a runtime dependency.
 
-## Required manifest fields
+## Required contract fields
+
+The default artifact is `scenario.manifest.yaml`. A concrete workflow may use an
+equivalent TypeScript contract constant if it preserves the same fields.
 
 - `manifest_version`
 - `scenario_key`
@@ -17,17 +21,32 @@ Use this template when adding a controlled scenario on top of the workflow base.
 - `handoffs`
 - `surface_mapping`
 - `internal_api`
+- `event_registry`
 - `governance`
 - `verification`
 
 ## Required checks
 
-- Domain facts have repository interfaces and Postgres-backed implementations.
+- Domain context refs declare a resolver key. Canonical domain objects are owned
+  by the host platform/domain registry, not by workflow.
 - The canonical `Scenario` record exists before activation.
-- The published manifest hash/version is stored on the `Scenario` record.
-- YAML manifest handler/action/presenter/policy keys match the TS registries.
+- The published contract hash/version is stored on the `Scenario` record.
+- YAML manifest or TS contract handler/action/adapter/presenter/policy keys
+  match the TS registries.
 - Business layers do not import Prisma directly.
-- Durable writes use Command API, Postgres transaction, and outbox.
+- Durable writes use the concrete workflow Command API, Postgres transaction,
+  and outbox.
+- High-risk writes append minimal evidence records, but the scenario does not
+  need an audit UI, review queue, or reporting workflow for MVP activation.
+- Outbox payloads are ref-only downstream signals; downstream owners reread
+  canonical state before projection, publication, indexing, notification,
+  search/vector, PPR, or replay side effects.
+- Shared product consumers depend on platform events and standard `workflow.*`
+  events only; scenario internal events are declared implementation details.
+- Standard workflow events use refs-only payloads with `signal_version=1`,
+  `body=no_body`, `pii=no_pii`, and deterministic idempotency keys.
+- Event producers and consumers are declared so shared consumers cannot depend
+  on scenario internal events.
 - Worker payloads contain ids, versions, trace/correlation metadata, and retry
   hints only.
 - Artifact exposure levels are explicitly declared.
@@ -35,8 +54,9 @@ Use this template when adding a controlled scenario on top of the workflow base.
 - Public/forum/RAG/indexing/notification/external delivery behavior is owned by
   downstream modules after handoff acceptance.
 - Mobile dashboard uses display projection plus canonical reread before writes.
-- Web workbenches use API/Postgres strong reads.
-- Internal Web/Admin APIs, if any, are manifest-declared and not consumed by
+- Web workbenches use Domain registry API, concrete Workflow API/adapter, and
+  API/Postgres strong reads through the proper owner.
+- Internal Web/Admin APIs, if any, are contract-declared and not consumed by
   chat/mobile/forum/RAG/notification.
 - Chat workflow control, dashboard summary, and citation modes are separately
   defined.
@@ -45,6 +65,68 @@ Use this template when adding a controlled scenario on top of the workflow base.
 - Admin can govern publication, policy, exceptions, and rebuilds without becoming
   a user workflow builder.
 - Deterministic tests and one end-to-end journey harness exist before activation.
+
+## Validation gates
+
+The host project should run a manifest validator in CI, module registration, or
+an admin dry-run command before enabling a scenario beyond local development.
+The validator should return rule ids, severity, manifest path, owner, and
+remediation.
+
+Minimum fatal checks:
+- `scenario_key` matches a canonical `Scenario` record.
+- Contract hash/version is stored before pilot or GA activation.
+- Step handlers, action handlers, adapters, presenters, policies, internal API
+  handlers, and tests match the manifest declarations.
+- Internal APIs are Web/Admin-only.
+- Chat does not declare or consume `step_interventions`.
+- Handoffs declare downstream owner, policy key, and receipt requirement.
+- `event_registry.producers` and `event_registry.consumers` do not route shared
+  consumers to scenario internal events.
+- Standard event payload policy is refs-only and uses deterministic idempotency.
+- P0/P1 authoritative writes have evidence record declarations.
+- Projection field changes have a projection review record.
+
+Migration bridges may warn during pilot only when they are timeboxed and not
+presented as shared product-surface contracts.
+
+## Registry loader expectations
+
+The host product owns the registry loader. The base template defines the
+expected behavior:
+- load approved modules at deploy or application boot, not from user input or
+  per-request dynamic code
+- run validation before registration and fail fast on fatal findings
+- keep YAML or TS contracts declarative; executable bindings come from
+  TypeScript registries
+- register a descriptor containing scenario identity, contract hash,
+  capabilities, handlers, actions, adapters, presenters, policies, handoffs,
+  event registry, and validation report
+- resolve worker handlers from canonical run identity plus stored contract hash
+- expose only standard adapters/presenters to shared product surfaces
+- mount internal APIs only for declared Web/Admin surfaces
+- keep disabled modules available only for replay, rollback, or controlled
+  migration
+
+## Standard API closure
+
+Each concrete scenario must fit the host product's standard workflow API or
+adapter closure:
+- discovery: scenario and capability list/detail
+- start requirements: pre-run requirement read, preview, and start run
+- run lifecycle: start, detail, and timeline
+- action command: approve, reject, retry, cancel, suppress, confirm, and create
+  declared handoff with expected versions
+- artifact preview: list and preview by exposure level
+- handoff: request and receipt ledger operations
+- dashboard: safe cards, summaries, and target links
+- chat citation: eligible citation package only
+- admin governance: validate, publish, enable/disable, rebuild, and evidence
+- worker runtime: claim, complete, and fail steps from canonical identity
+
+Scenario-specific APIs may exist only as declared Web/Admin internal APIs. They
+cannot become new chat, mobile, forum, RAG, notification, public-link, external
+client, or worker-dispatch contracts.
 
 ## Required runtime files
 
@@ -57,13 +139,20 @@ src/<scenario>/repositories.ts
 src/<scenario>/registry.ts
 src/<scenario>/handlers/*.ts
 src/<scenario>/actions/*.ts
+src/<scenario>/adapters/*.ts
 src/<scenario>/presenters.ts
 src/<scenario>/policies.ts
 src/<scenario>/tests/<scenario>.journey.test.ts
 ```
 
-The manifest declares the public contract. `module.ts` wires repositories,
-handlers, presenters, and policies into the workflow base.
+The manifest or equivalent TS constant declares the public contract. `module.ts`
+wires repositories, handlers, presenters, adapters, and policies into the
+concrete workflow implementation.
+
+Host runtime scaffolding is described in
+`docs/context/workflow/implementation-skeleton.md`. Scenario modules should not
+copy host registry loader, route, worker, outbox, or downstream owner code into
+the scenario folder.
 
 ## Minimal manifest skeleton
 
@@ -87,7 +176,7 @@ capabilities:
     entrypoints: []
 
 scenario_data:
-  domain_fact_types: []
+  context_ref_types: []
   run_start_requirements: []
   step_interventions: []
 
@@ -131,10 +220,24 @@ surface_mapping:
 internal_api:
   routes: []
 
+event_registry:
+  standard_workflow_events: []
+  scenario_internal_events: []
+  event_payload_policy:
+    signal_version: 1
+    body: no_body
+    pii: no_pii
+    status_in_payload: false
+    presenter_output_in_payload: false
+    idempotency_key: "{event_type}:{aggregate_id}:{aggregate_version}"
+  producers: {}
+  consumers: {}
+
 governance:
   admin_actions: []
   rollback:
   projection_review_required:
+  evidence_records: []
   outbox_events: []
 
 verification:
