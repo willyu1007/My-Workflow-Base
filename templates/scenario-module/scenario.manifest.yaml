@@ -1,0 +1,201 @@
+manifest_version: 1
+scenario_key: example
+scenario_record:
+  display_name: Example scenario
+  required_status: draft
+  owner_team: team-name
+  policy_version: 1
+owner: team-name
+launch_phase: dev
+allowed_user_classes:
+  - internal_admin
+  - pilot_user
+
+capabilities:
+  - capability_key: example_capability
+    label: Example capability
+    description: Replace with the user-facing capability description.
+    enablement_policy: workspace_enabled
+    entrypoints:
+      - entrypoint_key: authoring
+        label: Create example output
+        workflow_version: 1
+        input_schema_version: 1
+        output_schema_version: 1
+        allowed_step_types:
+          - domain_action
+          - llm_generate
+          - artifact_write
+          - approval_gate
+          - emit_event
+        steps:
+          - step_key: collect_context
+            step_type: domain_action
+            order: 10
+            handler_key: example.collect_context
+            retry_policy: none
+          - step_key: generate_output
+            step_type: llm_generate
+            order: 20
+            handler_key: example.generate_output
+            retry_policy: bounded_exponential
+            timeout_ms: 30000
+          - step_key: write_artifact
+            step_type: artifact_write
+            order: 30
+            handler_key: example.write_artifact
+            retry_policy: bounded_exponential
+          - step_key: request_approval
+            step_type: approval_gate
+            order: 40
+            handler_key: example.request_approval
+            retry_policy: none
+
+scenario_data:
+  domain_fact_types:
+    - object_type: example_profile
+      schema_version: 1
+      shared_across_workflows: true
+      repository_key: example.repositories.profile
+  run_start_requirements:
+    - requirement_key: example_target
+      schema_version: 1
+      entrypoints:
+        - authoring
+      surfaces:
+        - chat_workflow_control
+        - web_domain_workbench
+      required: true
+  step_interventions:
+    - intervention_type: example_manual_review
+      schema_version: 1
+      step_keys:
+        - request_approval
+      surface: web_run_workbench
+      handler_key: example.interventions.manual_review
+
+artifact_policy:
+  artifact_types:
+    - example_summary
+    - example_private_detail
+  exposure_levels:
+    L0:
+      - example_private_detail
+    L1:
+      - example_summary
+    L2:
+      - example_summary
+    L3:
+      - example_private_detail
+    L4: []
+  handoff_eligible:
+    public_draft:
+      - example_summary
+    indexing:
+      - example_summary
+    notification:
+      - example_summary
+
+action_availability:
+  shared_actions:
+    - start_run
+    - submit_start_requirements
+    - approve
+    - reject
+    - confirm
+    - retry
+    - cancel
+    - step_intervention
+    - create_handoff
+  scenario_actions: []
+  expected_version_required: true
+
+handoffs:
+  - handoff_type: public_draft
+    source_artifact_types:
+      - example_summary
+    requested_purposes:
+      - forum_publication
+    downstream_owner: public_draft
+    policy_key: example.can_create_public_draft_handoff
+    receipt_required: true
+  - handoff_type: indexing
+    source_artifact_types:
+      - example_summary
+    requested_purposes:
+      - retrieval
+    downstream_owner: knowledge_index
+    policy_key: example.can_create_indexing_handoff
+    receipt_required: true
+  - handoff_type: notification
+    source_artifact_types:
+      - example_summary
+    requested_purposes:
+      - workflow_reminder
+    downstream_owner: notification
+    policy_key: example.can_create_notification_handoff
+    receipt_required: true
+
+surface_mapping:
+  chat_workflow_control:
+    recommendation_presenter: example.chat_workflow_control
+    start_requirements_presenter: example.chat_start_requirements
+    supports_strong_confirmation: true
+  chat_dashboard_summary:
+    presenter: example.chat_dashboard_summary
+    max_exposure_level: L1
+  chat_citation:
+    presenter: example.chat_citation
+    requires_indexing_gate: true
+  web_domain_workbench:
+    presenter: example.web_domain_workbench
+    internal_api_allowed: true
+  web_run_workbench:
+    presenter: example.web_run_workbench
+    internal_api_allowed: true
+    supports_step_interventions: true
+  mobile_dashboard:
+    card_presenter: example.dashboard_card
+    max_exposure_level: L2
+  forum_publication:
+    requires_public_draft: true
+  rag_knowledge:
+    requires_indexing_gate: true
+    requires_pbr: true
+    indexing_requested_by: service_policy
+  notification_push:
+    safe_payload_only: true
+  admin_operator:
+    governance_presenter: example.admin_summary
+
+internal_api:
+  routes:
+    - method: POST
+      path: /api/internal/scenarios/example/import-preview
+      owner_surface: web_domain_workbench
+      command_class: scenario_internal
+      writes_workflow_facts: false
+      handler_key: example.internal.import_preview
+
+governance:
+  admin_actions:
+    - enable_capability
+    - disable_capability
+    - publish_version
+    - deprecate_version
+    - dry_run_rebuild
+  rollback: Disable capability and preserve canonical facts.
+  projection_review_required: true
+  outbox_events:
+    - example.example_capability.run.started
+    - example.example_capability.artifact.created
+    - example.example_capability.approval.requested
+
+verification:
+  deterministic_tests:
+    - manifest validation
+    - start run command
+    - step handler idempotency
+    - artifact exposure policy
+    - public draft handoff denial for private detail
+  journey_harness: example-authoring-happy-path
