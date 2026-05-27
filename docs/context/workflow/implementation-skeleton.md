@@ -88,6 +88,12 @@ scenarios/<scenario_key>/
 The base template may provide example files, but the host product owns concrete
 runtime code and persistence.
 
+A lightweight copyable scaffold is available under
+`templates/host-runtime/packages/`. It mirrors this layout with type-only
+contracts, validator/loader stubs, service ports, route metadata, and worker
+runtime shells. Host products should copy and rename it locally instead of
+importing this repository.
+
 ## Contract package exports
 
 The contract package should be importable by both host runtime and scenario

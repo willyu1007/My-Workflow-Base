@@ -15,6 +15,7 @@ Workflow modular base template。这个仓库不提供运行时服务；具体 w
 - [Workflow v0 readiness checklist](docs/context/workflow/v0-readiness-checklist.md)：记录语义漂移检查和 v0 contract readiness。
 - [Scenario module template](templates/scenario-module/README.md)：新增场景模块时必须填写的接入清单。
 - [Scenario manifest example](templates/scenario-module/scenario.manifest.yaml)：可复制的场景 manifest 骨架。
+- [Workflow templates](templates/README.md)：可复制的 host runtime package 脚手架与 scenario module 代码脚手架。
 
 ## 当前任务包
 
@@ -38,6 +39,12 @@ Workflow modular base template。这个仓库不提供运行时服务；具体 w
 ## 即插即用目标
 
 一个新场景接入底座时，只允许新增这些东西：
+
+- 复制 `templates/host-runtime/packages/workflow-contracts` 和
+  `templates/host-runtime/packages/workflow-runtime` 到宿主项目，并按宿主项目
+  package 命名改 import alias。
+- 复制 `templates/scenario-module` 到宿主项目的场景目录，填写 manifest 或等价
+  TS contract，并实现 handlers/actions/adapters/presenters/policies。
 
 1. 场景 manifest：声明 capability、entrypoint、artifact、action、surface mapping。
 2. TS handler registry：把 manifest 里的 handler key 绑定到受控实现。

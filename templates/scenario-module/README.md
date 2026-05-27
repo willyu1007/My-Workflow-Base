@@ -154,6 +154,11 @@ Host runtime scaffolding is described in
 copy host registry loader, route, worker, outbox, or downstream owner code into
 the scenario folder.
 
+This template now includes lightweight TypeScript stubs under `src/` and
+`tests/`. Copy them as a starting point, then rename the scenario key, package
+imports, handlers, adapters, presenters, policies, and fixtures to the concrete
+host project conventions.
+
 ## Minimal manifest skeleton
 
 ```yaml

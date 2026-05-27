@@ -1,0 +1,16 @@
+{
+  "name": "@host/workflow-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "cd ../.. && vitest run packages/workflow-runtime/src/**/*.test.ts"
+  },
+  "dependencies": {
+    "@host/workflow-contracts": "workspace:*"
+  }
+}

@@ -17,9 +17,23 @@
 - Clarified that service-owned indexing follows sharing consent/policy and must
   not be exposed as a dashboard direct knowledge-base indexing action.
 
+## 2026-05-27 Lightweight Scaffold
+- Added copyable `templates/host-runtime` scaffold with local workflow contract
+  and runtime package shapes.
+- Added scenario module TypeScript stubs for module wiring, registry, handler,
+  action registry, adapter, presenters, policies, repository port placeholder,
+  and deterministic journey test.
+- Included chat, web run workbench, mobile dashboard, admin operator, and worker
+  runtime adapter stubs so the scaffold matches the standard surface closure.
+- Added `templates/README.md` and linked scaffold usage from repository README,
+  scenario template README, and implementation skeleton docs.
+- Fixed scaffold quality findings: worker now uses claim/complete/fail through
+  `WorkflowRuntimePort`, validator computes a deterministic contract hash from
+  normalized module content, handler resolution uses full workflow identity,
+  action command types support the full standard action set, and descriptors are
+  deep-frozen.
+
 ## Open Implementation Notes
-- The next concrete review should confirm whether `architecture-matrix.md`,
-  `surface-contract.md`, `module-contract.md`, and `api-contract.md` now agree
-  closely enough to start implementation skeleton work.
-- Avoid adding runtime code until the matrix, manifest, and API contracts agree.
+- The next concrete review should confirm whether copied host projects preserve
+  the template/runtime boundary without importing this repository.
 - Keep examples scenario-neutral unless explicitly marked as examples.

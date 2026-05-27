@@ -14,7 +14,7 @@
 - 2026-05-25: `ruby -e 'require "yaml"; YAML.load_file("templates/scenario-module/scenario.manifest.yaml"); puts "yaml ok"'` passed.
 - 2026-05-25: `git diff --check` passed.
 - 2026-05-26: Stale surface-name scan passed for active workflow docs and
-  scenario templates. Removed legacy chat/web surface wording from the v0
+  scenario templates. Removed earlier chat/web surface wording from the v0
   contract path.
 - 2026-05-26: Knowledge-indexing action wording scan passed. Dashboard and chat
   docs now describe service-owned indexing instead of direct knowledge-base
@@ -83,3 +83,22 @@
   and adapter DTO/import scan passed. No temp/test artifacts from this round
   were found; `WorkflowRuntimePort` is exported from the API contract and
   imported by the module contract scaffold instead of being redefined.
+- 2026-05-27: Lightweight scaffold added under `templates/host-runtime` and
+  `templates/scenario-module/src`. Pending final fence/link/diff checks in this
+  implementation round.
+- 2026-05-27: `ruby -e` Markdown fence scan passed for README, workflow docs,
+  active task docs, and templates.
+- 2026-05-27: `ruby -e` Markdown link scan passed for README, workflow docs,
+  active task docs, and templates.
+- 2026-05-27: `git diff --check` passed after lightweight scaffold additions.
+- 2026-05-27: Scaffold adapter closure reviewed and expanded to include
+  chat, web run workbench, mobile dashboard, admin operator, and worker runtime.
+- 2026-05-27: Review-fix pass completed for lightweight scaffold. Markdown
+  fence scan, Markdown link scan, template host/path scan, and `git diff
+  --check` passed after worker lifecycle, contract hash, validator, binding
+  identity, action command, and descriptor freeze fixes were synchronized from
+  the reference host implementation.
+- 2026-05-27: Final cleanup pass removed a copied local `node_modules`
+  workspace link from the host-runtime template. The registry scaffold now
+  exposes runtime read-only map proxies, and validator checks host-supported
+  surfaces plus standard/platform event registration.
