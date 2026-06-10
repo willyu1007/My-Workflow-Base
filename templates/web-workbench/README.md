@@ -6,9 +6,9 @@ paradigms; a host scenario writes *adapters* that map its own view-models onto
 the contracts, and the components render them. No domain vocabulary lives in the
 kit ("lock the chrome, vary the content").
 
-This mirrors the host-runtime template: a host project copies/depends on this
-package, then implements its own adapters + data — same way it implements
-handlers/policies against `workflow-contracts`.
+This mirrors the host-runtime template: a host project depends on this **published**
+package (GitHub Packages — see Install below), then implements its own adapters + data —
+same way it implements handlers/policies against `workflow-contracts`.
 
 ## What's inside
 
@@ -21,15 +21,39 @@ handlers/policies against `workflow-contracts`.
 | **Insight paradigm** | `InsightCard` (narrative → breakdown → overview, one hairline + whitespace) |
 | **Styles** | `tokens.css` · `components.css` · `workbench.css` |
 
-## Consuming it
+## Install
 
-1. **Depend on it** (workspace or copy into your repo), then import styles once at the app root:
+Published to **GitHub Packages** as `@willyu1007/web-workbench`. GitHub Packages requires a
+token even for public packages, so a consumer configures two `.npmrc` entries:
 
-   ```ts
-   import "@willyu1007/web-workbench/styles";
-   ```
+- **Project `.npmrc`** (scope → registry; no secret, commit it):
 
-2. **Write an adapter** mapping your view-model → a contract, and render the component:
+  ```
+  @willyu1007:registry=https://npm.pkg.github.com
+  ```
+
+- **`~/.npmrc`** (auth token; keep out of the repo — a `read:packages` token is enough):
+
+  ```
+  //npm.pkg.github.com/:_authToken=YOUR_TOKEN
+  ```
+
+Then add the dependency and import the styles once at the app root:
+
+```bash
+pnpm add @willyu1007/web-workbench@^0.1.0
+```
+
+```ts
+import "@willyu1007/web-workbench/styles/index.css";
+```
+
+> Full publish + auth runbook: [PUBLISHING.md](./PUBLISHING.md). For token-free public
+> installs, publish to npmjs.com instead (GitHub Packages always needs a token).
+
+## Use
+
+1. **Write an adapter** mapping your view-model → a contract, and render the component:
 
    ```tsx
    import { InsightCard, type InsightModel } from "@willyu1007/web-workbench";
@@ -41,7 +65,7 @@ handlers/policies against `workflow-contracts`.
    See [`examples/education-adapters`](./examples/education-adapters) for worked adapters
    (Insight readout, table status resolution).
 
-3. **The one framework touchpoint** is [`src/components/nav.tsx`](./src/components/nav.tsx) —
+2. **The one framework touchpoint** is [`src/components/nav.tsx`](./src/components/nav.tsx) —
    it wraps `next/link` + `next/navigation`. The kit targets **Next.js (App Router) +
    React 19**. To port to another router (Vite + react-router, Remix, TanStack), reimplement
    *only* `nav.tsx`; nothing else imports a router.
