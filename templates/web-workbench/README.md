@@ -26,13 +26,13 @@ handlers/policies against `workflow-contracts`.
 1. **Depend on it** (workspace or copy into your repo), then import styles once at the app root:
 
    ```ts
-   import "@workflow/web-workbench/styles";
+   import "@willyu1007/web-workbench/styles";
    ```
 
 2. **Write an adapter** mapping your view-model → a contract, and render the component:
 
    ```tsx
-   import { InsightCard, type InsightModel } from "@workflow/web-workbench";
+   import { InsightCard, type InsightModel } from "@willyu1007/web-workbench";
 
    const model: InsightModel = insightToCard(myReport); // your adapter
    return <InsightCard model={model} />;

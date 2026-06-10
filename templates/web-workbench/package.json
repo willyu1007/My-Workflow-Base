@@ -1,20 +1,56 @@
 {
-  "name": "@workflow/web-workbench",
+  "name": "@willyu1007/web-workbench",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
+  "description": "Scenario-agnostic web workbench UI kit (Scene paradigms) — contracts + presentational React components.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/willyu1007/My-Workflow-Base.git",
+    "directory": "templates/web-workbench"
+  },
+  "sideEffects": [
+    "*.css"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./contracts": "./src/contracts/index.ts",
-    "./styles": "./src/styles/index.css",
-    "./styles/*": "./src/styles/*"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./contracts": {
+      "types": "./dist/contracts/index.d.ts",
+      "default": "./dist/contracts/index.js"
+    },
+    "./styles": "./dist/styles/index.css",
+    "./styles/*": "./dist/styles/*"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && pnpm run build:css",
+    "build:css": "mkdir -p dist/styles && cp src/styles/*.css dist/styles/",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
     "next": ">=15",
     "react": ">=19",
     "react-dom": ">=19"
   },
-  "scripts": {
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "next": "^16",
+    "react": "^19",
+    "react-dom": "^19",
+    "typescript": "^5.4.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   }
 }

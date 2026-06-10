@@ -6,7 +6,7 @@
  * from its status vocabulary → tone + label, and resolves it in the adapter.
  * That map is the one place status meaning lives, so the kit carries none.
  */
-import type { CardTone } from "@workflow/web-workbench";
+import type { CardTone } from "@willyu1007/web-workbench";
 
 /** The host's status vocabulary → tone + label (single source of truth). */
 const STUDENT_STATUS: Record<string, { tone: CardTone; label: string }> = {
@@ -20,5 +20,5 @@ export function studentStatus(status: string): { tone: CardTone; label: string }
 }
 
 // Usage in a table column:
-//   import { CellStatus } from "@workflow/web-workbench";
+//   import { CellStatus } from "@willyu1007/web-workbench";
 //   render: (s) => <CellStatus {...studentStatus(s.status)} />

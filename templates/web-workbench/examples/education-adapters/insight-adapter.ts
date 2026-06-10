@@ -6,7 +6,7 @@
  * own. Note the governance in action: the adapter applies the scenario's tone
  * policy (color only "needs attention") so the component stays domain-free.
  */
-import type { InsightModel } from "@workflow/web-workbench";
+import type { InsightModel } from "@willyu1007/web-workbench";
 
 /** A host view-model (example). */
 interface ReportVM {

@@ -1,12 +1,12 @@
 /**
- * @workflow/web-workbench — scenario-agnostic web workbench UI kit.
+ * @willyu1007/web-workbench — scenario-agnostic web workbench UI kit.
  *
  * Contracts (types) + presentational components for the Scene paradigms
  * (Hub / List / Queue / Record / Insight / Form). A host scenario writes
  * adapters that map its own view-models → these contracts; the components
  * render them and carry no domain vocabulary.
  *
- * Import styles once at the app root:  import "@workflow/web-workbench/styles";
+ * Import styles once at the app root:  import "@willyu1007/web-workbench/styles";
  */
 
 // ---- Contracts ----
