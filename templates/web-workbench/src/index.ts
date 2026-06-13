@@ -37,3 +37,13 @@ export * from "./components/list-view";
 
 // ---- Insight paradigm ----
 export * from "./components/insight-card";
+
+// ---- Queue paradigm (rows + action button + Drawer; structure component-locked) ----
+export * from "./components/overlay";
+export * from "./components/queue";
+
+// ---- Record paradigm (intro + tabs + top-right action + drawer; locked) ----
+export * from "./components/record";
+
+// ---- Hub paradigm (aggregation台 renderer; structure is component-locked) ----
+export * from "./components/hub";

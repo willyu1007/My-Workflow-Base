@@ -10,6 +10,11 @@ This mirrors the host-runtime template: a host project depends on this **publish
 package (GitHub Packages — see Install below), then implements its own adapters + data —
 same way it implements handlers/policies against `workflow-contracts`.
 
+> **Read [PARADIGMS.md](./PARADIGMS.md) first.** It is the spec behind the components:
+> the 6 Scene paradigms, which component renders each, and the 6 iron rules (e.g.
+> *a dashboard's to-dos are rows, never cards* — use `<Hub>` and the wrong thing is
+> unreachable). The components ship the rules; this is why.
+
 ## What's inside
 
 | Layer | Files |
@@ -17,6 +22,7 @@ same way it implements handlers/policies against `workflow-contracts`.
 | **Contracts** (`src/contracts`) | `CardModel` · `RowModel` · `TableModel` · `InsightModel` · `WorkflowModule`/`AttentionItem` (Hub) |
 | **Scene shell** | `Scene` + `SceneNav` |
 | **Primitives** | `StatStrip`/`Stat` · `Section` · `EmptyState` · `Meter` · `icons` · `tabs` · `StatusBadge` |
+| **Hub paradigm** | `<Hub modules={…}/>` — aggregation台 renderer; structure is component-locked (to-dos = rows, per-workflow stats, topbar filter) |
 | **List paradigm** | `EntityCard` · `EntityRow` · `EntityTable` + cell kit (`CellIdentity`/`CellMetric`/`CellProgress`/`CellStatus`) · `ListView` (shared container: topbar filter + stats + empty + load-more) |
 | **Insight paradigm** | `InsightCard` (narrative → breakdown → overview, one hairline + whitespace) |
 | **Styles** | `tokens.css` · `components.css` · `workbench.css` |
@@ -79,9 +85,8 @@ import "@willyu1007/web-workbench/styles/index.css";
 - **Controlled variants only**: scenarios tune via enumerated knobs (`emphasis`, `primary`
   kind, column defs) drawn from the token palette — never custom colors or layout.
 
-## Not in v1 (extract next if needed)
+## Not yet in the kit (extract next if needed)
 
-- **Hub renderer** (`dashboard-client`) — the `WorkflowModule` *contract* is here; the
-  aggregating page component stays host-side for now.
-- **App shell** (sidebar / topbar / breadcrumb / account menu) — host chrome.
+- **App shell** (sidebar / topbar / breadcrumb / account menu) — host chrome. The nav
+  rhythm tokens (`--nav-gap-*`) and `wb-nav` styles are here; the shell component is not.
 - **`format` util** — date/relative helpers are adapter-side (and need a host "today").

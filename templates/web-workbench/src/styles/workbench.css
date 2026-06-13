@@ -136,13 +136,25 @@
   font-weight: 500;
 }
 
-.wb-nav { display: flex; flex-direction: column; gap: 1px; flex: 1; }
+/* Nav rhythm is fixed by three tokens (scoped to the nav so a host can override):
+   --nav-gap-item  : between items in a group   (default 0 — backgrounds adjacent)
+   --nav-gap-group : between groups (top → workflow → resources)
+   --nav-gap-label : group label → its first item
+   Adding items/groups preserves the rhythm automatically (flex gap, no per-item margin). */
+.wb-nav {
+  --nav-gap-item: 0px;
+  --nav-gap-group: 11px;
+  --nav-gap-label: 3px;
+  display: flex; flex-direction: column;
+  gap: var(--nav-gap-group);
+  flex: 1;
+}
 .wb-nav__sep { height: 6px; }
-.wb-nav__group { margin-bottom: 10px; }
+.wb-nav__group { display: flex; flex-direction: column; gap: var(--nav-gap-item); }
 .wb-nav__group-label {
   font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--fg-3);
-  margin: 0 0 3px; padding: 0 10px;
+  margin: 0 0 var(--nav-gap-label, 3px); padding: 0 10px;
 }
 .wb-nav__item {
   display: flex; align-items: center; gap: 10px;
