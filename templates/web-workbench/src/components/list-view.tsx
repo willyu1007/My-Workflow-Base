@@ -1,10 +1,11 @@
 /**
  * ListView — the List paradigm's shared container. It owns the cross-cutting
  * concerns every list needs regardless of presentation: scene chrome (nav /
- * actions / stats), status filtering (a topbar dropdown, same control the Hub
- * uses), optional load-more, and the empty state. The per-item presentation
- * (card grid, table, row list) is supplied via `present`, so any List gets a
- * consistent filter / empty / load-more no matter how its items are drawn.
+ * filters / actions / stats), status filtering (a scene-toolbar dropdown, same
+ * control the Hub uses), optional load-more, and the empty state. The per-item
+ * presentation (card grid, table, row list) is supplied via `present`, so any
+ * List gets a consistent filter / empty / load-more no matter how its items are
+ * drawn.
  */
 "use client";
 
@@ -13,7 +14,6 @@ import { IconCheck, IconChevronDown } from "./icons";
 import { Menu } from "./menu";
 import { EmptyState } from "./primitives";
 import { Scene } from "./scene";
-import { TopbarPortal } from "./topbar-slot";
 
 export interface ListFilter<T> {
   readonly key: string;
@@ -36,7 +36,7 @@ export function ListView<T>({
 }: {
   /** Items in their final display order (caller sorts before passing). */
   readonly items: readonly T[];
-  /** Status/segment filters → chips in the scene bar. Optional. */
+  /** Status/segment filters → a dropdown in the scene toolbar. Optional. */
   readonly filters?: readonly ListFilter<T>[];
   /** Enable load-more: show this many, then reveal another page. Omit to show all. */
   readonly pageSize?: number;
@@ -63,52 +63,47 @@ export function ListView<T>({
   const countOf = (f: ListFilter<T>): number =>
     f.predicate ? items.filter(f.predicate).length : items.length;
 
+  // The filter lives in the scene toolbar (left, with the nav) — never the topbar.
   const filterMenu =
     filters && filters.length > 0 ? (
-      <TopbarPortal>
-        <div className="wb-topbar__tools">
-          <Menu
-            label="筛选"
-            align="start"
-            trigger={
-              <>
-                {active?.label ?? filters[0]?.label}
-                {active && (
-                  <span className="wb-mono" style={{ fontSize: 11, color: "var(--fg-3)", marginLeft: 4 }}>
-                    {countOf(active)}
-                  </span>
-                )}
-                <IconChevronDown size={14} style={{ color: "var(--mt-stone)", marginLeft: 2 }} />
-              </>
-            }
+      <Menu
+        label="筛选"
+        align="start"
+        trigger={
+          <>
+            {active?.label ?? filters[0]?.label}
+            {active && (
+              <span className="wb-mono" style={{ fontSize: 11, color: "var(--fg-3)", marginLeft: 4 }}>
+                {countOf(active)}
+              </span>
+            )}
+            <IconChevronDown size={14} style={{ color: "var(--mt-stone)", marginLeft: 2 }} />
+          </>
+        }
+      >
+        {filters.map((f) => (
+          <button
+            key={f.key}
+            type="button"
+            className="mt-menu-item"
+            role="menuitem"
+            aria-current={activeKey === f.key ? "true" : undefined}
+            onClick={() => setActiveKey(f.key)}
           >
-            {filters.map((f) => (
-              <button
-                key={f.key}
-                type="button"
-                className="mt-menu-item"
-                role="menuitem"
-                aria-current={activeKey === f.key ? "true" : undefined}
-                onClick={() => setActiveKey(f.key)}
-              >
-                <span className="wb-spacer">{f.label}</span>
-                <span className="wb-mono" style={{ fontSize: 11, color: "var(--fg-3)" }}>
-                  {countOf(f)}
-                </span>
-                {activeKey === f.key && (
-                  <IconCheck size={14} style={{ color: "var(--mt-orange-700)", marginLeft: 6 }} />
-                )}
-              </button>
-            ))}
-          </Menu>
-        </div>
-      </TopbarPortal>
+            <span className="wb-spacer">{f.label}</span>
+            <span className="wb-mono" style={{ fontSize: 11, color: "var(--fg-3)" }}>
+              {countOf(f)}
+            </span>
+            {activeKey === f.key && (
+              <IconCheck size={14} style={{ color: "var(--mt-orange-700)", marginLeft: 6 }} />
+            )}
+          </button>
+        ))}
+      </Menu>
     ) : null;
 
   return (
-    <>
-      {filterMenu}
-      <Scene nav={nav} actions={actions} stats={stats} intro={intro}>
+    <Scene nav={nav} filters={filterMenu} actions={actions} stats={stats} intro={intro}>
       {filtered.length === 0 ? (
         <EmptyState title={empty.title} {...(empty.desc !== undefined ? { desc: empty.desc } : {})} />
       ) : (
@@ -125,7 +120,6 @@ export function ListView<T>({
           )}
         </>
       )}
-      </Scene>
-    </>
+    </Scene>
   );
 }

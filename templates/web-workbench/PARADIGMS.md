@@ -26,8 +26,8 @@ it does not invent layouts. The components are built so the right structure is t
 
 ## 6 iron rules (hold in every paradigm)
 
-1. **Primary action is always top-right of the scene bar** (the one orange button).
-2. **Segmented = workflow-step nav (in the scene bar); filter = topbar dropdown.** Never mix.
+1. **Primary action is the one navy pill, right-aligned in the scene toolbar** (`<ActionButton kind="primary">`) — never the global topbar (identity only: scenario switcher + breadcrumb). Up to ~3 slots: 1 primary + ghost secondaries (`<ActionButton>`). Quick global create lives in the sidebar 「新增」. (The bold current breadcrumb IS the page title — never repeat it as a content heading.)
+2. **Segmented = workflow-step nav; filter = a dropdown — both live in the scene toolbar (left), never the global topbar.** Never mix the two.
 3. **Status always uses one semantic-tone source** — same color, same meaning, every screen.
 4. **Affordance:** trailing `chevron` = 去看 (navigate); inline button = 去做 (act).
    A **card means "click to view detail"** — so an actionable to-do is a **row with a `cta`**, not a card.

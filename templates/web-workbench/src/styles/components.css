@@ -51,6 +51,31 @@
   opacity: 0.5; cursor: not-allowed; pointer-events: none;
 }
 
+/* ---------- Action pill ----------
+   The quiet toolbar / row action. One `--primary` (solid navy) per scene; the
+   rest ghost. Lighter than .mt-btn (smaller, pill, muted) so the content stays
+   the visual focus. */
+.wb-action {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-sans);
+  font-size: 12.5px; font-weight: 500;
+  padding: 5px 12px;
+  border-radius: var(--r-pill);
+  border: 0.5px solid var(--border-1);
+  background: transparent; color: var(--fg-3);
+  cursor: pointer; white-space: nowrap;
+  transition: background var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+}
+.wb-action:hover { background: var(--mt-sand); color: var(--fg-2); }
+.wb-action:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.wb-action--primary {
+  background: var(--mt-navy); border-color: transparent; color: #fff;
+  font-weight: 600; padding: 6px 14px;
+}
+.wb-action--primary:hover { background: var(--mt-navy-700); }
+.wb-action__icon { display: inline-flex; }
+.wb-action[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
 /* ---------- Inputs ---------- */
 .mt-field {
   display: flex; flex-direction: column; gap: 6px;

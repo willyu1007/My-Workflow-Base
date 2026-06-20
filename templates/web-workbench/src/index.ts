@@ -15,6 +15,7 @@ export * from "./contracts/row-model";
 export * from "./contracts/table-model";
 export * from "./contracts/insight-model";
 export * from "./contracts/dashboard";
+export * from "./contracts/shell-nav";
 
 // ---- Framework adapter (the one Next.js touchpoint) ----
 export * from "./components/nav";
@@ -23,10 +24,18 @@ export * from "./components/nav";
 export * from "./components/icons";
 export * from "./components/primitives";
 export * from "./components/scene";
+export * from "./components/action-button";
 export * from "./components/menu";
-export * from "./components/topbar-slot";
 export * from "./components/tabs";
 export * from "./components/badge";
+
+// ---- App shell (Batch 2) — one ShellNav drives sidebar + topbar breadcrumb ----
+export * from "./components/scenario-switcher";
+export * from "./components/breadcrumb";
+export * from "./components/account-menu";
+export * from "./components/sidebar-create";
+export * from "./components/sidebar";
+export * from "./components/app-shell";
 
 // ---- List paradigm presentations ----
 export * from "./components/entity-card";

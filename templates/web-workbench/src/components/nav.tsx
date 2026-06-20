@@ -25,3 +25,6 @@ export function useNavigate(): (href: string) => void {
   const router = useRouter();
   return (href) => router.push(href);
 }
+
+/** Raw current pathname — for shell active-route / breadcrumb derivation. */
+export { usePathname };
