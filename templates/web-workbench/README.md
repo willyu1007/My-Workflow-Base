@@ -85,6 +85,27 @@ import "@willyu1007/web-workbench/styles/index.css";
 - **Controlled variants only**: scenarios tune via enumerated knobs (`emphasis`, `primary`
   kind, column defs) drawn from the token palette — never custom colors or layout.
 
+## Typography contract (enforced)
+
+All type comes from **one scale** (`tokens.css`) — never hardcode `font-size` /
+`font-weight` / `font-family`. App-authored text uses a semantic class
+(`.mt-h1`…`.mt-caption`, `.mt-body`, `.mt-small`, `.mt-code`) or a scale token; everything
+structured uses the kit's components (which carry their own tuned type). This keeps every
+project on the kit visually identical. Wire the shipped lint presets into CI:
+
+```jsonc
+// .stylelintrc.json — bans literal font-size/weight/family in CSS
+{ "extends": ["@willyu1007/web-workbench/stylelint"] }
+```
+
+```js
+// eslint.config.js — bans inline fontSize/fontWeight/fontFamily in JSX
+import workbenchType from "@willyu1007/web-workbench/eslint";
+export default [ ...workbenchType, /* …your config */ ];
+```
+
+Full rationale, the scale table, and a migration cheatsheet: [TYPOGRAPHY.md](./TYPOGRAPHY.md).
+
 ## Not yet in the kit (extract next if needed)
 
 - **App shell** (sidebar / topbar / breadcrumb / account menu) — host chrome. The nav

@@ -1,6 +1,6 @@
 {
   "name": "@willyu1007/web-workbench",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "Scenario-agnostic web workbench UI kit (Scene paradigms) — contracts + presentational React components.",
   "license": "MIT",
@@ -25,14 +25,17 @@
       "default": "./dist/contracts/index.js"
     },
     "./styles": "./dist/styles/index.css",
-    "./styles/*": "./dist/styles/*"
+    "./styles/*": "./dist/styles/*",
+    "./stylelint": "./dist/lint/stylelint.cjs",
+    "./eslint": "./dist/lint/eslint.js"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && pnpm run build:css",
+    "build": "tsc -p tsconfig.build.json && pnpm run build:css && pnpm run build:lint",
     "build:css": "mkdir -p dist/styles && cp src/styles/*.css dist/styles/",
+    "build:lint": "mkdir -p dist/lint && cp lint/stylelint.cjs lint/eslint.js dist/lint/",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "prepublishOnly": "pnpm run build"
   },
