@@ -99,7 +99,8 @@ project on the kit visually identical. Wire the shipped lint presets into CI:
 ```
 
 ```js
-// eslint.config.js — bans inline fontSize/fontWeight/fontFamily in JSX
+// eslint.config.js — bans LITERAL inline fontSize/fontWeight/fontFamily in JSX
+//                     (var(--…) tokens + dynamic expressions are allowed)
 import workbenchType from "@willyu1007/web-workbench/eslint";
 export default [ ...workbenchType, /* …your config */ ];
 ```

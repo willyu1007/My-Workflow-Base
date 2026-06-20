@@ -15,7 +15,7 @@
  * merge the two selectors below into your own entry instead of spreading this preset.
  */
 const MESSAGE =
-  "No inline font-size/weight/family. Use a kit typography class (.mt-h1…mt-caption / .mt-body / .mt-small) or a scale token var(--…).";
+  "No LITERAL inline font-size/weight/family. Use a scale token (var(--small-size) …) or a kit typography class (.mt-h1…mt-caption / .mt-body / .mt-small). var(--…) and dynamic expressions are allowed.";
 const KEYS = "/^(fontSize|fontWeight|fontFamily)$/";
 
 export default [
@@ -24,11 +24,11 @@ export default [
       "no-restricted-syntax": [
         "error",
         {
-          selector: `JSXAttribute[name.name='style'] Property[key.name=${KEYS}]`,
-          message: MESSAGE,
-        },
-        {
-          selector: `JSXAttribute[name.name='style'] Property[key.value=${KEYS}]`,
+          // Ban LITERAL inline font values (e.g. `fontSize: 14` / `"14px"`); ALLOW
+          // `var(--…)` tokens and dynamic expressions (ConditionalExpression etc.),
+          // matching the stylelint preset's allow-list. Consistency without forcing
+          // a className when font sits next to dynamic/layout inline props.
+          selector: `JSXAttribute[name.name='style'] Property[key.name=${KEYS}] > Literal:not([value=/^var\\(/])`,
           message: MESSAGE,
         },
       ],

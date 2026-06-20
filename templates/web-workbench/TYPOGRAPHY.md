@@ -51,7 +51,7 @@ Wire both presets into CI. They target **consumer-authored** code, not the kit.
 { "extends": ["@willyu1007/web-workbench/stylelint"] }
 ```
 
-**ESLint** (flat config) — bans inline `style={{ fontSize / fontWeight / fontFamily }}`:
+**ESLint** (flat config) — bans **literal** inline `style={{ fontSize / fontWeight / fontFamily }}` (allows `var(--…)` tokens + dynamic expressions, matching stylelint):
 
 ```js
 // eslint.config.js
