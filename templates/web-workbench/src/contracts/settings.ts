@@ -76,6 +76,9 @@ export interface SettingsGroupBlock {
 /**
  * A bespoke panel the host renders itself (resolved by `key` from the frame's
  * `slots` prop). It self-manages persistence — NOT part of the unified save bar.
+ * NB: a slot is UNMOUNTED while its section is inactive, so keep any state that
+ * must survive section switches ABOVE <SettingsFrame> (in the host or a store),
+ * not in local component state inside the panel.
  */
 export interface SettingsSlotBlock {
   readonly kind: "slot";
