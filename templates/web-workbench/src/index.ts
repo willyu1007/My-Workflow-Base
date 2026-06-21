@@ -37,6 +37,9 @@ export * from "./components/sidebar-create";
 export * from "./components/sidebar";
 export * from "./components/app-shell";
 
+// ---- Toast (Batch 3) — host notification chrome (ToastProvider + useToast) ----
+export * from "./components/toast";
+
 // ---- List paradigm presentations ----
 export * from "./components/entity-card";
 export * from "./components/entity-row";
