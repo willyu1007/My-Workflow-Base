@@ -40,6 +40,10 @@ export * from "./components/app-shell";
 // ---- Toast (Batch 3) — host notification chrome (ToastProvider + useToast) ----
 export * from "./components/toast";
 
+// ---- Settings / Form paradigm (Batch 4) — locked SettingsFrame + field schema ----
+export * from "./contracts/settings";
+export * from "./components/settings";
+
 // ---- List paradigm presentations ----
 export * from "./components/entity-card";
 export * from "./components/entity-row";

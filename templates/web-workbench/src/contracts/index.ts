@@ -4,3 +4,4 @@ export * from "./table-model";
 export * from "./insight-model";
 export * from "./dashboard";
 export * from "./shell-nav";
+export * from "./settings";

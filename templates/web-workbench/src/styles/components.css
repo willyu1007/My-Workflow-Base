@@ -348,3 +348,108 @@
     border-radius: var(--r-md);
   }
 }
+
+/* ---------- Settings frame (Form paradigm) ----------
+   Locked chrome: left section nav + right field rows + sticky save bar. The
+   breadcrumb is the page identity, so the frame carries NO big title — the
+   active nav entry names the section. Field controls reuse the mt-* atoms. */
+.wb-settings {
+  display: flex; flex-direction: column;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.wb-settings__body { display: flex; align-items: stretch; }
+.wb-settings__nav {
+  width: 188px; flex-shrink: 0;
+  padding: 14px 10px;
+  border-right: 1px solid var(--border-1);
+  background: var(--bg-canvas);
+}
+.wb-settings__navhead {
+  font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em;
+  color: var(--fg-3); padding: 0 10px 8px;
+}
+.wb-settings__navitem {
+  display: block; width: 100%; text-align: left;
+  font-family: var(--font-sans); font-size: 14px; color: var(--fg-2);
+  padding: 8px 10px; border: 0; background: transparent;
+  border-radius: var(--r-sm); cursor: pointer; position: relative;
+  transition: background var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+}
+.wb-settings__navitem:hover { background: var(--bg-tint); color: var(--fg-1); }
+.wb-settings__navitem--active { color: var(--mt-navy); font-weight: 600; }
+.wb-settings__navitem--active::before {
+  content: ""; position: absolute; left: 0; top: 6px; bottom: 6px;
+  width: 3px; border-radius: 0 3px 3px 0; background: var(--mt-navy);
+}
+.wb-settings__content {
+  flex: 1; min-width: 0;
+  padding: 18px 24px;
+  background: var(--bg-float);
+}
+.wb-settings__group + .wb-settings__group,
+.wb-settings__group + .wb-settings__slotgroup,
+.wb-settings__slotgroup + .wb-settings__group { margin-top: 6px; }
+.wb-settings__grouplabel {
+  font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em;
+  color: var(--fg-3); padding-bottom: 2px;
+}
+.wb-settings__slotgroup .wb-settings__grouplabel { padding: 18px 0 8px; }
+.wb-settings__grouphint { font-weight: 400; letter-spacing: 0; color: var(--fg-3); }
+.wb-settings__row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; padding: 13px 0;
+  border-bottom: 1px solid var(--border-1);
+}
+.wb-settings__group .wb-settings__row:last-child { border-bottom: 0; }
+.wb-settings__row--stack { flex-direction: column; align-items: stretch; gap: 8px; }
+.wb-settings__rowhead { min-width: 0; }
+.wb-settings__label { font-size: 15px; font-weight: 500; color: var(--fg-1); }
+.wb-settings__desc { font-size: 13px; color: var(--fg-3); margin-top: 2px; }
+.wb-settings__control { flex-shrink: 0; }
+.wb-settings__row--stack .wb-settings__control { width: 100%; }
+.wb-settings__input { width: 220px; }
+.wb-settings__select { width: auto; min-width: 132px; max-width: 240px; }
+.wb-settings__row .mt-input,
+.wb-settings__row .mt-select { padding: 7px 11px; }
+.wb-settings__row--stack .mt-textarea { width: 100%; }
+
+/* Toggle switch — the only new control atom (others reuse mt-*) */
+.wb-toggle {
+  flex-shrink: 0; width: 38px; height: 21px; padding: 0;
+  border: 0; border-radius: var(--r-pill); background: var(--border-3);
+  position: relative; cursor: pointer;
+  transition: background var(--t-fast) var(--ease-out);
+}
+.wb-toggle--on { background: var(--mt-navy); }
+.wb-toggle:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.wb-toggle__knob {
+  position: absolute; top: 2px; left: 2px;
+  width: 17px; height: 17px; border-radius: 50%; background: #fff;
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.18);
+  transition: transform var(--t-fast) var(--ease-out);
+}
+.wb-toggle--on .wb-toggle__knob { transform: translateX(17px); }
+
+/* Render-slot — kit frames it; the host-rendered panel fills + self-manages it */
+.wb-settings__slot {
+  border: 1px solid var(--border-2); border-radius: var(--r-md);
+  background: var(--bg-surface); overflow: hidden;
+}
+.wb-settings__slotmissing { padding: 14px; font-size: 13px; color: var(--fg-3); }
+
+/* Save bar — only declared fields; reuses ActionButton (already light) */
+.wb-settings__savebar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 20px;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-1);
+}
+.wb-settings__dirty {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 12px; color: var(--fg-3);
+}
+.wb-settings__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mt-navy); }
+.wb-settings__saveactions { display: inline-flex; gap: 8px; }

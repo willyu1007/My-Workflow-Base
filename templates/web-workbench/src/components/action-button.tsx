@@ -16,6 +16,7 @@ export function ActionButton({
   onClick,
   icon,
   ariaLabel,
+  disabled,
 }: {
   readonly children: ReactNode;
   readonly kind?: "primary" | "ghost";
@@ -23,6 +24,7 @@ export function ActionButton({
   readonly onClick?: () => void;
   readonly icon?: ReactNode;
   readonly ariaLabel?: string;
+  readonly disabled?: boolean;
 }): React.ReactElement {
   const className = `wb-action${kind === "primary" ? " wb-action--primary" : ""}`;
   const body = (
@@ -31,7 +33,7 @@ export function ActionButton({
       {children}
     </>
   );
-  if (href) {
+  if (href && !disabled) {
     return (
       <Link href={href} className={className} aria-label={ariaLabel} {...(onClick ? { onClick } : {})}>
         {body}
@@ -39,7 +41,13 @@ export function ActionButton({
     );
   }
   return (
-    <button type="button" className={className} onClick={onClick} aria-label={ariaLabel}>
+    <button
+      type="button"
+      className={className}
+      onClick={onClick}
+      aria-label={ariaLabel}
+      disabled={disabled}
+    >
       {body}
     </button>
   );
