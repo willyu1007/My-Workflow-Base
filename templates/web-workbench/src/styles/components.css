@@ -416,6 +416,15 @@
 .wb-settings__row .mt-select { padding: 7px 11px; }
 .wb-settings__row--stack .mt-textarea { width: 100%; }
 
+/* Filter-context fields read quieter than data-entry forms: a warm off-white
+   fill (vs the white of a form field) so a filter toolbar recedes on the
+   canvas. Auto-applies to inputs/selects in the scene bar's filter slot and the
+   scene toolbar row — no consumer class needed. */
+.wb-scene__lead .mt-input,
+.wb-scene__lead .mt-select,
+.wb-scene__toolbar .mt-input,
+.wb-scene__toolbar .mt-select { background: var(--bg-field-quiet); }
+
 /* Toggle switch — the only new control atom (others reuse mt-*) */
 .wb-toggle {
   flex-shrink: 0; width: 38px; height: 21px; padding: 0;

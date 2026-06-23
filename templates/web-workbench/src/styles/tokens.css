@@ -64,6 +64,7 @@
   --bg-hover:   var(--mt-sand-2);
   --bg-tint:    color-mix(in oklab, var(--mt-navy) 3%, transparent); /* subtle navy row hover */
   --bg-float:   color-mix(in oklab, var(--mt-paper) 40%, var(--mt-cream)); /* floating panel — warm off-white, not stark white */
+  --bg-field-quiet: color-mix(in oklab, var(--bg-surface) 50%, var(--bg-canvas)); /* quiet filter-toolbar field — softer than a white data-entry field */
   --scrim:      rgba(20, 25, 35, 0.36);   /* overlay / drawer backdrop */
 
   --border-1:  rgba(40, 62, 104, 0.10);   /* hairline on warm bg */
