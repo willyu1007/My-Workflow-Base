@@ -47,8 +47,6 @@ export interface NavItemDef {
   readonly match?: readonly string[];
   /** Key into the badges map for a count pill. */
   readonly badgeKey?: string;
-  /** Collapse this low-frequency item under the group's 「更多」overflow. */
-  readonly overflow?: boolean;
   /** Optional workflow status — a small locked-size dot in the lead slot (hover
       shows `label`). `busy` renders the "agent 处理中" animated ellipsis. Omit for none. */
   readonly status?: { readonly tone: CardTone; readonly label: string; readonly busy?: boolean };

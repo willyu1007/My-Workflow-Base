@@ -7,10 +7,31 @@
  */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { NavItemDef, ShellNav } from "../contracts/shell-nav";
 import { AccountMenu, type AccountMenuItem } from "./account-menu";
-import { IconHome, IconMore, IconPlus, IconSearch, IconSidebar } from "./icons";
+import { IconChevronDown, IconHome, IconPlus, IconSearch, IconSidebar } from "./icons";
+
+const COLLAPSE_KEY = "wb-nav-collapsed";
+
+function loadCollapsedGroups(): ReadonlySet<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = window.localStorage.getItem(COLLAPSE_KEY);
+    return new Set(raw ? (JSON.parse(raw) as string[]) : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveCollapsedGroups(keys: ReadonlySet<string>): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(COLLAPSE_KEY, JSON.stringify([...keys]));
+  } catch {
+    /* storage unavailable — collapse state is best-effort */
+  }
+}
 import { Link, usePathname } from "./nav";
 import { SidebarCreate } from "./sidebar-create";
 
@@ -41,7 +62,23 @@ export function Sidebar({
   readonly onSearch?: () => void;
 }): React.ReactElement {
   const pathname = usePathname();
-  const [openOverflow, setOpenOverflow] = useState<string | null>(null);
+  // Collapse state is loaded post-mount (SSR renders all expanded) to avoid a
+  // hydration mismatch; persisted per user in localStorage.
+  const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set());
+  useEffect(() => {
+    const stored = loadCollapsedGroups();
+    if (stored.size > 0) setCollapsed(stored);
+  }, []);
+
+  function toggleGroup(key: string): void {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      saveCollapsedGroups(next);
+      return next;
+    });
+  }
 
   /** The fixed 18px lead slot: workflow status (dot / 处理中 ellipsis) takes
       precedence; else an icon only for icon groups; else an empty (aligned) slot. */
@@ -152,17 +189,31 @@ export function Sidebar({
             const groupKey = group.label ?? `group-${gi}`;
             const add = group.add;
             const showIcons = group.showIcons ?? false;
-            const mainItems = group.items.filter((it) => !it.overflow);
-            const overflowItems = group.items.filter((it) => it.overflow);
-            const overflowActive = overflowItems.some(
-              (it) => !it.soon && (it.match ?? [it.href]).some((p) => matchPrefix(pathname, p)),
-            );
-            const expanded = openOverflow === groupKey;
+            // Labeled groups collapse/expand from their header; the persisted
+            // set tracks which are collapsed.
+            const collapsible = Boolean(group.label);
+            const isCollapsed = collapsible && collapsed.has(groupKey);
             return (
-              <div key={groupKey} className="wb-nav__group">
+              <div
+                key={groupKey}
+                className={`wb-nav__group${isCollapsed ? " wb-nav__group--collapsed" : ""}`}
+              >
                 {(group.label || add) && (
                   <div className="wb-nav__grouphead">
-                    {group.label && <p className="wb-nav__group-label">{group.label}</p>}
+                    {group.label &&
+                      (collapsible ? (
+                        <button
+                          type="button"
+                          className="wb-nav__group-label wb-nav__group-toggle"
+                          aria-expanded={!isCollapsed}
+                          onClick={() => toggleGroup(groupKey)}
+                        >
+                          <IconChevronDown size={12} className="wb-nav__group-caret" />
+                          {group.label}
+                        </button>
+                      ) : (
+                        <p className="wb-nav__group-label">{group.label}</p>
+                      ))}
                     {add &&
                       (add.href ? (
                         <Link
@@ -187,23 +238,7 @@ export function Sidebar({
                       ))}
                   </div>
                 )}
-                {mainItems.map((item) => renderItem(item, showIcons))}
-                {overflowItems.length > 0 && (
-                  <>
-                    <button
-                      type="button"
-                      className={`wb-nav__item wb-nav__item--more${expanded ? " wb-nav__item--more-open" : ""}${overflowActive ? " wb-nav__item--more-active" : ""}`}
-                      aria-expanded={expanded}
-                      onClick={() => setOpenOverflow(expanded ? null : groupKey)}
-                    >
-                      <span className="wb-nav__icon" />
-                      <span className="wb-nav__label" aria-label="更多">
-                        <IconMore size={18} />
-                      </span>
-                    </button>
-                    {expanded && overflowItems.map((item) => renderItem(item, false))}
-                  </>
-                )}
+                {!isCollapsed && group.items.map((item) => renderItem(item, showIcons))}
               </div>
             );
           })}

@@ -148,6 +148,9 @@
   display: flex; flex-direction: column;
   gap: var(--nav-gap-group);
   flex: 1;
+  min-height: 0;          /* allow the nav to shrink so it (not the page) scrolls */
+  overflow-y: auto;       /* single scroll region for all groups */
+  overscroll-behavior: contain;
 }
 .wb-nav__sep { height: 6px; }
 .wb-nav__group { display: flex; flex-direction: column; gap: var(--nav-gap-item); }
@@ -156,6 +159,18 @@
   text-transform: uppercase; color: var(--fg-3);
   margin: 0 0 var(--nav-gap-label, 3px); padding: 0 10px;
 }
+/* Collapsible group header — the label doubles as the expand/collapse toggle. */
+.wb-nav__group-toggle {
+  display: flex; align-items: center; gap: 5px;
+  width: 100%; border: 0; background: transparent;
+  font-family: inherit; text-align: left; cursor: pointer;
+}
+.wb-nav__group-toggle:hover { color: var(--fg-2); }
+.wb-nav__group-caret {
+  flex-shrink: 0; color: var(--fg-3);
+  transition: transform var(--t-fast) var(--ease-out);
+}
+.wb-nav__group--collapsed .wb-nav__group-caret { transform: rotate(-90deg); }
 .wb-nav__item {
   display: flex; align-items: center; gap: 10px;
   padding: 6px 10px;
@@ -219,11 +234,6 @@
   transition: background var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
 }
 .wb-nav__add:hover { background: var(--mt-sand); color: var(--fg-1); }
-/* 更多 overflow toggle — a ··· glyph (IconMore); low-frequency items tuck behind
-   it. Neutral by default; lightly tinted (navy-300) when open or active. */
-.wb-nav__item--more { color: var(--fg-3); }
-.wb-nav__item--more-active,
-.wb-nav__item--more-open { color: var(--mt-navy-300); }
 /* Workflow status indicator in the nav lead slot — locked size. A 6px tone dot;
    `busy` renders the agent "处理中" animated ellipsis. Hover (title) shows the name.
    Colors are locked to the tone palette (scenarios add named statuses, not colors). */
