@@ -424,6 +424,41 @@
 .wb-scene__lead .mt-select,
 .wb-scene__toolbar .mt-input,
 .wb-scene__toolbar .mt-select { background: var(--bg-field-quiet); }
+/* …and focus with a soft navy ring (the toolbar/structural accent) rather than
+   the orange CTA focus used by data-entry forms. */
+.wb-scene__lead .mt-input:focus,
+.wb-scene__lead .mt-select:focus,
+.wb-scene__toolbar .mt-input:focus,
+.wb-scene__toolbar .mt-select:focus {
+  border-color: var(--border-3);
+  box-shadow: 0 0 0 2px rgba(40, 62, 104, 0.22);
+}
+
+/* ---------- Select (custom listbox, opens below the trigger) ---------- */
+.mt-selectbox { position: relative; }
+.mt-select--trigger {
+  display: inline-flex; align-items: center; justify-content: space-between;
+  gap: 8px; text-align: left; cursor: pointer;
+}
+.mt-select__value {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mt-select__caret { flex-shrink: 0; color: var(--fg-3); }
+.mt-select__pop {
+  position: absolute; top: calc(100% + 4px); left: 0; z-index: 50;
+  min-width: 100%; width: max-content; max-width: min(360px, 80vw);
+  margin: 0; padding: 4px; list-style: none;
+  background: var(--bg-surface); border: 1px solid var(--border-2);
+  border-radius: var(--r-md); box-shadow: var(--shadow-sm);
+  max-height: 248px; overflow-y: auto; overscroll-behavior: contain;
+}
+.mt-select__option {
+  padding: 7px 10px; border-radius: var(--r-sm);
+  color: var(--fg-1); cursor: pointer;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mt-select__option.is-active { background: var(--mt-sand); }
+.mt-select__option.is-selected { color: var(--mt-navy); font-weight: 600; }
 
 /* Toggle switch — the only new control atom (others reuse mt-*) */
 .wb-toggle {

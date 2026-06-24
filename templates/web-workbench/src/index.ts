@@ -26,6 +26,7 @@ export * from "./components/primitives";
 export * from "./components/scene";
 export * from "./components/action-button";
 export * from "./components/menu";
+export * from "./components/select";
 export * from "./components/tabs";
 export * from "./components/badge";
 
