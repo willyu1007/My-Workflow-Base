@@ -4,16 +4,25 @@
  */
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { IconChevronDown, IconLogout } from "./icons";
 import { Link } from "./nav";
 
+/** A utility link in the account menu (e.g. 设置). Host-supplied. */
+export interface AccountMenuItem {
+  readonly href: string;
+  readonly label: string;
+  readonly icon?: ReactNode;
+}
+
 export function AccountMenu({
   accountName,
+  items,
   signOutHref,
   signOutLabel = "退出登录",
 }: {
   readonly accountName: string;
+  readonly items?: readonly AccountMenuItem[];
   readonly signOutHref?: string;
   readonly signOutLabel?: string;
 }): React.ReactElement {
@@ -48,17 +57,34 @@ export function AccountMenu({
         <span className="wb-account__name">{accountName}</span>
         <IconChevronDown size={13} style={{ color: "var(--mt-stone)", flexShrink: 0 }} />
       </button>
-      {open && signOutHref && (
+      {open && (items?.length || signOutHref) && (
         <div className="mt-menu wb-account__pop" role="menu">
-          <Link
-            href={signOutHref}
-            className="mt-menu-item"
-            role="menuitem"
-            onClick={() => setOpen(false)}
-          >
-            <IconLogout size={16} />
-            <span className="wb-spacer">{signOutLabel}</span>
-          </Link>
+          {items?.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="mt-menu-item"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+            >
+              {item.icon}
+              <span className="wb-spacer">{item.label}</span>
+            </Link>
+          ))}
+          {items?.length && signOutHref ? (
+            <div className="mt-menu-sep" role="separator" />
+          ) : null}
+          {signOutHref && (
+            <Link
+              href={signOutHref}
+              className="mt-menu-item"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+            >
+              <IconLogout size={16} />
+              <span className="wb-spacer">{signOutLabel}</span>
+            </Link>
+          )}
         </div>
       )}
     </div>

@@ -9,8 +9,8 @@
 
 import { useState } from "react";
 import type { NavItemDef, ShellNav } from "../contracts/shell-nav";
-import { AccountMenu } from "./account-menu";
-import { IconChevronDown, IconHome, IconPlus, IconSearch, IconSidebar } from "./icons";
+import { AccountMenu, type AccountMenuItem } from "./account-menu";
+import { IconHome, IconMore, IconPlus, IconSearch, IconSidebar } from "./icons";
 import { Link, usePathname } from "./nav";
 import { SidebarCreate } from "./sidebar-create";
 
@@ -26,6 +26,7 @@ export function Sidebar({
   nav,
   badges = {},
   accountName,
+  accountMenuItems,
   signOutHref,
   onSearch,
 }: {
@@ -35,6 +36,7 @@ export function Sidebar({
   readonly nav: ShellNav;
   readonly badges?: Readonly<Record<string, number>>;
   readonly accountName: string;
+  readonly accountMenuItems?: readonly AccountMenuItem[];
   readonly signOutHref?: string;
   readonly onSearch?: () => void;
 }): React.ReactElement {
@@ -195,9 +197,8 @@ export function Sidebar({
                       onClick={() => setOpenOverflow(expanded ? null : groupKey)}
                     >
                       <span className="wb-nav__icon" />
-                      <span className="wb-nav__label">更多</span>
-                      <span className="wb-nav__more-caret">
-                        <IconChevronDown size={15} />
+                      <span className="wb-nav__label" aria-label="更多">
+                        <IconMore size={18} />
                       </span>
                     </button>
                     {expanded && overflowItems.map((item) => renderItem(item, false))}
@@ -209,7 +210,11 @@ export function Sidebar({
         </nav>
 
         <div className="wb-sidebar__foot">
-          <AccountMenu accountName={accountName} {...(signOutHref ? { signOutHref } : {})} />
+          <AccountMenu
+            accountName={accountName}
+            {...(accountMenuItems ? { items: accountMenuItems } : {})}
+            {...(signOutHref ? { signOutHref } : {})}
+          />
         </div>
       </aside>
     </>

@@ -184,13 +184,16 @@
 .wb-nav__icon svg { width: 18px; height: 18px; display: block; }
 .wb-nav__label { flex: 1; min-width: 0; }
 .wb-nav__count {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; /* = .wb-nav__add width → the number centres under the + */
   font-size: 11px; font-family: var(--font-mono);
   color: var(--fg-3);
-  background: var(--mt-sand);
-  padding: 1px 7px; border-radius: 999px;
 }
+/* Count items share the add button's right rail (4px) so the number sits under
+   the +; an equal-width centred box keeps it aligned regardless of digit count. */
+.wb-nav__item:has(.wb-nav__count) { padding-right: 4px; }
 .wb-nav__item--active .wb-nav__count {
-  background: var(--mt-orange-100); color: var(--mt-orange-700);
+  color: var(--mt-orange-700);
 }
 .wb-nav__soon {
   font-size: 10px; font-weight: 600; letter-spacing: 0.02em;
@@ -216,17 +219,11 @@
   transition: background var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
 }
 .wb-nav__add:hover { background: var(--mt-sand); color: var(--fg-1); }
-/* 更多 overflow toggle — low-frequency items stay tucked behind it. */
+/* 更多 overflow toggle — a ··· glyph (IconMore); low-frequency items tuck behind
+   it. Neutral by default; lightly tinted (navy-300) when open or active. */
 .wb-nav__item--more { color: var(--fg-3); }
-/* Expand chevron sits AFTER the 更多 label (the ··· glyph is reserved for the
-   "agent 处理中" status); rotates ▾→▴ when open. */
-.wb-nav__more-caret {
-  display: inline-flex; align-items: center; color: var(--fg-3);
-  transition: transform var(--t-fast) var(--ease-out);
-}
-.wb-nav__item--more-open .wb-nav__more-caret { transform: rotate(180deg); }
-.wb-nav__item--more-active { color: var(--mt-navy); }
-.wb-nav__item--more-active .wb-nav__label { font-weight: var(--h3-weight, 600); }
+.wb-nav__item--more-active,
+.wb-nav__item--more-open { color: var(--mt-navy-300); }
 /* Workflow status indicator in the nav lead slot — locked size. A 6px tone dot;
    `busy` renders the agent "处理中" animated ellipsis. Hover (title) shows the name.
    Colors are locked to the tone palette (scenarios add named statuses, not colors). */

@@ -14,6 +14,7 @@
 
 import { useState, type ReactNode } from "react";
 import type { Crumb, ShellNav } from "../contracts/shell-nav";
+import type { AccountMenuItem } from "./account-menu";
 import { BreadcrumbProvider, TopbarBreadcrumb, useBreadcrumbTrail } from "./breadcrumb";
 import { IconMenu } from "./icons";
 import { usePathname } from "./nav";
@@ -51,6 +52,7 @@ export function AppShell({
   nav,
   accountName,
   badges = {},
+  accountMenuItems,
   signOutHref,
   onSearch,
   children,
@@ -58,6 +60,7 @@ export function AppShell({
   readonly nav: ShellNav;
   readonly accountName: string;
   readonly badges?: Readonly<Record<string, number>>;
+  readonly accountMenuItems?: readonly AccountMenuItem[];
   readonly signOutHref?: string;
   readonly onSearch?: () => void;
   readonly children: ReactNode;
@@ -75,6 +78,7 @@ export function AppShell({
           nav={nav}
           badges={badges}
           accountName={accountName}
+          {...(accountMenuItems ? { accountMenuItems } : {})}
           {...(signOutHref ? { signOutHref } : {})}
           {...(onSearch ? { onSearch } : {})}
         />
