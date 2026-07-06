@@ -1,9 +1,9 @@
 /**
  * Pure presentational primitives for workbench pages (server-safe, no hooks).
  */
-import { Link } from "./nav";
+import { Link } from "./nav.js";
 import type { ReactNode } from "react";
-import { IconChevronRight, IconInbox } from "./icons";
+import { IconChevronRight } from "./icons.js";
 
 /* ---------- Breadcrumb ---------- */
 export function Breadcrumb({
@@ -104,7 +104,7 @@ export function EmptyState({
 }): React.ReactElement {
   return (
     <div className="wb-empty">
-      <span className="wb-empty__icon">{icon ?? <IconInbox size={22} />}</span>
+      {icon && <span className="wb-empty__icon">{icon}</span>}
       <h3 className="wb-empty__title">{title}</h3>
       {desc && <p className="wb-empty__desc">{desc}</p>}
       {action && <div style={{ marginTop: 4 }}>{action}</div>}

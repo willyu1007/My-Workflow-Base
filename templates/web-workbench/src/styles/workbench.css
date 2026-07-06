@@ -808,6 +808,8 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
 .wb-table td { padding: 11px 14px; color: var(--fg-1); vertical-align: middle; }
 .wb-table__cell--end { text-align: right; }
 .wb-table__cell--center { text-align: center; }
+.wb-table th.wb-table__cell--end,
+.wb-table th.wb-table__cell--center { text-align: left; }
 /* Cell kit */
 .wb-tcell-id { display: flex; align-items: center; gap: 10px; }
 .wb-tcell-id__main { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
@@ -825,16 +827,14 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
    ============================================================ */
 .wb-empty {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center; gap: 12px;
-  padding: 56px 24px;
-  border-radius: var(--r-xl);
-  background: var(--bg-sunken);
+  text-align: center; gap: 6px;
+  padding: 32px 24px;
   color: var(--fg-3);
 }
 .wb-empty__icon {
-  width: 44px; height: 44px; border-radius: 12px;
+  width: 32px; height: 32px; border-radius: var(--r-md);
   display: inline-flex; align-items: center; justify-content: center;
-  background: var(--bg-surface); color: var(--mt-navy-300);
+  color: var(--mt-navy-300);
 }
 .wb-empty__title { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--fg-1); margin: 0; }
 .wb-empty__desc { font-size: 13.5px; color: var(--fg-3); margin: 0; max-width: 42ch; line-height: 1.55; }
@@ -1039,17 +1039,62 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
 .wb-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .text-balance { text-wrap: balance; }
 
-/* Reveal on mount */
-.wb-reveal { animation: wb-fade-up var(--t-slow) var(--ease-out) both; }
+/* Reveal on mount — a brief settle, not an entrance. Duration + shift are tokens
+   so a host can tune or disable it (--wb-reveal-duration: 0ms); it replays on
+   every Scene mount, so the default is deliberately short. */
+.wb-reveal { animation: wb-fade-up var(--wb-reveal-duration, 180ms) var(--ease-out) both; }
+
+/* ============================================================
+   Skeleton (loading placeholder)
+   Server-safe building blocks for <SceneSkeleton> and route loading.tsx.
+   ============================================================ */
+.wb-skeleton {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: var(--mt-sand);
+  border-radius: var(--r-sm);
+}
+.wb-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--mt-paper) 55%, transparent),
+    transparent
+  );
+  animation: wb-shimmer 1.4s var(--ease-out) infinite;
+}
+.wb-skeleton--pill   { width: 72px;  height: 30px; border-radius: var(--r-pill); }
+.wb-skeleton--btn    { width: 104px; height: 36px; border-radius: var(--r-md); }
+.wb-skeleton--label  { width: 52px;  height: 11px; border-radius: var(--r-xs); }
+.wb-skeleton--figure { width: 76px;  height: 26px; border-radius: var(--r-xs); }
+.wb-skeleton--row    { width: 100%;  height: 52px; border-radius: var(--r-lg); }
+
+/* Screen-reader-only (visually hidden but announced). */
+.wb-sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* ============================================================
    Animations
    ============================================================ */
 @keyframes wb-fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes wb-fade-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes wb-fade-up { from { opacity: 0; transform: translateY(var(--wb-reveal-shift, 6px)); } to { opacity: 1; transform: translateY(0); } }
 @keyframes wb-slide-in-right { from { transform: translateX(24px); opacity: 0.6; } to { transform: translateX(0); opacity: 1; } }
 @keyframes wb-slide-in-up { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes wb-shimmer { 100% { transform: translateX(100%); } }
 
 @media (prefers-reduced-motion: reduce) {
   .wb-reveal, .wb-toast, .wb-drawer, .wb-overlay { animation: none !important; }
+  .wb-skeleton::after { animation: none !important; }
 }

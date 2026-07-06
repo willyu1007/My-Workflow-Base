@@ -218,6 +218,9 @@ The current design stance is:
 - 2026-05-26: Audit scope reduced to MVP evidence log: record high-risk writes
   and resolution/handoff/domain-context mutations, but do not build audit UI or
   log low-value reads/clicks.
+- 2026-06-26: Web workbench package boundary follow-up added. The UI kit keeps
+  its root entry for compatibility and adds grouped public subpath entries so
+  host products can avoid broad route chunks.
 - 2026-05-26: Downstream information matrix added: outbox carries signals and
   refs only; downstream consumers must reread canonical state and own their
   side effects.

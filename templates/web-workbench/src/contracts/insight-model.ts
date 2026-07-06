@@ -5,7 +5,7 @@
  * this shape via an adapter (e.g. `insightToCard`); the presentational
  * `InsightCard` renders the shape and carries no domain vocabulary. Types-only.
  */
-import type { CardTone, MeterTone } from "./card-model";
+import type { CardTone, MeterTone } from "./card-model.js";
 
 /** A single headline figure in the metric grid. */
 export interface InsightMetricCell {

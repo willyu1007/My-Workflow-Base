@@ -5,6 +5,10 @@
 - YAML parse for `templates/scenario-module/scenario.manifest.yaml`
 - Markdown fence count check for workflow docs and task docs
 - Search for stale local-path references before finalizing docs
+- `pnpm --dir templates/web-workbench typecheck`
+- `pnpm --dir templates/web-workbench build`
+- Node ESM import smoke for every new `@willyu1007/web-workbench/*` grouped
+  entry
 
 ## Results
 - 2026-05-25: Task package created.
@@ -102,3 +106,14 @@
   workspace link from the host-runtime template. The registry scaffold now
   exposes runtime read-only map proxies, and validator checks host-supported
   surfaces plus standard/platform event registration.
+- 2026-06-26: Planned verification expanded for the web workbench grouped
+  public entry split. Results pending implementation.
+- 2026-06-26: `corepack pnpm --dir templates/web-workbench typecheck` passed
+  for `@willyu1007/web-workbench@0.6.6`.
+- 2026-06-26: `corepack pnpm --dir templates/web-workbench build` passed after
+  changing the build/prepublish scripts to avoid nested bare `pnpm` calls in the
+  local runtime.
+- 2026-06-26: Node ESM import smoke passed for grouped entries:
+  `primitives`, `shell`, `feedback`, `list`, `insight`, `settings`, `hub`,
+  `queue`, `record`, and existing `contracts`.
+- 2026-06-26: Published `@willyu1007/web-workbench@0.6.6` to GitHub Packages.

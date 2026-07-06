@@ -5,8 +5,8 @@
  * `render` escape hatch stays open for the bespoke 20%.
  */
 import type { ReactNode } from "react";
-import type { CardTone } from "../contracts/card-model";
-import { StatusBadge } from "./badge";
+import type { CardTone } from "../contracts/card-model.js";
+import { StatusBadge } from "./badge.js";
 
 /** Identity cell: avatar + primary name + secondary ref. */
 export function CellIdentity({

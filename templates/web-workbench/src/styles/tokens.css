@@ -4,7 +4,13 @@
    any HTML/CSS that needs the brand.
    ========================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@400;500;600;700&family=Ma+Shan+Zheng&display=swap');
+/* Fonts are HOST-PROVIDED — the kit no longer self-loads webfonts.
+   A render-blocking `@import url('fonts.googleapis.com/...')` used to live here;
+   it was removed so the kit never forces a third-party network dependency (a
+   first-paint stall, and a hard block behind the Great Firewall). The `--font-*`
+   tokens below still define the family stacks (one source of truth); the host is
+   responsible for loading the actual faces (recommended: `next/font`, self-hosted).
+   See TYPOGRAPHY.md → "Fonts (host-provided)" for the exact recipe. */
 
 :root {
   /* ---------- Brand core ---------- */
@@ -133,6 +139,14 @@
   --t-fast: 120ms;
   --t-base: 180ms;
   --t-slow: 280ms;
+
+  /* Scene reveal-on-mount. The Scene root carries `.wb-reveal`, which replays
+     every time a Scene mounts — i.e. on every route change. Keep it brief so it
+     never reads as lag stacked on top of navigation. Hosts can tune these, or
+     set `--wb-reveal-duration: 0ms` to disable the reveal entirely (e.g. when
+     the host owns its own route transitions). */
+  --wb-reveal-duration: var(--t-base);
+  --wb-reveal-shift: 6px;
 }
 
 /* ---------- Base resets bound to tokens ---------- */

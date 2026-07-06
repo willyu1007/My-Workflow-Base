@@ -9,7 +9,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Link, useActiveRoute } from "./nav";
+import { Link, useActiveRoute } from "./nav.js";
 
 export function Scene({
   nav,

@@ -10,7 +10,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from "react";
-import { IconAlert, IconCheck, IconClock, IconX } from "./icons";
+import { IconAlert, IconCheck, IconClock, IconX } from "./icons.js";
 
 export type ToastTone = "info" | "success" | "error" | "busy";
 

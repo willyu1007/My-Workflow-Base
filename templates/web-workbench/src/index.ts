@@ -10,57 +10,60 @@
  */
 
 // ---- Contracts ----
-export * from "./contracts/card-model";
-export * from "./contracts/row-model";
-export * from "./contracts/table-model";
-export * from "./contracts/insight-model";
-export * from "./contracts/dashboard";
-export * from "./contracts/shell-nav";
+export * from "./contracts/card-model.js";
+export * from "./contracts/row-model.js";
+export * from "./contracts/table-model.js";
+export * from "./contracts/insight-model.js";
+export * from "./contracts/dashboard.js";
+export * from "./contracts/shell-nav.js";
 
 // ---- Framework adapter (the one Next.js touchpoint) ----
-export * from "./components/nav";
+export * from "./components/nav.js";
 
 // ---- Primitives & chrome ----
-export * from "./components/icons";
-export * from "./components/primitives";
-export * from "./components/scene";
-export * from "./components/action-button";
-export * from "./components/menu";
-export * from "./components/select";
-export * from "./components/tabs";
-export * from "./components/badge";
+export * from "./components/icons.js";
+export * from "./components/primitives.js";
+export * from "./components/scene.js";
+export * from "./components/scene-skeleton.js";
+export * from "./components/action-button.js";
+export * from "./components/menu.js";
+export * from "./components/select.js";
+export * from "./components/date-button.js";
+export * from "./components/expandable-text-field.js";
+export * from "./components/tabs.js";
+export * from "./components/badge.js";
 
 // ---- App shell (Batch 2) — one ShellNav drives sidebar + topbar breadcrumb ----
-export * from "./components/scenario-switcher";
-export * from "./components/breadcrumb";
-export * from "./components/account-menu";
-export * from "./components/sidebar-create";
-export * from "./components/sidebar";
-export * from "./components/app-shell";
+export * from "./components/scenario-switcher.js";
+export * from "./components/breadcrumb.js";
+export * from "./components/account-menu.js";
+export * from "./components/sidebar-create.js";
+export * from "./components/sidebar.js";
+export * from "./components/app-shell.js";
 
 // ---- Toast (Batch 3) — host notification chrome (ToastProvider + useToast) ----
-export * from "./components/toast";
+export * from "./components/toast.js";
 
 // ---- Settings / Form paradigm (Batch 4) — locked SettingsFrame + field schema ----
-export * from "./contracts/settings";
-export * from "./components/settings";
+export * from "./contracts/settings.js";
+export * from "./components/settings.js";
 
 // ---- List paradigm presentations ----
-export * from "./components/entity-card";
-export * from "./components/entity-row";
-export * from "./components/entity-table";
-export * from "./components/table-cells";
-export * from "./components/list-view";
+export * from "./components/entity-card.js";
+export * from "./components/entity-row.js";
+export * from "./components/entity-table.js";
+export * from "./components/table-cells.js";
+export * from "./components/list-view.js";
 
 // ---- Insight paradigm ----
-export * from "./components/insight-card";
+export * from "./components/insight-card.js";
 
 // ---- Queue paradigm (rows + action button + Drawer; structure component-locked) ----
-export * from "./components/overlay";
-export * from "./components/queue";
+export * from "./components/overlay.js";
+export * from "./components/queue.js";
 
 // ---- Record paradigm (intro + tabs + top-right action + drawer; locked) ----
-export * from "./components/record";
+export * from "./components/record.js";
 
 // ---- Hub paradigm (aggregation台 renderer; structure is component-locked) ----
-export * from "./components/hub";
+export * from "./components/hub.js";

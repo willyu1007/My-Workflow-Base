@@ -72,7 +72,21 @@
   background: var(--mt-navy); border-color: transparent; color: #fff;
   font-weight: 600; padding: 6px 14px;
 }
-.wb-action--primary:hover { background: var(--mt-navy-700); }
+.wb-action--primary:hover { background: var(--mt-navy-700); color: #fff; }
+.wb-action--primary:focus,
+.wb-action--primary:focus-visible,
+.wb-action--primary:active {
+  color: #fff;
+}
+.wb-scene__bar .wb-action--primary {
+  --wb-action-control-font-size: 13.5px;
+
+  min-height: 36px;
+  padding: 6px 16px;
+  font-size: var(--wb-action-control-font-size);
+  font-weight: var(--h3-weight);
+  line-height: 1.4;
+}
 .wb-action__icon { display: inline-flex; }
 .wb-action[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 
@@ -104,6 +118,162 @@
   box-shadow: var(--shadow-focus);
 }
 .mt-input--error { border-color: var(--mt-danger); }
+.mt-date-button-control {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+.mt-date-button {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-md);
+  padding: 0 12px;
+  background: var(--bg-surface);
+  color: var(--fg-1);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  line-height: 34px;
+  text-align: left;
+  transition: border-color var(--t-fast) var(--ease-out),
+              background var(--t-fast) var(--ease-out),
+              box-shadow var(--t-fast) var(--ease-out);
+}
+.mt-date-button:hover {
+  border-color: var(--border-3);
+  background: var(--bg-field-quiet);
+}
+.mt-date-button:focus-visible {
+  outline: 2px solid var(--mt-navy-300);
+  outline-offset: 2px;
+}
+.mt-date-button--invalid {
+  border-color: var(--mt-danger);
+}
+.mt-date-button--disabled,
+.mt-date-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.mt-date-button--compact {
+  min-height: 28px;
+  border-color: transparent;
+  border-radius: var(--r-sm);
+  padding: 4px 8px;
+  background: transparent;
+  box-shadow: none;
+  font-size: 13px;
+  line-height: 18px;
+}
+.mt-date-button--compact:hover {
+  border-color: var(--border-1);
+  background: var(--bg-field-quiet);
+}
+.mt-date-button--compact:focus-visible {
+  outline: none;
+  border-color: var(--mt-navy-300);
+  background: var(--bg-surface);
+  box-shadow: 0 0 0 2px var(--mt-navy-100);
+}
+.mt-date-button-native {
+  position: absolute;
+  inset: auto auto 0 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.mt-expandable-text-field {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+.mt-expandable-text-field:focus-within {
+  z-index: 70;
+}
+.mt-expandable-text-field__input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-md);
+  padding: 9px 12px;
+  background: var(--bg-surface);
+  color: var(--fg-1);
+  box-shadow: inset 0 1px 1px rgba(17,24,39,0.03);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  transition: border-color var(--t-fast) var(--ease-out),
+              background var(--t-fast) var(--ease-out),
+              box-shadow var(--t-fast) var(--ease-out);
+}
+.mt-expandable-text-field__input::placeholder,
+.mt-expandable-text-field__panel::placeholder {
+  color: var(--mt-ink-5);
+}
+.mt-expandable-text-field__input:hover {
+  border-color: var(--border-3);
+}
+.mt-expandable-text-field__input:focus {
+  outline: none;
+  border-color: var(--mt-orange);
+  box-shadow: var(--shadow-focus);
+}
+.mt-expandable-text-field__panel {
+  box-sizing: border-box;
+  position: absolute;
+  z-index: 70;
+  top: calc(100% + 4px);
+  left: 0;
+  width: min(520px, calc(100vw - 32px));
+  min-height: 112px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-md);
+  padding: 9px 12px;
+  background: var(--bg-float);
+  color: var(--fg-1);
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  resize: vertical;
+}
+.mt-expandable-text-field__panel:focus {
+  outline: none;
+  border-color: var(--mt-orange);
+  box-shadow: var(--shadow-focus), var(--shadow-md);
+}
+.mt-expandable-text-field--invalid .mt-expandable-text-field__input,
+.mt-expandable-text-field--invalid .mt-expandable-text-field__panel {
+  border-color: var(--mt-danger);
+}
+.mt-expandable-text-field--disabled {
+  opacity: 0.55;
+}
+.mt-expandable-text-field--compact .mt-expandable-text-field__input {
+  min-height: 28px;
+  border-color: transparent;
+  border-radius: var(--r-sm);
+  padding: 4px 8px;
+  background: transparent;
+  box-shadow: none;
+  font-size: 13px;
+}
+.mt-expandable-text-field--compact .mt-expandable-text-field__input:hover {
+  border-color: var(--border-1);
+  background: var(--bg-field-quiet);
+}
+.mt-expandable-text-field--compact .mt-expandable-text-field__input:focus {
+  border-color: var(--mt-navy-300);
+  background: var(--bg-surface);
+  box-shadow: 0 0 0 2px var(--mt-navy-100);
+}
+.mt-expandable-text-field--compact .mt-expandable-text-field__panel {
+  width: min(520px, calc(100vw - 32px));
+  min-height: 104px;
+  font-size: 13px;
+}
 .mt-help { font-size: 12px; color: var(--fg-3); }
 .mt-help--error { color: var(--mt-danger); }
 
@@ -439,6 +609,38 @@
 .mt-select--trigger {
   display: inline-flex; align-items: center; justify-content: space-between;
   gap: 8px; text-align: left; cursor: pointer;
+}
+.mt-select--action {
+  --wb-action-control-font-size: 13.5px;
+
+  width: auto;
+  min-height: 36px;
+  gap: 6px;
+  border-color: transparent;
+  border-radius: var(--r-pill);
+  padding: 6px 16px;
+  background: var(--mt-navy);
+  color: #fff;
+  box-shadow: none;
+  font-size: var(--wb-action-control-font-size);
+  font-weight: var(--h3-weight);
+  line-height: 1.4;
+}
+.mt-select--action:hover {
+  border-color: transparent;
+  background: var(--mt-navy-700);
+}
+.mt-select--action:focus,
+.mt-select--action:focus-visible,
+.mt-select--action:active {
+  border-color: transparent;
+  color: #fff;
+  outline: none;
+  box-shadow: none;
+}
+.mt-select--action .mt-select__value,
+.mt-select--action .mt-select__caret {
+  color: currentColor;
 }
 .mt-select__value {
   min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;

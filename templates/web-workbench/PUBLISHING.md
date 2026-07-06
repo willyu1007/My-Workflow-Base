@@ -42,15 +42,19 @@ Target registry: **GitHub Packages** (`https://npm.pkg.github.com`), scope `@wil
 2. **Add the dependency**:
 
    ```bash
-   pnpm add @willyu1007/web-workbench@^0.1.0
+   pnpm add @willyu1007/web-workbench@^0.7.0
    ```
 
 3. **Import styles once** at the app root and use the components:
 
    ```ts
    import "@willyu1007/web-workbench/styles/index.css";
-   import { InsightCard, type InsightModel } from "@willyu1007/web-workbench";
+   import { InsightCard, type InsightModel } from "@willyu1007/web-workbench/insight";
    ```
+
+   Prefer grouped entries for new code: `primitives`, `shell`, `feedback`, `list`,
+   `insight`, `settings`, `hub`, `queue`, and `record`. The root entry remains
+   available only as a legacy compatibility barrel.
 
 4. **Remove the local-dev hacks** (they are only needed for the `link:` setup):
    - `next.config.mjs`: delete the `turbopack.root` / `outputFileTracingRoot` block.

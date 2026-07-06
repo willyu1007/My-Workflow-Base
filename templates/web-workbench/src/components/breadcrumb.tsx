@@ -24,10 +24,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Crumb, ScenarioConfig } from "../contracts/shell-nav";
-import { IconChevronRight } from "./icons";
-import { Link } from "./nav";
-import { ScenarioSwitcher } from "./scenario-switcher";
+import type { Crumb, ScenarioConfig } from "../contracts/shell-nav.js";
+import { IconChevronRight } from "./icons.js";
+import { Link } from "./nav.js";
+import { ScenarioSwitcher } from "./scenario-switcher.js";
 
 interface BreadcrumbCtx {
   readonly trail: readonly Crumb[];

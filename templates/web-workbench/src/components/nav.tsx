@@ -8,8 +8,8 @@
  */
 "use client";
 
-import NextLink from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import NextLink from "next/link.js";
+import { usePathname, useRouter } from "next/navigation.js";
 
 /** Client-side link. Swap to your router's link component when porting. */
 export const Link = NextLink;

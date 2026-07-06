@@ -4,10 +4,10 @@
  * hover only. Scenarios supply data via an adapter; this component never knows
  * about assignments, students, or any domain object.
  */
-import { Link } from "./nav";
+import { Link } from "./nav.js";
 import { Fragment } from "react";
-import type { CardModel } from "../contracts/card-model";
-import { IconArrowRight } from "./icons";
+import type { CardModel } from "../contracts/card-model.js";
+import { IconArrowRight } from "./icons.js";
 
 export function EntityCard({ model }: { readonly model: CardModel }): React.ReactElement {
   const { href, title, status, aside, primary, metrics, meta, entryLabel = "详情", emphasis } = model;

@@ -5,7 +5,7 @@
  * the scenario = swapping the module set — the Hub engine is unchanged.
  */
 import type { ReactNode } from "react";
-import type { CardTone } from "./card-model";
+import type { CardTone } from "./card-model.js";
 
 /** A to-do surfaced on the Hub; `tone` drives its dot color. */
 export interface AttentionItem {

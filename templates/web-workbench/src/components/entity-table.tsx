@@ -7,9 +7,9 @@
 "use client";
 
 import { useState } from "react";
-import type { SortDir, TableColumn, TableModel } from "../contracts/table-model";
-import { IconChevronDown } from "./icons";
-import { useNavigate } from "./nav";
+import type { SortDir, TableColumn, TableModel } from "../contracts/table-model.js";
+import { IconChevronDown } from "./icons.js";
+import { useNavigate } from "./nav.js";
 
 export function EntityTable<T>({ model }: { readonly model: TableModel<T> }): React.ReactElement {
   const { columns, rows, rowKey, rowHref } = model;

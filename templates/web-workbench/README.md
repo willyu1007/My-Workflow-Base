@@ -20,7 +20,7 @@ same way it implements handlers/policies against `workflow-contracts`.
 | Layer | Files |
 | --- | --- |
 | **Contracts** (`src/contracts`) | `CardModel` · `RowModel` · `TableModel` · `InsightModel` · `WorkflowModule`/`AttentionItem` (Hub) |
-| **Scene shell** | `Scene` + `SceneNav` |
+| **Scene shell** | `Scene` + `SceneSkeleton` (loading placeholder) + app shell/navigation chrome |
 | **Primitives** | `StatStrip`/`Stat` · `Section` · `EmptyState` · `Meter` · `icons` · `tabs` · `StatusBadge` |
 | **Hub paradigm** | `<Hub modules={…}/>` — aggregation台 renderer; structure is component-locked (to-dos = rows, per-workflow stats, topbar filter) |
 | **List paradigm** | `EntityCard` · `EntityRow` · `EntityTable` + cell kit (`CellIdentity`/`CellMetric`/`CellProgress`/`CellStatus`) · `ListView` (shared container: topbar filter + stats + empty + load-more) |
@@ -47,26 +47,47 @@ token even for public packages, so a consumer configures two `.npmrc` entries:
 Then add the dependency and import the styles once at the app root:
 
 ```bash
-pnpm add @willyu1007/web-workbench@^0.1.0
+pnpm add @willyu1007/web-workbench@^0.7.0
 ```
 
 ```ts
 import "@willyu1007/web-workbench/styles/index.css";
 ```
 
+> **Fonts are host-provided.** The kit ships the family *stacks* but does not load the
+> webfont files (no third-party `@import`). Load them once host-side — `next/font` is the
+> recommended, self-hosted path — and map them onto the `--font-*` tokens. Full recipe:
+> [TYPOGRAPHY.md → Fonts (host-provided)](./TYPOGRAPHY.md#fonts-host-provided).
+
+> ⚠️ **Upgrading from 0.6.x (breaking).** 0.7.0 removed the built-in Google Fonts `@import`.
+> If you upgrade and change nothing else, every Latin face silently falls back to a system
+> font (Manrope → system sans, Source Serif 4 → Georgia, JetBrains Mono → Menlo, Caveat →
+> cursive). To keep the intended type, wire the faces host-side per the recipe above **before**
+> shipping. Nothing else in 0.7.0 is breaking.
+
+> **Loading states.** Give each App Router route segment a `loading.tsx` that renders
+> `<SceneSkeleton/>`. It's server-safe and mirrors the Scene layout, so a nav click paints
+> an instant on-brand placeholder instead of freezing on the previous page until the
+> server responds.
+
 > Full publish + auth runbook: [PUBLISHING.md](./PUBLISHING.md). For token-free public
 > installs, publish to npmjs.com instead (GitHub Packages always needs a token).
 
 ## Use
 
-1. **Write an adapter** mapping your view-model → a contract, and render the component:
+1. **Write an adapter** mapping your view-model → a contract, and render the component.
+   Prefer grouped public entries so host route chunks only pull the surface they use:
 
    ```tsx
-   import { InsightCard, type InsightModel } from "@willyu1007/web-workbench";
+   import { InsightCard, type InsightModel } from "@willyu1007/web-workbench/insight";
 
    const model: InsightModel = insightToCard(myReport); // your adapter
    return <InsightCard model={model} />;
    ```
+
+   Available grouped entries: `primitives`, `shell`, `feedback`, `list`, `insight`,
+   `settings`, `hub`, `queue`, and `record`. The root package entry remains for
+   legacy consumers, but new code should avoid it.
 
    See [`examples/education-adapters`](./examples/education-adapters) for worked adapters
    (Insight readout, table status resolution).
@@ -109,6 +130,4 @@ Full rationale, the scale table, and a migration cheatsheet: [TYPOGRAPHY.md](./T
 
 ## Not yet in the kit (extract next if needed)
 
-- **App shell** (sidebar / topbar / breadcrumb / account menu) — host chrome. The nav
-  rhythm tokens (`--nav-gap-*`) and `wb-nav` styles are here; the shell component is not.
 - **`format` util** — date/relative helpers are adapter-side (and need a host "today").

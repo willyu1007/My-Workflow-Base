@@ -14,14 +14,14 @@
 "use client";
 
 import { useState } from "react";
-import type { DashAttention, WorkflowModule } from "../contracts/dashboard";
-import type { RowModel } from "../contracts/row-model";
-import { EntityRow } from "./entity-row";
-import { IconCheck, IconChevronDown, IconMore } from "./icons";
-import { Menu } from "./menu";
-import { Link } from "./nav";
-import { EmptyState, Section, Stat, StatStrip } from "./primitives";
-import { Scene } from "./scene";
+import type { DashAttention, WorkflowModule } from "../contracts/dashboard.js";
+import type { RowModel } from "../contracts/row-model.js";
+import { EntityRow } from "./entity-row.js";
+import { IconCheck, IconChevronDown, IconMore } from "./icons.js";
+import { Menu } from "./menu.js";
+import { Link } from "./nav.js";
+import { EmptyState, Section, Stat, StatStrip } from "./primitives.js";
+import { Scene } from "./scene.js";
 
 function attentionToRow(item: DashAttention, showWorkflow: boolean): RowModel {
   return {

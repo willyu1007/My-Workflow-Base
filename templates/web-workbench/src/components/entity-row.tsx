@@ -4,10 +4,10 @@
  * `wb-list__row` skeleton. With `href` the whole row is a link (chevron, hover);
  * otherwise it is a static row that can host `trailing` action buttons (Queue).
  */
-import { Link } from "./nav";
+import { Link } from "./nav.js";
 import { Fragment } from "react";
-import type { RowModel } from "../contracts/row-model";
-import { IconArrowRight, IconChevronRight } from "./icons";
+import type { RowModel } from "../contracts/row-model.js";
+import { IconArrowRight, IconChevronRight } from "./icons.js";
 
 export function EntityRow({ model }: { readonly model: RowModel }): React.ReactElement {
   const { href, cta, leading, title, sub, note, meta, metrics, status, trailing, emphasis } = model;

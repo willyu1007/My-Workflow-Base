@@ -9,8 +9,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { ScenarioConfig } from "../contracts/shell-nav";
-import { IconCheck, IconChevronDown, IconPlus } from "./icons";
+import type { ScenarioConfig } from "../contracts/shell-nav.js";
+import { IconCheck, IconChevronDown, IconPlus } from "./icons.js";
 
 export function ScenarioSwitcher({
   scenario,

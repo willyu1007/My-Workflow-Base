@@ -10,10 +10,10 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import type { RowModel } from "../contracts/row-model";
-import { EntityRow } from "./entity-row";
-import { Drawer } from "./overlay";
-import { EmptyState } from "./primitives";
+import type { RowModel } from "../contracts/row-model.js";
+import { EntityRow } from "./entity-row.js";
+import { Drawer } from "./overlay.js";
+import { EmptyState } from "./primitives.js";
 
 export interface QueueDrawer {
   readonly title: string;

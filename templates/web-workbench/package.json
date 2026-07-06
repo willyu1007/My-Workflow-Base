@@ -1,6 +1,6 @@
 {
   "name": "@willyu1007/web-workbench",
-  "version": "0.6.5",
+  "version": "0.7.0",
   "type": "module",
   "description": "Scenario-agnostic web workbench UI kit (Scene paradigms) — contracts + presentational React components.",
   "license": "MIT",
@@ -24,6 +24,42 @@
       "types": "./dist/contracts/index.d.ts",
       "default": "./dist/contracts/index.js"
     },
+    "./primitives": {
+      "types": "./dist/primitives.d.ts",
+      "default": "./dist/primitives.js"
+    },
+    "./shell": {
+      "types": "./dist/shell.d.ts",
+      "default": "./dist/shell.js"
+    },
+    "./feedback": {
+      "types": "./dist/feedback.d.ts",
+      "default": "./dist/feedback.js"
+    },
+    "./list": {
+      "types": "./dist/list.d.ts",
+      "default": "./dist/list.js"
+    },
+    "./insight": {
+      "types": "./dist/insight.d.ts",
+      "default": "./dist/insight.js"
+    },
+    "./settings": {
+      "types": "./dist/settings.d.ts",
+      "default": "./dist/settings.js"
+    },
+    "./hub": {
+      "types": "./dist/hub.d.ts",
+      "default": "./dist/hub.js"
+    },
+    "./queue": {
+      "types": "./dist/queue.d.ts",
+      "default": "./dist/queue.js"
+    },
+    "./record": {
+      "types": "./dist/record.d.ts",
+      "default": "./dist/record.js"
+    },
     "./styles": "./dist/styles/index.css",
     "./styles/*": "./dist/styles/*",
     "./stylelint": "./dist/lint/stylelint.cjs",
@@ -33,11 +69,11 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && pnpm run build:css && pnpm run build:lint",
+    "build": "tsc -p tsconfig.build.json && mkdir -p dist/styles && cp src/styles/*.css dist/styles/ && mkdir -p dist/lint && cp lint/stylelint.cjs lint/eslint.js dist/lint/",
     "build:css": "mkdir -p dist/styles && cp src/styles/*.css dist/styles/",
     "build:lint": "mkdir -p dist/lint && cp lint/stylelint.cjs lint/eslint.js dist/lint/",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
     "next": ">=15",

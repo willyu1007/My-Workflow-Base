@@ -8,7 +8,7 @@
  * the paradigm 铁律 "chevron = 去看 / button = 去做".
  */
 import type { ReactNode } from "react";
-import type { CardTone } from "./card-model";
+import type { CardTone } from "./card-model.js";
 
 export interface RowMeta {
   readonly text: string;

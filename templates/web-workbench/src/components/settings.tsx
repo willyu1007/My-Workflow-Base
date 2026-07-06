@@ -22,8 +22,8 @@ import type {
   SettingsSchema,
   SettingsSection,
   SettingsValues,
-} from "../contracts/settings";
-import { ActionButton } from "./action-button";
+} from "../contracts/settings.js";
+import { ActionButton } from "./action-button.js";
 
 export function SettingsFrame({
   schema,

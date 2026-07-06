@@ -9,7 +9,7 @@
  * ERP "财务" module grouping) are NOT breadcrumb levels and have no field here.
  */
 import type { ReactNode } from "react";
-import type { CardTone } from "./card-model";
+import type { CardTone } from "./card-model.js";
 
 /** One registered My-Chat scenario for the topbar switcher. `mark` is the
     1-glyph square badge (e.g. "教"). */

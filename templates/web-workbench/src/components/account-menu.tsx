@@ -5,8 +5,8 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { IconChevronDown, IconLogout } from "./icons";
-import { Link } from "./nav";
+import { IconChevronDown, IconLogout } from "./icons.js";
+import { Link } from "./nav.js";
 
 /** A utility link in the account menu (e.g. 设置). Host-supplied. */
 export interface AccountMenuItem {

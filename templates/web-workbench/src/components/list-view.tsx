@@ -10,10 +10,10 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { IconCheck, IconChevronDown } from "./icons";
-import { Menu } from "./menu";
-import { EmptyState } from "./primitives";
-import { Scene } from "./scene";
+import { IconCheck, IconChevronDown } from "./icons.js";
+import { Menu } from "./menu.js";
+import { EmptyState } from "./primitives.js";
+import { Scene } from "./scene.js";
 
 export interface ListFilter<T> {
   readonly key: string;

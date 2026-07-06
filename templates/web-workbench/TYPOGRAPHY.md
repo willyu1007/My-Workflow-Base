@@ -18,10 +18,61 @@ vary the content.**
 | Caption | 12 / 1.4 / 600 · uppercase | `.mt-caption` | labels, eyebrows |
 | Code | 13 (mono) | `.mt-code` | inline code / timestamps |
 
-The font **families** are also set once (`--font-sans` / `--font-display` / `--font-serif`
-/ `--font-mono`) and loaded once via `tokens.css`. Do not redeclare `--font-*`, and do
-not load fonts again (no `next/font`, no second `@import`) — that is what guarantees the
-family is identical across projects.
+The font **families** are declared once as token stacks (`--font-sans` / `--font-display`
+/ `--font-serif` / `--font-mono` / `--font-hand`) in `tokens.css`. The kit does **not**
+load the webfont files — that is the host's job (see [Fonts (host-provided)](#fonts-host-provided)
+below). Keeping the *stacks* in one place is what guarantees the family order is identical
+across projects; the host only supplies the actual faces.
+
+## Fonts (host-provided)
+
+The kit ships the family **stacks** but not the font **files** — it deliberately does
+**not** `@import` from `fonts.googleapis.com` (that import was render-blocking on first
+paint and hard-blocked behind the Great Firewall). Load the faces host-side, once, and
+map them onto the kit tokens. The recommended path is `next/font` (self-hosted, no
+third-party request, no layout shift):
+
+```tsx
+// app/layout.tsx — load once at the app root
+import "@willyu1007/web-workbench/styles";
+import "./fonts.css"; // AFTER the kit styles, so its :root override wins
+import { Manrope, Source_Serif_4, JetBrains_Mono, Caveat } from "next/font/google";
+
+const sans  = Manrope({ subsets: ["latin"], variable: "--f-sans",  display: "swap" });
+const serif = Source_Serif_4({ subsets: ["latin"], variable: "--f-serif", display: "swap" });
+const mono  = JetBrains_Mono({ subsets: ["latin"], variable: "--f-mono",  display: "swap" });
+const hand  = Caveat({ subsets: ["latin"], variable: "--f-hand",  display: "swap" });
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="zh-CN" className={`${sans.variable} ${serif.variable} ${mono.variable} ${hand.variable}`}>
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+```css
+/* fonts.css — point the kit tokens at the self-hosted faces, keeping the
+   system CJK fallbacks. (Latin faces are self-hosted; Chinese resolves to the
+   platform Han font — PingFang SC / system-ui — instead of a heavy CJK webfont.) */
+:root {
+  --font-sans:    var(--f-sans),  "Noto Sans SC", "PingFang SC", "HarmonyOS Sans", "Source Han Sans SC", system-ui, sans-serif;
+  --font-display: var(--f-sans),  "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  --font-serif:   var(--f-serif), "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", Georgia, serif;
+  --font-mono:    var(--f-mono),  "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-hand:    var(--f-hand),  "Ma Shan Zheng", "Kaiti SC", "STKaiti", "KaiTi", cursive;
+  --font-hand-cn: "Ma Shan Zheng", "Kaiti SC", "STKaiti", "KaiTi", var(--f-hand), cursive;
+}
+```
+
+> **Notes.** Do not pass a `weight` array to variable fonts (Manrope / Source Serif 4 /
+> JetBrains Mono / Caveat are variable) — omit it to load the full axis. Redefining the
+> `--font-*` stacks is the *one* sanctioned host override of a kit token, because font
+> *loading* is a host concern; do not otherwise redeclare `--font-*`, and never restyle
+> font size/weight (those stay governed by the scale and the lint below). Want the
+> original Google-hosted CJK faces? Self-host `Noto Sans SC` / `Noto Serif SC` /
+> `Ma Shan Zheng` too and prepend their variables — the kit stays out of it.
 
 ## The two rules
 

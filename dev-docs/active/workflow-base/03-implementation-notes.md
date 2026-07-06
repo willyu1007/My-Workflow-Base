@@ -33,6 +33,21 @@
   action command types support the full standard action set, and descriptors are
   deep-frozen.
 
+## 2026-06-26 Web Workbench Public Entry Split
+- Added the implementation plan for `@willyu1007/web-workbench@0.6.6`.
+- The root entry remains a legacy compatibility barrel.
+- Recommended host consumption moves to grouped entries:
+  `primitives`, `shell`, `feedback`, `list`, `insight`, `settings`, `hub`,
+  `queue`, and `record`.
+- The package will continue to keep `dist/components/*` internal; host products
+  should not depend on private build output paths.
+- Existing local CSS work in `templates/web-workbench/src/styles/components.css`
+  is out of scope and must be preserved.
+- To satisfy Node ESM package-resolution smoke checks, relative imports/exports
+  in `templates/web-workbench/src` now use explicit `.js` specifiers.
+- `build` and `prepublishOnly` were made single-layer/npm-invoked so publishing
+  is not blocked by a nested bare `pnpm` resolving to the wrong local runtime.
+
 ## Open Implementation Notes
 - The next concrete review should confirm whether copied host projects preserve
   the template/runtime boundary without importing this repository.

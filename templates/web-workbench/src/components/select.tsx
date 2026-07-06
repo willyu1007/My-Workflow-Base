@@ -8,12 +8,14 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { IconChevronDown } from "./icons";
+import { IconChevronDown } from "./icons.js";
 
 export interface SelectOption {
   readonly value: string;
   readonly label: string;
 }
+
+export type SelectVariant = "field" | "action";
 
 export function Select({
   value,
@@ -21,12 +23,16 @@ export function Select({
   onChange,
   disabled = false,
   ariaLabel,
+  placeholder = "",
+  variant = "field",
 }: {
   readonly value: string;
   readonly options: readonly SelectOption[];
   readonly onChange: (value: string) => void;
   readonly disabled?: boolean;
   readonly ariaLabel?: string;
+  readonly placeholder?: string;
+  readonly variant?: SelectVariant;
 }): React.ReactElement {
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -36,7 +42,7 @@ export function Select({
   const baseId = useId();
 
   const selectedIndex = options.findIndex((o) => o.value === value);
-  const selectedLabel = selectedIndex >= 0 ? options[selectedIndex]!.label : "";
+  const selectedLabel = selectedIndex >= 0 ? options[selectedIndex]!.label : placeholder;
 
   useEffect(() => {
     if (!open) return;
@@ -116,7 +122,7 @@ export function Select({
       <button
         ref={triggerRef}
         type="button"
-        className="mt-select mt-select--trigger"
+        className={`mt-select mt-select--trigger mt-select--${variant}`}
         aria-haspopup="listbox"
         aria-expanded={open}
         {...(ariaLabel ? { "aria-label": ariaLabel } : {})}

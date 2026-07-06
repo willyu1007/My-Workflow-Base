@@ -7,9 +7,9 @@
  * (StatStrip). Tone is a signal, not decoration: figures default to ink, only
  * flagged metrics color (via the shared `wb-emph--*` token).
  */
-import type { InsightModel } from "../contracts/insight-model";
-import { Link } from "./nav";
-import { Meter, Stat, StatStrip } from "./primitives";
+import type { InsightModel } from "../contracts/insight-model.js";
+import { Link } from "./nav.js";
+import { Meter, Stat, StatStrip } from "./primitives.js";
 
 export function InsightCard({ model }: { readonly model: InsightModel }): React.ReactElement {
   const hasEvidence = model.metrics.length > 0 || (model.bars != null && model.bars.length > 0);

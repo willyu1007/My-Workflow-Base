@@ -6,7 +6,7 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
-import { IconX } from "./icons";
+import { IconX } from "./icons.js";
 
 function useEscape(open: boolean, onClose: () => void): void {
   useEffect(() => {

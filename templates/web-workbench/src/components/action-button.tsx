@@ -7,7 +7,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Link } from "./nav";
+import { Link } from "./nav.js";
 
 export function ActionButton({
   children,

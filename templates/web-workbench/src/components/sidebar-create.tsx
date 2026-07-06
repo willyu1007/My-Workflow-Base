@@ -5,9 +5,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { CreateItemDef } from "../contracts/shell-nav";
-import { IconPlus } from "./icons";
-import { Link } from "./nav";
+import type { CreateItemDef } from "../contracts/shell-nav.js";
+import { IconPlus } from "./icons.js";
+import { Link } from "./nav.js";
 
 export function SidebarCreate({
   items,

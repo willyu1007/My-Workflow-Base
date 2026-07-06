@@ -4,7 +4,7 @@
  * component carries no domain vocabulary. Tone colors come from the shared
  * `mt-badge--*` palette.
  */
-import type { CardTone } from "../contracts/card-model";
+import type { CardTone } from "../contracts/card-model.js";
 
 export function StatusBadge({
   tone,

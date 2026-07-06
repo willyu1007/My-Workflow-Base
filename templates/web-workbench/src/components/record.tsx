@@ -8,9 +8,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Drawer } from "./overlay";
-import { Scene } from "./scene";
-import { Tabs, type TabItem } from "./tabs";
+import { Drawer } from "./overlay.js";
+import { Scene } from "./scene.js";
+import { Tabs, type TabItem } from "./tabs.js";
 
 export interface RecordDrawer {
   readonly open: boolean;

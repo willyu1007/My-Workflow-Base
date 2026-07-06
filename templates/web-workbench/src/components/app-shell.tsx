@@ -13,12 +13,12 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import type { Crumb, ShellNav } from "../contracts/shell-nav";
-import type { AccountMenuItem } from "./account-menu";
-import { BreadcrumbProvider, TopbarBreadcrumb, useBreadcrumbTrail } from "./breadcrumb";
-import { IconMenu } from "./icons";
-import { usePathname } from "./nav";
-import { Sidebar } from "./sidebar";
+import type { Crumb, ShellNav } from "../contracts/shell-nav.js";
+import type { AccountMenuItem } from "./account-menu.js";
+import { BreadcrumbProvider, TopbarBreadcrumb, useBreadcrumbTrail } from "./breadcrumb.js";
+import { IconMenu } from "./icons.js";
+import { usePathname } from "./nav.js";
+import { Sidebar } from "./sidebar.js";
 
 function matchPrefix(pathname: string, prefix: string): boolean {
   if (prefix === "/") return pathname === "/";

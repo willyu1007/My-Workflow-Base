@@ -8,9 +8,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { NavItemDef, ShellNav } from "../contracts/shell-nav";
-import { AccountMenu, type AccountMenuItem } from "./account-menu";
-import { IconChevronDown, IconHome, IconPlus, IconSearch, IconSidebar } from "./icons";
+import type { NavItemDef, ShellNav } from "../contracts/shell-nav.js";
+import { AccountMenu, type AccountMenuItem } from "./account-menu.js";
+import { IconChevronDown, IconHome, IconPlus, IconSearch, IconSidebar } from "./icons.js";
 
 const COLLAPSE_KEY = "wb-nav-collapsed";
 
@@ -32,8 +32,8 @@ function saveCollapsedGroups(keys: ReadonlySet<string>): void {
     /* storage unavailable — collapse state is best-effort */
   }
 }
-import { Link, usePathname } from "./nav";
-import { SidebarCreate } from "./sidebar-create";
+import { Link, usePathname } from "./nav.js";
+import { SidebarCreate } from "./sidebar-create.js";
 
 function matchPrefix(pathname: string, prefix: string): boolean {
   if (prefix === "/") return pathname === "/";
