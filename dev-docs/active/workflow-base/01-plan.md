@@ -37,9 +37,9 @@ Acceptance:
 
 ### X0-C: Validator and conformance rules
 
-- Add warning-only legacy handoff migration findings.
-- Add fatal vNext key/source/host-capability/duplicate-key rules.
-- Add positive and negative vNext fixtures, including claim-token compile and
+- [x] Add warning-only legacy handoff migration findings.
+- [x] Add fatal vNext key/source/host-capability/duplicate-key rules.
+- [x] Add positive and negative vNext fixtures, including claim-token compile and
   no-persistence/logging checks.
 
 ### X0-D: Handoff and adoption record
@@ -60,9 +60,15 @@ Acceptance:
 | vNext mode with missing/disabled host capability | Fatal. |
 | vNext mode with all requirements and capability enabled | Pass. |
 
-Reserved validator rule range for X0-B/C: `WF-MAN-043` through `WF-MAN-047`.
-The exact rule-to-predicate mapping must be recorded with the implementation and
-must not repurpose existing rule IDs.
+Implemented validator mapping:
+
+| Rule id | Severity | Predicate |
+| --- | --- | --- |
+| `WF-MAN-043` | Warning | Legacy handoff omits `materialization_mode`. |
+| `WF-MAN-044` | Fatal | vNext handoff has no non-empty stable `handoff_key`. |
+| `WF-MAN-045` | Fatal | vNext handoff has no non-empty artifact/context source type. |
+| `WF-MAN-046` | Fatal | Any vNext handoff exists while host capability evidence is absent/empty. |
+| `WF-MAN-047` | Fatal | Any non-empty declared `handoff_key` is duplicated. |
 
 ## Phase 1: Matrix contract reduction
 
@@ -122,6 +128,6 @@ Acceptance:
 - Implementation can start without reopening M1/M2/M3 ownership debates.
 
 ## Current First Move
-Implement X0-C from the compatibility matrix above. Add the reserved validator
-rules and negative conformance cases without changing legacy runtime behavior or
-enabling a host capability.
+Execute X0-D: rerun the full clean/frozen verification and boundary matrix,
+compute the adopted Base revision and deterministic contract source hash, then
+record the My-Chat X1 handoff without enabling a host capability.

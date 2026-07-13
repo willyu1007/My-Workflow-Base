@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type {
   ChatWorkflowAdapter,
+  HandoffManifest,
   ScenarioManifest,
   WorkflowHostValidationSnapshot,
   WorkflowRuntimePort,
@@ -367,6 +368,55 @@ function createScenarioModule(): WorkflowScenarioModule {
   };
 }
 
+function createLegacyHandoff(overrides: Partial<HandoffManifest> = {}): HandoffManifest {
+  return {
+    handoff_type: "notification",
+    source_artifact_types: ["example_summary"],
+    requested_purposes: ["user_attention"],
+    downstream_owner: "notification",
+    policy_key: "example.can_request_user_attention",
+    receipt_required: true,
+    ...overrides,
+  };
+}
+
+function createVnextHandoff(overrides: Partial<HandoffManifest> = {}): HandoffManifest {
+  return createLegacyHandoff({
+    handoff_key: "user_attention",
+    source_artifact_types: [],
+    source_context_ref_types: [
+      {
+        namespace: "scenario.example",
+        object_type: "care_item",
+      },
+    ],
+    materialization_mode: "workflow_step_complete_v1",
+    ...overrides,
+  });
+}
+
+function createModuleWithHandoffs(handoffs: HandoffManifest[]): WorkflowScenarioModule {
+  const module = createScenarioModule();
+  module.manifest = {
+    ...module.manifest,
+    handoffs,
+  };
+  module.policies = {
+    "example.can_request_user_attention": async () => true,
+  };
+  return module;
+}
+
+function createHandoffHostSnapshot(
+  overrides: Partial<WorkflowHostValidationSnapshot> = {},
+): WorkflowHostValidationSnapshot {
+  return {
+    ...hostSnapshot,
+    downstream_owners: ["notification"],
+    ...overrides,
+  };
+}
+
 describe("workflow module validation and loading", () => {
   it("passes the legacy scenario module without changing its contract hash", () => {
     const report = validateWorkflowModule({
@@ -378,6 +428,163 @@ describe("workflow module validation and loading", () => {
     expect(report.passed).toBe(true);
     expect(report.contract_hash).toMatch(/^[a-f0-9]{64}$/);
     expect(report.contract_hash).toBe("9f568ff772d3dafc02dd96f284f7cedb85aff18839b8f26f4691a8b2dc0d0ca6");
+    expect(report.findings.some((finding) => finding.rule_id.startsWith("WF-MAN-04"))).toBe(false);
+  });
+
+  it("warns for a legacy handoff without blocking registration", () => {
+    const module = createModuleWithHandoffs([createLegacyHandoff()]);
+    const handoffHostSnapshot = createHandoffHostSnapshot();
+    const report = validateWorkflowModule({
+      module,
+      host_snapshot: handoffHostSnapshot,
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(true);
+    expect(report.findings).toEqual([
+      expect.objectContaining({
+        rule_id: "WF-MAN-043",
+        severity: "warning",
+        path: "handoffs.0.materialization_mode",
+      }),
+    ]);
+    expect(() =>
+      loadWorkflowRegistry({
+        modules: [module],
+        host_snapshot: handoffHostSnapshot,
+      }),
+    ).not.toThrow();
+  });
+
+  it("preserves existing legacy handoff finding paths", () => {
+    const report = validateWorkflowModule({
+      module: createModuleWithHandoffs([
+        createLegacyHandoff({
+          receipt_required: false,
+        }),
+      ]),
+      host_snapshot: createHandoffHostSnapshot(),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toContainEqual(
+      expect.objectContaining({
+        rule_id: "WF-MAN-040",
+        severity: "fatal",
+        path: "handoffs",
+      }),
+    );
+  });
+
+  it("passes a valid vNext handoff when the host capability is enabled", () => {
+    const report = validateWorkflowModule({
+      module: createModuleWithHandoffs([createVnextHandoff()]),
+      host_snapshot: createHandoffHostSnapshot({
+        host_capabilities: ["workflow_handoff_materialization_v1"],
+      }),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(true);
+    expect(report.findings.some((finding) => /^WF-MAN-04[3-7]$/.test(finding.rule_id))).toBe(false);
+  });
+
+  it("rejects a vNext handoff without a stable handoff key", () => {
+    const report = validateWorkflowModule({
+      module: createModuleWithHandoffs([
+        createVnextHandoff({
+          handoff_key: " ",
+        }),
+      ]),
+      host_snapshot: createHandoffHostSnapshot({
+        host_capabilities: ["workflow_handoff_materialization_v1"],
+      }),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toContainEqual(
+      expect.objectContaining({ rule_id: "WF-MAN-044", severity: "fatal" }),
+    );
+  });
+
+  it("rejects a vNext handoff without a declared artifact or context source type", () => {
+    const report = validateWorkflowModule({
+      module: createModuleWithHandoffs([
+        createVnextHandoff({
+          source_artifact_types: [],
+          source_context_ref_types: [{ namespace: " ", object_type: "care_item" }],
+        }),
+      ]),
+      host_snapshot: createHandoffHostSnapshot({
+        host_capabilities: ["workflow_handoff_materialization_v1"],
+      }),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toContainEqual(
+      expect.objectContaining({ rule_id: "WF-MAN-045", severity: "fatal" }),
+    );
+  });
+
+  it.each([
+    ["absent", {}],
+    ["empty", { host_capabilities: [] }],
+  ])("rejects a vNext handoff when host capability evidence is %s", (_label, hostOverrides) => {
+    const report = validateWorkflowModule({
+      module: createModuleWithHandoffs([createVnextHandoff()]),
+      host_snapshot: createHandoffHostSnapshot(hostOverrides),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toContainEqual(
+      expect.objectContaining({
+        rule_id: "WF-MAN-046",
+        severity: "fatal",
+        path: "host_capabilities",
+      }),
+    );
+  });
+
+  it("emits one host-capability fatal for multiple vNext handoffs", () => {
+    const report = validateWorkflowModule({
+      module: createModuleWithHandoffs([
+        createVnextHandoff(),
+        createVnextHandoff({
+          handoff_key: "external_delivery",
+          handoff_type: "external_delivery",
+        }),
+      ]),
+      host_snapshot: createHandoffHostSnapshot(),
+      activation_target: "dev",
+    });
+
+    expect(report.findings.filter((finding) => finding.rule_id === "WF-MAN-046")).toHaveLength(1);
+  });
+
+  it("rejects duplicate declared handoff keys across migration and vNext declarations", () => {
+    const report = validateWorkflowModule({
+      module: createModuleWithHandoffs([
+        createLegacyHandoff({ handoff_key: "user_attention" }),
+        createVnextHandoff({ handoff_type: "external_delivery" }),
+      ]),
+      host_snapshot: createHandoffHostSnapshot({
+        host_capabilities: ["workflow_handoff_materialization_v1"],
+      }),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toContainEqual(
+      expect.objectContaining({
+        rule_id: "WF-MAN-047",
+        severity: "fatal",
+        path: "handoffs.1.handoff_key",
+      }),
+    );
   });
 
   it("changes the contract hash when the manifest changes", () => {

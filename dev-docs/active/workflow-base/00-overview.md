@@ -34,8 +34,8 @@ consumption surfaces
 - Created: 2026-05-25
 - Updated: 2026-07-13
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
-- Completed increment: X0-B additive vNext contract types
-- Next gate: X0-C validator and negative conformance rules
+- Completed increment: X0-C validator and negative conformance rules
+- Next gate: X0-D full verification and revision/hash handoff
 
 ## Context
 This repository is the workflow base template. It defines durable contracts for
@@ -259,6 +259,22 @@ The current design stance is:
 - [x] No validator behavior, runtime persistence, Prisma, queue, Outbox, or
   scenario-specific logic is introduced in X0-B.
 
+### X0-C Acceptance Criteria
+
+- [x] No-handoff manifests produce no migration finding and retain the frozen
+  legacy contract hash.
+- [x] Legacy handoffs without `materialization_mode` produce warning-only
+  `WF-MAN-043` and remain registerable.
+- [x] Invalid vNext declarations fail on missing key, missing source,
+  missing/empty host capability, or duplicate declared key through
+  `WF-MAN-044`–`047`.
+- [x] A valid vNext declaration passes when all requirements and the host
+  capability are present.
+- [x] Negative compile fixtures reject missing trusted claim evidence and reject
+  claim fields on snapshot, draft, materialization, and completion-result DTOs.
+- [x] Existing `WF-MAN-040`–`042` semantics/finding paths, legacy lifecycle,
+  contract types, and runtime ownership remain unchanged.
+
 ## Current Notes
 - 2026-05-25: Task package created to preserve macro alignment before further
   contract edits.
@@ -289,6 +305,10 @@ The current design stance is:
   fixtures completed. The legacy runtime port remains unchanged; the vNext
   materialization port is an explicit additive extension. X0-C remains the
   validator/negative-conformance gate, and no host activation is enabled.
+- 2026-07-13: X0-C implemented the reserved `WF-MAN-043`–`047` matrix,
+  negative type fixtures, and claim-token persistence/logging guard. The task
+  remains `in-progress`; X0-D must record the final revision/source hash before
+  My-Chat X1 adoption, and no capability is enabled.
 - 2026-05-26: Downstream information matrix added: outbox carries signals and
   refs only; downstream consumers must reread canonical state and own their
   side effects.

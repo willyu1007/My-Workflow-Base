@@ -44,6 +44,29 @@ function addFatal(
   findings.push({ ...input, severity: "fatal" });
 }
 
+function addWarning(
+  findings: WorkflowModuleValidationFinding[],
+  input: Omit<WorkflowModuleValidationFinding, "severity">,
+): void {
+  findings.push({ ...input, severity: "warning" });
+}
+
+function isNonEmpty(value: string | undefined): value is string {
+  return value !== undefined && value.trim().length > 0;
+}
+
+function hasDeclaredHandoffSource(input: {
+  source_artifact_types: string[];
+  source_context_ref_types?: Array<{ namespace: string; object_type: string }>;
+}): boolean {
+  return (
+    input.source_artifact_types.some(isNonEmpty) ||
+    (input.source_context_ref_types ?? []).some(
+      (sourceType) => isNonEmpty(sourceType.namespace) && isNonEmpty(sourceType.object_type),
+    )
+  );
+}
+
 export function validateWorkflowModule(input: {
   module: WorkflowScenarioModule;
   host_snapshot: WorkflowHostValidationSnapshot;
@@ -149,7 +172,12 @@ export function validateWorkflowModule(input: {
     }
   }
 
-  for (const handoff of manifest.handoffs) {
+  const declaredHandoffKeys = new Map<string, number>();
+  let hasVnextHandoff = false;
+
+  for (const [handoffIndex, handoff] of manifest.handoffs.entries()) {
+    const handoffPath = `handoffs.${handoffIndex}`;
+
     if (!handoff.receipt_required) {
       addFatal(findings, {
         rule_id: "WF-MAN-040",
@@ -176,6 +204,63 @@ export function validateWorkflowModule(input: {
         remediation: "Register the downstream owner in the host handoff registry.",
       });
     }
+
+    const handoffKey = handoff.handoff_key?.trim();
+    if (handoffKey) {
+      const firstDeclarationIndex = declaredHandoffKeys.get(handoffKey);
+      if (firstDeclarationIndex === undefined) {
+        declaredHandoffKeys.set(handoffKey, handoffIndex);
+      } else {
+        addFatal(findings, {
+          rule_id: "WF-MAN-047",
+          message: `Handoff key is declared more than once: ${handoffKey}`,
+          path: `${handoffPath}.handoff_key`,
+          remediation: `Use a unique stable handoff_key; first declared at handoffs.${firstDeclarationIndex}.handoff_key.`,
+        });
+      }
+    }
+
+    if (handoff.materialization_mode !== "workflow_step_complete_v1") {
+      addWarning(findings, {
+        rule_id: "WF-MAN-043",
+        message: `Legacy handoff does not opt into vNext materialization: ${handoff.handoff_type}`,
+        path: `${handoffPath}.materialization_mode`,
+        remediation: "Keep legacy behavior or migrate explicitly with materialization_mode and all vNext requirements.",
+      });
+      continue;
+    }
+
+    hasVnextHandoff = true;
+
+    if (!handoffKey) {
+      addFatal(findings, {
+        rule_id: "WF-MAN-044",
+        message: "vNext handoff requires a stable handoff_key.",
+        path: `${handoffPath}.handoff_key`,
+        remediation: "Declare a non-empty stable handoff_key before enabling vNext materialization.",
+      });
+    }
+
+    if (!hasDeclaredHandoffSource(handoff)) {
+      addFatal(findings, {
+        rule_id: "WF-MAN-045",
+        message: "vNext handoff requires at least one declared artifact or context source type.",
+        path: handoffPath,
+        remediation: "Declare a non-empty source_artifact_types or source_context_ref_types entry.",
+      });
+    }
+  }
+
+  if (
+    hasVnextHandoff &&
+    !input.host_snapshot.host_capabilities?.includes("workflow_handoff_materialization_v1")
+  ) {
+    addFatal(findings, {
+      rule_id: "WF-MAN-046",
+      message: "Host does not enable workflow_handoff_materialization_v1.",
+      path: "host_capabilities",
+      remediation: "Keep vNext activation disabled until the host declares the materialization capability.",
+    });
   }
 
   const registeredEvents = new Set([

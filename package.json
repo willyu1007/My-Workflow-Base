@@ -15,10 +15,12 @@
     "typecheck": "pnpm typecheck:contracts && pnpm typecheck:runtime && pnpm typecheck:scenario && pnpm typecheck:conformance",
     "test:runtime": "pnpm --filter @host/workflow-runtime test",
     "test:scenario": "pnpm --filter @host/scenario-module-example test",
-    "test": "pnpm test:runtime && pnpm test:scenario",
+    "test:conformance": "pnpm --filter @workflow-base/conformance test",
+    "test": "pnpm test:runtime && pnpm test:scenario && pnpm test:conformance",
     "verify:workflow-contracts": "pnpm typecheck && pnpm test",
     "verify:x0-a": "pnpm verify:workflow-contracts",
-    "verify:x0-b": "pnpm verify:workflow-contracts"
+    "verify:x0-b": "pnpm verify:workflow-contracts",
+    "verify:x0-c": "pnpm verify:workflow-contracts"
   },
   "devDependencies": {
     "@types/node": "^20.17.0",

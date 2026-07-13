@@ -191,6 +191,18 @@ Compatibility rules:
 - Contract/hash validation occurs before host persistence. Base defines the
   rule and fixture; the host owns transaction, replay, ledger, and outbox.
 
+X0-C validator behavior:
+
+- no handoff declaration produces no migration finding
+- a legacy declaration without `materialization_mode` emits warning-only
+  `WF-MAN-043`; warnings do not block registry loading
+- vNext missing-key/source/capability defects are fatal `WF-MAN-044`–`046`
+- host capability absence/empty state produces one host-level finding rather
+  than one duplicate finding per vNext declaration
+- declared non-empty keys must be unique across legacy migration and vNext
+  declarations (`WF-MAN-047`) so pinned-contract lookup cannot be ambiguous
+- existing `WF-MAN-040`–`042` outputs remain stable
+
 The source repository verifies these rules through copyable packages and
 scenario fixtures. It must not rely on My-Chat's workspace to supply TypeScript,
 Vitest, aliases, or missing tsconfig files.

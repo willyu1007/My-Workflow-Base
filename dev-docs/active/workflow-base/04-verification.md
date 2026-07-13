@@ -86,6 +86,49 @@
   `9f2c36c`: frozen install and the full `verify:workflow-contracts` job
   completed successfully.
 
+## X0-C Required Checks
+
+- `corepack pnpm install --frozen-lockfile`
+- `corepack pnpm verify:x0-c`
+- validator matrix for no-handoff, legacy warning, valid vNext, missing key,
+  missing source, absent/empty host capability, and duplicate declared key
+- negative TypeScript fixtures for trusted claim evidence and forbidden
+  persisted/output claim fields
+- claim-token type-placement and runtime logging/metrics boundary check
+- frozen legacy contract hash and existing `WF-MAN-040`–`042` finding-path
+  regression assertions
+- clean-checkout frozen-install simulation without root `node_modules`
+- YAML, Markdown fence/link, `git diff --check`, and changed-path boundary scans
+- independent web-workbench typecheck/build regression
+- Draft PR remote CI
+
+## X0-C Results
+
+- 2026-07-13: Targeted runtime validator tests passed 17/17 after adding the
+  compatibility matrix and legacy-path regression; scenario journey remained
+  1/1.
+- 2026-07-13: Negative TypeScript conformance fixtures compiled with all
+  expected errors consumed. The claim-token boundary script confirmed required
+  trusted-input placement, forbidden snapshot/draft/output placement, and no
+  runtime logging/metrics use.
+- 2026-07-13: Frozen install and integrated `corepack pnpm verify:x0-c` passed:
+  four typechecks, runtime validator/worker tests, scenario journey, and
+  conformance boundary check.
+- 2026-07-13: Architecture review caught an observable legacy finding-path
+  change in `WF-MAN-040`–`042`; the paths were restored and a regression test
+  was added before continuing.
+- 2026-07-13: A temporary-directory clean-checkout simulation excluded all
+  existing `node_modules`, completed frozen install for five workspace
+  projects, and passed the same X0-C matrix: four typechecks, runtime 17/17,
+  scenario 1/1, and claim-boundary conformance.
+- 2026-07-13: Scenario manifest/GitHub workflow YAML parsing, Markdown fence
+  scan across 19 files, Markdown link scan across eight changed docs, `git diff
+  --check`, and changed-path boundary scans passed. No contract type,
+  worker/repository/service, scenario implementation, persistence, queue,
+  Outbox, or provider path changed.
+- 2026-07-13: Independent `templates/web-workbench` typecheck and build passed;
+  the X0-C validator/conformance changes do not absorb or regress that package.
+
 ## Planned Checks
 - `git diff --check`
 - YAML parse for `templates/scenario-module/scenario.manifest.yaml`

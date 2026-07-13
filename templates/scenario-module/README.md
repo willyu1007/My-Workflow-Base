@@ -260,3 +260,7 @@ verification:
 The vNext fields expose contract shape only. They do not activate non-empty
 handoffs by themselves: X0-C validator rules and an enabled host capability are
 both required before vNext activation.
+
+Validator behavior is additive: legacy declarations receive warning
+`WF-MAN-043`, while vNext declarations fail on missing key/source/capability or
+duplicate declared keys (`WF-MAN-044` through `WF-MAN-047`).

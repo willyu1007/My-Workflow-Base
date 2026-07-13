@@ -49,8 +49,6 @@
   is not blocked by a nested bare `pnpm` resolving to the wrong local runtime.
 
 ## Open Implementation Notes
-- X0-C must implement the reserved warning/fatal validator rules and negative
-  fixtures on top of the X0-B positive compile baseline.
 - X0-D must record the final Base revision and contract source hash only after
   X0-C passes.
 - Keep examples scenario-neutral unless explicitly marked as examples.
@@ -94,3 +92,25 @@
 - Updated workflow context docs and scenario-template guidance. No validator
   rule, runtime persistence, Prisma, queue, Outbox, or scenario-specific logic
   was added.
+
+## 2026-07-13 X0-C Validator and Negative Conformance
+
+- Implemented the locked `WF-MAN-043`–`047` compatibility matrix in the host
+  validator scaffold. Legacy handoffs warn without blocking; vNext missing
+  key/source/capability and duplicate-key declarations fail closed.
+- Capability absence is evaluated once at host-snapshot level. Duplicate-key
+  detection covers every non-empty declared key, including migration-prepared
+  legacy declarations, so a vNext key cannot resolve ambiguously.
+- Added validator tests for no-handoff legacy hash stability, warning-only
+  registration, valid vNext, each fatal predicate, absent/empty capability, and
+  legacy finding-path stability.
+- Added negative TypeScript fixtures proving transient claim evidence is
+  required on trusted driver/v1 completion inputs and rejected from persisted
+  snapshot/draft and output DTOs.
+- Added a source-repo claim-token boundary check for type placement and runtime
+  logging/metrics calls, and included it in the generic CI verification command.
+- Architecture review found an initial accidental change to existing
+  `WF-MAN-040`–`042` finding paths. It was reverted and covered by regression
+  test before full verification.
+- No workflow contract type, runtime persistence, Prisma/database, queue,
+  Outbox, provider, downstream side effect, or capability enablement was added.
