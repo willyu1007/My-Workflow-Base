@@ -27,10 +27,13 @@ Acceptance:
 
 ### X0-B: Additive vNext contract types
 
-- Add stable `handoff_key`, context-source declarations, snapshot/draft/driver,
+- [x] Add stable `handoff_key`, context-source declarations, snapshot/draft/driver,
   host-capability, materialized-handoff, versioned lifecycle, and discriminated
   `complete_step` input/result types.
-- Keep legacy types and calls valid.
+- [x] Keep legacy types and calls valid.
+- [x] Add dedicated positive legacy/vNext compile fixtures to the source-repo
+  conformance package.
+- [x] Keep validator warning/fatal behavior and negative fixtures out of X0-B.
 
 ### X0-C: Validator and conformance rules
 
@@ -119,5 +122,6 @@ Acceptance:
 - Implementation can start without reopening M1/M2/M3 ownership debates.
 
 ## Current First Move
-Complete X0-A and its clean/frozen verification before editing vNext contract
-types. After X0-A passes, start X0-B from the compatibility matrix above.
+Implement X0-C from the compatibility matrix above. Add the reserved validator
+rules and negative conformance cases without changing legacy runtime behavior or
+enabling a host capability.

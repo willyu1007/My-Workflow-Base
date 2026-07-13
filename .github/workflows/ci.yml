@@ -33,5 +33,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Verify X0-A conformance baseline
-        run: pnpm verify:x0-a
+      - name: Verify workflow contract conformance
+        run: pnpm verify:workflow-contracts

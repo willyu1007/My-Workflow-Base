@@ -11,11 +11,14 @@
     "typecheck:contracts": "pnpm --filter @host/workflow-contracts typecheck",
     "typecheck:runtime": "pnpm --filter @host/workflow-runtime typecheck",
     "typecheck:scenario": "pnpm --filter @host/scenario-module-example typecheck",
-    "typecheck": "pnpm typecheck:contracts && pnpm typecheck:runtime && pnpm typecheck:scenario",
+    "typecheck:conformance": "pnpm --filter @workflow-base/conformance typecheck",
+    "typecheck": "pnpm typecheck:contracts && pnpm typecheck:runtime && pnpm typecheck:scenario && pnpm typecheck:conformance",
     "test:runtime": "pnpm --filter @host/workflow-runtime test",
     "test:scenario": "pnpm --filter @host/scenario-module-example test",
     "test": "pnpm test:runtime && pnpm test:scenario",
-    "verify:x0-a": "pnpm typecheck && pnpm test"
+    "verify:workflow-contracts": "pnpm typecheck && pnpm test",
+    "verify:x0-a": "pnpm verify:workflow-contracts",
+    "verify:x0-b": "pnpm verify:workflow-contracts"
   },
   "devDependencies": {
     "@types/node": "^20.17.0",

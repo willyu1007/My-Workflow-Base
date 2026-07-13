@@ -29,6 +29,25 @@ export type ManifestCapability = {
   entrypoints: ManifestEntrypoint[];
 };
 
+export type HandoffContextRefTypeManifest = {
+  namespace: string;
+  object_type: string;
+};
+
+export type WorkflowHandoffMaterializationMode = "workflow_step_complete_v1";
+
+export type HandoffManifest = {
+  handoff_type: string;
+  source_artifact_types: string[];
+  requested_purposes: string[];
+  downstream_owner: string;
+  policy_key: string;
+  receipt_required: boolean;
+  handoff_key?: string;
+  source_context_ref_types?: HandoffContextRefTypeManifest[];
+  materialization_mode?: WorkflowHandoffMaterializationMode;
+};
+
 export type ScenarioManifest = {
   manifest_version: number;
   scenario_key: string;
@@ -77,14 +96,7 @@ export type ScenarioManifest = {
     scenario_actions: string[];
     expected_version_required: boolean;
   };
-  handoffs: Array<{
-    handoff_type: string;
-    source_artifact_types: string[];
-    requested_purposes: string[];
-    downstream_owner: string;
-    policy_key: string;
-    receipt_required: boolean;
-  }>;
+  handoffs: HandoffManifest[];
   surface_mapping: Record<string, Record<string, unknown>>;
   internal_api: {
     routes: Array<{

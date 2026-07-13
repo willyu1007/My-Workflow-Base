@@ -38,6 +38,51 @@
   `chore/x0-a-contract-conformance`; GitHub Actions run `29233753559` passed the
   frozen-install and `verify:x0-a` conformance job in 20 seconds.
 
+## X0-B Required Checks
+
+- `corepack pnpm install --frozen-lockfile`
+- `corepack pnpm verify:x0-b`
+- dedicated legacy and vNext positive compile fixtures
+- clean-checkout frozen-install simulation without root `node_modules`
+- YAML parse for scenario manifest and GitHub workflow
+- Markdown fence and link checks for changed docs
+- `git diff --check`
+- claim-token placement scan
+- boundary scan for validator behavior, runtime persistence, Prisma, database,
+  queue, Outbox, provider, or scenario-specific implementation
+- independent web-workbench typecheck/build regression
+
+## X0-B Results
+
+- 2026-07-13: Integrated `corepack pnpm verify:x0-b` passed after contract and
+  positive fixture implementation: four typechecks, runtime 8/8 tests, and
+  scenario journey 1/1.
+- 2026-07-13: Architecture review found that a broad completion input/output
+  union would not correlate a v1 input with its materialization result and
+  would change the legacy implementation obligation. The contract was repaired
+  to retain `WorkflowRuntimePort` and add the overloaded
+  `WorkflowRuntimePortMaterializationV1`; the full verification command passed
+  again.
+- 2026-07-13: Positive compile fixtures prove three paths independently: the
+  unchanged legacy port accepts legacy completion and returns
+  `WorkflowStepResult`; the v1 port retains that legacy overload; and the v1
+  completion overload returns materialized Handoff refs.
+- 2026-07-13: A temporary-directory clean-checkout simulation excluded all
+  existing `node_modules`, completed frozen install for five workspace
+  projects, and passed `verify:x0-b`: four typechecks, runtime 8/8, scenario
+  journey 1/1.
+- 2026-07-13: Scenario manifest and GitHub workflow YAML parsing, Markdown fence
+  scan across 19 files, Markdown link scan across 11 changed docs, and `git
+  diff --check` passed.
+- 2026-07-13: Claim-token placement and changed-path boundary scans passed.
+  Newly added claim fields exist only on the trusted driver and discriminated
+  completion input; snapshots, drafts, lifecycle, and materialization outputs
+  contain none. No validator implementation, runtime/scenario implementation,
+  Prisma/database, queue, Outbox, provider, or delivery path changed.
+- 2026-07-13: Independent `templates/web-workbench` typecheck and build passed;
+  the X0-B workspace/conformance additions do not absorb or regress that
+  package.
+
 ## Planned Checks
 - `git diff --check`
 - YAML parse for `templates/scenario-module/scenario.manifest.yaml`

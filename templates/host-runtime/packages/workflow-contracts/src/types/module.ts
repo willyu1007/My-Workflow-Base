@@ -11,6 +11,7 @@ import type {
   ContextBindingDraft,
   OutboxEventDraft,
 } from "./api.js";
+import type { WorkflowHandoffDraft } from "./handoff.js";
 import type { CanonicalRef, WorkflowCommandMeta, WorkflowCommandResponse, WorkflowRunRef } from "./identity.js";
 import type { ScenarioManifest } from "./manifest.js";
 import type { WorkflowModuleValidationReport } from "./validation.js";
@@ -34,6 +35,7 @@ export type WorkflowStepHandlerResult = {
   output_refs: CanonicalRef[];
   artifact_drafts?: WorkflowArtifactDraft[];
   context_bindings?: ContextBindingDraft[];
+  handoff_drafts?: WorkflowHandoffDraft[];
   event_drafts?: OutboxEventDraft[];
   reason_code?: string;
 };

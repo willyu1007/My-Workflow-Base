@@ -1,0 +1,10 @@
+{
+  "extends": "../templates/host-runtime/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "../dist/conformance",
+    "types": ["node"]
+  },
+  "include": ["fixtures/**/*.ts"],
+  "exclude": ["node_modules"]
+}

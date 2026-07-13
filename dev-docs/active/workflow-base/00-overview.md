@@ -34,8 +34,8 @@ consumption surfaces
 - Created: 2026-05-25
 - Updated: 2026-07-13
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
-- Completed increment: X0-A governance and source-repo conformance baseline
-- Next gate: X0-B additive vNext contract types
+- Completed increment: X0-B additive vNext contract types
+- Next gate: X0-C validator and negative conformance rules
 
 ## Context
 This repository is the workflow base template. It defines durable contracts for
@@ -244,6 +244,21 @@ The current design stance is:
 - [x] No vNext contract fields, runtime persistence, Prisma, queue, or outbox
   implementation is introduced in X0-A.
 
+### X0-B Acceptance Criteria
+
+- [x] Legacy manifest, host snapshot, completion input/result, and Handoff
+  lifecycle fixtures still compile without vNext fields.
+- [x] vNext manifest, snapshot, draft, trusted driver, host capability,
+  completion input/result, and versioned lifecycle fixtures compile.
+- [x] `WorkflowRuntimePort` retains its legacy `complete_step` contract while
+  `WorkflowRuntimePortMaterializationV1` correlates legacy and v1 input/result
+  overloads.
+- [x] Newly added vNext claim-token fields occur only on trusted
+  driver/completion inputs and are not retained by snapshot, draft, lifecycle,
+  or materialized-result types.
+- [x] No validator behavior, runtime persistence, Prisma, queue, Outbox, or
+  scenario-specific logic is introduced in X0-B.
+
 ## Current Notes
 - 2026-05-25: Task package created to preserve macro alignment before further
   contract edits.
@@ -270,6 +285,10 @@ The current design stance is:
 - 2026-07-13: X0-A implementation and clean-install verification completed. The
   task remains `in-progress`; X0-B is the next gate and no host activation is
   enabled.
+- 2026-07-13: X0-B additive contract types and positive legacy/vNext compile
+  fixtures completed. The legacy runtime port remains unchanged; the vNext
+  materialization port is an explicit additive extension. X0-C remains the
+  validator/negative-conformance gate, and no host activation is enabled.
 - 2026-05-26: Downstream information matrix added: outbox carries signals and
   refs only; downstream consumers must reread canonical state and own their
   side effects.

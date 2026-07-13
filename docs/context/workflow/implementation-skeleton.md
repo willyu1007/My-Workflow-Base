@@ -232,6 +232,11 @@ Rules:
 - public draft, RAG/knowledge, notification, search/vector, and PPR remain
   downstream-owned
 
+X0-B adds contract shapes for a future atomic materializer, but adds no
+materializer implementation here. My-Chat X2/X3 owns the transaction that
+completes a claimed Step, materializes Handoffs, and appends Outbox records.
+The legacy request/receipt service above remains unchanged.
+
 ## Worker runtime skeleton
 
 Worker payloads carry ids and versions only:
@@ -262,6 +267,12 @@ claim step through WorkflowRuntimePort
 ```
 
 The queue is never the source of business truth.
+
+For the vNext path, a trusted worker passes the live claim token only through
+`WorkflowRuntimePortMaterializationV1.complete_step`. The Step handler may
+return typed `handoff_drafts`, but neither the queue payload nor any scenario
+snapshot/draft persists the token. Worker pass-through is a My-Chat X1 adoption
+task; lease/reclaim and atomic persistence remain X2/X3 tasks.
 
 ## Journey harness skeleton
 

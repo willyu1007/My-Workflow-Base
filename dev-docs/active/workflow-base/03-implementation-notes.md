@@ -49,10 +49,10 @@
   is not blocked by a nested bare `pnpm` resolving to the wrong local runtime.
 
 ## Open Implementation Notes
-- X0-B must implement the documented discriminator and versioned completion
-  branch without modifying legacy Handoff lifecycle semantics.
-- X0-C must add vNext fixtures only after X0-B types compile; X0-A establishes
-  the runner and frozen legacy baseline.
+- X0-C must implement the reserved warning/fatal validator rules and negative
+  fixtures on top of the X0-B positive compile baseline.
+- X0-D must record the final Base revision and contract source hash only after
+  X0-C passes.
 - Keep examples scenario-neutral unless explicitly marked as examples.
 
 ## 2026-07-13 X0-A Governance and Conformance Baseline
@@ -73,3 +73,24 @@
   normalization or contract-hash drift during X0-B/C.
 - No workflow contract type, validator rule, runtime persistence, Prisma,
   database, queue, provider, or downstream side-effect implementation changed.
+
+## 2026-07-13 X0-B Additive vNext Contract Types
+
+- Extended `HandoffManifest` with optional `handoff_key`,
+  `source_context_ref_types`, and the explicit
+  `workflow_step_complete_v1` materialization discriminator.
+- Added scenario replay snapshot, host handoff draft, trusted command driver,
+  materialization result, host capability, and separately versioned lifecycle
+  types. Existing `WorkflowHandoffResult` semantics remain unchanged.
+- Added a discriminated v1 completion input requiring transient claim evidence
+  and returning deterministic materialization results.
+- Architecture review rejected changing the legacy runtime port to return a
+  broad input/output union: that shape could not correlate v1 input to v1
+  output and would burden legacy implementers. The final shape preserves
+  `WorkflowRuntimePort` and adds `WorkflowRuntimePortMaterializationV1` with
+  correlated overloads.
+- Added a dedicated conformance workspace with positive legacy and vNext
+  compile fixtures. Negative type and validator cases remain assigned to X0-C.
+- Updated workflow context docs and scenario-template guidance. No validator
+  rule, runtime persistence, Prisma, queue, Outbox, or scenario-specific logic
+  was added.

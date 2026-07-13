@@ -156,6 +156,43 @@ export type WorkflowStepResult = {
   output_refs: CanonicalRef[];
 };
 
+export type WorkflowCompleteStepLegacyInput = {
+  run_id: string;
+  step_id: string;
+  expected_version: number;
+  status?: "completed" | "retry_requested" | "manual_review_required";
+  output_refs: CanonicalRef[];
+  artifact_drafts?: WorkflowArtifactDraft[];
+  context_bindings?: ContextBindingDraft[];
+  event_drafts?: OutboxEventDraft[];
+  meta: WorkflowCommandMeta;
+  completion_contract_version?: never;
+  claim_token?: never;
+  handoff_drafts?: never;
+};
+
+export type WorkflowCompleteStepMaterializationInputV1 = Omit<
+  WorkflowCompleteStepLegacyInput,
+  "completion_contract_version" | "claim_token" | "handoff_drafts"
+> & {
+  completion_contract_version: 1;
+  claim_token: string;
+  handoff_drafts?: WorkflowHandoffDraft[];
+};
+
+export type WorkflowCompleteStepInput =
+  | WorkflowCompleteStepLegacyInput
+  | WorkflowCompleteStepMaterializationInputV1;
+
+export type WorkflowStepMaterializationResultV1 = WorkflowStepResult & {
+  completion_contract_version: 1;
+  materialized_handoffs: MaterializedHandoff[];
+};
+
+export type WorkflowCompleteStepResult =
+  | WorkflowStepResult
+  | WorkflowStepMaterializationResultV1;
+
 export type WorkflowRuntimePort = {
   claim_step(input: {
     run_id: string;
@@ -164,16 +201,9 @@ export type WorkflowRuntimePort = {
     worker_id: string;
     meta: WorkflowCommandMeta;
   }): Promise<WorkflowStepLease>;
-  complete_step(input: {
-    run_id: string;
-    step_id: string;
-    expected_version: number;
-    output_refs: CanonicalRef[];
-    artifact_drafts?: WorkflowArtifactDraft[];
-    context_bindings?: ContextBindingDraft[];
-    event_drafts?: OutboxEventDraft[];
-    meta: WorkflowCommandMeta;
-  }): Promise<WorkflowCommandResponse<WorkflowStepResult>>;
+  complete_step(
+    input: WorkflowCompleteStepLegacyInput,
+  ): Promise<WorkflowCommandResponse<WorkflowStepResult>>;
   fail_step(input: {
     run_id: string;
     step_id: string;
@@ -183,11 +213,34 @@ export type WorkflowRuntimePort = {
     meta: WorkflowCommandMeta;
   }): Promise<WorkflowCommandResponse<WorkflowStepResult>>;
 };
+
+export type WorkflowCompleteStepMaterializationFunctionV1 = {
+  (
+    input: WorkflowCompleteStepLegacyInput,
+  ): Promise<WorkflowCommandResponse<WorkflowStepResult>>;
+  (
+    input: WorkflowCompleteStepMaterializationInputV1,
+  ): Promise<WorkflowCommandResponse<WorkflowStepMaterializationResultV1>>;
+};
+
+export type WorkflowRuntimePortMaterializationV1 = Omit<
+  WorkflowRuntimePort,
+  "complete_step"
+> & {
+  complete_step: WorkflowCompleteStepMaterializationFunctionV1;
+};
 ```
 
 Worker runtime methods must not accept executable instructions from queue
 payloads. They resolve handlers from the validated registry using canonical
 workflow identity and stored contract hash.
+
+X0-B preserves `WorkflowRuntimePort` as the legacy contract. Hosts adopt
+`WorkflowRuntimePortMaterializationV1` explicitly, whose overloads correlate a
+legacy input with the legacy result and a v1 input with the materialization
+result. This avoids weakening callers with an uncorrelated input/output union.
+The v1 `claim_token` is transient claim evidence and must never be persisted,
+hashed, logged, emitted, or returned.
 
 ## Standard headers
 

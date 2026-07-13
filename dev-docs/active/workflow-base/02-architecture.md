@@ -180,8 +180,12 @@ Compatibility rules:
   validator must not infer vNext behavior from a legacy handoff type or owner.
 - Host capability evidence is optional in the snapshot type and defaults to an
   empty/disabled capability set for legacy hosts.
-- The vNext completion branch requires the claim token, expected version, and
-  typed handoff drafts. The legacy completion branch remains valid.
+- The vNext completion branch requires the claim token and expected version and
+  accepts typed handoff drafts. The legacy completion branch remains valid.
+- `WorkflowRuntimePort` retains its legacy completion signature. The additive
+  `WorkflowRuntimePortMaterializationV1` replaces only `complete_step` with
+  correlated overloads so a v1 input yields a v1 result without weakening
+  legacy implementers or callers with an uncorrelated union.
 - The new Handoff lifecycle status is versioned separately from the existing
   `WorkflowHandoffResult` status union.
 - Contract/hash validation occurs before host persistence. Base defines the

@@ -29,6 +29,11 @@
   explicit discriminator and keep legacy semantics intact.
 - Do not make claim tokens optional inside the vNext completion branch or place
   them in persisted/hash/loggable DTOs merely to preserve legacy compilation.
+- Do not replace the legacy `WorkflowRuntimePort.complete_step` result with an
+  uncorrelated legacy/v1 union. Keep the legacy port stable and use the additive
+  v1 overload contract so input and output remain statically correlated.
+- Do not implement X0-C warning/fatal rules opportunistically while adding X0-B
+  types; positive type availability is not activation permission.
 
 ## Historical Notes
 - 2026-07-13: X0-A initially used `tests/**/*.test.ts`; Vitest 4 did not select

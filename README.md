@@ -29,11 +29,11 @@ Workflow 合同、host-runtime scaffold 和 scenario module template 可以在�
 
 ```bash
 corepack pnpm install --frozen-lockfile
-corepack pnpm verify:x0-a
+corepack pnpm verify:workflow-contracts
 ```
 
-`verify:x0-a` 只执行模板 typecheck、validator/worker tests 和 scenario journey
-test，不启动运行时、不连接数据库，也不执行发布或部署。
+该命令只执行模板/conformance typecheck、validator/worker tests 和 scenario
+journey test，不启动运行时、不连接数据库，也不执行发布或部署。
 
 ## 底座原则
 
