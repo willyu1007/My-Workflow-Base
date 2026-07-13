@@ -34,7 +34,7 @@ consumption surfaces
 - Created: 2026-05-25
 - Updated: 2026-07-13
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
-- Completed increment: X0-D verification and revision/hash handoff
+- Completed increment: X0-D verification plus post-review contract repair and revision/hash refresh
 - Next gate: My-Chat X1 contract adoption with capability disabled
 
 ## Context
@@ -180,6 +180,13 @@ The current design stance is:
 - D31: Cross-repo source adoption uses a separate deterministic source hash over
   logical contract/validator roots. It normalizes physical host package aliases
   but is never substituted for a runtime scenario `contract_hash`.
+- D32: Only an omitted `materialization_mode` is legacy. Any explicit unknown,
+  null, or otherwise unsupported value fails closed before activation.
+- D33: The exported completion result is a closed legacy/v1 union; a result with
+  the v1 discriminator must include deterministic materialization output.
+- D34: My-Chat X1 injects the host-owned
+  `WorkflowRuntimePortMaterializationV1` directly into its worker. It does not
+  recover the v1 overload from the legacy scenario adapter through a cast.
 
 ## Dependencies
 - `docs/context/workflow/v0-convergence.md`
@@ -271,6 +278,8 @@ The current design stance is:
 - [x] Invalid vNext declarations fail on missing key, missing source,
   missing/empty host capability, or duplicate declared key through
   `WF-MAN-044`–`047`.
+- [x] Explicit unknown or null `materialization_mode` values fail closed through
+  `WF-MAN-048`; only an omitted field receives the legacy warning.
 - [x] A valid vNext declaration passes when all requirements and the host
   capability are present.
 - [x] Negative compile fixtures reject missing trusted claim evidence and reject
@@ -291,6 +300,18 @@ The current design stance is:
   reproduction command, and exit evidence checklist.
 - [x] X0-D adds no contract/validator behavior, runtime persistence, Prisma,
   queue, Outbox, provider, scenario logic, or capability enablement.
+
+### X0 Post-Review Repair Acceptance Criteria
+
+- [x] A v1-looking completion result without `materialized_handoffs` fails
+  TypeScript conformance.
+- [x] Unknown and null materialization modes fail validator conformance.
+- [x] A compile fixture composes claimed driver evidence, handler drafts, and a
+  directly injected host v1 runtime port without a type assertion.
+- [x] BOM/CRLF, physical-root, and allowed package-alias portability are part of
+  the generic CI conformance command.
+- [x] Contract docs, validator rule tables, X1 handoff, source revision, and
+  source hash identify the repaired contract consistently.
 
 ## Current Notes
 - 2026-05-25: Task package created to preserve macro alignment before further
@@ -331,6 +352,10 @@ The current design stance is:
   and the My-Chat X1 adoption handoff. The broader workflow-base task remains
   `in-progress`; ownership now moves to the separate My-Chat X1 task, and the
   host capability remains disabled.
+- 2026-07-13: Post-X0 quality review superseded that initial revision/hash with
+  repaired contract revision `c7f904c` and source hash
+  `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.
+  X1 remains blocked until the refreshed evidence commit and CI pass.
 - 2026-05-26: Downstream information matrix added: outbox carries signals and
   refs only; downstream consumers must reread canonical state and own their
   side effects.

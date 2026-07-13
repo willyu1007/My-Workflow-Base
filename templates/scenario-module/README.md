@@ -263,4 +263,6 @@ both required before vNext activation.
 
 Validator behavior is additive: legacy declarations receive warning
 `WF-MAN-043`, while vNext declarations fail on missing key/source/capability or
-duplicate declared keys (`WF-MAN-044` through `WF-MAN-047`).
+duplicate declared keys (`WF-MAN-044` through `WF-MAN-047`). An explicitly
+unknown or null `materialization_mode` fails closed through `WF-MAN-048`; only
+an omitted mode is treated as legacy.

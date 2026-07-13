@@ -2,13 +2,13 @@
 
 ## Status
 
-- Handoff state: ready for My-Chat X1
+- Handoff state: post-review repair verification in progress; do not start X1 yet
 - Base contract source revision:
-  `e20c0735f450fd4fbc65ca195d7bc9a494c20cda`
-- X0-D evidence revision:
+  `c7f904cdb9b647c80f28134ab6967cd76f730962`
+- Superseded pre-review X0-D evidence revision:
   `2894badedf8588f97d57aa89d01bd003e56ace9d`
 - Contract source hash:
-  `1a393c21192e711a7e87733724fc74d9c0c5bbb36a2ad2824d34157e2be83416`
+  `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`
 - Hash schema: `workflow-contract-source-lock.json` schema version 1
 - Delivery branch: `chore/x0-a-contract-conformance`
 - Delivery PR: My-Workflow-Base PR #1
@@ -19,7 +19,8 @@ Pre-adoption observation on 2026-07-13: clean My-Chat `main` revision
 The mismatch is expected and is the X1 adoption delta, not an X0-D failure.
 
 The source revision is the last commit that changes the X0 contract/validator
-source. Later X0-D commits add only hashing, verification, and handoff evidence.
+source. Later repair-evidence commits add only hashing, verification, and
+handoff evidence.
 My-Chat may adopt from the final PR head, but MUST record the source revision and
 source hash above so later documentation-only commits cannot obscure what was
 actually adopted.
@@ -61,13 +62,15 @@ dev-docs/active/workflow-handoff-materialization/
 X1 must then:
 
 1. Adopt the Base workflow-contracts source types and public exports.
-2. Adopt validator behavior including `WF-MAN-043` through `WF-MAN-047`.
+2. Adopt validator behavior including `WF-MAN-043` through `WF-MAN-048`.
 3. Add or retain legacy/vNext positive and negative conformance coverage.
-4. Pass the claimed Step driver context and handler `handoff_drafts` through the
+4. Inject the host-owned `WorkflowRuntimePortMaterializationV1` directly into
+   the worker; do not cast the legacy scenario `worker_runtime` adapter to v1.
+5. Pass the claimed Step driver context and handler `handoff_drafts` through the
    trusted worker call path without persisting/logging the claim token.
-5. Add `workflow_handoff_materialization_v1` to the host snapshot type, while
+6. Add `workflow_handoff_materialization_v1` to the host snapshot type, while
    keeping the runtime value absent/empty and therefore disabled by default.
-6. Record the Base source revision/hash and the resulting My-Chat commit/hash in
+7. Record the Base source revision/hash and the resulting My-Chat commit/hash in
    the My-Chat task verification log.
 
 ## X1 Explicit Non-Goals
@@ -80,6 +83,7 @@ X1 must not:
 - enable `workflow_handoff_materialization_v1` in any environment
 - change legacy scenario behavior or reinterpret legacy Handoff lifecycle
 - add Nurture-specific contract types or business rules
+- use a type assertion to reinterpret a legacy runtime port as the v1 port
 
 Those responsibilities remain X2/X3 or N1/X4-N2 as defined by the cross-repo
 roadmap.
@@ -114,6 +118,8 @@ My-Chat X1 is ready to hand off to X2/N1 only when:
   validator fixtures
 - disabled/absent runtime capability prevents non-empty activation
 - worker pass-through tests prove the current claimed Step remains the driver
+- worker construction and completion compile without casting the legacy
+  scenario adapter to `WorkflowRuntimePortMaterializationV1`
 - claim-token negative conformance passes
 - My-Chat contract/validator source hash matches the Base lock
 - My-Chat task docs record adopted Base revision/hash and the My-Chat commit

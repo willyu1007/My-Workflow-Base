@@ -201,6 +201,8 @@ X0-C validator behavior:
   than one duplicate finding per vNext declaration
 - declared non-empty keys must be unique across legacy migration and vNext
   declarations (`WF-MAN-047`) so pinned-contract lookup cannot be ambiguous
+- explicit unknown or null materialization modes fail closed through
+  `WF-MAN-048`; only an omitted mode is treated as legacy
 - existing `WF-MAN-040`–`042` outputs remain stable
 
 The source repository verifies these rules through copyable packages and
@@ -224,6 +226,12 @@ The claim token:
 Base conformance can enforce type placement and fixture behavior. My-Chat X2/X3
 must enforce lease, claim, replay, transaction, and persistence behavior.
 
+My-Chat X1 injects the host-owned `WorkflowRuntimePortMaterializationV1`
+directly into its worker. The scenario registry remains legacy-compatible and
+is not used as an unsafe type-narrowing authority for host capability. A compile
+fixture proves the driver evidence and handler drafts can reach the injected v1
+port without `as WorkflowRuntimePortMaterializationV1`.
+
 ## X0-D Source Adoption Hash Boundary
 
 The cross-repo adoption hash identifies copied contract and validator source;
@@ -236,11 +244,11 @@ Logical hash roots:
 - `workflow-validator`: all non-test TypeScript under the validator source root
 
 The hash is deterministic across repo locations. It normalizes UTF-8 BOM and
-line endings, maps the host-specific package specifier ending in
-`/workflow-contracts` to a logical alias inside validator sources, then hashes
-sorted logical path + byte length + normalized bytes with NUL delimiters.
-Everything else, including comments and validator behavior, remains
-source-sensitive.
+line endings, maps only `@host/workflow-contracts` and
+`@my-chat/workflow-contracts` in supported module-import positions to a logical
+alias inside validator sources, then hashes sorted logical path + byte length +
+normalized bytes with NUL delimiters. Everything else, including other package
+scopes, comments, and validator behavior, remains source-sensitive.
 
 This deliberately separates three identities:
 

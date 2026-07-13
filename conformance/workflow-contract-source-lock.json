@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "contract_source_revision": "e20c0735f450fd4fbc65ca195d7bc9a494c20cda",
+  "contract_source_revision": "c7f904cdb9b647c80f28134ab6967cd76f730962",
   "algorithm": "sha256",
   "normalization": "utf8_lf_workflow_contracts_import_alias_path_nul_length_nul_content_nul_v1",
   "logical_roots": [
     "workflow-contracts",
     "workflow-validator"
   ],
-  "source_hash": "1a393c21192e711a7e87733724fc74d9c0c5bbb36a2ad2824d34157e2be83416",
+  "source_hash": "a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981",
   "files": [
     {
       "path": "workflow-contracts/index.ts",
@@ -16,8 +16,8 @@
     },
     {
       "path": "workflow-contracts/types/api.ts",
-      "bytes": 8990,
-      "sha256": "b83bb472e1b0d6181b91eda964bd324b1726e5e2fa8544020807cc576e1105ba"
+      "bytes": 9156,
+      "sha256": "a5aca2797f1b2dedcd683e7a1790f05619b26959f7337fd0d22b3c9b80e8e172"
     },
     {
       "path": "workflow-contracts/types/events.ts",
@@ -51,8 +51,8 @@
     },
     {
       "path": "workflow-validator/validate-module.ts",
-      "bytes": 16509,
-      "sha256": "fc458998e8c6bf3ec3432b4e7dff52e47a9d29d56792e6547ef97a778183536f"
+      "bytes": 16958,
+      "sha256": "d29b473046091d8a0624028ee674f9fe5707a171e65e2c2e121e7e0740d0f102"
     }
   ]
 }

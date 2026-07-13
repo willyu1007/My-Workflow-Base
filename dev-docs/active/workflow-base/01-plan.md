@@ -49,12 +49,21 @@ Acceptance:
 - [x] Record the Base revision and contract source hash for My-Chat X1 adoption.
 - [x] Do not enable a host capability or non-empty scenario path in Base.
 
+### X0 post-review quality repair
+
+- [x] Fail closed on every explicit unsupported materialization mode.
+- [x] Close the generic completion-result union and add negative conformance.
+- [x] Prove a host-owned v1 runtime port can be injected into the worker call
+  path without narrowing a legacy scenario adapter.
+- [x] Refresh contract docs, source revision/hash lock, handoff evidence, and CI.
+
 ## X0 Compatibility Rule Matrix
 
 | Manifest/runtime state | X0 behavior |
 | --- | --- |
 | No handoff declaration | No migration finding. |
 | Legacy handoff without `materialization_mode` | Warning only; legacy behavior and hash remain unchanged. |
+| Explicit unknown or null `materialization_mode` | Fatal. |
 | vNext mode without stable `handoff_key` | Fatal. |
 | vNext mode without any declared artifact/context source type | Fatal. |
 | vNext mode with missing/disabled host capability | Fatal. |
@@ -69,6 +78,7 @@ Implemented validator mapping:
 | `WF-MAN-045` | Fatal | vNext handoff has no non-empty artifact/context source type. |
 | `WF-MAN-046` | Fatal | Any vNext handoff exists while host capability evidence is absent/empty. |
 | `WF-MAN-047` | Fatal | Any non-empty declared `handoff_key` is duplicated. |
+| `WF-MAN-048` | Fatal | An explicit `materialization_mode` is not the supported v1 value. |
 
 ## Phase 1: Matrix contract reduction
 

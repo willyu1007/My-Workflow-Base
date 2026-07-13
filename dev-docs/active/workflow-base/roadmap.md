@@ -21,6 +21,11 @@ runtime:
 My-Chat adoption, Step persistence, Handoff Ledger, materializer, outbox, and
 capability enablement remain outside X0.
 
+The X0 exit gate also includes the post-review repair: unsupported explicit
+materialization modes fail closed, the completion-result union is closed, and
+the X1 worker uses a directly injected host-owned v1 runtime port rather than a
+cast from the legacy scenario adapter.
+
 The roadmap aligns two layers:
 - template contract modules: ownership expectations for identities, state,
   actions, presenters, handoffs, and governance inside concrete workflows

@@ -1227,14 +1227,15 @@ Minimum validation rules:
 | `WF-MAN-021` | Fatal | Chat, mobile, forum, RAG, notification, public links, and external clients do not consume internal APIs. |
 | `WF-MAN-030` | Fatal | Domain context ref types declare resolver keys and owner scope; workflow does not declare itself as canonical domain owner. |
 | `WF-MAN-031` | Fatal | `step_interventions` are restricted to `web_run_workbench`; chat does not declare or consume them. |
-| `WF-MAN-040` | Fatal | Handoffs declare type, source artifact types, requested purposes, downstream owner, policy key, and receipt requirement. |
-| `WF-MAN-041` | Fatal | Public draft, indexing, notification, and external delivery side effects are reachable only through handoff or owner APIs. |
+| `WF-MAN-040` | Fatal | Every declared handoff requires a downstream receipt. |
+| `WF-MAN-041` | Fatal | Every declared handoff policy key is registered by the scenario module. |
 | `WF-MAN-042` | Fatal | Every handoff downstream owner is registered in the host snapshot. |
 | `WF-MAN-043` | Warning | A legacy handoff omits `materialization_mode`; registration remains allowed and legacy semantics stay active. |
 | `WF-MAN-044` | Fatal | A `workflow_step_complete_v1` handoff has no non-empty stable `handoff_key`. |
 | `WF-MAN-045` | Fatal | A `workflow_step_complete_v1` handoff declares no non-empty artifact or context source type. |
 | `WF-MAN-046` | Fatal | At least one vNext handoff exists but the host snapshot does not enable `workflow_handoff_materialization_v1`. |
 | `WF-MAN-047` | Fatal | A non-empty `handoff_key` is declared more than once across legacy migration and vNext declarations. |
+| `WF-MAN-048` | Fatal | `materialization_mode` is present but is not the supported `workflow_step_complete_v1` value. |
 | `WF-MAN-050` | Fatal | Standard workflow events match the base registry; scenario internal events use `{scenario_key}.{capability_key}.{aggregate}.{verb}`. |
 | `WF-MAN-051` | Fatal | `event_registry.producers` maps every emitted event to an allowed owner and write boundary. |
 | `WF-MAN-052` | Fatal | Shared consumer `allowed_events` contain no scenario internal events. |
@@ -1249,6 +1250,8 @@ Minimum validation rules:
 The capability check emits one host-level `WF-MAN-046` finding even when a
 manifest contains multiple vNext handoffs. Existing `WF-MAN-040` through
 `WF-MAN-042` semantics and finding paths remain unchanged.
+An explicitly unknown or null materialization mode is not legacy: it fails
+closed through `WF-MAN-048`.
 
 Activation phases:
 

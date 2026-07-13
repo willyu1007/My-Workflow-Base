@@ -117,9 +117,9 @@
 
 ## 2026-07-13 X0-D Source Lock and X1 Handoff
 
-- Pinned the last contract-bearing revision as
-  `e20c0735f450fd4fbc65ca195d7bc9a494c20cda`; later X0-D changes are tooling,
-  verification, and documentation only.
+- Initially pinned the last contract-bearing revision as
+  `e20c0735f450fd4fbc65ca195d7bc9a494c20cda`; the post-review repair below
+  intentionally supersedes this historical revision/hash pair.
 - Added a deterministic SHA-256 source manifest/lock for the contract package
   and validator non-test source. The aggregate adoption hash is
   `1a393c21192e711a7e87733724fc74d9c0c5bbb36a2ad2824d34157e2be83416`.
@@ -138,3 +138,23 @@
   capability disabled.
 - No contract/validator behavior, runtime persistence, Prisma/database, queue,
   Outbox, provider, scenario logic, or capability enablement changed in X0-D.
+
+## 2026-07-13 X0 Post-Review Contract Repair
+
+- Reproduced and fixed a fail-open validator path: an explicitly unknown or
+  null `materialization_mode` was previously treated as a warning-only legacy
+  declaration. `WF-MAN-048` now rejects every explicit unsupported value while
+  preserving warning-only behavior for an omitted field.
+- Closed `WorkflowCompleteStepResult` with a legacy result branch that forbids
+  v1 discriminator/materialization fields. Negative TypeScript conformance now
+  proves a v1-looking result cannot omit `materialized_handoffs`.
+- Kept the scenario adapter legacy-compatible and made the X1 typed path
+  explicit: My-Chat injects its host-owned
+  `WorkflowRuntimePortMaterializationV1` directly into the worker. A compile
+  fixture composes driver evidence, handler drafts, and v1 completion without a
+  type assertion; Base still implements no runtime persistence.
+- Promoted BOM/CRLF normalization from manual evidence into the generic source
+  hash portability test.
+- The repaired contract/validator source revision is
+  `c7f904cdb9b647c80f28134ab6967cd76f730962`; its adoption source hash is
+  `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.

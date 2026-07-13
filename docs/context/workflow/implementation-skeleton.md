@@ -268,11 +268,18 @@ claim step through WorkflowRuntimePort
 
 The queue is never the source of business truth.
 
-For the vNext path, a trusted worker passes the live claim token only through
+For the vNext path, the trusted worker passes the live claim evidence through
+two internal-only calls: the service-authenticated scenario driver context and
 `WorkflowRuntimePortMaterializationV1.complete_step`. The Step handler may
 return typed `handoff_drafts`, but neither the queue payload nor any scenario
-snapshot/draft persists the token. Worker pass-through is a My-Chat X1 adoption
-task; lease/reclaim and atomic persistence remain X2/X3 tasks.
+snapshot/draft persists the token.
+
+The v1 runtime port is host-owned and injected directly into the worker. It is
+not recovered from the legacy-typed scenario `worker_runtime` adapter with a
+cast. A source-repo compile fixture proves the claimed driver, handler result,
+and injected v1 port compose without a type assertion. Worker pass-through is a
+My-Chat X1 adoption task; lease/reclaim and atomic persistence remain X2/X3
+tasks.
 
 ## Journey harness skeleton
 

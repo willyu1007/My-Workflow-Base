@@ -190,6 +190,54 @@
   GitHub Actions run `29238833875` passed the frozen install and complete
   workflow contract conformance job in 22 seconds.
 
+## X0 Post-Review Repair Required Checks
+
+- runtime validator rejects unknown and null materialization modes
+- TypeScript rejects a v1-discriminated completion result without
+  `materialized_handoffs`
+- host-owned v1 runtime port composes with claimed driver and handler drafts
+  without a type assertion
+- generic portability test covers physical roots, allowed import aliases,
+  UTF-8 BOM, CRLF, and unexpected package scopes
+- source lock matches repaired contract revision
+  `c7f904cdb9b647c80f28134ab6967cd76f730962`
+- full local and clean-copy `corepack pnpm verify:x0-d`
+- independent web-workbench typecheck/build
+- contract/docs/boundary review, My-Chat pre-adoption hash, and Draft PR CI
+
+## X0 Post-Review Repair Results
+
+- 2026-07-13: The pre-fix runtime diagnostic proved
+  `workflow_step_complete_v2` produced only `WF-MAN-043` and
+  `report.passed=true`. Post-fix targeted runtime tests pass 19/19, including
+  unknown-string and explicit-null `WF-MAN-048` cases.
+- 2026-07-13: A semantic TypeScript diagnostic reproduced that the old generic
+  result union accepted a v1 discriminator without materialization output.
+  Post-fix negative conformance consumes the expected error, while the
+  host-injected v1 worker fixture typechecks without a cast.
+- 2026-07-13: The repaired contract source revision is `c7f904c`; regenerated
+  source-lock SHA-256 is
+  `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.
+- 2026-07-13: Integrated `corepack pnpm verify:x0-d` passed four typechecks,
+  runtime tests 19/19, scenario journey 1/1, claim-token conformance,
+  BOM/CRLF/physical-root/allowed-alias portability, unexpected-scope negative
+  coverage, and the refreshed source lock.
+- 2026-07-13: A temporary clean copy excluded all existing `node_modules`,
+  completed frozen install for five workspace projects, and passed the same
+  complete repaired X0 matrix.
+- 2026-07-13: Direct post-fix diagnostics confirmed an unsupported mode now
+  returns `WF-MAN-048`, `severity=fatal`, and `passed=false`; the previously
+  accepted incomplete v1 result now fails specifically because
+  `materialized_handoffs` is required.
+- 2026-07-13: Contract/validator source diff against `c7f904c` is empty.
+  Scenario/GitHub workflow YAML, package/lock JSON, Markdown fence/link checks
+  across 12 changed docs, durable local-path scan, and `git diff --check`
+  passed. Independent web-workbench typecheck/build also passed.
+- 2026-07-13: Read-only My-Chat `main` remains clean at `e53aa610` with expected
+  pre-adoption source hash
+  `7e083fd26164ee7034989535a115b3b5066ac7d9c2aa93c94448f225749294e8`;
+  no X1 code or capability was enabled during the repair.
+
 ## Planned Checks
 - `git diff --check`
 - YAML parse for `templates/scenario-module/scenario.manifest.yaml`

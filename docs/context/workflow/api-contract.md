@@ -189,8 +189,13 @@ export type WorkflowStepMaterializationResultV1 = WorkflowStepResult & {
   materialized_handoffs: MaterializedHandoff[];
 };
 
+export type WorkflowCompleteStepLegacyResult = WorkflowStepResult & {
+  completion_contract_version?: never;
+  materialized_handoffs?: never;
+};
+
 export type WorkflowCompleteStepResult =
-  | WorkflowStepResult
+  | WorkflowCompleteStepLegacyResult
   | WorkflowStepMaterializationResultV1;
 
 export type WorkflowRuntimePort = {
@@ -241,6 +246,9 @@ legacy input with the legacy result and a v1 input with the materialization
 result. This avoids weakening callers with an uncorrelated input/output union.
 The v1 `claim_token` is transient claim evidence and must never be persisted,
 hashed, logged, emitted, or returned.
+The exported result union also forbids v1 discriminator/materialization fields
+on the legacy branch, so a v1-looking result cannot omit
+`materialized_handoffs`.
 
 ## Standard headers
 

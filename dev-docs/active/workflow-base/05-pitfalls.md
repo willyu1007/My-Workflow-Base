@@ -54,6 +54,14 @@
 - Do not pin the adoption revision to a later documentation-only commit. Record
   the last commit that actually changed contract/validator source and keep
   evidence revisions separate.
+- Do not treat every non-v1 `materialization_mode` as legacy. Only absence is a
+  migration bridge; explicit unknown or null values must fail closed.
+- Do not form a v1 result union by adding a subtype to an unrestricted base
+  result. The legacy branch must forbid v1 discriminator/materialization fields
+  or TypeScript will accept incomplete v1-looking objects.
+- Do not recover `WorkflowRuntimePortMaterializationV1` from the legacy-typed
+  scenario adapter through a cast. Inject the host-owned v1 port into the worker
+  and prove the call path through compile conformance.
 
 ## Historical Notes
 - 2026-07-13: X0-A initially used `tests/**/*.test.ts`; Vitest 4 did not select
@@ -66,3 +74,7 @@
   `@host` versus `@my-chat` package rename look like contract drift. The hash
   normalization and portability fixture now remove only that false difference;
   an unexpected package scope is verified to change the hash.
+- 2026-07-13: Post-X0 review reproduced two contract gaps despite green CI:
+  explicit unsupported materialization modes warned instead of failing, and the
+  generic completion-result union accepted an incomplete v1-looking object.
+  Both now have negative regression coverage, and the source lock was refreshed.

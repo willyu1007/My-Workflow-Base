@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -21,6 +21,21 @@ function computeManifest(contractsRoot, validatorRoot) {
     { cwd: repositoryRoot, encoding: "utf8" },
   );
   return JSON.parse(output);
+}
+
+function typescriptSourceFiles(directory) {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) {
+      return typescriptSourceFiles(path);
+    }
+    return entry.isFile() && entry.name.endsWith(".ts") ? [path] : [];
+  });
+}
+
+function rewriteWithBomAndCrlf(file) {
+  const source = readFileSync(file, "utf8").replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
+  writeFileSync(file, `\uFEFF${source.replace(/\n/g, "\r\n")}`, "utf8");
 }
 
 try {
@@ -47,6 +62,13 @@ try {
     throw new Error("validator fixture no longer contains the expected @host import alias");
   }
   writeFileSync(validatorFile, myChatSource, "utf8");
+
+  for (const sourceFile of [
+    ...typescriptSourceFiles(contractsRoot),
+    ...typescriptSourceFiles(validatorRoot),
+  ]) {
+    rewriteWithBomAndCrlf(sourceFile);
+  }
 
   const actual = computeManifest(contractsRoot, validatorRoot);
   const expected = JSON.parse(
