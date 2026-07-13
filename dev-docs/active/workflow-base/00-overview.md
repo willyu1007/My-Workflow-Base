@@ -355,7 +355,8 @@ The current design stance is:
 - 2026-07-13: Post-X0 quality review superseded that initial revision/hash with
   repaired contract revision `c7f904c` and source hash
   `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.
-  X1 remains blocked until the refreshed evidence commit and CI pass.
+  Repair evidence revision `ee84c29` and remote CI passed; My-Chat X1 is
+  unblocked while the host capability remains disabled.
 - 2026-05-26: Downstream information matrix added: outbox carries signals and
   refs only; downstream consumers must reread canonical state and own their
   side effects.

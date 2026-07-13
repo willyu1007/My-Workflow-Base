@@ -2,11 +2,13 @@
 
 ## Status
 
-- Handoff state: post-review repair verification in progress; do not start X1 yet
+- Handoff state: ready for My-Chat X1 after post-review repair
 - Base contract source revision:
   `c7f904cdb9b647c80f28134ab6967cd76f730962`
 - Superseded pre-review X0-D evidence revision:
   `2894badedf8588f97d57aa89d01bd003e56ace9d`
+- Post-review repair evidence revision:
+  `ee84c29b432441f383d27529dbadabc97c9a2c57`
 - Contract source hash:
   `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`
 - Hash schema: `workflow-contract-source-lock.json` schema version 1

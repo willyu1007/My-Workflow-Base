@@ -158,3 +158,6 @@
 - The repaired contract/validator source revision is
   `c7f904cdb9b647c80f28134ab6967cd76f730962`; its adoption source hash is
   `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.
+- Repair evidence revision `ee84c29b432441f383d27529dbadabc97c9a2c57`
+  records the refreshed lock, portability conformance, documentation, and X1
+  handoff without changing contract/validator source.
