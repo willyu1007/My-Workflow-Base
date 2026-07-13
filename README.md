@@ -22,6 +22,19 @@ Workflow modular base template。这个仓库不提供运行时服务；具体 w
 - [Workflow base task package](dev-docs/active/workflow-base/00-overview.md)：用于收敛双层架构表、manifest/API 对齐和后续实现骨架。
 - [Workflow base roadmap](dev-docs/active/workflow-base/roadmap.md)：宏观里程碑与收敛顺序。
 
+## 源仓验证
+
+Workflow 合同、host-runtime scaffold 和 scenario module template 可以在本仓
+独立验证，不需要复制到宿主仓后才能发现类型或测试问题：
+
+```bash
+corepack pnpm install --frozen-lockfile
+corepack pnpm verify:x0-a
+```
+
+`verify:x0-a` 只执行模板 typecheck、validator/worker tests 和 scenario journey
+test，不启动运行时、不连接数据库，也不执行发布或部署。
+
 ## 底座原则
 
 - Postgres 是 canonical；实时、搜索、向量、通知等都是下游投影或派生系统。

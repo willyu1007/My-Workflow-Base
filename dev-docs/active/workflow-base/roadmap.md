@@ -5,6 +5,22 @@ Turn the workflow base from a set of exploratory contracts into a v0 modular
 template that concrete workflow teams can implement against and host products
 can consume without per-scenario API drift.
 
+## Current X0 Implementation Overlay
+
+The v0 contract remains the base. The current cross-repo increment adds an
+additive vNext materialization path without turning this repository into a
+runtime:
+
+| Increment | Owner | Deliverable | Exit gate |
+| --- | --- | --- | --- |
+| X0-A | My-Workflow-Base | Governance, source workspace, frozen lockfile, legacy hash baseline, CI | Clean/frozen install and `verify:x0-a` pass. |
+| X0-B | My-Workflow-Base | Additive handoff/driver/host-capability/completion/lifecycle types | Legacy and vNext compile fixtures pass. |
+| X0-C | My-Workflow-Base | Warning/fatal validator rules and conformance matrix | Legacy unchanged; invalid vNext blocked; valid vNext passes. |
+| X0-D | My-Workflow-Base | Full verification and revision/hash handoff | No runtime/Prisma; Base revision/hash ready for My-Chat X1. |
+
+My-Chat adoption, Step persistence, Handoff Ledger, materializer, outbox, and
+capability enablement remain outside X0.
+
 The roadmap aligns two layers:
 - template contract modules: ownership expectations for identities, state,
   actions, presenters, handoffs, and governance inside concrete workflows

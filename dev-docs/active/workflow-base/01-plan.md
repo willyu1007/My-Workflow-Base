@@ -1,5 +1,66 @@
 # Plan
 
+## Current Increment: X0
+
+X0 is the additive contract increment required before My-Chat can adopt durable
+handoff materialization. It is split so the validation environment exists before
+the contract surface changes.
+
+### X0-A: Governance and conformance baseline
+
+- [x] Synchronize the active task bundle with the cross-repo X0 scope and
+  ownership boundary.
+- [x] Add a root pnpm workspace and frozen lockfile for the workflow templates.
+- [x] Typecheck `workflow-contracts`, `workflow-runtime`, and the scenario module
+  template in the Base repository.
+- [x] Run validator/worker tests and the scenario journey test from a single
+  command.
+- [x] Pin the legacy fixture contract hash.
+- [x] Add a fast GitHub Actions conformance gate with no secrets or delivery
+  behavior.
+
+Acceptance:
+- `corepack pnpm install --frozen-lockfile` succeeds from the repository root.
+- `corepack pnpm verify:x0-a` passes.
+- No files under workflow contract types, manifest shape, Prisma, database,
+  queue, provider, or downstream runtime behavior change.
+
+### X0-B: Additive vNext contract types
+
+- Add stable `handoff_key`, context-source declarations, snapshot/draft/driver,
+  host-capability, materialized-handoff, versioned lifecycle, and discriminated
+  `complete_step` input/result types.
+- Keep legacy types and calls valid.
+
+### X0-C: Validator and conformance rules
+
+- Add warning-only legacy handoff migration findings.
+- Add fatal vNext key/source/host-capability/duplicate-key rules.
+- Add positive and negative vNext fixtures, including claim-token compile and
+  no-persistence/logging checks.
+
+### X0-D: Handoff and adoption record
+
+- Run clean/frozen install, typecheck, tests, YAML/template checks, boundary
+  scans, and legacy hash checks.
+- Record the Base revision and contract source hash for My-Chat X1 adoption.
+- Do not enable a host capability or non-empty scenario path in Base.
+
+## X0 Compatibility Rule Matrix
+
+| Manifest/runtime state | X0 behavior |
+| --- | --- |
+| No handoff declaration | No migration finding. |
+| Legacy handoff without `materialization_mode` | Warning only; legacy behavior and hash remain unchanged. |
+| vNext mode without stable `handoff_key` | Fatal. |
+| vNext mode without any declared artifact/context source type | Fatal. |
+| vNext mode with missing/disabled host capability | Fatal. |
+| vNext mode with all requirements and capability enabled | Pass. |
+
+Reserved validator rule range for X0-B/C: `WF-MAN-043` through `WF-MAN-047`.
+The exact rule-to-predicate mapping must be recorded with the implementation and
+must not repurpose existing rule IDs.
+
 ## Phase 1: Matrix contract reduction
 
 Steps:
@@ -58,4 +119,5 @@ Acceptance:
 - Implementation can start without reopening M1/M2/M3 ownership debates.
 
 ## Current First Move
-Start with Phase 1. Do not edit implementation skeletons yet.
+Complete X0-A and its clean/frozen verification before editing vNext contract
+types. After X0-A passes, start X0-B from the compatibility matrix above.

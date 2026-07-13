@@ -1,0 +1,3 @@
+packages:
+  - "templates/host-runtime/packages/*"
+  - "templates/scenario-module"

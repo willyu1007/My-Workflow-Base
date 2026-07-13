@@ -21,6 +21,16 @@
 - Do not let an example scenario become the base contract.
 - Do not start implementation skeleton work before matrix, manifest, and API
   contracts agree.
+- Do not rely on a host repository's `node_modules`, tsconfig, aliases, or test
+  runner to validate Base templates; the source repository must be sufficient.
+- Do not use a Vitest file-filter glob whose `**/` segment excludes tests placed
+  directly under the selected directory; prefer stable directory entrypoints.
+- Do not infer vNext materialization from legacy handoff declarations. Require an
+  explicit discriminator and keep legacy semantics intact.
+- Do not make claim tokens optional inside the vNext completion branch or place
+  them in persisted/hash/loggable DTOs merely to preserve legacy compilation.
 
 ## Historical Notes
-- None yet.
+- 2026-07-13: X0-A initially used `tests/**/*.test.ts`; Vitest 4 did not select
+  the root-level scenario journey test. Replaced it with `vitest run tests` and
+  retained the failure as a conformance-runner lesson.

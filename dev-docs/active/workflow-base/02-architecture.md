@@ -166,6 +166,48 @@ Handoff payloads are refs-only:
 
 Private body content does not cross the handoff boundary.
 
+## X0 vNext Compatibility Boundary
+
+X0 extends the template contract for host-owned atomic handoff materialization.
+It does not make this repository a runtime and does not give a scenario module
+permission to create Handoff Ledger or standard `workflow.handoff.*` outbox
+records directly.
+
+Compatibility rules:
+
+- Legacy handoff declarations remain valid and keep their existing lifecycle.
+- An explicit optional `materialization_mode` is the vNext discriminator. The
+  validator must not infer vNext behavior from a legacy handoff type or owner.
+- Host capability evidence is optional in the snapshot type and defaults to an
+  empty/disabled capability set for legacy hosts.
+- The vNext completion branch requires the claim token, expected version, and
+  typed handoff drafts. The legacy completion branch remains valid.
+- The new Handoff lifecycle status is versioned separately from the existing
+  `WorkflowHandoffResult` status union.
+- Contract/hash validation occurs before host persistence. Base defines the
+  rule and fixture; the host owns transaction, replay, ledger, and outbox.
+
+The source repository verifies these rules through copyable packages and
+scenario fixtures. It must not rely on My-Chat's workspace to supply TypeScript,
+Vitest, aliases, or missing tsconfig files.
+
+## X0 Trusted Driver Boundary
+
+`ScenarioCommandDriverContext` is a trusted service-call contract. The driver
+ref and pinned binding identify provenance; `claimToken` and expected Step
+version are transient concurrency evidence.
+
+The claim token:
+
+- is required only on the vNext trusted runtime branch
+- is never part of semantic command hashing
+- is not stored in scenario snapshots or Handoff drafts
+- is not returned by presenters or user-facing replay
+- is not logged, traced, or emitted in metrics/event payloads
+
+Base conformance can enforce type placement and fixture behavior. My-Chat X2/X3
+must enforce lease, claim, replay, transaction, and persistence behavior.
+
 ## Key Architectural Risk
 The main risk is accidental second-system creation: a scenario or surface might
 introduce private APIs, private status, private domain stores, or private handoff

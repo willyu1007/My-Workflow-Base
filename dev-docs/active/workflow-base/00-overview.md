@@ -32,8 +32,10 @@ consumption surfaces
 - State: in-progress
 - Owner: unassigned
 - Created: 2026-05-25
-- Updated: 2026-05-26
+- Updated: 2026-07-13
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
+- Completed increment: X0-A governance and source-repo conformance baseline
+- Next gate: X0-B additive vNext contract types
 
 ## Context
 This repository is the workflow base template. It defines durable contracts for
@@ -69,10 +71,16 @@ The current design stance is:
   bindings, run start requirements, and web-owned step interventions.
 - Manifest/API/module contract implications.
 - Macro roadmap for moving from docs to implementation skeleton.
+- X0 additive vNext handoff, durable-driver, host-capability, and completion
+  contracts for later explicit host materialization.
+- Source-repo workspace, deterministic legacy/vNext conformance fixtures, and CI
+  gates that validate templates before host adoption.
 
 ## Scope Out
 - Implementing runtime services.
 - Implementing a host product integration.
+- Implementing Prisma models, database transactions, queues, outbox dispatch, or
+  a concrete Handoff Ledger.
 - Implementing forum, RAG, notification, or public draft downstream modules.
 - User-editable workflow builders.
 - Plugin marketplace behavior.
@@ -148,6 +156,27 @@ The current design stance is:
   scenario-specific shared APIs/events, bodyful payloads, direct downstream
   writes, chat interventions, dashboard indexing, and workflow-owned canonical
   domain objects are explicit regressions.
+- D24: X0 remains additive. Existing manifest, runtime-port, and
+  `WorkflowHandoffResult` shapes continue to compile and retain their legacy
+  semantics.
+- D25: A handoff opts into vNext materialization through an explicit optional
+  `materialization_mode: "workflow_step_complete_v1"`; the validator does not
+  infer activation from `handoff_type` or downstream owner.
+- D26: Host capability evidence is additive and absent means disabled. The
+  vNext path requires `workflow_handoff_materialization_v1`; legacy handoffs do
+  not.
+- D27: `complete_step` vNext uses a discriminated input/result branch so its
+  `claim_token` and deterministic materialization result can be required without
+  making legacy completion calls invalid.
+- D28: The new `requested/completed/stopped/failed` Handoff lifecycle is a
+  versioned type. It does not reinterpret the existing
+  `WorkflowHandoffResult.status` union; `created/existing` is a materialization
+  disposition only.
+- D29: Claim tokens are transient secrets. Contracts may carry them only on the
+  trusted runtime call path; fixtures, logs, hashes, persisted snapshots, and
+  presenter/output DTOs must not retain them.
+- D30: Base contract changes must pass in-repo typecheck/tests, a frozen legacy
+  contract-hash fixture, and vNext conformance before My-Chat adoption begins.
 
 ## Dependencies
 - `docs/context/workflow/v0-convergence.md`
@@ -203,6 +232,18 @@ The current design stance is:
 - [ ] V0 readiness checklist records the semantic drift pass and
   must-not-regress checks.
 
+### X0-A Acceptance Criteria
+
+- [x] Root workspace and frozen lockfile install from a clean checkout.
+- [x] Workflow contracts, runtime scaffold, and scenario template independently
+  typecheck.
+- [x] Validator/worker tests and scenario journey tests run from one root
+  command.
+- [x] Legacy validator fixture pins its existing contract hash.
+- [x] GitHub Actions runs the same frozen-install and verification command.
+- [x] No vNext contract fields, runtime persistence, Prisma, queue, or outbox
+  implementation is introduced in X0-A.
+
 ## Current Notes
 - 2026-05-25: Task package created to preserve macro alignment before further
   contract edits.
@@ -221,6 +262,14 @@ The current design stance is:
 - 2026-06-26: Web workbench package boundary follow-up added. The UI kit keeps
   its root entry for compatibility and adds grouped public subpath entries so
   host products can avoid broad route chunks.
+- 2026-07-13: Cross-repo readiness review confirmed Base and My-Chat contract
+  source parity, but found that the Base host/scenario templates could not
+  independently install, typecheck, or run tests.
+- 2026-07-13: X0-A started on an isolated branch. The current work is limited to
+  governance and source-repo conformance; X0-B owns vNext type additions.
+- 2026-07-13: X0-A implementation and clean-install verification completed. The
+  task remains `in-progress`; X0-B is the next gate and no host activation is
+  enabled.
 - 2026-05-26: Downstream information matrix added: outbox carries signals and
   refs only; downstream consumers must reread canonical state and own their
   side effects.

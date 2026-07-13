@@ -1,5 +1,40 @@
 # Verification
 
+## X0-A Required Checks
+
+- `corepack pnpm install --frozen-lockfile`
+- `corepack pnpm verify:x0-a`
+- `corepack pnpm typecheck`
+- `corepack pnpm test`
+- `ruby -e 'require "yaml"; YAML.load_file("templates/scenario-module/scenario.manifest.yaml"); puts "yaml ok"'`
+- `git diff --check`
+- scan X0-A diff for contract-type, Prisma, database, queue, outbox, provider, or
+  delivery implementation changes
+- clean-install simulation without existing root `node_modules`
+
+## X0-A Results
+
+- 2026-07-13: Initial Base source-repo commands failed because the repository had
+  no root workspace/dependencies and the host packages referenced a missing
+  shared tsconfig. This is the pre-fix B6 evidence.
+- 2026-07-13: First integrated run passed all three typechecks and runtime tests,
+  then failed because Vitest's `tests/**/*.test.ts` filter did not include the
+  root-level scenario journey test. Package scripts were changed to stable
+  directory entrypoints before continuing.
+- 2026-07-13: Post-fix `corepack pnpm verify:x0-a` passed: contracts, runtime,
+  and scenario template typechecks; runtime 8/8 tests; scenario journey 1/1.
+- 2026-07-13: Legacy module contract hash baseline recorded as
+  `9f568ff772d3dafc02dd96f284f7cedb85aff18839b8f26f4691a8b2dc0d0ca6`.
+- 2026-07-13: `corepack pnpm install --frozen-lockfile`, YAML parsing for the
+  scenario manifest and GitHub workflow, `git diff --check`, and the contract
+  type no-change boundary check passed.
+- 2026-07-13: A temporary-directory clean checkout simulation excluded all
+  existing `node_modules`, performed a frozen install, and passed the full
+  `verify:x0-a` matrix: three typechecks, runtime 8/8, scenario journey 1/1.
+- 2026-07-13: Existing independent web-workbench regression checks passed:
+  `corepack pnpm --dir templates/web-workbench typecheck` and `build`. The new
+  root workspace does not absorb or replace the web-workbench lockfile/package.
+
 ## Planned Checks
 - `git diff --check`
 - YAML parse for `templates/scenario-module/scenario.manifest.yaml`

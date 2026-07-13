@@ -49,6 +49,27 @@
   is not blocked by a nested bare `pnpm` resolving to the wrong local runtime.
 
 ## Open Implementation Notes
-- The next concrete review should confirm whether copied host projects preserve
-  the template/runtime boundary without importing this repository.
+- X0-B must implement the documented discriminator and versioned completion
+  branch without modifying legacy Handoff lifecycle semantics.
+- X0-C must add vNext fixtures only after X0-B types compile; X0-A establishes
+  the runner and frozen legacy baseline.
 - Keep examples scenario-neutral unless explicitly marked as examples.
+
+## 2026-07-13 X0-A Governance and Conformance Baseline
+
+- Added a root pnpm workspace for the two host-runtime packages and scenario
+  module template; the independent web-workbench package remains outside this
+  workspace and retains its own lockfile.
+- Added the missing host-runtime base tsconfig and scenario-template package/
+  tsconfig so all copyable TypeScript surfaces compile in the source repository.
+- Added root typecheck/test/`verify:x0-a` commands and a frozen workspace
+  lockfile.
+- Changed Vitest package scripts to directory entrypoints so root-level and
+  nested tests are matched consistently across shells.
+- Added a GitHub Actions PR/main gate that performs frozen install and runs the
+  same `verify:x0-a` command; it has read-only contents permission and no
+  secrets, delivery, release, or deployment behavior.
+- Pinned the complete legacy module fixture contract hash to detect accidental
+  normalization or contract-hash drift during X0-B/C.
+- No workflow contract type, validator rule, runtime persistence, Prisma,
+  database, queue, provider, or downstream side-effect implementation changed.

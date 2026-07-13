@@ -1,0 +1,25 @@
+{
+  "name": "my-workflow-base",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "typecheck:contracts": "pnpm --filter @host/workflow-contracts typecheck",
+    "typecheck:runtime": "pnpm --filter @host/workflow-runtime typecheck",
+    "typecheck:scenario": "pnpm --filter @host/scenario-module-example typecheck",
+    "typecheck": "pnpm typecheck:contracts && pnpm typecheck:runtime && pnpm typecheck:scenario",
+    "test:runtime": "pnpm --filter @host/workflow-runtime test",
+    "test:scenario": "pnpm --filter @host/scenario-module-example test",
+    "test": "pnpm test:runtime && pnpm test:scenario",
+    "verify:x0-a": "pnpm typecheck && pnpm test"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0",
+    "typescript": "^5.4.0",
+    "vitest": "^4.1.5"
+  }
+}

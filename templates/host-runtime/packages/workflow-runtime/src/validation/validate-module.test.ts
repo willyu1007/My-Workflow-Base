@@ -368,7 +368,7 @@ function createScenarioModule(): WorkflowScenarioModule {
 }
 
 describe("workflow module validation and loading", () => {
-  it("passes a complete scenario module", () => {
+  it("passes the legacy scenario module without changing its contract hash", () => {
     const report = validateWorkflowModule({
       module: createScenarioModule(),
       host_snapshot: hostSnapshot,
@@ -377,6 +377,7 @@ describe("workflow module validation and loading", () => {
 
     expect(report.passed).toBe(true);
     expect(report.contract_hash).toMatch(/^[a-f0-9]{64}$/);
+    expect(report.contract_hash).toBe("9f568ff772d3dafc02dd96f284f7cedb85aff18839b8f26f4691a8b2dc0d0ca6");
   });
 
   it("changes the contract hash when the manifest changes", () => {
