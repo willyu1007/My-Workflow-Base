@@ -2,9 +2,11 @@
 
 ## Status
 
-- Handoff state: ready for My-Chat X1 after X0-D verification
+- Handoff state: ready for My-Chat X1
 - Base contract source revision:
   `e20c0735f450fd4fbc65ca195d7bc9a494c20cda`
+- X0-D evidence revision:
+  `2894badedf8588f97d57aa89d01bd003e56ace9d`
 - Contract source hash:
   `1a393c21192e711a7e87733724fc74d9c0c5bbb36a2ad2824d34157e2be83416`
 - Hash schema: `workflow-contract-source-lock.json` schema version 1
