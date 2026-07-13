@@ -43,6 +43,17 @@
 - Do not rely on positive fixtures alone for claim-secret boundaries. Keep
   negative `@ts-expect-error` DTO cases and the source logging/metrics scan in
   the generic conformance command.
+- Do not use physical repo paths or host package names directly in a cross-repo
+  source hash; expected `@host`/`@my-chat` alias differences would create false
+  drift. Normalize only `@host/workflow-contracts` and
+  `@my-chat/workflow-contracts` in supported module-import positions and keep
+  every other scope and byte source-sensitive.
+- Do not conflate the X0-D adoption source hash with a runtime scenario
+  `contract_hash`. The former proves copied source parity; the latter pins a
+  manifest/registry instance.
+- Do not pin the adoption revision to a later documentation-only commit. Record
+  the last commit that actually changed contract/validator source and keep
+  evidence revisions separate.
 
 ## Historical Notes
 - 2026-07-13: X0-A initially used `tests/**/*.test.ts`; Vitest 4 did not select
@@ -51,3 +62,7 @@
 - 2026-07-13: X0-C initially changed existing `WF-MAN-040`–`042` finding paths
   to indexed paths while adding new rules. Architecture review reverted the
   observable legacy change and added a regression assertion.
+- 2026-07-13: X0-D initially hashed raw validator source, which made the expected
+  `@host` versus `@my-chat` package rename look like contract drift. The hash
+  normalization and portability fixture now remove only that false difference;
+  an unexpected package scope is verified to change the hash.

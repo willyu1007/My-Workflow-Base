@@ -17,10 +17,13 @@
     "test:scenario": "pnpm --filter @host/scenario-module-example test",
     "test:conformance": "pnpm --filter @workflow-base/conformance test",
     "test": "pnpm test:runtime && pnpm test:scenario && pnpm test:conformance",
-    "verify:workflow-contracts": "pnpm typecheck && pnpm test",
+    "hash:workflow-contract-source": "node conformance/scripts/compute-workflow-contract-source-hash.mjs",
+    "check:workflow-contract-source": "node conformance/scripts/compute-workflow-contract-source-hash.mjs --check conformance/workflow-contract-source-lock.json",
+    "verify:workflow-contracts": "pnpm typecheck && pnpm test && pnpm check:workflow-contract-source",
     "verify:x0-a": "pnpm verify:workflow-contracts",
     "verify:x0-b": "pnpm verify:workflow-contracts",
-    "verify:x0-c": "pnpm verify:workflow-contracts"
+    "verify:x0-c": "pnpm verify:workflow-contracts",
+    "verify:x0-d": "pnpm verify:workflow-contracts"
   },
   "devDependencies": {
     "@types/node": "^20.17.0",

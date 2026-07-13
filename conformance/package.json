@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "node scripts/check-claim-token-boundary.mjs"
+    "test": "node scripts/check-claim-token-boundary.mjs && node scripts/check-contract-source-hash-portability.mjs"
   },
   "dependencies": {
     "@host/workflow-contracts": "workspace:*"

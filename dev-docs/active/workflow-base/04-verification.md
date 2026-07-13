@@ -132,6 +132,61 @@
   `e20c073`: frozen install and the full generic workflow contract conformance
   job completed successfully in 21 seconds.
 
+## X0-D Required Checks
+
+- `corepack pnpm install --frozen-lockfile`
+- `corepack pnpm verify:x0-d`
+- `corepack pnpm check:workflow-contract-source`
+- contract source diff against pinned revision `e20c073`
+- source-hash portability under changed physical roots and
+  `@host`/`@my-chat` import aliases
+- My-Chat pre-adoption hash observation without modifying My-Chat
+- clean-checkout frozen-install simulation without root `node_modules`
+- repeated hash calculation and lock comparison
+- legacy/vNext validator matrix, negative type fixtures, and claim boundary
+- YAML/JSON, Markdown fence/link, `git diff --check`, and stale local-path scans
+- no contract/validator behavior, runtime persistence, Prisma, queue, Outbox,
+  provider, scenario logic, or capability enablement changes
+- independent web-workbench typecheck/build regression
+- final architecture/readiness review and Draft PR remote CI
+
+## X0-D Results
+
+- 2026-07-13: Contract source revision pinned to
+  `e20c0735f450fd4fbc65ca195d7bc9a494c20cda`; scoped Git diff confirms the
+  current contract/validator source is byte-identical before hash
+  normalization.
+- 2026-07-13: Source lock schema v1 contains nine logical source files and
+  aggregate SHA-256
+  `1a393c21192e711a7e87733724fc74d9c0c5bbb36a2ad2824d34157e2be83416`.
+  Direct lock verification passed.
+- 2026-07-13: Hash portability conformance copied sources to different physical
+  roots and changed the expected validator import from `@host` to `@my-chat`;
+  the logical file manifest and aggregate hash remained identical.
+- 2026-07-13: Read-only My-Chat pre-adoption check at clean revision
+  `e53aa6100578bab62cad110c6020e87e19b17c80` produced hash
+  `7e083fd26164ee7034989535a115b3b5066ac7d9c2aa93c94448f225749294e8`.
+  The mismatch is expected X1 work and confirms X0-D has not modified My-Chat.
+- 2026-07-13: Final architecture review tightened alias normalization from an
+  arbitrary package scope to only `@host/workflow-contracts` and
+  `@my-chat/workflow-contracts` in supported module-import positions. A
+  negative portability case proves an unexpected third-party scope changes the
+  hash.
+- 2026-07-13: Post-review `corepack pnpm verify:x0-d` passed four typechecks,
+  runtime tests 17/17, scenario journey 1/1, claim-token boundary conformance,
+  source-hash portability, and source-lock verification.
+- 2026-07-13: A temporary clean copy excluded existing `node_modules`,
+  completed a frozen install for all five workspace projects, and passed the
+  same complete X0-D matrix.
+- 2026-07-13: Repeated hash calculation remained stable. Scenario manifest and
+  actual GitHub `ci.yml` YAML parsing, package/lock JSON parsing, Markdown
+  fence/link checks across nine changed docs, durable local-path scan, and
+  `git diff --check` passed.
+- 2026-07-13: Changed-path review against `e20c073` found no contract,
+  validator, worker, repository, service, scenario, Prisma, database, queue,
+  Outbox, provider, or capability-enablement change. Independent
+  `templates/web-workbench` typecheck and build also passed.
+
 ## Planned Checks
 - `git diff --check`
 - YAML parse for `templates/scenario-module/scenario.manifest.yaml`

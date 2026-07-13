@@ -309,3 +309,15 @@ A host implementation skeleton is acceptable when:
 - worker runtime resolves handlers from canonical identity and contract hash
 - handoff service writes request/receipt records only
 - deterministic journey harness passes for the example scenario
+
+## Cross-repo source adoption evidence
+
+When a host copies the contract package and validator scaffold, it records both
+the Base Git source revision and the deterministic adoption source hash from
+`conformance/workflow-contract-source-lock.json`. The hash uses logical roots so
+physical repo layout and the expected host package alias do not create false
+drift.
+
+This source-adoption hash proves copied source parity only. It does not replace
+the runtime `contract_hash` that pins a scenario manifest and registry keys.
+Host adoption must keep those two identities separate in task docs and CI.

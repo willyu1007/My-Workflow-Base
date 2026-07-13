@@ -224,6 +224,36 @@ The claim token:
 Base conformance can enforce type placement and fixture behavior. My-Chat X2/X3
 must enforce lease, claim, replay, transaction, and persistence behavior.
 
+## X0-D Source Adoption Hash Boundary
+
+The cross-repo adoption hash identifies copied contract and validator source;
+it is not a business/runtime identity.
+
+Logical hash roots:
+
+- `workflow-contracts`: all non-test TypeScript under the contract package
+  source root
+- `workflow-validator`: all non-test TypeScript under the validator source root
+
+The hash is deterministic across repo locations. It normalizes UTF-8 BOM and
+line endings, maps the host-specific package specifier ending in
+`/workflow-contracts` to a logical alias inside validator sources, then hashes
+sorted logical path + byte length + normalized bytes with NUL delimiters.
+Everything else, including comments and validator behavior, remains
+source-sensitive.
+
+This deliberately separates three identities:
+
+| Identity | Authority | Purpose |
+| --- | --- | --- |
+| Base Git revision | Git commit | Locate the last contract-bearing source revision. |
+| Adoption source hash | X0-D source lock | Prove Base/My-Chat contract and validator source parity despite physical path/package alias differences. |
+| Runtime `contract_hash` | Host validator over manifest/registries | Pin one registered scenario module at runtime. |
+
+Changing docs, tests, package-manager files, or the hash tool does not change the
+adoption source hash. Changing contract or validator non-test source does and
+requires an intentional new lock/revision.
+
 ## Key Architectural Risk
 The main risk is accidental second-system creation: a scenario or surface might
 introduce private APIs, private status, private domain stores, or private handoff

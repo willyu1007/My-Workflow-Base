@@ -44,10 +44,10 @@ Acceptance:
 
 ### X0-D: Handoff and adoption record
 
-- Run clean/frozen install, typecheck, tests, YAML/template checks, boundary
+- [x] Run clean/frozen install, typecheck, tests, YAML/template checks, boundary
   scans, and legacy hash checks.
-- Record the Base revision and contract source hash for My-Chat X1 adoption.
-- Do not enable a host capability or non-empty scenario path in Base.
+- [x] Record the Base revision and contract source hash for My-Chat X1 adoption.
+- [x] Do not enable a host capability or non-empty scenario path in Base.
 
 ## X0 Compatibility Rule Matrix
 
@@ -128,6 +128,6 @@ Acceptance:
 - Implementation can start without reopening M1/M2/M3 ownership debates.
 
 ## Current First Move
-Execute X0-D: rerun the full clean/frozen verification and boundary matrix,
-compute the adopted Base revision and deterministic contract source hash, then
-record the My-Chat X1 handoff without enabling a host capability.
+Create `dev-docs/active/workflow-handoff-materialization/` in My-Chat and execute
+X1 against `06-x1-adoption-handoff.md`. Adopt types/validator/worker pass-through,
+record the matching source hash, and keep the host capability absent/disabled.

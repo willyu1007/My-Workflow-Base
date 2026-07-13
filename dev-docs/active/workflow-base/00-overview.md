@@ -34,8 +34,8 @@ consumption surfaces
 - Created: 2026-05-25
 - Updated: 2026-07-13
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
-- Completed increment: X0-C validator and negative conformance rules
-- Next gate: X0-D full verification and revision/hash handoff
+- Completed increment: X0-D verification and revision/hash handoff
+- Next gate: My-Chat X1 contract adoption with capability disabled
 
 ## Context
 This repository is the workflow base template. It defines durable contracts for
@@ -177,6 +177,9 @@ The current design stance is:
   presenter/output DTOs must not retain them.
 - D30: Base contract changes must pass in-repo typecheck/tests, a frozen legacy
   contract-hash fixture, and vNext conformance before My-Chat adoption begins.
+- D31: Cross-repo source adoption uses a separate deterministic source hash over
+  logical contract/validator roots. It normalizes physical host package aliases
+  but is never substituted for a runtime scenario `contract_hash`.
 
 ## Dependencies
 - `docs/context/workflow/v0-convergence.md`
@@ -275,6 +278,20 @@ The current design stance is:
 - [x] Existing `WF-MAN-040`–`042` semantics/finding paths, legacy lifecycle,
   contract types, and runtime ownership remain unchanged.
 
+### X0-D Acceptance Criteria
+
+- [x] The last contract-bearing Base revision is pinned independently from
+  later documentation/evidence commits.
+- [x] A machine-readable lock records the aggregate source hash, logical roots,
+  normalized file manifest, and per-file hashes.
+- [x] Hash reproduction is independent of physical repo path, LF/CRLF, and the
+  expected `@host`/`@my-chat` workflow-contracts package alias.
+- [x] The generic verification command checks the source lock on every CI run.
+- [x] My-Chat X1 has an explicit adoption mapping, required actions, non-goals,
+  reproduction command, and exit evidence checklist.
+- [x] X0-D adds no contract/validator behavior, runtime persistence, Prisma,
+  queue, Outbox, provider, scenario logic, or capability enablement.
+
 ## Current Notes
 - 2026-05-25: Task package created to preserve macro alignment before further
   contract edits.
@@ -309,6 +326,11 @@ The current design stance is:
   negative type fixtures, and claim-token persistence/logging guard. The task
   remains `in-progress`; X0-D must record the final revision/source hash before
   My-Chat X1 adoption, and no capability is enabled.
+- 2026-07-13: X0-D pinned contract source revision `e20c073`, source hash
+  `1a393c21192e711a7e87733724fc74d9c0c5bbb36a2ad2824d34157e2be83416`,
+  and the My-Chat X1 adoption handoff. The broader workflow-base task remains
+  `in-progress`; ownership now moves to the separate My-Chat X1 task, and the
+  host capability remains disabled.
 - 2026-05-26: Downstream information matrix added: outbox carries signals and
   refs only; downstream consumers must reread canonical state and own their
   side effects.

@@ -49,8 +49,8 @@
   is not blocked by a nested bare `pnpm` resolving to the wrong local runtime.
 
 ## Open Implementation Notes
-- X0-D must record the final Base revision and contract source hash only after
-  X0-C passes.
+- My-Chat X1 must consume `06-x1-adoption-handoff.md`, create its own task
+  package, and record the adopted Base/My-Chat revisions and matching hash.
 - Keep examples scenario-neutral unless explicitly marked as examples.
 
 ## 2026-07-13 X0-A Governance and Conformance Baseline
@@ -114,3 +114,27 @@
   test before full verification.
 - No workflow contract type, runtime persistence, Prisma/database, queue,
   Outbox, provider, downstream side effect, or capability enablement was added.
+
+## 2026-07-13 X0-D Source Lock and X1 Handoff
+
+- Pinned the last contract-bearing revision as
+  `e20c0735f450fd4fbc65ca195d7bc9a494c20cda`; later X0-D changes are tooling,
+  verification, and documentation only.
+- Added a deterministic SHA-256 source manifest/lock for the contract package
+  and validator non-test source. The aggregate adoption hash is
+  `1a393c21192e711a7e87733724fc74d9c0c5bbb36a2ad2824d34157e2be83416`.
+- Initial review caught that raw validator bytes would differ only because Base
+  imports `@host/workflow-contracts` while My-Chat imports
+  `@my-chat/workflow-contracts`. The final normalization maps only those two
+  allowed aliases in supported module-import positions to a logical alias; a
+  portability test proves physical path and alias independence, while a
+  negative case proves an unexpected third-party scope changes the hash.
+- Added the lock check to the generic source-repo/CI verification command so
+  later contract or validator edits cannot silently invalidate the X1 handoff.
+- Added `06-x1-adoption-handoff.md` with source mappings, X1 requirements,
+  explicit non-goals, reproduction commands, and exit evidence.
+- Verified clean My-Chat pre-adoption revision `e53aa610` currently has a
+  different logical hash, as expected; X1 owns convergence and must keep the
+  capability disabled.
+- No contract/validator behavior, runtime persistence, Prisma/database, queue,
+  Outbox, provider, scenario logic, or capability enablement changed in X0-D.
