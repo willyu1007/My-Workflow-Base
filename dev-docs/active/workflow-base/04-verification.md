@@ -34,6 +34,9 @@
 - 2026-07-13: Existing independent web-workbench regression checks passed:
   `corepack pnpm --dir templates/web-workbench typecheck` and `build`. The new
   root workspace does not absorb or replace the web-workbench lockfile/package.
+- 2026-07-13: Draft PR #1 opened from
+  `chore/x0-a-contract-conformance`; GitHub Actions run `29233753559` passed the
+  frozen-install and `verify:x0-a` conformance job in 20 seconds.
 
 ## Planned Checks
 - `git diff --check`
