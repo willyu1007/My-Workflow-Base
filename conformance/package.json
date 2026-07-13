@@ -1,14 +1,11 @@
 {
-  "name": "@host/workflow-runtime",
+  "name": "@workflow-base/conformance",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": {
-    ".": "./src/index.ts"
-  },
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "vitest run src"
+    "test": "node scripts/check-claim-token-boundary.mjs && node scripts/check-contract-source-hash-portability.mjs"
   },
   "dependencies": {
     "@host/workflow-contracts": "workspace:*"

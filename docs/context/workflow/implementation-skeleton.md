@@ -232,6 +232,11 @@ Rules:
 - public draft, RAG/knowledge, notification, search/vector, and PPR remain
   downstream-owned
 
+X0-B adds contract shapes for a future atomic materializer, but adds no
+materializer implementation here. My-Chat X2/X3 owns the transaction that
+completes a claimed Step, materializes Handoffs, and appends Outbox records.
+The legacy request/receipt service above remains unchanged.
+
 ## Worker runtime skeleton
 
 Worker payloads carry ids and versions only:
@@ -262,6 +267,19 @@ claim step through WorkflowRuntimePort
 ```
 
 The queue is never the source of business truth.
+
+For the vNext path, the trusted worker passes the live claim evidence through
+two internal-only calls: the service-authenticated scenario driver context and
+`WorkflowRuntimePortMaterializationV1.complete_step`. The Step handler may
+return typed `handoff_drafts`, but neither the queue payload nor any scenario
+snapshot/draft persists the token.
+
+The v1 runtime port is host-owned and injected directly into the worker. It is
+not recovered from the legacy-typed scenario `worker_runtime` adapter with a
+cast. A source-repo compile fixture proves the claimed driver, handler result,
+and injected v1 port compose without a type assertion. Worker pass-through is a
+My-Chat X1 adoption task; lease/reclaim and atomic persistence remain X2/X3
+tasks.
 
 ## Journey harness skeleton
 
@@ -298,3 +316,15 @@ A host implementation skeleton is acceptable when:
 - worker runtime resolves handlers from canonical identity and contract hash
 - handoff service writes request/receipt records only
 - deterministic journey harness passes for the example scenario
+
+## Cross-repo source adoption evidence
+
+When a host copies the contract package and validator scaffold, it records both
+the Base Git source revision and the deterministic adoption source hash from
+`conformance/workflow-contract-source-lock.json`. The hash uses logical roots so
+physical repo layout and the expected host package alias do not create false
+drift.
+
+This source-adoption hash proves copied source parity only. It does not replace
+the runtime `contract_hash` that pins a scenario manifest and registry keys.
+Host adoption must keep those two identities separate in task docs and CI.

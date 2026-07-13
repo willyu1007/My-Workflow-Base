@@ -210,6 +210,13 @@ handoffs:
     policy_key:
     receipt_required: true
 
+    # Additive vNext fields. Omit all three for a legacy declaration.
+    # handoff_key: stable_handoff_key
+    # source_context_ref_types:
+    #   - namespace: owner.namespace
+    #     object_type: canonical_object_type
+    # materialization_mode: workflow_step_complete_v1
+
 surface_mapping:
   chat_workflow_control:
   chat_dashboard_summary:
@@ -249,3 +256,13 @@ verification:
   deterministic_tests: []
   journey_harness:
 ```
+
+The vNext fields expose contract shape only. They do not activate non-empty
+handoffs by themselves: X0-C validator rules and an enabled host capability are
+both required before vNext activation.
+
+Validator behavior is additive: legacy declarations receive warning
+`WF-MAN-043`, while vNext declarations fail on missing key/source/capability or
+duplicate declared keys (`WF-MAN-044` through `WF-MAN-047`). An explicitly
+unknown or null `materialization_mode` fails closed through `WF-MAN-048`; only
+an omitted mode is treated as legacy.

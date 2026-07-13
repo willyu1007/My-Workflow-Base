@@ -166,6 +166,102 @@ Handoff payloads are refs-only:
 
 Private body content does not cross the handoff boundary.
 
+## X0 vNext Compatibility Boundary
+
+X0 extends the template contract for host-owned atomic handoff materialization.
+It does not make this repository a runtime and does not give a scenario module
+permission to create Handoff Ledger or standard `workflow.handoff.*` outbox
+records directly.
+
+Compatibility rules:
+
+- Legacy handoff declarations remain valid and keep their existing lifecycle.
+- An explicit optional `materialization_mode` is the vNext discriminator. The
+  validator must not infer vNext behavior from a legacy handoff type or owner.
+- Host capability evidence is optional in the snapshot type and defaults to an
+  empty/disabled capability set for legacy hosts.
+- The vNext completion branch requires the claim token and expected version and
+  accepts typed handoff drafts. The legacy completion branch remains valid.
+- `WorkflowRuntimePort` retains its legacy completion signature. The additive
+  `WorkflowRuntimePortMaterializationV1` replaces only `complete_step` with
+  correlated overloads so a v1 input yields a v1 result without weakening
+  legacy implementers or callers with an uncorrelated union.
+- The new Handoff lifecycle status is versioned separately from the existing
+  `WorkflowHandoffResult` status union.
+- Contract/hash validation occurs before host persistence. Base defines the
+  rule and fixture; the host owns transaction, replay, ledger, and outbox.
+
+X0-C validator behavior:
+
+- no handoff declaration produces no migration finding
+- a legacy declaration without `materialization_mode` emits warning-only
+  `WF-MAN-043`; warnings do not block registry loading
+- vNext missing-key/source/capability defects are fatal `WF-MAN-044`–`046`
+- host capability absence/empty state produces one host-level finding rather
+  than one duplicate finding per vNext declaration
+- declared non-empty keys must be unique across legacy migration and vNext
+  declarations (`WF-MAN-047`) so pinned-contract lookup cannot be ambiguous
+- explicit unknown or null materialization modes fail closed through
+  `WF-MAN-048`; only an omitted mode is treated as legacy
+- existing `WF-MAN-040`–`042` outputs remain stable
+
+The source repository verifies these rules through copyable packages and
+scenario fixtures. It must not rely on My-Chat's workspace to supply TypeScript,
+Vitest, aliases, or missing tsconfig files.
+
+## X0 Trusted Driver Boundary
+
+`ScenarioCommandDriverContext` is a trusted service-call contract. The driver
+ref and pinned binding identify provenance; `claimToken` and expected Step
+version are transient concurrency evidence.
+
+The claim token:
+
+- is required only on the vNext trusted runtime branch
+- is never part of semantic command hashing
+- is not stored in scenario snapshots or Handoff drafts
+- is not returned by presenters or user-facing replay
+- is not logged, traced, or emitted in metrics/event payloads
+
+Base conformance can enforce type placement and fixture behavior. My-Chat X2/X3
+must enforce lease, claim, replay, transaction, and persistence behavior.
+
+My-Chat X1 injects the host-owned `WorkflowRuntimePortMaterializationV1`
+directly into its worker. The scenario registry remains legacy-compatible and
+is not used as an unsafe type-narrowing authority for host capability. A compile
+fixture proves the driver evidence and handler drafts can reach the injected v1
+port without `as WorkflowRuntimePortMaterializationV1`.
+
+## X0-D Source Adoption Hash Boundary
+
+The cross-repo adoption hash identifies copied contract and validator source;
+it is not a business/runtime identity.
+
+Logical hash roots:
+
+- `workflow-contracts`: all non-test TypeScript under the contract package
+  source root
+- `workflow-validator`: all non-test TypeScript under the validator source root
+
+The hash is deterministic across repo locations. It normalizes UTF-8 BOM and
+line endings, maps only `@host/workflow-contracts` and
+`@my-chat/workflow-contracts` in supported module-import positions to a logical
+alias inside validator sources, then hashes sorted logical path + byte length +
+normalized bytes with NUL delimiters. Everything else, including other package
+scopes, comments, and validator behavior, remains source-sensitive.
+
+This deliberately separates three identities:
+
+| Identity | Authority | Purpose |
+| --- | --- | --- |
+| Base Git revision | Git commit | Locate the last contract-bearing source revision. |
+| Adoption source hash | X0-D source lock | Prove Base/My-Chat contract and validator source parity despite physical path/package alias differences. |
+| Runtime `contract_hash` | Host validator over manifest/registries | Pin one registered scenario module at runtime. |
+
+Changing docs, tests, package-manager files, or the hash tool does not change the
+adoption source hash. Changing contract or validator non-test source does and
+requires an intentional new lock/revision.
+
 ## Key Architectural Risk
 The main risk is accidental second-system creation: a scenario or surface might
 introduce private APIs, private status, private domain stores, or private handoff

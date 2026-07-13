@@ -1,4 +1,47 @@
-import type { CanonicalRef, WorkflowCommandMeta } from "./identity.js";
+import type { CanonicalRef, DomainContextRef, WorkflowCommandMeta } from "./identity.js";
+
+export type ScenarioHandoffRequestSnapshot = {
+  requestId: string;
+  handoffKey: string;
+  requestedPurpose: string;
+  sourceContextRefs?: DomainContextRef[];
+  sourceArtifactRefs?: CanonicalRef[];
+  expiresAt?: string;
+};
+
+export type WorkflowHandoffDraft = {
+  draft_key: string;
+  handoff_key: string;
+  requested_purpose: string;
+  source_context_refs?: DomainContextRef[];
+  source_refs?: CanonicalRef[];
+  expected_versions?: Record<string, number>;
+  expires_at?: string;
+};
+
+export type ScenarioCommandDriverContext = {
+  driverRef: DomainContextRef;
+  contractHash: string;
+  capabilityKey: string;
+  entrypointKey: string;
+  /** Transient claim evidence. Never persist, hash, log, or expose this value. */
+  claimToken: string;
+  expectedStepVersion: number;
+};
+
+export type WorkflowHandoffLifecycleStatusV1 = "requested" | "completed" | "stopped" | "failed";
+
+export type HandoffMaterializationDisposition = "created" | "existing";
+
+export type WorkflowHandoffRef = Omit<CanonicalRef, "kind"> & {
+  kind: "workflow_handoff";
+};
+
+export type MaterializedHandoff = {
+  draft_key: string;
+  handoff_ref: WorkflowHandoffRef;
+  disposition: HandoffMaterializationDisposition;
+};
 
 export type HandoffRequestInput = {
   handoff_type: string;

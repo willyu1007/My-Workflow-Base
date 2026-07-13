@@ -21,6 +21,23 @@ Workflow modular base template。这个仓库不提供运行时服务；具体 w
 
 - [Workflow base task package](dev-docs/active/workflow-base/00-overview.md)：用于收敛双层架构表、manifest/API 对齐和后续实现骨架。
 - [Workflow base roadmap](dev-docs/active/workflow-base/roadmap.md)：宏观里程碑与收敛顺序。
+- [My-Chat X1 adoption handoff](dev-docs/active/workflow-base/06-x1-adoption-handoff.md)：记录 X0 合同源码 revision/hash、跨仓逻辑路径映射和 X1 禁止越界项。
+
+## 源仓验证
+
+Workflow 合同、host-runtime scaffold 和 scenario module template 可以在本仓
+独立验证，不需要复制到宿主仓后才能发现类型或测试问题：
+
+```bash
+corepack pnpm install --frozen-lockfile
+corepack pnpm verify:workflow-contracts
+corepack pnpm check:workflow-contract-source
+```
+
+该命令只执行模板/conformance typecheck、validator/worker tests 和 scenario
+journey test，并校验 X1 采用所需的合同源码 lock；不启动运行时、不连接数据库，
+也不执行发布或部署。源码 hash 的范围、逻辑路径与逐文件摘要记录在
+`conformance/workflow-contract-source-lock.json`。
 
 ## 底座原则
 

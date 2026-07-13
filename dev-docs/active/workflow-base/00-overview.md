@@ -32,8 +32,10 @@ consumption surfaces
 - State: in-progress
 - Owner: unassigned
 - Created: 2026-05-25
-- Updated: 2026-05-26
+- Updated: 2026-07-13
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
+- Completed increment: X0-D verification plus post-review contract repair and revision/hash refresh
+- Next gate: My-Chat X1 contract adoption with capability disabled
 
 ## Context
 This repository is the workflow base template. It defines durable contracts for
@@ -69,10 +71,16 @@ The current design stance is:
   bindings, run start requirements, and web-owned step interventions.
 - Manifest/API/module contract implications.
 - Macro roadmap for moving from docs to implementation skeleton.
+- X0 additive vNext handoff, durable-driver, host-capability, and completion
+  contracts for later explicit host materialization.
+- Source-repo workspace, deterministic legacy/vNext conformance fixtures, and CI
+  gates that validate templates before host adoption.
 
 ## Scope Out
 - Implementing runtime services.
 - Implementing a host product integration.
+- Implementing Prisma models, database transactions, queues, outbox dispatch, or
+  a concrete Handoff Ledger.
 - Implementing forum, RAG, notification, or public draft downstream modules.
 - User-editable workflow builders.
 - Plugin marketplace behavior.
@@ -148,6 +156,37 @@ The current design stance is:
   scenario-specific shared APIs/events, bodyful payloads, direct downstream
   writes, chat interventions, dashboard indexing, and workflow-owned canonical
   domain objects are explicit regressions.
+- D24: X0 remains additive. Existing manifest, runtime-port, and
+  `WorkflowHandoffResult` shapes continue to compile and retain their legacy
+  semantics.
+- D25: A handoff opts into vNext materialization through an explicit optional
+  `materialization_mode: "workflow_step_complete_v1"`; the validator does not
+  infer activation from `handoff_type` or downstream owner.
+- D26: Host capability evidence is additive and absent means disabled. The
+  vNext path requires `workflow_handoff_materialization_v1`; legacy handoffs do
+  not.
+- D27: `complete_step` vNext uses a discriminated input/result branch so its
+  `claim_token` and deterministic materialization result can be required without
+  making legacy completion calls invalid.
+- D28: The new `requested/completed/stopped/failed` Handoff lifecycle is a
+  versioned type. It does not reinterpret the existing
+  `WorkflowHandoffResult.status` union; `created/existing` is a materialization
+  disposition only.
+- D29: Claim tokens are transient secrets. Contracts may carry them only on the
+  trusted runtime call path; fixtures, logs, hashes, persisted snapshots, and
+  presenter/output DTOs must not retain them.
+- D30: Base contract changes must pass in-repo typecheck/tests, a frozen legacy
+  contract-hash fixture, and vNext conformance before My-Chat adoption begins.
+- D31: Cross-repo source adoption uses a separate deterministic source hash over
+  logical contract/validator roots. It normalizes physical host package aliases
+  but is never substituted for a runtime scenario `contract_hash`.
+- D32: Only an omitted `materialization_mode` is legacy. Any explicit unknown,
+  null, or otherwise unsupported value fails closed before activation.
+- D33: The exported completion result is a closed legacy/v1 union; a result with
+  the v1 discriminator must include deterministic materialization output.
+- D34: My-Chat X1 injects the host-owned
+  `WorkflowRuntimePortMaterializationV1` directly into its worker. It does not
+  recover the v1 overload from the legacy scenario adapter through a cast.
 
 ## Dependencies
 - `docs/context/workflow/v0-convergence.md`
@@ -203,6 +242,77 @@ The current design stance is:
 - [ ] V0 readiness checklist records the semantic drift pass and
   must-not-regress checks.
 
+### X0-A Acceptance Criteria
+
+- [x] Root workspace and frozen lockfile install from a clean checkout.
+- [x] Workflow contracts, runtime scaffold, and scenario template independently
+  typecheck.
+- [x] Validator/worker tests and scenario journey tests run from one root
+  command.
+- [x] Legacy validator fixture pins its existing contract hash.
+- [x] GitHub Actions runs the same frozen-install and verification command.
+- [x] No vNext contract fields, runtime persistence, Prisma, queue, or outbox
+  implementation is introduced in X0-A.
+
+### X0-B Acceptance Criteria
+
+- [x] Legacy manifest, host snapshot, completion input/result, and Handoff
+  lifecycle fixtures still compile without vNext fields.
+- [x] vNext manifest, snapshot, draft, trusted driver, host capability,
+  completion input/result, and versioned lifecycle fixtures compile.
+- [x] `WorkflowRuntimePort` retains its legacy `complete_step` contract while
+  `WorkflowRuntimePortMaterializationV1` correlates legacy and v1 input/result
+  overloads.
+- [x] Newly added vNext claim-token fields occur only on trusted
+  driver/completion inputs and are not retained by snapshot, draft, lifecycle,
+  or materialized-result types.
+- [x] No validator behavior, runtime persistence, Prisma, queue, Outbox, or
+  scenario-specific logic is introduced in X0-B.
+
+### X0-C Acceptance Criteria
+
+- [x] No-handoff manifests produce no migration finding and retain the frozen
+  legacy contract hash.
+- [x] Legacy handoffs without `materialization_mode` produce warning-only
+  `WF-MAN-043` and remain registerable.
+- [x] Invalid vNext declarations fail on missing key, missing source,
+  missing/empty host capability, or duplicate declared key through
+  `WF-MAN-044`–`047`.
+- [x] Explicit unknown or null `materialization_mode` values fail closed through
+  `WF-MAN-048`; only an omitted field receives the legacy warning.
+- [x] A valid vNext declaration passes when all requirements and the host
+  capability are present.
+- [x] Negative compile fixtures reject missing trusted claim evidence and reject
+  claim fields on snapshot, draft, materialization, and completion-result DTOs.
+- [x] Existing `WF-MAN-040`–`042` semantics/finding paths, legacy lifecycle,
+  contract types, and runtime ownership remain unchanged.
+
+### X0-D Acceptance Criteria
+
+- [x] The last contract-bearing Base revision is pinned independently from
+  later documentation/evidence commits.
+- [x] A machine-readable lock records the aggregate source hash, logical roots,
+  normalized file manifest, and per-file hashes.
+- [x] Hash reproduction is independent of physical repo path, LF/CRLF, and the
+  expected `@host`/`@my-chat` workflow-contracts package alias.
+- [x] The generic verification command checks the source lock on every CI run.
+- [x] My-Chat X1 has an explicit adoption mapping, required actions, non-goals,
+  reproduction command, and exit evidence checklist.
+- [x] X0-D adds no contract/validator behavior, runtime persistence, Prisma,
+  queue, Outbox, provider, scenario logic, or capability enablement.
+
+### X0 Post-Review Repair Acceptance Criteria
+
+- [x] A v1-looking completion result without `materialized_handoffs` fails
+  TypeScript conformance.
+- [x] Unknown and null materialization modes fail validator conformance.
+- [x] A compile fixture composes claimed driver evidence, handler drafts, and a
+  directly injected host v1 runtime port without a type assertion.
+- [x] BOM/CRLF, physical-root, and allowed package-alias portability are part of
+  the generic CI conformance command.
+- [x] Contract docs, validator rule tables, X1 handoff, source revision, and
+  source hash identify the repaired contract consistently.
+
 ## Current Notes
 - 2026-05-25: Task package created to preserve macro alignment before further
   contract edits.
@@ -221,6 +331,32 @@ The current design stance is:
 - 2026-06-26: Web workbench package boundary follow-up added. The UI kit keeps
   its root entry for compatibility and adds grouped public subpath entries so
   host products can avoid broad route chunks.
+- 2026-07-13: Cross-repo readiness review confirmed Base and My-Chat contract
+  source parity, but found that the Base host/scenario templates could not
+  independently install, typecheck, or run tests.
+- 2026-07-13: X0-A started on an isolated branch. The current work is limited to
+  governance and source-repo conformance; X0-B owns vNext type additions.
+- 2026-07-13: X0-A implementation and clean-install verification completed. The
+  task remains `in-progress`; X0-B is the next gate and no host activation is
+  enabled.
+- 2026-07-13: X0-B additive contract types and positive legacy/vNext compile
+  fixtures completed. The legacy runtime port remains unchanged; the vNext
+  materialization port is an explicit additive extension. X0-C remains the
+  validator/negative-conformance gate, and no host activation is enabled.
+- 2026-07-13: X0-C implemented the reserved `WF-MAN-043`–`047` matrix,
+  negative type fixtures, and claim-token persistence/logging guard. The task
+  remains `in-progress`; X0-D must record the final revision/source hash before
+  My-Chat X1 adoption, and no capability is enabled.
+- 2026-07-13: X0-D pinned contract source revision `e20c073`, source hash
+  `1a393c21192e711a7e87733724fc74d9c0c5bbb36a2ad2824d34157e2be83416`,
+  and the My-Chat X1 adoption handoff. The broader workflow-base task remains
+  `in-progress`; ownership now moves to the separate My-Chat X1 task, and the
+  host capability remains disabled.
+- 2026-07-13: Post-X0 quality review superseded that initial revision/hash with
+  repaired contract revision `c7f904c` and source hash
+  `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.
+  Repair evidence revision `ee84c29` and remote CI passed; My-Chat X1 is
+  unblocked while the host capability remains disabled.
 - 2026-05-26: Downstream information matrix added: outbox carries signals and
   refs only; downstream consumers must reread canonical state and own their
   side effects.

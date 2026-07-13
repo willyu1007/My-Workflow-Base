@@ -260,8 +260,19 @@ export type HandoffManifest = {
   downstream_owner: string;
   policy_key: string;
   receipt_required: boolean;
+  handoff_key?: string;
+  source_context_ref_types?: Array<{
+    namespace: string;
+    object_type: string;
+  }>;
+  materialization_mode?: "workflow_step_complete_v1";
 };
 ```
+
+The three optional fields are additive X0 vNext declarations. Their presence
+does not alter legacy behavior by itself. Only the explicit
+`materialization_mode` opts a declaration into the vNext validator path; X0-C
+defines the warning/fatal activation rules.
 
 ## Scenario canonical record
 `Scenario` is a database object. A module cannot activate itself with YAML only.
@@ -349,6 +360,7 @@ export type WorkflowStepHandlerResult =
       status: "succeeded";
       output_refs: CanonicalRef[];
       artifacts?: WorkflowArtifactDraft[];
+      handoff_drafts?: WorkflowHandoffDraft[];
       outbox_events?: OutboxEventDraft[];
       action_availability?: WorkflowActionAvailability[];
     }
@@ -645,6 +657,46 @@ export type WorkflowHandoffResult = {
   aggregate_version: number;
 };
 
+export type ScenarioHandoffRequestSnapshot = {
+  requestId: string;
+  handoffKey: string;
+  requestedPurpose: string;
+  sourceContextRefs?: DomainContextRef[];
+  sourceArtifactRefs?: CanonicalRef[];
+  expiresAt?: string;
+};
+
+export type WorkflowHandoffDraft = {
+  draft_key: string;
+  handoff_key: string;
+  requested_purpose: string;
+  source_context_refs?: DomainContextRef[];
+  source_refs?: CanonicalRef[];
+  expected_versions?: Record<string, number>;
+  expires_at?: string;
+};
+
+export type ScenarioCommandDriverContext = {
+  driverRef: DomainContextRef;
+  contractHash: string;
+  capabilityKey: string;
+  entrypointKey: string;
+  claimToken: string;
+  expectedStepVersion: number;
+};
+
+export type WorkflowHandoffLifecycleStatusV1 =
+  | "requested"
+  | "completed"
+  | "stopped"
+  | "failed";
+
+export type MaterializedHandoff = {
+  draft_key: string;
+  handoff_ref: CanonicalRef & { kind: "workflow_handoff" };
+  disposition: "created" | "existing";
+};
+
 export type DashboardCardListInput = {
   workspace_id: string;
   actor_id?: string;
@@ -769,6 +821,13 @@ export type WorkflowAdminAdapter = {
   get_evidence(input: EvidenceReadInput): Promise<WorkflowEvidenceView>;
 };
 ```
+
+These vNext types do not replace `HandoffRequestInput` or
+`WorkflowHandoffResult`. In particular, the versioned lifecycle is separate
+from the legacy status union, and `created/existing` describes materialization
+disposition rather than business lifecycle. `claimToken` is transient trusted
+call evidence: it is forbidden from snapshots, drafts, materialized results,
+contract hashes, logs, and presenter/output DTOs.
 
 ```ts
 export type ChatWorkflowAdapter = {
@@ -1137,10 +1196,21 @@ export type WorkflowModuleValidationReport = {
     remediation: string;
   }>;
 };
+
+export const workflowHostCapabilities = [
+  "workflow_handoff_materialization_v1",
+] as const;
+
+export type WorkflowHostValidationSnapshot = {
+  // Existing host evidence fields are omitted from this focused excerpt.
+  host_capabilities?: Array<(typeof workflowHostCapabilities)[number]>;
+};
 ```
 
 Fatal findings block pilot/GA activation. Warnings may be allowed only for
 explicitly timeboxed migration bridges.
+An absent or empty `host_capabilities` list means the vNext materialization
+capability is disabled.
 
 Minimum validation rules:
 
@@ -1157,8 +1227,15 @@ Minimum validation rules:
 | `WF-MAN-021` | Fatal | Chat, mobile, forum, RAG, notification, public links, and external clients do not consume internal APIs. |
 | `WF-MAN-030` | Fatal | Domain context ref types declare resolver keys and owner scope; workflow does not declare itself as canonical domain owner. |
 | `WF-MAN-031` | Fatal | `step_interventions` are restricted to `web_run_workbench`; chat does not declare or consume them. |
-| `WF-MAN-040` | Fatal | Handoffs declare type, source artifact types, requested purposes, downstream owner, policy key, and receipt requirement. |
-| `WF-MAN-041` | Fatal | Public draft, indexing, notification, and external delivery side effects are reachable only through handoff or owner APIs. |
+| `WF-MAN-040` | Fatal | Every declared handoff requires a downstream receipt. |
+| `WF-MAN-041` | Fatal | Every declared handoff policy key is registered by the scenario module. |
+| `WF-MAN-042` | Fatal | Every handoff downstream owner is registered in the host snapshot. |
+| `WF-MAN-043` | Warning | A legacy handoff omits `materialization_mode`; registration remains allowed and legacy semantics stay active. |
+| `WF-MAN-044` | Fatal | A `workflow_step_complete_v1` handoff has no non-empty stable `handoff_key`. |
+| `WF-MAN-045` | Fatal | A `workflow_step_complete_v1` handoff declares no non-empty artifact or context source type. |
+| `WF-MAN-046` | Fatal | At least one vNext handoff exists but the host snapshot does not enable `workflow_handoff_materialization_v1`. |
+| `WF-MAN-047` | Fatal | A non-empty `handoff_key` is declared more than once across legacy migration and vNext declarations. |
+| `WF-MAN-048` | Fatal | `materialization_mode` is present but is not the supported `workflow_step_complete_v1` value. |
 | `WF-MAN-050` | Fatal | Standard workflow events match the base registry; scenario internal events use `{scenario_key}.{capability_key}.{aggregate}.{verb}`. |
 | `WF-MAN-051` | Fatal | `event_registry.producers` maps every emitted event to an allowed owner and write boundary. |
 | `WF-MAN-052` | Fatal | Shared consumer `allowed_events` contain no scenario internal events. |
@@ -1168,6 +1245,13 @@ Minimum validation rules:
 | `WF-MAN-070` | Fatal | P0/P1 authoritative writes have minimal evidence record declarations. |
 | `WF-MAN-080` | Fatal | Projection field changes have a projection review record before activation. |
 | `WF-MAN-090` | Fatal | Deterministic tests and at least one journey harness are declared. |
+
+`WF-MAN-043` is warning-only and therefore does not make `report.passed` false.
+The capability check emits one host-level `WF-MAN-046` finding even when a
+manifest contains multiple vNext handoffs. Existing `WF-MAN-040` through
+`WF-MAN-042` semantics and finding paths remain unchanged.
+An explicitly unknown or null materialization mode is not legacy: it fails
+closed through `WF-MAN-048`.
 
 Activation phases:
 

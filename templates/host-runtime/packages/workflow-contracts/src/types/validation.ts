@@ -1,5 +1,9 @@
 import type { WorkflowActivationTarget } from "./identity.js";
 
+export const workflowHostCapabilities = ["workflow_handoff_materialization_v1"] as const;
+
+export type WorkflowHostCapability = (typeof workflowHostCapabilities)[number];
+
 export type WorkflowValidationSeverity = "fatal" | "warning" | "info";
 
 export type WorkflowModuleValidationFinding = {
@@ -27,4 +31,5 @@ export type WorkflowHostValidationSnapshot = {
   platform_events: string[];
   allowed_surfaces: string[];
   projection_reviews: string[];
+  host_capabilities?: WorkflowHostCapability[];
 };

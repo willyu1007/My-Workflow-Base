@@ -1,0 +1,4 @@
+packages:
+  - "conformance"
+  - "templates/host-runtime/packages/*"
+  - "templates/scenario-module"

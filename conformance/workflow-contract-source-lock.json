@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "contract_source_revision": "c7f904cdb9b647c80f28134ab6967cd76f730962",
+  "algorithm": "sha256",
+  "normalization": "utf8_lf_workflow_contracts_import_alias_path_nul_length_nul_content_nul_v1",
+  "logical_roots": [
+    "workflow-contracts",
+    "workflow-validator"
+  ],
+  "source_hash": "a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981",
+  "files": [
+    {
+      "path": "workflow-contracts/index.ts",
+      "bytes": 251,
+      "sha256": "87d9ae1023e4561049466bd853929856cb4905908adc7a3ff2fa321ffb467d77"
+    },
+    {
+      "path": "workflow-contracts/types/api.ts",
+      "bytes": 9156,
+      "sha256": "a5aca2797f1b2dedcd683e7a1790f05619b26959f7337fd0d22b3c9b80e8e172"
+    },
+    {
+      "path": "workflow-contracts/types/events.ts",
+      "bytes": 2150,
+      "sha256": "4926111700fdfa1e22f70679beafa5cc18c45763b4cd5f1cbac5057a76924377"
+    },
+    {
+      "path": "workflow-contracts/types/handoff.ts",
+      "bytes": 2166,
+      "sha256": "5f24df8191a6d1a743130c1efe4118eaf6b2a4e63578e6e3db09d2df55effe5c"
+    },
+    {
+      "path": "workflow-contracts/types/identity.ts",
+      "bytes": 2015,
+      "sha256": "bea400367896410dcac086ef9ad39a0250f7e06508e1085e42c079cb2634d91a"
+    },
+    {
+      "path": "workflow-contracts/types/manifest.ts",
+      "bytes": 3460,
+      "sha256": "1239ab011f181995ef591a83999475c6b4794fd16257d003b75568ab23e05dac"
+    },
+    {
+      "path": "workflow-contracts/types/module.ts",
+      "bytes": 3430,
+      "sha256": "9752f54c72105fe58c42c42df524c5c71094409ea1d7f01494cc1bb589e76213"
+    },
+    {
+      "path": "workflow-contracts/types/validation.ts",
+      "bytes": 1080,
+      "sha256": "77ad8c07ca122714304fa316161e36a2aa72f9965ca3eaa1ed219fff1b3c83ef"
+    },
+    {
+      "path": "workflow-validator/validate-module.ts",
+      "bytes": 16958,
+      "sha256": "d29b473046091d8a0624028ee674f9fe5707a171e65e2c2e121e7e0740d0f102"
+    }
+  ]
+}

@@ -7,7 +7,12 @@ import type {
   WorkflowExposureLevel,
   WorkflowRunRef,
 } from "./identity.js";
-import type { HandoffRequestInput, WorkflowHandoffResult } from "./handoff.js";
+import type {
+  HandoffRequestInput,
+  MaterializedHandoff,
+  WorkflowHandoffDraft,
+  WorkflowHandoffResult,
+} from "./handoff.js";
 import type { WorkflowSignalPayload } from "./events.js";
 
 export type WorkflowStartRequirement = {
@@ -166,6 +171,49 @@ export type WorkflowStepResult = {
   output_refs: CanonicalRef[];
 };
 
+type WorkflowCompleteStepCommonInput = {
+  run_id: string;
+  step_id: string;
+  expected_version: number;
+  status?: "completed" | "retry_requested" | "manual_review_required";
+  output_refs: CanonicalRef[];
+  artifact_drafts?: WorkflowArtifactDraft[];
+  context_bindings?: ContextBindingDraft[];
+  event_drafts?: OutboxEventDraft[];
+  meta: WorkflowCommandMeta;
+};
+
+export type WorkflowCompleteStepLegacyInput = WorkflowCompleteStepCommonInput & {
+  completion_contract_version?: never;
+  claim_token?: never;
+  handoff_drafts?: never;
+};
+
+export type WorkflowCompleteStepMaterializationInputV1 = WorkflowCompleteStepCommonInput & {
+  completion_contract_version: 1;
+  /** Transient claim evidence. Never persist, hash, log, or expose this value. */
+  claim_token: string;
+  handoff_drafts?: WorkflowHandoffDraft[];
+};
+
+export type WorkflowCompleteStepInput =
+  | WorkflowCompleteStepLegacyInput
+  | WorkflowCompleteStepMaterializationInputV1;
+
+export type WorkflowStepMaterializationResultV1 = WorkflowStepResult & {
+  completion_contract_version: 1;
+  materialized_handoffs: MaterializedHandoff[];
+};
+
+export type WorkflowCompleteStepLegacyResult = WorkflowStepResult & {
+  completion_contract_version?: never;
+  materialized_handoffs?: never;
+};
+
+export type WorkflowCompleteStepResult =
+  | WorkflowCompleteStepLegacyResult
+  | WorkflowStepMaterializationResultV1;
+
 export type WorkflowRuntimePort = {
   claim_step(input: {
     run_id: string;
@@ -174,17 +222,7 @@ export type WorkflowRuntimePort = {
     worker_id: string;
     meta: WorkflowCommandMeta;
   }): Promise<WorkflowStepLease>;
-  complete_step(input: {
-    run_id: string;
-    step_id: string;
-    expected_version: number;
-    status?: "completed" | "retry_requested" | "manual_review_required";
-    output_refs: CanonicalRef[];
-    artifact_drafts?: WorkflowArtifactDraft[];
-    context_bindings?: ContextBindingDraft[];
-    event_drafts?: OutboxEventDraft[];
-    meta: WorkflowCommandMeta;
-  }): Promise<WorkflowCommandResponse<WorkflowStepResult>>;
+  complete_step(input: WorkflowCompleteStepLegacyInput): Promise<WorkflowCommandResponse<WorkflowStepResult>>;
   fail_step(input: {
     run_id: string;
     step_id: string;
@@ -193,6 +231,17 @@ export type WorkflowRuntimePort = {
     retryable: boolean;
     meta: WorkflowCommandMeta;
   }): Promise<WorkflowCommandResponse<WorkflowStepResult>>;
+};
+
+export type WorkflowCompleteStepMaterializationFunctionV1 = {
+  (input: WorkflowCompleteStepLegacyInput): Promise<WorkflowCommandResponse<WorkflowStepResult>>;
+  (
+    input: WorkflowCompleteStepMaterializationInputV1,
+  ): Promise<WorkflowCommandResponse<WorkflowStepMaterializationResultV1>>;
+};
+
+export type WorkflowRuntimePortMaterializationV1 = Omit<WorkflowRuntimePort, "complete_step"> & {
+  complete_step: WorkflowCompleteStepMaterializationFunctionV1;
 };
 
 export type ChatWorkflowAdapter = {

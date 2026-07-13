@@ -1,5 +1,246 @@
 # Verification
 
+## X0-A Required Checks
+
+- `corepack pnpm install --frozen-lockfile`
+- `corepack pnpm verify:x0-a`
+- `corepack pnpm typecheck`
+- `corepack pnpm test`
+- `ruby -e 'require "yaml"; YAML.load_file("templates/scenario-module/scenario.manifest.yaml"); puts "yaml ok"'`
+- `git diff --check`
+- scan X0-A diff for contract-type, Prisma, database, queue, outbox, provider, or
+  delivery implementation changes
+- clean-install simulation without existing root `node_modules`
+
+## X0-A Results
+
+- 2026-07-13: Initial Base source-repo commands failed because the repository had
+  no root workspace/dependencies and the host packages referenced a missing
+  shared tsconfig. This is the pre-fix B6 evidence.
+- 2026-07-13: First integrated run passed all three typechecks and runtime tests,
+  then failed because Vitest's `tests/**/*.test.ts` filter did not include the
+  root-level scenario journey test. Package scripts were changed to stable
+  directory entrypoints before continuing.
+- 2026-07-13: Post-fix `corepack pnpm verify:x0-a` passed: contracts, runtime,
+  and scenario template typechecks; runtime 8/8 tests; scenario journey 1/1.
+- 2026-07-13: Legacy module contract hash baseline recorded as
+  `9f568ff772d3dafc02dd96f284f7cedb85aff18839b8f26f4691a8b2dc0d0ca6`.
+- 2026-07-13: `corepack pnpm install --frozen-lockfile`, YAML parsing for the
+  scenario manifest and GitHub workflow, `git diff --check`, and the contract
+  type no-change boundary check passed.
+- 2026-07-13: A temporary-directory clean checkout simulation excluded all
+  existing `node_modules`, performed a frozen install, and passed the full
+  `verify:x0-a` matrix: three typechecks, runtime 8/8, scenario journey 1/1.
+- 2026-07-13: Existing independent web-workbench regression checks passed:
+  `corepack pnpm --dir templates/web-workbench typecheck` and `build`. The new
+  root workspace does not absorb or replace the web-workbench lockfile/package.
+- 2026-07-13: Draft PR #1 opened from
+  `chore/x0-a-contract-conformance`; GitHub Actions run `29233753559` passed the
+  frozen-install and `verify:x0-a` conformance job in 20 seconds.
+
+## X0-B Required Checks
+
+- `corepack pnpm install --frozen-lockfile`
+- `corepack pnpm verify:x0-b`
+- dedicated legacy and vNext positive compile fixtures
+- clean-checkout frozen-install simulation without root `node_modules`
+- YAML parse for scenario manifest and GitHub workflow
+- Markdown fence and link checks for changed docs
+- `git diff --check`
+- claim-token placement scan
+- boundary scan for validator behavior, runtime persistence, Prisma, database,
+  queue, Outbox, provider, or scenario-specific implementation
+- independent web-workbench typecheck/build regression
+
+## X0-B Results
+
+- 2026-07-13: Integrated `corepack pnpm verify:x0-b` passed after contract and
+  positive fixture implementation: four typechecks, runtime 8/8 tests, and
+  scenario journey 1/1.
+- 2026-07-13: Architecture review found that a broad completion input/output
+  union would not correlate a v1 input with its materialization result and
+  would change the legacy implementation obligation. The contract was repaired
+  to retain `WorkflowRuntimePort` and add the overloaded
+  `WorkflowRuntimePortMaterializationV1`; the full verification command passed
+  again.
+- 2026-07-13: Positive compile fixtures prove three paths independently: the
+  unchanged legacy port accepts legacy completion and returns
+  `WorkflowStepResult`; the v1 port retains that legacy overload; and the v1
+  completion overload returns materialized Handoff refs.
+- 2026-07-13: A temporary-directory clean-checkout simulation excluded all
+  existing `node_modules`, completed frozen install for five workspace
+  projects, and passed `verify:x0-b`: four typechecks, runtime 8/8, scenario
+  journey 1/1.
+- 2026-07-13: Scenario manifest and GitHub workflow YAML parsing, Markdown fence
+  scan across 19 files, Markdown link scan across 11 changed docs, and `git
+  diff --check` passed.
+- 2026-07-13: Claim-token placement and changed-path boundary scans passed.
+  Newly added claim fields exist only on the trusted driver and discriminated
+  completion input; snapshots, drafts, lifecycle, and materialization outputs
+  contain none. No validator implementation, runtime/scenario implementation,
+  Prisma/database, queue, Outbox, provider, or delivery path changed.
+- 2026-07-13: Independent `templates/web-workbench` typecheck and build passed;
+  the X0-B workspace/conformance additions do not absorb or regress that
+  package.
+- 2026-07-13: Draft PR #1 GitHub Actions run `29235371875` passed for commit
+  `9f2c36c`: frozen install and the full `verify:workflow-contracts` job
+  completed successfully.
+
+## X0-C Required Checks
+
+- `corepack pnpm install --frozen-lockfile`
+- `corepack pnpm verify:x0-c`
+- validator matrix for no-handoff, legacy warning, valid vNext, missing key,
+  missing source, absent/empty host capability, and duplicate declared key
+- negative TypeScript fixtures for trusted claim evidence and forbidden
+  persisted/output claim fields
+- claim-token type-placement and runtime logging/metrics boundary check
+- frozen legacy contract hash and existing `WF-MAN-040`–`042` finding-path
+  regression assertions
+- clean-checkout frozen-install simulation without root `node_modules`
+- YAML, Markdown fence/link, `git diff --check`, and changed-path boundary scans
+- independent web-workbench typecheck/build regression
+- Draft PR remote CI
+
+## X0-C Results
+
+- 2026-07-13: Targeted runtime validator tests passed 17/17 after adding the
+  compatibility matrix and legacy-path regression; scenario journey remained
+  1/1.
+- 2026-07-13: Negative TypeScript conformance fixtures compiled with all
+  expected errors consumed. The claim-token boundary script confirmed required
+  trusted-input placement, forbidden snapshot/draft/output placement, and no
+  runtime logging/metrics use.
+- 2026-07-13: Frozen install and integrated `corepack pnpm verify:x0-c` passed:
+  four typechecks, runtime validator/worker tests, scenario journey, and
+  conformance boundary check.
+- 2026-07-13: Architecture review caught an observable legacy finding-path
+  change in `WF-MAN-040`–`042`; the paths were restored and a regression test
+  was added before continuing.
+- 2026-07-13: A temporary-directory clean-checkout simulation excluded all
+  existing `node_modules`, completed frozen install for five workspace
+  projects, and passed the same X0-C matrix: four typechecks, runtime 17/17,
+  scenario 1/1, and claim-boundary conformance.
+- 2026-07-13: Scenario manifest/GitHub workflow YAML parsing, Markdown fence
+  scan across 19 files, Markdown link scan across eight changed docs, `git diff
+  --check`, and changed-path boundary scans passed. No contract type,
+  worker/repository/service, scenario implementation, persistence, queue,
+  Outbox, or provider path changed.
+- 2026-07-13: Independent `templates/web-workbench` typecheck and build passed;
+  the X0-C validator/conformance changes do not absorb or regress that package.
+- 2026-07-13: Draft PR #1 GitHub Actions run `29236469992` passed for commit
+  `e20c073`: frozen install and the full generic workflow contract conformance
+  job completed successfully in 21 seconds.
+
+## X0-D Required Checks
+
+- `corepack pnpm install --frozen-lockfile`
+- `corepack pnpm verify:x0-d`
+- `corepack pnpm check:workflow-contract-source`
+- contract source diff against pinned revision `e20c073`
+- source-hash portability under changed physical roots and
+  `@host`/`@my-chat` import aliases
+- My-Chat pre-adoption hash observation without modifying My-Chat
+- clean-checkout frozen-install simulation without root `node_modules`
+- repeated hash calculation and lock comparison
+- legacy/vNext validator matrix, negative type fixtures, and claim boundary
+- YAML/JSON, Markdown fence/link, `git diff --check`, and stale local-path scans
+- no contract/validator behavior, runtime persistence, Prisma, queue, Outbox,
+  provider, scenario logic, or capability enablement changes
+- independent web-workbench typecheck/build regression
+- final architecture/readiness review and Draft PR remote CI
+
+## X0-D Results
+
+- 2026-07-13: Contract source revision pinned to
+  `e20c0735f450fd4fbc65ca195d7bc9a494c20cda`; scoped Git diff confirms the
+  current contract/validator source is byte-identical before hash
+  normalization.
+- 2026-07-13: Source lock schema v1 contains nine logical source files and
+  aggregate SHA-256
+  `1a393c21192e711a7e87733724fc74d9c0c5bbb36a2ad2824d34157e2be83416`.
+  Direct lock verification passed.
+- 2026-07-13: Hash portability conformance copied sources to different physical
+  roots and changed the expected validator import from `@host` to `@my-chat`;
+  the logical file manifest and aggregate hash remained identical.
+- 2026-07-13: Read-only My-Chat pre-adoption check at clean revision
+  `e53aa6100578bab62cad110c6020e87e19b17c80` produced hash
+  `7e083fd26164ee7034989535a115b3b5066ac7d9c2aa93c94448f225749294e8`.
+  The mismatch is expected X1 work and confirms X0-D has not modified My-Chat.
+- 2026-07-13: Final architecture review tightened alias normalization from an
+  arbitrary package scope to only `@host/workflow-contracts` and
+  `@my-chat/workflow-contracts` in supported module-import positions. A
+  negative portability case proves an unexpected third-party scope changes the
+  hash.
+- 2026-07-13: Post-review `corepack pnpm verify:x0-d` passed four typechecks,
+  runtime tests 17/17, scenario journey 1/1, claim-token boundary conformance,
+  source-hash portability, and source-lock verification.
+- 2026-07-13: A temporary clean copy excluded existing `node_modules`,
+  completed a frozen install for all five workspace projects, and passed the
+  same complete X0-D matrix.
+- 2026-07-13: Repeated hash calculation remained stable. Scenario manifest and
+  actual GitHub `ci.yml` YAML parsing, package/lock JSON parsing, Markdown
+  fence/link checks across nine changed docs, durable local-path scan, and
+  `git diff --check` passed.
+- 2026-07-13: Changed-path review against `e20c073` found no contract,
+  validator, worker, repository, service, scenario, Prisma, database, queue,
+  Outbox, provider, or capability-enablement change. Independent
+  `templates/web-workbench` typecheck and build also passed.
+- 2026-07-13: X0-D evidence commit `2894bad` was pushed to Draft PR #1.
+  GitHub Actions run `29238833875` passed the frozen install and complete
+  workflow contract conformance job in 22 seconds.
+
+## X0 Post-Review Repair Required Checks
+
+- runtime validator rejects unknown and null materialization modes
+- TypeScript rejects a v1-discriminated completion result without
+  `materialized_handoffs`
+- host-owned v1 runtime port composes with claimed driver and handler drafts
+  without a type assertion
+- generic portability test covers physical roots, allowed import aliases,
+  UTF-8 BOM, CRLF, and unexpected package scopes
+- source lock matches repaired contract revision
+  `c7f904cdb9b647c80f28134ab6967cd76f730962`
+- full local and clean-copy `corepack pnpm verify:x0-d`
+- independent web-workbench typecheck/build
+- contract/docs/boundary review, My-Chat pre-adoption hash, and Draft PR CI
+
+## X0 Post-Review Repair Results
+
+- 2026-07-13: The pre-fix runtime diagnostic proved
+  `workflow_step_complete_v2` produced only `WF-MAN-043` and
+  `report.passed=true`. Post-fix targeted runtime tests pass 19/19, including
+  unknown-string and explicit-null `WF-MAN-048` cases.
+- 2026-07-13: A semantic TypeScript diagnostic reproduced that the old generic
+  result union accepted a v1 discriminator without materialization output.
+  Post-fix negative conformance consumes the expected error, while the
+  host-injected v1 worker fixture typechecks without a cast.
+- 2026-07-13: The repaired contract source revision is `c7f904c`; regenerated
+  source-lock SHA-256 is
+  `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.
+- 2026-07-13: Integrated `corepack pnpm verify:x0-d` passed four typechecks,
+  runtime tests 19/19, scenario journey 1/1, claim-token conformance,
+  BOM/CRLF/physical-root/allowed-alias portability, unexpected-scope negative
+  coverage, and the refreshed source lock.
+- 2026-07-13: A temporary clean copy excluded all existing `node_modules`,
+  completed frozen install for five workspace projects, and passed the same
+  complete repaired X0 matrix.
+- 2026-07-13: Direct post-fix diagnostics confirmed an unsupported mode now
+  returns `WF-MAN-048`, `severity=fatal`, and `passed=false`; the previously
+  accepted incomplete v1 result now fails specifically because
+  `materialized_handoffs` is required.
+- 2026-07-13: Contract/validator source diff against `c7f904c` is empty.
+  Scenario/GitHub workflow YAML, package/lock JSON, Markdown fence/link checks
+  across 12 changed docs, durable local-path scan, and `git diff --check`
+  passed. Independent web-workbench typecheck/build also passed.
+- 2026-07-13: Read-only My-Chat `main` remains clean at `e53aa610` with expected
+  pre-adoption source hash
+  `7e083fd26164ee7034989535a115b3b5066ac7d9c2aa93c94448f225749294e8`;
+  no X1 code or capability was enabled during the repair.
+- 2026-07-13: Repair contract commit `c7f904c` and evidence commit `ee84c29`
+  were pushed to Draft PR #1. GitHub Actions run `29240814017` passed frozen
+  install and the complete repaired workflow conformance job in 22 seconds.
+
 ## Planned Checks
 - `git diff --check`
 - YAML parse for `templates/scenario-module/scenario.manifest.yaml`

@@ -1,0 +1,10 @@
+{
+  "extends": "../host-runtime/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "../../dist/templates/scenario-module",
+    "types": ["node", "vitest"]
+  },
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
+  "exclude": ["node_modules"]
+}

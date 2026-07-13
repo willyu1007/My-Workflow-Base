@@ -21,6 +21,60 @@
 - Do not let an example scenario become the base contract.
 - Do not start implementation skeleton work before matrix, manifest, and API
   contracts agree.
+- Do not rely on a host repository's `node_modules`, tsconfig, aliases, or test
+  runner to validate Base templates; the source repository must be sufficient.
+- Do not use a Vitest file-filter glob whose `**/` segment excludes tests placed
+  directly under the selected directory; prefer stable directory entrypoints.
+- Do not infer vNext materialization from legacy handoff declarations. Require an
+  explicit discriminator and keep legacy semantics intact.
+- Do not make claim tokens optional inside the vNext completion branch or place
+  them in persisted/hash/loggable DTOs merely to preserve legacy compilation.
+- Do not replace the legacy `WorkflowRuntimePort.complete_step` result with an
+  uncorrelated legacy/v1 union. Keep the legacy port stable and use the additive
+  v1 overload contract so input and output remain statically correlated.
+- Do not implement X0-C warning/fatal rules opportunistically while adding X0-B
+  types; positive type availability is not activation permission.
+- Do not improve or reformat existing validator findings while adding new rule
+  IDs; path/message changes are observable legacy behavior and need separate
+  compatibility review.
+- Do not emit the same missing host-capability fatal once per handoff. Treat it
+  as one host-level gate while keeping handoff-specific key/source findings
+  indexed.
+- Do not rely on positive fixtures alone for claim-secret boundaries. Keep
+  negative `@ts-expect-error` DTO cases and the source logging/metrics scan in
+  the generic conformance command.
+- Do not use physical repo paths or host package names directly in a cross-repo
+  source hash; expected `@host`/`@my-chat` alias differences would create false
+  drift. Normalize only `@host/workflow-contracts` and
+  `@my-chat/workflow-contracts` in supported module-import positions and keep
+  every other scope and byte source-sensitive.
+- Do not conflate the X0-D adoption source hash with a runtime scenario
+  `contract_hash`. The former proves copied source parity; the latter pins a
+  manifest/registry instance.
+- Do not pin the adoption revision to a later documentation-only commit. Record
+  the last commit that actually changed contract/validator source and keep
+  evidence revisions separate.
+- Do not treat every non-v1 `materialization_mode` as legacy. Only absence is a
+  migration bridge; explicit unknown or null values must fail closed.
+- Do not form a v1 result union by adding a subtype to an unrestricted base
+  result. The legacy branch must forbid v1 discriminator/materialization fields
+  or TypeScript will accept incomplete v1-looking objects.
+- Do not recover `WorkflowRuntimePortMaterializationV1` from the legacy-typed
+  scenario adapter through a cast. Inject the host-owned v1 port into the worker
+  and prove the call path through compile conformance.
 
 ## Historical Notes
-- None yet.
+- 2026-07-13: X0-A initially used `tests/**/*.test.ts`; Vitest 4 did not select
+  the root-level scenario journey test. Replaced it with `vitest run tests` and
+  retained the failure as a conformance-runner lesson.
+- 2026-07-13: X0-C initially changed existing `WF-MAN-040`–`042` finding paths
+  to indexed paths while adding new rules. Architecture review reverted the
+  observable legacy change and added a regression assertion.
+- 2026-07-13: X0-D initially hashed raw validator source, which made the expected
+  `@host` versus `@my-chat` package rename look like contract drift. The hash
+  normalization and portability fixture now remove only that false difference;
+  an unexpected package scope is verified to change the hash.
+- 2026-07-13: Post-X0 review reproduced two contract gaps despite green CI:
+  explicit unsupported materialization modes warned instead of failing, and the
+  generic completion-result union accepted an incomplete v1-looking object.
+  Both now have negative regression coverage, and the source lock was refreshed.

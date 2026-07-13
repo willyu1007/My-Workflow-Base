@@ -1,0 +1,33 @@
+{
+  "name": "my-workflow-base",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "typecheck:contracts": "pnpm --filter @host/workflow-contracts typecheck",
+    "typecheck:runtime": "pnpm --filter @host/workflow-runtime typecheck",
+    "typecheck:scenario": "pnpm --filter @host/scenario-module-example typecheck",
+    "typecheck:conformance": "pnpm --filter @workflow-base/conformance typecheck",
+    "typecheck": "pnpm typecheck:contracts && pnpm typecheck:runtime && pnpm typecheck:scenario && pnpm typecheck:conformance",
+    "test:runtime": "pnpm --filter @host/workflow-runtime test",
+    "test:scenario": "pnpm --filter @host/scenario-module-example test",
+    "test:conformance": "pnpm --filter @workflow-base/conformance test",
+    "test": "pnpm test:runtime && pnpm test:scenario && pnpm test:conformance",
+    "hash:workflow-contract-source": "node conformance/scripts/compute-workflow-contract-source-hash.mjs",
+    "check:workflow-contract-source": "node conformance/scripts/compute-workflow-contract-source-hash.mjs --check conformance/workflow-contract-source-lock.json",
+    "verify:workflow-contracts": "pnpm typecheck && pnpm test && pnpm check:workflow-contract-source",
+    "verify:x0-a": "pnpm verify:workflow-contracts",
+    "verify:x0-b": "pnpm verify:workflow-contracts",
+    "verify:x0-c": "pnpm verify:workflow-contracts",
+    "verify:x0-d": "pnpm verify:workflow-contracts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0",
+    "typescript": "^5.4.0",
+    "vitest": "^4.1.5"
+  }
+}
