@@ -4,6 +4,7 @@ import type {
   ScenarioHandoffRequestSnapshot,
   WorkflowCompleteStepLegacyInput,
   WorkflowCompleteStepMaterializationInputV1,
+  WorkflowCompleteStepResult,
   WorkflowHandoffDraft,
   WorkflowStepMaterializationResultV1,
 } from "@host/workflow-contracts";
@@ -89,4 +90,14 @@ export const completionResultRejectsClaimToken: WorkflowStepMaterializationResul
   materialized_handoffs: [],
   // @ts-expect-error -- completion results cannot expose claim evidence.
   claim_token: transientClaimToken,
+};
+
+// @ts-expect-error -- a v1-discriminated completion result must include deterministic materialization output.
+export const vnextCompletionResultRequiresMaterializedHandoffs: WorkflowCompleteStepResult = {
+  completion_contract_version: 1,
+  run_id: "run-negative",
+  step_id: "step-negative",
+  status: "completed",
+  aggregate_version: 2,
+  output_refs: [],
 };

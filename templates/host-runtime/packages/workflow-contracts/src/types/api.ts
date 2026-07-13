@@ -205,7 +205,14 @@ export type WorkflowStepMaterializationResultV1 = WorkflowStepResult & {
   materialized_handoffs: MaterializedHandoff[];
 };
 
-export type WorkflowCompleteStepResult = WorkflowStepResult | WorkflowStepMaterializationResultV1;
+export type WorkflowCompleteStepLegacyResult = WorkflowStepResult & {
+  completion_contract_version?: never;
+  materialized_handoffs?: never;
+};
+
+export type WorkflowCompleteStepResult =
+  | WorkflowCompleteStepLegacyResult
+  | WorkflowStepMaterializationResultV1;
 
 export type WorkflowRuntimePort = {
   claim_step(input: {

@@ -456,6 +456,31 @@ describe("workflow module validation and loading", () => {
     ).not.toThrow();
   });
 
+  it.each([
+    ["unknown", "workflow_step_complete_v2"],
+    ["null", null],
+  ])("rejects an explicitly %s materialization mode", (_label, materializationMode) => {
+    const invalidHandoff = {
+      ...createLegacyHandoff(),
+      materialization_mode: materializationMode,
+    } as unknown as HandoffManifest;
+    const report = validateWorkflowModule({
+      module: createModuleWithHandoffs([invalidHandoff]),
+      host_snapshot: createHandoffHostSnapshot(),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toContainEqual(
+      expect.objectContaining({
+        rule_id: "WF-MAN-048",
+        severity: "fatal",
+        path: "handoffs.0.materialization_mode",
+      }),
+    );
+    expect(report.findings.some((finding) => finding.rule_id === "WF-MAN-043")).toBe(false);
+  });
+
   it("preserves existing legacy handoff finding paths", () => {
     const report = validateWorkflowModule({
       module: createModuleWithHandoffs([

@@ -220,12 +220,24 @@ export function validateWorkflowModule(input: {
       }
     }
 
-    if (handoff.materialization_mode !== "workflow_step_complete_v1") {
+    const materializationMode: unknown = handoff.materialization_mode;
+
+    if (materializationMode === undefined) {
       addWarning(findings, {
         rule_id: "WF-MAN-043",
         message: `Legacy handoff does not opt into vNext materialization: ${handoff.handoff_type}`,
         path: `${handoffPath}.materialization_mode`,
         remediation: "Keep legacy behavior or migrate explicitly with materialization_mode and all vNext requirements.",
+      });
+      continue;
+    }
+
+    if (materializationMode !== "workflow_step_complete_v1") {
+      addFatal(findings, {
+        rule_id: "WF-MAN-048",
+        message: `Unsupported handoff materialization mode: ${String(materializationMode)}`,
+        path: `${handoffPath}.materialization_mode`,
+        remediation: "Omit materialization_mode for legacy behavior or use workflow_step_complete_v1.",
       });
       continue;
     }

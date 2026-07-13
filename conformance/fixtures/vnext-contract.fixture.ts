@@ -3,6 +3,7 @@ import type {
   MaterializedHandoff,
   ScenarioCommandDriverContext,
   ScenarioHandoffRequestSnapshot,
+  WorkflowCommandMeta,
   WorkflowCompleteStepMaterializationInputV1,
   WorkflowCompleteStepResult,
   WorkflowHandoffDraft,
@@ -10,6 +11,7 @@ import type {
   WorkflowHostValidationSnapshot,
   WorkflowRuntimePortMaterializationV1,
   WorkflowStepHandlerResult,
+  WorkflowStepMaterializationResultV1,
   WorkflowStepResult,
 } from "@host/workflow-contracts";
 import { legacyCompleteStepInputFixture } from "./legacy-contract.fixture.js";
@@ -146,5 +148,29 @@ export async function invokeLegacyCompletionThroughVnextPortFixture(
   runtimePort: WorkflowRuntimePortMaterializationV1,
 ): Promise<WorkflowStepResult> {
   const response = await runtimePort.complete_step(legacyCompleteStepInputFixture);
+  return response.data;
+}
+
+export async function completeClaimedStepThroughHostPortFixture(input: {
+  runtimePort: WorkflowRuntimePortMaterializationV1;
+  driver: ScenarioCommandDriverContext;
+  runId: string;
+  handlerResult: WorkflowStepHandlerResult;
+  meta: WorkflowCommandMeta;
+}): Promise<WorkflowStepMaterializationResultV1> {
+  const response = await input.runtimePort.complete_step({
+    completion_contract_version: 1,
+    run_id: input.runId,
+    step_id: input.driver.driverRef.object_id,
+    expected_version: input.driver.expectedStepVersion,
+    claim_token: input.driver.claimToken,
+    output_refs: input.handlerResult.output_refs,
+    artifact_drafts: input.handlerResult.artifact_drafts,
+    context_bindings: input.handlerResult.context_bindings,
+    handoff_drafts: input.handlerResult.handoff_drafts,
+    event_drafts: input.handlerResult.event_drafts,
+    meta: input.meta,
+  });
+
   return response.data;
 }
