@@ -40,15 +40,49 @@ const manifest = {
     enablement_policy: "requires_workspace_activation",
     entrypoints: [],
   }],
-  scenario_data: {},
-  artifact_policy: {},
-  action_availability: {},
+  scenario_data: {
+    context_ref_types: [],
+    run_start_requirements: [],
+    step_interventions: [],
+  },
+  artifact_policy: {
+    artifact_types: [],
+    exposure_levels: { L0: [], L1: [], L2: [], L3: [], L4: [] },
+    handoff_eligible: {},
+  },
+  action_availability: {
+    shared_actions: [],
+    scenario_actions: [],
+    expected_version_required: true,
+  },
   handoffs: [],
   surface_mapping: {},
-  internal_api: {},
-  event_registry: {},
-  governance: {},
-  verification: {},
+  internal_api: { routes: [] },
+  event_registry: {
+    standard_workflow_events: [],
+    scenario_internal_events: [],
+    event_payload_policy: {
+      signal_version: 1,
+      body: "no_body",
+      pii: "no_pii",
+      status_in_payload: false,
+      presenter_output_in_payload: false,
+      idempotency_key: "{event_type}:{aggregate_id}:{aggregate_version}",
+    },
+    producers: {},
+    consumers: {},
+  },
+  governance: {
+    admin_actions: [],
+    rollback: "Disable activation and preserve owner facts.",
+    projection_review_required: false,
+    evidence_records: [],
+    outbox_events: [],
+  },
+  verification: {
+    deterministic_tests: [],
+    journey_harness: "example-release-contract-v1",
+  },
 };
 
 const first = deriveScenarioReleaseMetadataV1(manifest);
@@ -71,6 +105,46 @@ const expectFailure = (candidate, code) => {
 };
 
 expectFailure({ ...manifest, unknown: true }, "unknown_field");
+expectFailure({
+  ...manifest,
+  step_type_registry: [{ ...manifest.step_type_registry[0], future_field: true }],
+}, "unknown_field");
+expectFailure({
+  ...manifest,
+  capabilities: [{
+    ...manifest.capabilities[0],
+    entrypoints: [{
+      entrypoint_key: "invalid",
+      label: "Invalid",
+      workflow_version: 1,
+      input_schema_version: 1,
+      output_schema_version: 1,
+      allowed_step_types: ["example.missing"],
+      steps: [],
+    }],
+  }],
+}, "undeclared_step_type");
+expectFailure({
+  ...manifest,
+  capabilities: [{
+    ...manifest.capabilities[0],
+    entrypoints: [{
+      entrypoint_key: "missing-runtime-kind",
+      label: "Missing runtime kind",
+      workflow_version: 1,
+      input_schema_version: 1,
+      output_schema_version: 1,
+      allowed_step_types: ["example.action"],
+      steps: [{
+        step_key: "execute",
+        step_type: "example.action",
+        order: 10,
+        handler_key: "example.execute",
+        retry_policy: "none",
+      }],
+    }],
+  }],
+}, "missing_field");
 expectFailure({
   ...manifest,
   capabilities: [{ ...manifest.capabilities[0], enablement_policy: "workspace_enabled" }],
