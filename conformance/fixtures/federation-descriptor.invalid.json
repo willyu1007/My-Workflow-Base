@@ -1,0 +1,16 @@
+{
+  "repository": "Broken-Example",
+  "role": "scenario_owner",
+  "platform_ref_namespace": "Bad Namespace",
+  "manifest": {
+    "manifest_version": 2,
+    "scenario_key": "Bad_Key",
+    "contract": { "source_hash": "moving-head" },
+    "step_type_registry": [
+      { "step_type": "prepare", "runtime_kind": "handoff", "owner": "scenario" }
+    ],
+    "handoffs": [{ "handoff_type": "knowledge_candidate" }]
+  },
+  "providers": ["OpenAI"],
+  "scenario_aliases": [{ "key": "legacy-example", "allows_new_writes": true }]
+}

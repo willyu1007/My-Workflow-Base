@@ -1,7 +1,7 @@
 import type { ScenarioManifest } from "@host/workflow-contracts";
 
 export const scenarioManifest = {
-  manifest_version: 1,
+  manifest_version: 2,
   scenario_key: "example",
   scenario_record: {
     display_name: "Example scenario",
@@ -10,8 +10,29 @@ export const scenarioManifest = {
     policy_version: 1,
   },
   owner: "team-name",
+  contract: {
+    base_contract_version: "1.0.0",
+    host_sdk_version: "1.0.0",
+    host_abi_range: "^1.0.0",
+    source_hash: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  },
+  step_type_registry: [
+    {
+      step_type: "example.collect_context",
+      runtime_kind: "scenario_action",
+      owner: "scenario",
+      legacy_aliases: ["domain_action"],
+    },
+  ],
+  owner_integration: {
+    command_contract: "scenario-command-envelope-v1",
+    event_contract: "scenario-event-envelope-v1",
+    receipt_contract: "scenario-command-receipt-v1",
+    status_lookup_required: true,
+    auth_mode: "service_authenticated",
+  },
   launch_phase: "dev",
-  allowed_user_classes: ["internal_admin"],
+  allowed_user_classes: ["admin"],
   capabilities: [
     {
       capability_key: "example_capability",
@@ -26,11 +47,12 @@ export const scenarioManifest = {
           workflow_version_id: "example-version",
           input_schema_version: 1,
           output_schema_version: 1,
-          allowed_step_types: ["domain_action"],
+          allowed_step_types: ["example.collect_context"],
           steps: [
             {
               step_key: "collect_context",
-              step_type: "domain_action",
+              step_type: "example.collect_context",
+              runtime_kind: "scenario_action",
               order: 10,
               handler_key: "example.collect_context",
               retry_policy: "none",
@@ -48,7 +70,7 @@ export const scenarioManifest = {
   artifact_policy: {
     artifact_types: ["example_summary"],
     exposure_levels: { L0: [], L1: ["example_summary"], L2: [], L3: [], L4: [] },
-    handoff_eligible: { public_draft: [], indexing: [], notification: [] },
+    handoff_eligible: { public_draft: [], indexing: [], notification: [], external_delivery: [] },
   },
   action_availability: {
     shared_actions: ["start_run"],

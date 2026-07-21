@@ -1,0 +1,18 @@
+{
+  "repository": "The-Example",
+  "role": "scenario_owner",
+  "platform_ref_namespace": "my_chat",
+  "manifest": {
+    "manifest_version": 2,
+    "scenario_key": "example",
+    "contract": { "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+    "step_type_registry": [
+      { "step_type": "example.prepare", "runtime_kind": "scenario_action", "owner": "scenario" },
+      { "step_type": "artifact_write", "runtime_kind": "artifact_write", "owner": "host" }
+    ],
+    "handoffs": [{ "handoff_type": "indexing" }]
+  },
+  "providers": ["qwen", "deepseek"],
+  "scenario_aliases": [{ "key": "legacy-example", "allows_new_writes": false }],
+  "canonical_objects": [{ "key": "example.record", "owner": "The-Example" }]
+}

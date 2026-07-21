@@ -5,6 +5,11 @@ import type {
   WorkflowModuleValidationReport,
   WorkflowScenarioModule,
 } from "@host/workflow-contracts";
+import {
+  standardWorkflowHandoffTypes,
+  workflowRuntimeKinds,
+  workflowStepPolicyFlags,
+} from "@host/workflow-contracts";
 import { createHash } from "node:crypto";
 
 function stableStringify(value: unknown): string {
@@ -76,6 +81,201 @@ export function validateWorkflowModule(input: {
   const manifest = input.module.manifest;
   const contract_hash = computeContractHash(input.module);
   const scenarioRecord = input.host_snapshot.scenario_records[manifest.scenario_key];
+
+  if (manifest.manifest_version !== 1 && manifest.manifest_version !== 2) {
+    addFatal(findings, {
+      rule_id: "WF-MAN-099",
+      message: `Unsupported manifest version: ${manifest.manifest_version}`,
+      path: "manifest_version",
+      remediation: "Use a manifest version explicitly supported by this Host SDK.",
+    });
+  }
+
+  if (manifest.manifest_version === 2) {
+    const allowedManifestKeys = new Set([
+      "manifest_version", "scenario_key", "scenario_record", "owner", "contract",
+      "step_type_registry", "owner_integration", "launch_phase", "allowed_user_classes",
+      "capabilities", "scenario_data", "artifact_policy", "action_availability", "handoffs",
+      "surface_mapping", "internal_api", "event_registry", "governance", "verification",
+    ]);
+    const unknownManifestKeys = Object.keys(manifest).filter((key) => !allowedManifestKeys.has(key));
+    if (unknownManifestKeys.length > 0) {
+      addFatal(findings, {
+        rule_id: "WF-MAN-113",
+        message: `Federated manifest contains unknown top-level fields: ${unknownManifestKeys.join(", ")}`,
+        path: "manifest",
+        remediation: "Remove unknown fields or publish an additive contract minor version before using them.",
+      });
+    }
+
+    const contract = manifest.contract;
+    if (
+      !contract ||
+      !isNonEmpty(contract.base_contract_version) ||
+      !isNonEmpty(contract.host_sdk_version) ||
+      !isNonEmpty(contract.host_abi_range) ||
+      !/^[a-f0-9]{64}$/u.test(contract.source_hash)
+    ) {
+      addFatal(findings, {
+        rule_id: "WF-MAN-100",
+        message: "Federated manifest requires an exact contract and logical source hash.",
+        path: "contract",
+        remediation: "Lock Base, Host SDK, ABI range, and a 64-character lowercase SHA-256 source hash.",
+      });
+    }
+
+    const stepTypeRegistry = manifest.step_type_registry ?? [];
+    if (stepTypeRegistry.length === 0) {
+      addFatal(findings, {
+        rule_id: "WF-MAN-101",
+        message: "Federated manifest requires a non-empty step type registry.",
+        path: "step_type_registry",
+        remediation: "Declare every durable step type and map it to one closed runtime_kind.",
+      });
+    }
+
+    const stepTypes = new Map<string, (typeof stepTypeRegistry)[number]>();
+    for (const [definitionIndex, definition] of stepTypeRegistry.entries()) {
+      const definitionPath = `step_type_registry.${definitionIndex}`;
+      const unknownDefinitionKeys = Object.keys(definition).filter(
+        (key) => !["step_type", "runtime_kind", "owner", "policy_flags", "legacy_aliases"].includes(key),
+      );
+      if (unknownDefinitionKeys.length > 0) {
+        addFatal(findings, {
+          rule_id: "WF-MAN-114",
+          message: `Step type definition contains unknown fields: ${unknownDefinitionKeys.join(", ")}`,
+          path: definitionPath,
+          remediation: "Remove unknown fields or publish an additive contract minor version.",
+        });
+      }
+      if (stepTypes.has(definition.step_type)) {
+        addFatal(findings, {
+          rule_id: "WF-MAN-102",
+          message: `Step type is declared more than once: ${definition.step_type}`,
+          path: `${definitionPath}.step_type`,
+          remediation: "Keep exactly one definition for each durable step type.",
+        });
+      }
+      stepTypes.set(definition.step_type, definition);
+
+      if (!(workflowRuntimeKinds as readonly string[]).includes(definition.runtime_kind)) {
+        addFatal(findings, {
+          rule_id: "WF-MAN-103",
+          message: `Unknown runtime kind: ${String(definition.runtime_kind)}`,
+          path: `${definitionPath}.runtime_kind`,
+          remediation: "Use a runtime kind from the closed Base contract registry.",
+        });
+      }
+
+      if (
+        definition.owner === "scenario" &&
+        !definition.step_type.startsWith(`${manifest.scenario_key}.`)
+      ) {
+        addFatal(findings, {
+          rule_id: "WF-MAN-104",
+          message: `Scenario-owned step type is not namespaced: ${definition.step_type}`,
+          path: `${definitionPath}.step_type`,
+          remediation: `Prefix scenario-owned step types with ${manifest.scenario_key}.`,
+        });
+      }
+
+      for (const policyFlag of definition.policy_flags ?? []) {
+        if (!(workflowStepPolicyFlags as readonly string[]).includes(policyFlag)) {
+          addFatal(findings, {
+            rule_id: "WF-MAN-105",
+            message: `Unknown step policy flag: ${String(policyFlag)}`,
+            path: `${definitionPath}.policy_flags`,
+            remediation: "Use a policy flag from the closed Base contract registry.",
+          });
+        }
+      }
+    }
+
+    for (const capability of manifest.capabilities) {
+      for (const entrypoint of capability.entrypoints) {
+        for (const allowedStepType of entrypoint.allowed_step_types) {
+          if (!stepTypes.has(allowedStepType)) {
+            addFatal(findings, {
+              rule_id: "WF-MAN-106",
+              message: `Entrypoint allows an undeclared step type: ${allowedStepType}`,
+              path: `capabilities.${capability.capability_key}.${entrypoint.entrypoint_key}.allowed_step_types`,
+              remediation: "Declare the step type in step_type_registry.",
+            });
+          }
+        }
+
+        for (const step of entrypoint.steps) {
+          const definition = stepTypes.get(step.step_type);
+          if (!definition) {
+            addFatal(findings, {
+              rule_id: "WF-MAN-107",
+              message: `Durable step uses an undeclared step type: ${step.step_type}`,
+              path: `capabilities.${capability.capability_key}.${entrypoint.entrypoint_key}.${step.step_key}.step_type`,
+              remediation: "Declare the step type in step_type_registry.",
+            });
+          } else if (step.runtime_kind !== definition.runtime_kind) {
+            addFatal(findings, {
+              rule_id: "WF-MAN-108",
+              message: `Step runtime kind does not match its registry definition: ${step.step_type}`,
+              path: `capabilities.${capability.capability_key}.${entrypoint.entrypoint_key}.${step.step_key}.runtime_kind`,
+              remediation: `Set runtime_kind to ${definition.runtime_kind}.`,
+            });
+          }
+        }
+      }
+    }
+
+    for (const [handoffIndex, handoff] of manifest.handoffs.entries()) {
+      if (!(standardWorkflowHandoffTypes as readonly string[]).includes(handoff.handoff_type)) {
+        addFatal(findings, {
+          rule_id: "WF-MAN-109",
+          message: `Federated manifest uses a non-standard handoff type: ${handoff.handoff_type}`,
+          path: `handoffs.${handoffIndex}.handoff_type`,
+          remediation: "Use public_draft, indexing, notification, or external_delivery.",
+        });
+      }
+    }
+
+    if (
+      !manifest.owner_integration ||
+      manifest.owner_integration.command_contract !== "scenario-command-envelope-v1" ||
+      manifest.owner_integration.event_contract !== "scenario-event-envelope-v1" ||
+      manifest.owner_integration.receipt_contract !== "scenario-command-receipt-v1" ||
+      manifest.owner_integration.status_lookup_required !== true ||
+      manifest.owner_integration.auth_mode !== "service_authenticated"
+    ) {
+      addFatal(findings, {
+        rule_id: "WF-MAN-110",
+        message: "Federated manifest requires the versioned Owner API integration contract.",
+        path: "owner_integration",
+        remediation: "Declare command, event, receipt, status lookup, and service authentication v1 contracts.",
+      });
+    }
+
+    if (!input.host_snapshot.host_capabilities?.includes("scenario_federation_v1")) {
+      addFatal(findings, {
+        rule_id: "WF-MAN-111",
+        message: "Host does not enable scenario_federation_v1.",
+        path: "host_capabilities",
+        remediation: "Keep activation disabled until the Host SDK federation capability is available.",
+      });
+    }
+
+    const hasGenerationStep = stepTypeRegistry.some((definition) =>
+      definition.policy_flags?.includes("generation_record_required"),
+    );
+    if (
+      hasGenerationStep &&
+      !input.host_snapshot.host_capabilities?.includes("generation_ticket_v1")
+    ) {
+      addFatal(findings, {
+        rule_id: "WF-MAN-112",
+        message: "Generation steps require generation_ticket_v1 from the Host Gateway.",
+        path: "host_capabilities",
+        remediation: "Keep generation capabilities disabled until the Host Gateway issues auditable tickets.",
+      });
+    }
+  }
 
   if (!scenarioRecord) {
     addFatal(findings, {

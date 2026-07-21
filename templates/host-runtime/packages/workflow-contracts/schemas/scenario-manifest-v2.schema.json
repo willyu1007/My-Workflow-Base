@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-manifest-v2.schema.json",
+  "title": "Federated Scenario Manifest V2 Overlay",
+  "description": "Required federation overlay. Product manifests also carry the Base workflow fields defined by the TypeScript contract.",
+  "type": "object",
+  "required": ["manifest_version", "scenario_key", "contract", "step_type_registry", "owner_integration"],
+  "properties": {
+    "manifest_version": { "const": 2 },
+    "scenario_key": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_contract_version", "host_sdk_version", "host_abi_range", "source_hash"],
+      "properties": {
+        "base_contract_version": { "type": "string", "minLength": 1 },
+        "host_sdk_version": { "type": "string", "minLength": 1 },
+        "host_abi_range": { "type": "string", "minLength": 1 },
+        "source_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "step_type_registry": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["step_type", "runtime_kind", "owner"],
+        "properties": {
+          "step_type": { "type": "string", "minLength": 1 },
+          "runtime_kind": { "enum": ["scenario_action", "model_call", "tool_call", "transform", "human_gate", "wait_for_input", "artifact_write", "event_emit"] },
+          "owner": { "enum": ["host", "scenario"] },
+          "policy_flags": { "type": "array", "uniqueItems": true, "items": { "enum": ["policy_gate", "generation_record_required"] } },
+          "legacy_aliases": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+        }
+      }
+    },
+    "owner_integration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command_contract", "event_contract", "receipt_contract", "status_lookup_required", "auth_mode"],
+      "properties": {
+        "command_contract": { "const": "scenario-command-envelope-v1" },
+        "event_contract": { "const": "scenario-event-envelope-v1" },
+        "receipt_contract": { "const": "scenario-command-receipt-v1" },
+        "status_lookup_required": { "const": true },
+        "auth_mode": { "const": "service_authenticated" }
+      }
+    }
+  }
+}

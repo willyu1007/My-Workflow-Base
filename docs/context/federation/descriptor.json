@@ -1,0 +1,24 @@
+{
+  "repository": "My-Workflow-Base",
+  "role": "contract_owner",
+  "platform_ref_namespace": "my_chat",
+  "manifest_module": {
+    "path": "../../../templates/scenario-module/dist/registry.js",
+    "export": "scenarioManifest"
+  },
+  "manifest": {
+    "manifest_version": 2,
+    "scenario_key": "scenario-starter",
+    "contract": { "source_hash": "96a1773543efa63f20f6b472dcf09ac6a89ca9aab8bdcde954fac132a0e969a9" },
+    "step_type_registry": [],
+    "handoffs": []
+  },
+  "providers": [],
+  "scenario_aliases": [],
+  "canonical_objects": [
+    { "key": "contract.scenario_manifest", "owner": "My-Workflow-Base" },
+    { "key": "contract.command_envelope", "owner": "My-Workflow-Base" },
+    { "key": "contract.canonical_ref", "owner": "My-Workflow-Base" },
+    { "key": "contract.integration_lock", "owner": "My-Workflow-Base" }
+  ]
+}

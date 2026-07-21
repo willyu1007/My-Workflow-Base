@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ExampleRecord {
+  id        String   @id @default(cuid())
+  version   Int      @default(1)
+  state     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ScenarioCommandExecution {
+  id                  String   @id @default(cuid())
+  scenarioKey         String
+  commandId           String   @unique
+  idempotencyKey      String
+  workflowRunRef      Json
+  workflowStepRef     Json
+  commandIdentityHash String
+  status              String
+  receipt             Json
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@unique([scenarioKey, idempotencyKey])
+  @@index([scenarioKey, status, createdAt])
+}
+
+model OwnerIntegrationOutbox {
+  id              String   @id @default(cuid())
+  eventId         String   @unique
+  eventType       String
+  ownerEventRef   Json
+  subjectRefs     Json
+  purpose         String
+  correlationId   String
+  traceId         String?
+  occurredAt      DateTime
+  dispatchedAt    DateTime?
+  attemptCount    Int      @default(0)
+  nextAttemptAt   DateTime @default(now())
+  createdAt       DateTime @default(now())
+
+  @@index([dispatchedAt, nextAttemptAt])
+}
+
+model OwnerIntegrationInbox {
+  id             String   @id @default(cuid())
+  hostEventId    String   @unique
+  hostEventType  String
+  ownerTargetRef Json
+  purpose        String
+  correlationId  String
+  processedAt    DateTime?
+  failureCode    String?
+  createdAt      DateTime @default(now())
+
+  @@index([processedAt, createdAt])
+}

@@ -36,6 +36,11 @@ equivalent TypeScript contract constant if it preserves the same fields.
 - Business layers do not import Prisma directly.
 - Durable writes use the concrete workflow Command API, Postgres transaction,
   and outbox.
+- `scenario_artifact.logical_paths` covers every executable Owner path used by
+  the release. If the concrete Owner API, authorization, repository, Prisma
+  adapter, or migration lives outside the scenario package, add those external
+  package paths explicitly; hashing only the manifest/public package is not
+  qualification evidence.
 - High-risk writes append minimal evidence records, but the scenario does not
   need an audit UI, review queue, or reporting workflow for MVP activation.
 - Outbox payloads are ref-only downstream signals; downstream owners reread
@@ -86,6 +91,11 @@ Minimum fatal checks:
 - Standard event payload policy is refs-only and uses deterministic idempotency.
 - P0/P1 authoritative writes have evidence record declarations.
 - Projection field changes have a projection review record.
+
+Release qualification must also rerun the integration-lock verifier after any
+Owner authorization, execution, persistence, or migration change. A stable
+hash after such a change is a lock-coverage defect unless the changed code is
+provably outside that release's executable path.
 
 Migration bridges may warn during pilot only when they are timeboxed and not
 presented as shared product-surface contracts.

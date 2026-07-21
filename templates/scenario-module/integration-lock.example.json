@@ -1,0 +1,35 @@
+{
+  "lock_version": 3,
+  "generated_at": "2026-07-20T00:00:00.000Z",
+  "scenario_key": "example",
+  "qualification_mode": "ordinary",
+  "base_contract": {
+    "source": "git",
+    "repository": "../My-Workflow-Base",
+    "revision": "replace-with-exact-commit",
+    "logical_paths": [
+      "templates/host-runtime/packages/workflow-contracts/package.json",
+      "templates/host-runtime/packages/workflow-contracts/src",
+      "templates/host-runtime/packages/workflow-contracts/schemas"
+    ],
+    "hash_algorithm": "sha256-path-content-source-hash-normalized-v1",
+    "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "host_sdk": {
+    "source": "package",
+    "package": "@my-chat/workflow-contracts",
+    "version": "1.0.0",
+    "artifact_path": "../My-Chat/packages/workflow-contracts",
+    "logical_paths": ["package.json", "src"],
+    "hash_algorithm": "sha256-path-content-source-hash-normalized-v1",
+    "source_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "scenario_artifact": {
+    "source": "git",
+    "repository": ".",
+    "revision": "replace-with-exact-commit",
+    "logical_paths": ["package.json", "src", "prisma/schema.prisma"],
+    "hash_algorithm": "sha256-path-content-source-hash-normalized-v1",
+    "source_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-contract-release-v1.schema.json",
+  "title": "ScenarioContractReleaseRefV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["scenario_key", "release_id", "contract_version", "base_contract_version", "host_sdk_version", "source_hash"],
+  "properties": {
+    "scenario_key": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "release_id": { "type": "string", "minLength": 1 },
+    "contract_version": { "type": "string", "minLength": 1 },
+    "base_contract_version": { "type": "string", "minLength": 1 },
+    "host_sdk_version": { "type": "string", "minLength": 1 },
+    "source_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

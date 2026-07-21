@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-command-envelope-v1.schema.json",
+  "title": "ScenarioCommandEnvelopeV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["envelope_version", "command_id", "command_type", "command_schema_version", "idempotency_key", "scenario_release", "workspace_ref", "workflow_run_ref", "workflow_step_ref", "actor", "purpose", "expected_versions", "context_refs", "correlation_id"],
+  "properties": {
+    "envelope_version": { "const": 1 },
+    "command_id": { "type": "string", "minLength": 1 },
+    "command_type": { "type": "string", "minLength": 1 },
+    "command_schema_version": { "type": "integer", "minimum": 1 },
+    "idempotency_key": { "type": "string", "minLength": 1 },
+    "scenario_release": { "$ref": "scenario-contract-release-v1.schema.json" },
+    "workspace_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "workflow_run_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "workflow_step_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "actor": { "$ref": "#/$defs/actor" },
+    "purpose": { "type": "string", "minLength": 1 },
+    "expected_versions": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } },
+    "context_refs": { "type": "array", "items": { "$ref": "canonical-ref-v1.schema.json" } },
+    "correlation_id": { "type": "string", "minLength": 1 },
+    "trace_id": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor_ref"],
+      "properties": {
+        "actor_ref": { "$ref": "canonical-ref-v1.schema.json" },
+        "represented_organization_ref": { "$ref": "canonical-ref-v1.schema.json" }
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/generation-ticket-v1.schema.json",
+  "title": "GenerationTicketV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ticket_version", "generation_record_ref", "scenario_release", "actor_ref", "workspace_ref", "purpose", "intent_key", "prompt_template_hash", "requested_capability", "correlation_id"],
+  "properties": {
+    "ticket_version": { "const": 1 },
+    "generation_record_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "scenario_release": { "$ref": "scenario-contract-release-v1.schema.json" },
+    "actor_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "workspace_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "purpose": { "type": "string", "minLength": 1 },
+    "intent_key": { "type": "string", "minLength": 1 },
+    "prompt_template_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "requested_capability": { "enum": ["model", "embedding", "ocr"] },
+    "correlation_id": { "type": "string", "minLength": 1 },
+    "trace_id": { "type": "string", "minLength": 1 }
+  }
+}

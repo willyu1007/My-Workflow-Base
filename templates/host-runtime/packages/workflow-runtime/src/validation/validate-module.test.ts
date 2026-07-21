@@ -368,6 +368,48 @@ function createScenarioModule(): WorkflowScenarioModule {
   };
 }
 
+function createFederatedScenarioModule(): WorkflowScenarioModule {
+  const module = createScenarioModule();
+  module.manifest = {
+    ...module.manifest,
+    manifest_version: 2,
+    contract: {
+      base_contract_version: "1.0.0",
+      host_sdk_version: "1.0.0",
+      host_abi_range: "^1.0.0",
+      source_hash: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    },
+    step_type_registry: [
+      {
+        step_type: "example.collect_context",
+        runtime_kind: "scenario_action",
+        owner: "scenario",
+        legacy_aliases: ["domain_action"],
+      },
+    ],
+    owner_integration: {
+      command_contract: "scenario-command-envelope-v1",
+      event_contract: "scenario-event-envelope-v1",
+      receipt_contract: "scenario-command-receipt-v1",
+      status_lookup_required: true,
+      auth_mode: "service_authenticated",
+    },
+    capabilities: module.manifest.capabilities.map((capability) => ({
+      ...capability,
+      entrypoints: capability.entrypoints.map((entrypoint) => ({
+        ...entrypoint,
+        allowed_step_types: ["example.collect_context"],
+        steps: entrypoint.steps.map((step) => ({
+          ...step,
+          step_type: "example.collect_context",
+          runtime_kind: "scenario_action",
+        })),
+      })),
+    })),
+  };
+  return module;
+}
+
 function createLegacyHandoff(overrides: Partial<HandoffManifest> = {}): HandoffManifest {
   return {
     handoff_type: "notification",
@@ -418,6 +460,58 @@ function createHandoffHostSnapshot(
 }
 
 describe("workflow module validation and loading", () => {
+  it("passes a federated v2 module with exact Host capabilities", () => {
+    const report = validateWorkflowModule({
+      module: createFederatedScenarioModule(),
+      host_snapshot: {
+        ...hostSnapshot,
+        host_capabilities: ["scenario_federation_v1"],
+      },
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(true);
+    expect(report.findings.filter((finding) => finding.rule_id.startsWith("WF-MAN-1"))).toEqual([]);
+  });
+
+  it("fails closed when a federated manifest contains an unknown field", () => {
+    const module = createFederatedScenarioModule();
+    module.manifest = { ...module.manifest, future_field: true } as unknown as ScenarioManifest;
+    const report = validateWorkflowModule({
+      module,
+      host_snapshot: { ...hostSnapshot, host_capabilities: ["scenario_federation_v1"] },
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toContainEqual(expect.objectContaining({ rule_id: "WF-MAN-113", severity: "fatal" }));
+  });
+
+  it("fails closed on an unsupported future manifest version", () => {
+    const module = createFederatedScenarioModule();
+    module.manifest = { ...module.manifest, manifest_version: 3 };
+    const report = validateWorkflowModule({
+      module,
+      host_snapshot: { ...hostSnapshot, host_capabilities: ["scenario_federation_v1"] },
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toContainEqual(expect.objectContaining({ rule_id: "WF-MAN-099", severity: "fatal" }));
+  });
+
+  it("rejects undeclared runtime mappings and a host without federation support", () => {
+    const module = createFederatedScenarioModule();
+    module.manifest.capabilities[0].entrypoints[0].steps[0].runtime_kind = "tool_call";
+    const report = validateWorkflowModule({ module, host_snapshot: hostSnapshot, activation_target: "dev" });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ rule_id: "WF-MAN-108" }),
+      expect.objectContaining({ rule_id: "WF-MAN-111" }),
+    ]));
+  });
+
   it("passes the legacy scenario module without changing its contract hash", () => {
     const report = validateWorkflowModule({
       module: createScenarioModule(),

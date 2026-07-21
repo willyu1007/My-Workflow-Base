@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/canonical-ref-v1.schema.json",
+  "title": "CanonicalRefV1",
+  "description": "Metadata-only reference. object_id must be an opaque owner identifier, never PII, a body, or an authorization snapshot.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "namespace", "object_type", "object_id"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "namespace": { "type": "string", "minLength": 1, "pattern": "^[a-z][a-z0-9._-]*$" },
+    "object_type": { "type": "string", "minLength": 1, "pattern": "^[a-z][a-z0-9._-]*$" },
+    "object_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "version": { "type": "integer", "minimum": 0 }
+  }
+}

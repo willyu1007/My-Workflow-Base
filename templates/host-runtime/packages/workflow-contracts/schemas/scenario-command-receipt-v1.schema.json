@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-command-receipt-v1.schema.json",
+  "title": "ScenarioCommandReceiptV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["receipt_version", "command_id", "idempotency_key", "workflow_step_ref", "status", "owner_execution_ref", "result_refs", "generation_record_refs", "owner_version", "committed_at"],
+  "properties": {
+    "receipt_version": { "const": 1 },
+    "command_id": { "type": "string", "minLength": 1 },
+    "idempotency_key": { "type": "string", "minLength": 1 },
+    "workflow_step_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "status": { "enum": ["accepted", "applied", "already_applied", "rejected", "compensated"] },
+    "owner_execution_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "result_refs": { "type": "array", "items": { "$ref": "canonical-ref-v1.schema.json" } },
+    "generation_record_refs": { "type": "array", "items": { "$ref": "canonical-ref-v1.schema.json" } },
+    "owner_version": { "type": "integer", "minimum": 0 },
+    "committed_at": { "type": "string", "format": "date-time" },
+    "reason_code": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._:-]{0,199}$" }
+  }
+}
