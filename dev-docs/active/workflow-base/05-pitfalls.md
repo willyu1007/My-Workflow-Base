@@ -66,6 +66,8 @@
   runtime. When authorization, execution, Prisma adapters, or migrations live
   in another package, include those executable paths in
   `scenario_artifact.logical_paths`.
+- Do not load a descriptor's `manifest_module` before building its package;
+  semantic lint intentionally imports the declared public module path.
 
 ## Historical Notes
 - 2026-07-13: X0-A initially used `tests/**/*.test.ts`; Vitest 4 did not select
@@ -108,3 +110,13 @@
   release hashes, and document the same requirement in the Starter.
 - Prevention: review the deployed call graph, not only package boundaries,
   whenever constructing or qualifying an integration lock.
+
+### 2026-07-21 — Clean semantic lint required built manifest modules
+
+- Symptom: the clean cross-repository lint could not import the Base Starter's
+  declared `dist/registry.js` even though source-level verification passed.
+- Root cause: descriptor lint loads the real public manifest module, while the
+  preceding typecheck/test gate does not retain a build artifact for it.
+- Fix: build each descriptor's manifest package before running semantic lint.
+- Prevention: qualification order is frozen install, package build, then
+  import-based semantic lint; source typecheck alone is insufficient.

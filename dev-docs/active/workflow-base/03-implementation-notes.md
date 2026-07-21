@@ -206,3 +206,19 @@
   and handoff evidence remain a later reviewable commit.
 - Clean-checkout build, pack and cross-repository hash reproduction remain the
   P1 exit gate. Nothing was published or activated.
+
+## 2026-07-21 P1 clean-checkout closure
+
+- Reconstructed Base at exact qualification revision
+  `92c22ee82ada08ce713519eec4c7f9c7c9ffe12e` in the canonical sibling layout
+  and installed the root workspace with a frozen lockfile.
+- The full workflow-contract gate passed again. The Base package logical hash
+  remained `f9e5f65d...e917f` and the broader source lock remained
+  `96a17735...e969a9`.
+- Built the Starter manifest module before descriptor loading, then ran the
+  actual Base/Host/Education/Nurture semantic lint with zero findings.
+- `npm pack --dry-run --json` ran the contract package prepack build and
+  enumerated the public payload without creating or publishing a tarball.
+
+P1 is complete. Exact artifact publication and joint release qualification
+remain separate gates.

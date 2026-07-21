@@ -403,4 +403,22 @@ parity and environment-backed cross-database journeys.
   `f9e5f65d9818b0a5c556dfa4a22c2c46a049fc20c33098f09d3b4441383e917f`;
   broader contract source-lock remains
   `96a1773543efa63f20f6b472dcf09ac6a89ca9aab8bdcde954fac132a0e969a9`.
-- Clean-checkout reproduction is pending; no package publication is claimed.
+- Clean-checkout reproduction is recorded below; no package publication is
+  claimed.
+
+## 2026-07-21 P1 clean-checkout qualification
+
+Passed at exact checkout `92c22ee82ada08ce713519eec4c7f9c7c9ffe12e`:
+
+- `pnpm install --frozen-lockfile` without existing repository `node_modules`.
+- `pnpm verify:workflow-contracts`: runtime 25/25, Starter 10/10, conformance
+  scripts and source-lock verification.
+- Base package hash `f9e5f65d...e917f` and broader source lock
+  `96a17735...e969a9` reproduced through the contract and scenario lock gates.
+- `@host/scenario-module-example` build followed by actual four-repository
+  semantic lint: zero findings.
+- `@host/workflow-contracts` `npm pack --dry-run --json`: prepack build and
+  public file enumeration passed.
+- Final qualification-checkout `git status --short`: empty.
+
+No tarball publication, push, database access, traffic or activation occurred.

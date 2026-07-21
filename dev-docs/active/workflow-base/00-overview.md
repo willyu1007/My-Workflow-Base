@@ -39,8 +39,9 @@ consumption surfaces
   integration-lock v3 content verification
 - Frozen source revision:
   `c32c7be3871727686ca7570abed85eda343c2331`
-- Next gate: reproduce the candidate from a clean sibling checkout, then
-  publish exact Base/Host/scenario artifacts and run joint-candidate
+- P1 clean qualification revision:
+  `92c22ee82ada08ce713519eec4c7f9c7c9ffe12e`
+- Next gate: publish exact Base/Host/scenario artifacts and run joint release
   qualification; no scenario activation is implied
 
 ## Federation v1 checkpoint
