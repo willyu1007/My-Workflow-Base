@@ -141,3 +141,18 @@ Acceptance:
 Create `dev-docs/active/workflow-handoff-materialization/` in My-Chat and execute
 X1 against `06-x1-adoption-handoff.md`. Adopt types/validator/worker pass-through,
 record the matching source hash, and keep the host capability absent/disabled.
+
+## 2026-07-21 federation v1 quality checkpoint
+
+- [x] Close command/event/ref/release/receipt validation and fail on future
+      manifest versions or unknown fields.
+- [x] Hash the complete command authority/target identity for idempotent replay.
+- [x] Require safe machine-token receipt reason codes.
+- [x] Add a Starter Owner API with atomic execution/outbox, full-envelope
+      authorized receipt recovery, independent Prisma and reproducible tests.
+- [x] Verify actual package names/versions/public status and reject unknown
+      integration-lock v3 fields.
+- [x] Build package `dist` before runtime tests so green tests cannot consume a
+      stale generated contract.
+- [ ] Publish exact Base/Host candidates and run joint-candidate qualification
+      with Education, Nurture and a generated third scenario.

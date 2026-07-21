@@ -1,0 +1,13 @@
+version: 1
+task_id: T-001
+project: main
+slug: workflow-base
+status: in-progress
+updated: "2026-07-20"
+keywords:
+  - scenario-federation
+  - contract-v1
+  - starter
+  - integration-lock-v3
+  - semantic-lint
+  - conformance

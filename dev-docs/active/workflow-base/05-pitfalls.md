@@ -62,6 +62,10 @@
 - Do not recover `WorkflowRuntimePortMaterializationV1` from the legacy-typed
   scenario adapter through a cast. Inject the host-owned v1 port into the worker
   and prove the call path through compile conformance.
+- Do not assume hashing a scenario manifest and public package locks the Owner
+  runtime. When authorization, execution, Prisma adapters, or migrations live
+  in another package, include those executable paths in
+  `scenario_artifact.logical_paths`.
 
 ## Historical Notes
 - 2026-07-13: X0-A initially used `tests/**/*.test.ts`; Vitest 4 did not select
@@ -78,3 +82,29 @@
   explicit unsupported materialization modes warned instead of failing, and the
   generic completion-result union accepted an incomplete v1-looking object.
   Both now have negative regression coverage, and the source lock was refreshed.
+
+### 2026-07-21 — Runtime tests loaded stale contract output
+
+- Symptom: source-level validation rejected unsafe reason-code prose, but the
+  runtime test imported an older `dist` file and did not throw.
+- Root cause: the contract `typecheck` did not build its public export before a
+  dependent workspace test resolved the package.
+- What we tried: updating source and the aggregate hash alone could not change
+  the already-built module consumed by Vitest.
+- Fix: contract typecheck now builds `dist`; verification then runs dependent
+  tests. The full source-lock file manifest, not only its aggregate hash, is
+  refreshed after contract source changes.
+- Prevention: every public workspace dependency must be freshly built before
+  import-based tests, pack checks and semantic descriptor loading.
+
+### 2026-07-21 — Split-package Owner adapters escaped scenario locks
+
+- Symptom: Education and Nurture concrete Owner persistence adapters could
+  change while their prior scenario artifact hashes remained valid.
+- Root cause: each lock covered its scenario package, Prisma schema and
+  migration, but not the executable adapter implemented in a separate DB
+  package.
+- Fix: add both adapters to their scenario artifact logical paths, refresh the
+  release hashes, and document the same requirement in the Starter.
+- Prevention: review the deployed call graph, not only package boundaries,
+  whenever constructing or qualifying an integration lock.

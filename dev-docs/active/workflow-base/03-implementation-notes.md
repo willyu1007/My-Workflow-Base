@@ -1,5 +1,17 @@
 # Implementation Notes
 
+## 2026-07-20 — Federated scenario contract v1 candidate
+
+- Added Scenario release, CanonicalRef, command/event/receipt, generation
+  ticket, runtime-kind, handoff and integration-lock v3 contracts.
+- Added fail-closed v2 manifest validation while preserving the frozen v1 hash
+  behavior.
+- Added cross-repository semantic lint and exact logical-content lock
+  verification for Git objects and package artifacts.
+- Expanded the scenario Starter with independent persistence, Owner API,
+  CommandExecution, integration outbox/inbox, Model Gateway port, CI and tests.
+- Kept Base free of production runtime and product facts.
+
 ## 2026-05-25 Task Package Creation
 - Added a local dev-docs convention file for this base repository.
 - Created `dev-docs/active/workflow-base/` as the active convergence package.
@@ -161,3 +173,36 @@
 - Repair evidence revision `ee84c29b432441f383d27529dbadabc97c9a2c57`
   records the refreshed lock, portability conformance, documentation, and X1
   handoff without changing contract/validator source.
+
+## 2026-07-21 federation v1 quality remediation
+
+- Added shared full-command identity hashing and strict refs-only federation
+  validators/schemas, including safe receipt reason codes.
+- Added integration-lock v3 package-manifest validation for exact package name,
+  version and public status plus unknown-field fail-closed tests.
+- Changed semantic lint descriptors to load real built scenario manifests and
+  check canonical owners/keys, runtime kinds, handoffs, event namespaces,
+  providers, user classes and bodyless transport policy.
+- Completed the Starter with Owner API, independent Prisma/outbox ports,
+  authorized response-loss recovery, model-gateway port, build/prepack/CI and
+  deterministic journey tests.
+- Ensured Base contracts build before dependent runtime tests. This removed a
+  stale-`dist` false green/false red seam.
+- Refreshed the logical source lock to
+  `96a1773543efa63f20f6b472dcf09ac6a89ca9aab8bdcde954fac132a0e969a9`.
+  Exact commit publication and joint qualification remain separate gates.
+- Added a Starter release rule that integration-lock logical paths must include
+  concrete Owner authorization, execution, persistence and migration code even
+  when those implementations live outside the public scenario package. This
+  follows the Education/Nurture review that found both candidate locks omitted
+  their external Prisma Owner adapters.
+
+## 2026-07-21 P1 source freeze
+
+- Froze Base federation source at
+  `c32c7be3871727686ca7570abed85eda343c2331` after the complete workflow
+  contract gate passed.
+- The commit owns contract/schema/conformance/Starter source only; governance
+  and handoff evidence remain a later reviewable commit.
+- Clean-checkout build, pack and cross-repository hash reproduction remain the
+  P1 exit gate. Nothing was published or activated.

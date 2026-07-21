@@ -1,5 +1,16 @@
 # Verification
 
+## Federation v1 candidate
+
+- 2026-07-20: `corepack pnpm verify:workflow-contracts` passed four typecheck
+  groups, runtime 24/24 tests, Starter 4/4 tests, nine packaged JSON Schemas,
+  semantic/source portability checks and the refreshed logical source lock
+  `94ea92396f69f9500f2147ff2877565ed9e1acb28d4e3a2ad27e71b67fb94f12`.
+- 2026-07-20: Nurture and Education candidate integration-lock v3 files both
+  passed ordinary logical-content verification.
+- 2026-07-20: four-repository semantic lint passed with zero findings.
+- Joint-candidate qualification and package publication remain unclaimed.
+
 ## X0-A Required Checks
 
 - `corepack pnpm install --frozen-lockfile`
@@ -358,3 +369,38 @@
   `primitives`, `shell`, `feedback`, `list`, `insight`, `settings`, `hub`,
   `queue`, `record`, and existing `contracts`.
 - 2026-06-26: Published `@willyu1007/web-workbench@0.6.6` to GitHub Packages.
+
+## 2026-07-21 federation v1 candidate verification
+
+Passed:
+
+- `pnpm verify:workflow-contracts`
+- Runtime: 2 files / 25 tests.
+- Starter: 2 files / 10 tests.
+- Conformance: federation schemas, claim-token boundary, source-hash
+  portability, semantic-lint fixtures and integration-lock negative tests.
+- Contract source-lock check at
+  `96a1773543efa63f20f6b472dcf09ac6a89ca9aab8bdcde954fac132a0e969a9`.
+- Starter and contract package build/pack dry-run plus Node ESM import.
+- Actual four-repository semantic lint returned zero findings.
+- Education and Nurture candidate integration locks passed ordinary mode
+  against actual package logical sources.
+- Both candidate locks now cover their concrete cross-package Prisma Owner
+  adapters, and the Starter README records this as a release-qualification
+  requirement for future split-package scenarios.
+
+Not yet qualified: exact published revisions/packages, joint-candidate checkout
+parity and environment-backed cross-database journeys.
+
+## 2026-07-21 P1 pre-freeze gate
+
+- Source revision:
+  `c32c7be3871727686ca7570abed85eda343c2331`.
+- `pnpm verify:workflow-contracts` passed immediately before commit: runtime
+  25/25, Starter 10/10, federation schemas, semantic fixtures, integration-lock
+  tests and source-lock verification.
+- Base package logical hash remains
+  `f9e5f65d9818b0a5c556dfa4a22c2c46a049fc20c33098f09d3b4441383e917f`;
+  broader contract source-lock remains
+  `96a1773543efa63f20f6b472dcf09ac6a89ca9aab8bdcde954fac132a0e969a9`.
+- Clean-checkout reproduction is pending; no package publication is claimed.

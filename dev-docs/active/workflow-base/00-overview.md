@@ -32,10 +32,32 @@ consumption surfaces
 - State: in-progress
 - Owner: unassigned
 - Created: 2026-05-25
-- Updated: 2026-07-13
+- Updated: 2026-07-21
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
-- Completed increment: X0-D verification plus post-review contract repair and revision/hash refresh
-- Next gate: My-Chat X1 contract adoption with capability disabled
+- Completed increment: quality-remediated federated contract v1 candidate,
+  full scenario Starter, semantic lint, publishable package entries and
+  integration-lock v3 content verification
+- Frozen source revision:
+  `c32c7be3871727686ca7570abed85eda343c2331`
+- Next gate: reproduce the candidate from a clean sibling checkout, then
+  publish exact Base/Host/scenario artifacts and run joint-candidate
+  qualification; no scenario activation is implied
+
+## Federation v1 checkpoint
+
+- Base owns the normative JSON Schemas, reference TS types, closed runtime
+  kinds, standard handoffs, validator fixtures, semantic lint and Starter.
+- The Starter includes an independent Prisma SSOT, Owner API ports,
+  CommandExecution, private integration outbox/inbox, Model Gateway port, CI,
+  dev-docs and deterministic journey tests.
+- Integration-lock v3 ordinary mode hashes the locked Git object or exact
+  package artifact and does not inspect sibling HEAD. Joint-candidate mode adds
+  exact checkout equality.
+- The logical hash algorithm normalizes the declared `source_hash` field so a
+  manifest can carry its own reproducible artifact digest.
+- `@host/workflow-contracts` is versioned `1.0.0` as a release candidate. No
+  registry publication, production runtime, database or product fact has been
+  created by this repository.
 
 ## Context
 This repository is the workflow base template. It defines durable contracts for
