@@ -242,3 +242,25 @@ joint release qualification remain separate gates.
 - Make federation descriptors role-aware so a Host is not represented as a
   fake scenario and missing contract-owned objects fail lint.
 - No package, schema, database, publication, traffic or activation changed.
+
+## 2026-07-22 release and activation authority repair
+
+- Added closed scenario lifecycle, launch-phase, workspace-activation,
+  admitted-user and capability-policy vocabularies. `pilot` is retained only as
+  release metadata and maps to Host `canary`, never to Scenario lifecycle.
+- Added fail-closed `ScenarioManifestV2` validation, stable canonical manifest
+  hashing and derived release metadata. Top-level and typed nested structures
+  reject unknown fields; step registry/entrypoint/runtime-kind consistency,
+  legacy v2 capability policies, minor user classes and invalid lifecycle
+  values are rejected before registry persistence.
+- Renamed the old reference contracts to explicit legacy v0 types while
+  retaining deprecated aliases for replay compatibility. New federation
+  envelopes continue to require `CanonicalRefV1`.
+- Extended runtime and semantic lint with release/activation rules and migrated
+  the Starter capability policy. Contract source revision is
+  `c3b422ff43056512499f116927b31852446c4bb4`; the refreshed logical source lock
+  is `c5ec59f3...b238`.
+- Source-lock checking resolves the full Git object and proves every locked
+  contract/validator file is present at that revision; a merely well-shaped
+  but nonexistent revision is rejected.
+- No package publication, database migration, traffic or activation occurred.

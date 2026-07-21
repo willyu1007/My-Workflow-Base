@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
-  "contract_source_revision": "acba4e792c85131c19e63e08a5f671133c481c57",
+  "contract_source_revision": "c3b422ff43056512499f116927b31852446c4bb4",
   "algorithm": "sha256",
   "normalization": "utf8_lf_workflow_contracts_import_alias_path_nul_length_nul_content_nul_v1",
   "logical_roots": [
     "workflow-contracts",
     "workflow-validator"
   ],
-  "source_hash": "96a1773543efa63f20f6b472dcf09ac6a89ca9aab8bdcde954fac132a0e969a9",
+  "source_hash": "c5ec59f398d4318bba24fdf3df2451d348120529ff536212d5131020429ab238",
   "files": [
     {
       "path": "workflow-contracts/index.ts",
-      "bytes": 340,
-      "sha256": "149c5bf41d95957b1635d365188185cbe38d883efe222326cbdd33de34929e00"
+      "bytes": 385,
+      "sha256": "246e25487a548b39fcd2607550ed67a856e48cf45f6cb9afd11a1162a88c373e"
     },
     {
       "path": "workflow-contracts/types/api.ts",
@@ -41,18 +41,23 @@
     },
     {
       "path": "workflow-contracts/types/identity.ts",
-      "bytes": 2015,
-      "sha256": "bea400367896410dcac086ef9ad39a0250f7e06508e1085e42c079cb2634d91a"
+      "bytes": 3289,
+      "sha256": "cb6fa96db85a6dc42d316c059aa0850d54f31616069772101e513cc3097fe1bb"
     },
     {
       "path": "workflow-contracts/types/manifest.ts",
-      "bytes": 4239,
-      "sha256": "9b3e98ea96681a29c5ba9a351eafa9e39ac03f456f22944bde05df6a56183545"
+      "bytes": 5695,
+      "sha256": "4f19f2769555cbbc749a0a928b21dbb8241215cc13bad44391c2cf23d769d61f"
     },
     {
       "path": "workflow-contracts/types/module.ts",
       "bytes": 3430,
       "sha256": "9752f54c72105fe58c42c42df524c5c71094409ea1d7f01494cc1bb589e76213"
+    },
+    {
+      "path": "workflow-contracts/types/scenario-release.ts",
+      "bytes": 32518,
+      "sha256": "6b74324a9afbd05b2cc375f805b89728426a5f2d4088f1d75a855241de996cca"
     },
     {
       "path": "workflow-contracts/types/validation.ts",
@@ -61,8 +66,8 @@
     },
     {
       "path": "workflow-validator/validate-module.ts",
-      "bytes": 25590,
-      "sha256": "d37144326c233b312d4c9f65cde221ed74b607680a8ed4064546ece661c78103"
+      "bytes": 27126,
+      "sha256": "22743bb64954f4b58284b2a2ebe8221310f5bb0b3d1af6d9864f2105313fe78f"
     }
   ]
 }

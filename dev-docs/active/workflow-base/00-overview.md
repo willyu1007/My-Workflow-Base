@@ -32,19 +32,18 @@ consumption surfaces
 - State: in-progress
 - Owner: unassigned
 - Created: 2026-05-25
-- Updated: 2026-07-21
+- Updated: 2026-07-22
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
-- Candidate increment: quality-remediated federated contract v1, scenario
-  Starter, semantic lint, publishable package entries and integration-lock v3
-  content verification; the T-029 Phase 0 semantic re-audit found unresolved
-  contract-authority and Starter-persistence blockers
+- Candidate increment: fail-closed v2 release admission and closed Host
+  activation semantics, layered on the quality-remediated federated contract,
+  Starter, semantic lint and integration-lock v3 verification
 - Frozen source revision:
-  `c32c7be3871727686ca7570abed85eda343c2331`
+  `c3b422ff43056512499f116927b31852446c4bb4`
 - Historical candidate clean qualification revision:
   `92c22ee82ada08ce713519eec4c7f9c7c9ffe12e`
-- Next gate: close the CanonicalRef, activation/admission, event-ownership,
-  role-aware descriptor and persistence-complete Starter findings before
-  publishing exact artifacts or running joint release qualification
+- Next gate: complete the CanonicalRef new-write migration, then close
+  event-ownership, role-aware descriptor and persistence-complete Starter
+  findings before publishing exact artifacts or running joint qualification
 
 ## Federation v1 checkpoint
 

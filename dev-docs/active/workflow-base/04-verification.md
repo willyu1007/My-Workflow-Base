@@ -433,3 +433,21 @@ No tarball publication, push, database access, traffic or activation occurred.
 - These are unimplemented semantic-lint/conformance cases, so formal Base
   contract completion and publication remain blocked despite prior clean build
   and package evidence.
+
+## 2026-07-22 release and activation authority verification
+
+Passed:
+
+- `pnpm verify:workflow-contracts`: runtime 28/28, Starter 10/10, complete
+  conformance suite and exact source-lock verification.
+- Scenario-release conformance rejects unknown nested fields, undeclared step
+  types, missing durable `runtime_kind`, legacy v2 policy, `pilot` lifecycle
+  and non-admitted user types; canonical hash derivation is deterministic.
+- Ordinary scenario locks reproduce the Base package artifact hash
+  `4c27f6c2...4eca` after the deep-validation changes.
+- Built Base, Education and Nurture manifest modules followed by real
+  four-repository semantic lint: `passed: true`, zero findings.
+
+The remaining Base blockers are the complete CF-001 new-write migration,
+CF-008 owner-versus-Host event vocabulary, CF-010 persisted Starter and CF-011
+role-aware descriptor schema. No published artifact or activation is claimed.
