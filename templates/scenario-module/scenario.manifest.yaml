@@ -47,7 +47,7 @@ capabilities:
   - capability_key: example_capability
     label: Example capability
     description: Replace with the user-facing capability description.
-    enablement_policy: workspace_enabled
+    enablement_policy: requires_workspace_activation
     entrypoints:
       - entrypoint_key: authoring
         label: Create example output

@@ -2,12 +2,30 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://morethan.local/contracts/scenario-manifest-v2.schema.json",
   "title": "Federated Scenario Manifest V2 Overlay",
-  "description": "Required federation overlay. Product manifests also carry the Base workflow fields defined by the TypeScript contract.",
+  "description": "Complete top-level release-registration contract for a federated scenario manifest.",
   "type": "object",
-  "required": ["manifest_version", "scenario_key", "contract", "step_type_registry", "owner_integration"],
+  "additionalProperties": false,
+  "required": [
+    "manifest_version", "scenario_key", "scenario_record", "owner", "contract",
+    "step_type_registry", "owner_integration", "launch_phase", "allowed_user_classes",
+    "capabilities", "scenario_data", "artifact_policy", "action_availability", "handoffs",
+    "surface_mapping", "internal_api", "event_registry", "governance", "verification"
+  ],
   "properties": {
     "manifest_version": { "const": 2 },
     "scenario_key": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "scenario_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["display_name", "required_status", "owner_team", "policy_version"],
+      "properties": {
+        "display_name": { "type": "string", "minLength": 1 },
+        "required_status": { "enum": ["draft", "active", "disabled", "archived"] },
+        "owner_team": { "type": "string", "minLength": 1 },
+        "policy_version": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "owner": { "type": "string", "minLength": 1 },
     "contract": {
       "type": "object",
       "additionalProperties": false,
@@ -46,6 +64,38 @@
         "status_lookup_required": { "const": true },
         "auth_mode": { "const": "service_authenticated" }
       }
-    }
+    },
+    "launch_phase": { "enum": ["dev", "pilot", "ga", "disabled"] },
+    "allowed_user_classes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "enum": ["teacher", "curriculum_researcher", "subject_expert", "expert", "researcher", "admin"] }
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["capability_key", "label", "description", "enablement_policy", "entrypoints"],
+        "properties": {
+          "capability_key": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "description": { "type": "string", "minLength": 1 },
+          "enablement_policy": { "enum": ["requires_workspace_activation", "disabled"] },
+          "entrypoints": { "type": "array", "items": { "type": "object" } }
+        }
+      }
+    },
+    "scenario_data": { "type": "object" },
+    "artifact_policy": { "type": "object" },
+    "action_availability": { "type": "object" },
+    "handoffs": { "type": "array" },
+    "surface_mapping": { "type": "object" },
+    "internal_api": { "type": "object" },
+    "event_registry": { "type": "object" },
+    "governance": { "type": "object" },
+    "verification": { "type": "object" }
   }
 }

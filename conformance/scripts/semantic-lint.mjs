@@ -22,6 +22,9 @@ const handoffTypes = new Set([
 ]);
 const forbiddenProviders = new Set(["openai", "anthropic", "claude", "gemini", "google"]);
 const admittedUserClasses = new Set(["teacher", "curriculum_researcher", "subject_expert", "expert", "researcher", "admin"]);
+const launchPhases = new Set(["dev", "pilot", "ga", "disabled"]);
+const scenarioLifecycleStatuses = new Set(["draft", "active", "disabled", "archived"]);
+const capabilityEnablementPolicies = new Set(["requires_workspace_activation", "disabled"]);
 
 function finding(ruleId, repository, path, message) {
   return { rule_id: ruleId, repository, path, message };
@@ -65,6 +68,20 @@ export function lintFederationDescriptors(descriptors) {
 
     if (manifest.manifest_version !== 1 && manifest.manifest_version !== 2) {
       findings.push(finding("FED-MANIFEST-001", repository, "manifest.manifest_version", "Unsupported future manifest versions must fail closed."));
+    }
+
+    if (descriptor.role === "scenario_owner" && manifest.manifest_version === 2) {
+      if (!launchPhases.has(manifest.launch_phase)) {
+        findings.push(finding("FED-ACTIVATION-001", repository, "manifest.launch_phase", "Scenario launch phase must use the closed release-metadata vocabulary."));
+      }
+      if (!scenarioLifecycleStatuses.has(manifest.scenario_record?.required_status)) {
+        findings.push(finding("FED-ACTIVATION-002", repository, "manifest.scenario_record.required_status", "Pilot is canary activation, not a Scenario lifecycle status."));
+      }
+      for (const [index, capability] of (manifest.capabilities ?? []).entries()) {
+        if (!capabilityEnablementPolicies.has(capability.enablement_policy)) {
+          findings.push(finding("FED-ACTIVATION-003", repository, `manifest.capabilities.${index}.enablement_policy`, "Capability policy may only require Host workspace activation or remain disabled."));
+        }
+      }
     }
 
     for (const [index, userClass] of (manifest.allowed_user_classes ?? []).entries()) {

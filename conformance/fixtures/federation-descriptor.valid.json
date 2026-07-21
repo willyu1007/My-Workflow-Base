@@ -5,6 +5,9 @@
   "manifest": {
     "manifest_version": 2,
     "scenario_key": "example",
+    "scenario_record": { "required_status": "draft" },
+    "launch_phase": "dev",
+    "capabilities": [{ "enablement_policy": "requires_workspace_activation" }],
     "contract": { "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
     "step_type_registry": [
       { "step_type": "example.prepare", "runtime_kind": "scenario_action", "owner": "scenario" },
