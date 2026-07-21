@@ -38,5 +38,12 @@ if (manifest.properties.capabilities.items.properties.enablement_policy.enum.joi
 if (manifest.properties.scenario_record.properties.required_status.enum.includes("pilot")) {
   throw new Error("pilot must be represented by canary activation, not Scenario lifecycle");
 }
+if (
+  manifest.properties.scenario_data.additionalProperties !== false ||
+  manifest.properties.capabilities.items.properties.entrypoints.items.additionalProperties !== false ||
+  manifest.$defs.eventRegistry.additionalProperties !== false
+) {
+  throw new Error("manifest nested release structures must reject unknown fields");
+}
 
 process.stdout.write(`federation schema package ok: ${expected.length} schemas\n`);

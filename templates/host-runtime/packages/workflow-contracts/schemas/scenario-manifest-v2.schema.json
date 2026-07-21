@@ -84,18 +84,207 @@
           "label": { "type": "string", "minLength": 1 },
           "description": { "type": "string", "minLength": 1 },
           "enablement_policy": { "enum": ["requires_workspace_activation", "disabled"] },
-          "entrypoints": { "type": "array", "items": { "type": "object" } }
+          "entrypoints": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["entrypoint_key", "label", "workflow_version", "input_schema_version", "output_schema_version", "allowed_step_types", "steps"],
+              "properties": {
+                "entrypoint_key": { "type": "string", "minLength": 1 },
+                "label": { "type": "string", "minLength": 1 },
+                "workflow_version": { "type": "integer", "minimum": 1 },
+                "workflow_version_id": { "type": "string", "minLength": 1 },
+                "input_schema_version": { "type": "integer", "minimum": 1 },
+                "output_schema_version": { "type": "integer", "minimum": 1 },
+                "allowed_step_types": { "$ref": "#/$defs/uniqueStrings" },
+                "steps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["step_key", "step_type", "runtime_kind", "order", "handler_key", "retry_policy"],
+                    "properties": {
+                      "step_key": { "type": "string", "minLength": 1 },
+                      "step_type": { "type": "string", "minLength": 1 },
+                      "runtime_kind": { "$ref": "#/$defs/runtimeKind" },
+                      "policy_flags": { "$ref": "#/$defs/policyFlags" },
+                      "order": { "type": "integer", "minimum": 0 },
+                      "handler_key": { "type": "string", "minLength": 1 },
+                      "retry_policy": { "type": "string", "minLength": 1 },
+                      "timeout_ms": { "type": "integer", "minimum": 1 }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
-    "scenario_data": { "type": "object" },
-    "artifact_policy": { "type": "object" },
-    "action_availability": { "type": "object" },
-    "handoffs": { "type": "array" },
-    "surface_mapping": { "type": "object" },
-    "internal_api": { "type": "object" },
-    "event_registry": { "type": "object" },
-    "governance": { "type": "object" },
-    "verification": { "type": "object" }
+    "scenario_data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context_ref_types", "run_start_requirements", "step_interventions"],
+      "properties": {
+        "context_ref_types": { "type": "array", "items": { "$ref": "#/$defs/contextRefType" } },
+        "run_start_requirements": { "type": "array", "items": { "$ref": "#/$defs/runStartRequirement" } },
+        "step_interventions": { "type": "array", "items": { "$ref": "#/$defs/stepIntervention" } }
+      }
+    },
+    "artifact_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_types", "exposure_levels", "handoff_eligible"],
+      "properties": {
+        "artifact_types": { "$ref": "#/$defs/uniqueStrings" },
+        "exposure_levels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["L0", "L1", "L2", "L3", "L4"],
+          "properties": {
+            "L0": { "$ref": "#/$defs/uniqueStrings" }, "L1": { "$ref": "#/$defs/uniqueStrings" },
+            "L2": { "$ref": "#/$defs/uniqueStrings" }, "L3": { "$ref": "#/$defs/uniqueStrings" },
+            "L4": { "$ref": "#/$defs/uniqueStrings" }
+          }
+        },
+        "handoff_eligible": {
+          "type": "object",
+          "propertyNames": { "enum": ["public_draft", "indexing", "notification", "external_delivery"] },
+          "additionalProperties": { "$ref": "#/$defs/uniqueStrings" }
+        }
+      }
+    },
+    "action_availability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["shared_actions", "scenario_actions", "expected_version_required"],
+      "properties": {
+        "shared_actions": { "$ref": "#/$defs/uniqueStrings" },
+        "scenario_actions": { "$ref": "#/$defs/uniqueStrings" },
+        "expected_version_required": { "type": "boolean" }
+      }
+    },
+    "handoffs": { "type": "array", "items": { "$ref": "#/$defs/handoff" } },
+    "surface_mapping": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/workflowSurface" },
+      "additionalProperties": { "type": "object" }
+    },
+    "internal_api": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["routes"],
+      "properties": { "routes": { "type": "array", "items": { "$ref": "#/$defs/internalRoute" } } }
+    },
+    "event_registry": { "$ref": "#/$defs/eventRegistry" },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["admin_actions", "rollback", "projection_review_required", "evidence_records", "outbox_events"],
+      "properties": {
+        "admin_actions": { "$ref": "#/$defs/uniqueStrings" },
+        "rollback": { "type": "string", "minLength": 1 },
+        "projection_review_required": { "type": "boolean" },
+        "evidence_records": { "$ref": "#/$defs/uniqueStrings" },
+        "outbox_events": { "$ref": "#/$defs/uniqueStrings" }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deterministic_tests", "journey_harness"],
+      "properties": {
+        "deterministic_tests": { "$ref": "#/$defs/uniqueStrings" },
+        "journey_harness": { "type": "string", "minLength": 1 }
+      }
+    }
+  },
+  "$defs": {
+    "uniqueStrings": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "runtimeKind": { "enum": ["scenario_action", "model_call", "tool_call", "transform", "human_gate", "wait_for_input", "artifact_write", "event_emit"] },
+    "policyFlags": { "type": "array", "uniqueItems": true, "items": { "enum": ["policy_gate", "generation_record_required"] } },
+    "workflowSurface": { "enum": ["chat_workflow_control", "chat_dashboard_summary", "chat_citation", "web_domain_workbench", "web_run_workbench", "mobile_dashboard", "forum_publication", "rag_knowledge", "notification_push", "admin_operator", "worker_runtime", "api"] },
+    "contextRefType": {
+      "type": "object", "additionalProperties": false,
+      "required": ["namespace", "object_type", "resolver_key", "owner_scope", "canonical_required", "scenario_local_allowed", "snapshot_required"],
+      "properties": {
+        "namespace": { "type": "string", "minLength": 1 }, "object_type": { "type": "string", "minLength": 1 },
+        "resolver_key": { "type": "string", "minLength": 1 }, "owner_scope": { "enum": ["workspace", "organization", "platform", "external"] },
+        "canonical_required": { "type": "boolean" }, "scenario_local_allowed": { "type": "boolean" }, "snapshot_required": { "type": "boolean" }
+      }
+    },
+    "runStartRequirement": {
+      "type": "object", "additionalProperties": false,
+      "required": ["requirement_key", "schema_version", "entrypoints", "surfaces", "required"],
+      "properties": {
+        "requirement_key": { "type": "string", "minLength": 1 }, "schema_version": { "type": "integer", "minimum": 1 },
+        "entrypoints": { "$ref": "#/$defs/uniqueStrings" },
+        "surfaces": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/workflowSurface" } },
+        "required": { "type": "boolean" }
+      }
+    },
+    "stepIntervention": {
+      "type": "object", "additionalProperties": false,
+      "required": ["intervention_type", "schema_version", "step_keys", "surface", "handler_key"],
+      "properties": {
+        "intervention_type": { "type": "string", "minLength": 1 }, "schema_version": { "type": "integer", "minimum": 1 },
+        "step_keys": { "$ref": "#/$defs/uniqueStrings" }, "surface": { "const": "web_run_workbench" },
+        "handler_key": { "type": "string", "minLength": 1 }
+      }
+    },
+    "handoff": {
+      "type": "object", "additionalProperties": false,
+      "required": ["handoff_type", "source_artifact_types", "requested_purposes", "downstream_owner", "policy_key", "receipt_required"],
+      "properties": {
+        "handoff_type": { "enum": ["public_draft", "indexing", "notification", "external_delivery"] },
+        "source_artifact_types": { "$ref": "#/$defs/uniqueStrings" }, "requested_purposes": { "$ref": "#/$defs/uniqueStrings" },
+        "downstream_owner": { "type": "string", "minLength": 1 }, "policy_key": { "type": "string", "minLength": 1 },
+        "receipt_required": { "type": "boolean" }, "handoff_key": { "type": "string", "minLength": 1 },
+        "source_context_ref_types": { "type": "array", "items": { "$ref": "#/$defs/handoffContextRef" } },
+        "materialization_mode": { "const": "workflow_step_complete_v1" }
+      }
+    },
+    "handoffContextRef": {
+      "type": "object", "additionalProperties": false, "required": ["namespace", "object_type"],
+      "properties": { "namespace": { "type": "string", "minLength": 1 }, "object_type": { "type": "string", "minLength": 1 } }
+    },
+    "internalRoute": {
+      "type": "object", "additionalProperties": false,
+      "required": ["method", "path", "owner_surface", "command_class", "writes_workflow_facts", "handler_key"],
+      "properties": {
+        "method": { "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"] }, "path": { "type": "string", "minLength": 1 },
+        "owner_surface": { "enum": ["web_domain_workbench", "web_run_workbench", "admin_operator"] },
+        "command_class": { "enum": ["scenario_internal", "workflow_fact_write"] },
+        "writes_workflow_facts": { "type": "boolean" }, "handler_key": { "type": "string", "minLength": 1 }
+      }
+    },
+    "eventRegistry": {
+      "type": "object", "additionalProperties": false,
+      "required": ["standard_workflow_events", "scenario_internal_events", "event_payload_policy", "producers", "consumers"],
+      "properties": {
+        "standard_workflow_events": { "$ref": "#/$defs/uniqueStrings" }, "scenario_internal_events": { "$ref": "#/$defs/uniqueStrings" },
+        "platform_events": { "$ref": "#/$defs/uniqueStrings" },
+        "event_payload_policy": {
+          "type": "object", "additionalProperties": false,
+          "required": ["signal_version", "body", "pii", "status_in_payload", "presenter_output_in_payload", "idempotency_key"],
+          "properties": {
+            "signal_version": { "const": 1 }, "body": { "const": "no_body" }, "pii": { "const": "no_pii" },
+            "status_in_payload": { "const": false }, "presenter_output_in_payload": { "const": false },
+            "idempotency_key": { "type": "string", "minLength": 1 }
+          }
+        },
+        "producers": { "type": "object", "additionalProperties": { "$ref": "#/$defs/eventProducer" } },
+        "consumers": { "type": "object", "additionalProperties": { "$ref": "#/$defs/eventConsumer" } }
+      }
+    },
+    "eventProducer": {
+      "type": "object", "additionalProperties": false, "required": ["owner", "write_boundary"],
+      "properties": { "owner": { "type": "string", "minLength": 1 }, "write_boundary": { "enum": ["same_transaction", "scenario_internal", "downstream_owner"] } }
+    },
+    "eventConsumer": {
+      "type": "object", "additionalProperties": false, "required": ["allowed_events"],
+      "properties": { "allowed_events": { "$ref": "#/$defs/uniqueStrings" }, "forbidden_events": { "$ref": "#/$defs/uniqueStrings" } }
+    }
   }
 }
