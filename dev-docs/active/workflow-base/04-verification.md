@@ -422,3 +422,14 @@ Passed at exact checkout `92c22ee82ada08ce713519eec4c7f9c7c9ffe12e`:
 - Final qualification-checkout `git status --short`: empty.
 
 No tarball publication, push, database access, traffic or activation occurred.
+
+## 2026-07-21 T-029 Phase 0 semantic re-audit
+
+- Actual four-repository descriptor lint reproduced with `passed: true` and no
+  findings.
+- Static contract/Starter review found old/new durable ref duality, open-ended
+  activation policy, pseudo-scenario Host descriptors, incomplete declared
+  contract ownership and an in-memory-only Starter persistence journey.
+- These are unimplemented semantic-lint/conformance cases, so formal Base
+  contract completion and publication remain blocked despite prior clean build
+  and package evidence.

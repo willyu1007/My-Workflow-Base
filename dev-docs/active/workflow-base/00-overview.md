@@ -34,15 +34,17 @@ consumption surfaces
 - Created: 2026-05-25
 - Updated: 2026-07-21
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
-- Completed increment: quality-remediated federated contract v1 candidate,
-  full scenario Starter, semantic lint, publishable package entries and
-  integration-lock v3 content verification
+- Candidate increment: quality-remediated federated contract v1, scenario
+  Starter, semantic lint, publishable package entries and integration-lock v3
+  content verification; the T-029 Phase 0 semantic re-audit found unresolved
+  contract-authority and Starter-persistence blockers
 - Frozen source revision:
   `c32c7be3871727686ca7570abed85eda343c2331`
-- P1 clean qualification revision:
+- Historical candidate clean qualification revision:
   `92c22ee82ada08ce713519eec4c7f9c7c9ffe12e`
-- Next gate: publish exact Base/Host/scenario artifacts and run joint release
-  qualification; no scenario activation is implied
+- Next gate: close the CanonicalRef, activation/admission, event-ownership,
+  role-aware descriptor and persistence-complete Starter findings before
+  publishing exact artifacts or running joint release qualification
 
 ## Federation v1 checkpoint
 
@@ -102,8 +104,9 @@ The current design stance is:
 ## Scope Out
 - Implementing runtime services.
 - Implementing a host product integration.
-- Implementing Prisma models, database transactions, queues, outbox dispatch, or
-  a concrete Handoff Ledger.
+- Implementing production runtime Prisma models, queues, outbox dispatch, or a
+  deployed Handoff Ledger. The generated scenario Starter remains responsible
+  for a runnable owner-local Prisma transaction/outbox/inbox example.
 - Implementing forum, RAG, notification, or public draft downstream modules.
 - User-editable workflow builders.
 - Plugin marketplace behavior.

@@ -220,5 +220,25 @@
 - `npm pack --dry-run --json` ran the contract package prepack build and
   enumerated the public payload without creating or publishing a tarball.
 
-P1 is complete. Exact artifact publication and joint release qualification
-remain separate gates.
+The historical candidate freeze/clean-checkout evidence is complete, not formal
+contract convergence. Exact artifact publication, semantic conflict closure and
+joint release qualification remain separate gates.
+
+## 2026-07-21 T-029 Phase 0 semantic conflict handoff
+
+- Existing semantic lint passes the four descriptors but only inspects fields
+  they declare. It cannot find undeclared runtime/DB owners, invalid platform
+  context object types, manifest-source drift, registry/manifest admission
+  mismatch or Host-observed versus scenario-produced events.
+- Base/Host templates still expose legacy `CanonicalRef`/`DomainContextRef`
+  beside `CanonicalRefV1`; new durable writes need one authoritative shape and
+  named read/replay-only adapters.
+- Activation is split across launch phase, lifecycle, free-form capability
+  enablement and Host workspace activation. Define one Host traffic gate and a
+  closed restrictive capability-policy vocabulary.
+- The Starter Prisma schema exists, but qualification is still in-memory at the
+  repository boundary; add a concrete Prisma adapter and persisted command,
+  replay, owner outbox and inbox journey.
+- Make federation descriptors role-aware so a Host is not represented as a
+  fake scenario and missing contract-owned objects fail lint.
+- No package, schema, database, publication, traffic or activation changed.
