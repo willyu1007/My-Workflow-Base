@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-event-envelope-v1.schema.json",
+  "title": "ScenarioEventEnvelopeV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["envelope_version", "event_id", "event_type", "event_schema_version", "scenario_release", "owner_event_ref", "subject_refs", "purpose", "correlation_id", "occurred_at"],
+  "properties": {
+    "envelope_version": { "const": 1 },
+    "event_id": { "type": "string", "minLength": 1 },
+    "event_type": { "type": "string", "minLength": 1 },
+    "event_schema_version": { "type": "integer", "minimum": 1 },
+    "scenario_release": { "$ref": "scenario-contract-release-v1.schema.json" },
+    "owner_event_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "subject_refs": { "type": "array", "items": { "$ref": "canonical-ref-v1.schema.json" } },
+    "purpose": { "type": "string", "minLength": 1 },
+    "actor_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "correlation_id": { "type": "string", "minLength": 1 },
+    "trace_id": { "type": "string", "minLength": 1 },
+    "occurred_at": { "type": "string", "format": "date-time" }
+  }
+}

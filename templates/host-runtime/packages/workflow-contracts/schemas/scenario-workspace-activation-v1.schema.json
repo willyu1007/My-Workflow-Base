@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-workspace-activation-v1.schema.json",
+  "title": "ScenarioWorkspaceActivationV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["activation_version", "activation_ref", "workspace_ref", "scenario_release", "status", "admission_evidence_refs", "aggregate_version"],
+  "properties": {
+    "activation_version": { "const": 1 },
+    "activation_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "workspace_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "scenario_release": { "$ref": "scenario-contract-release-v1.schema.json" },
+    "status": { "enum": ["disabled", "canary", "enabled", "suspended"] },
+    "admission_evidence_refs": { "type": "array", "items": { "$ref": "canonical-ref-v1.schema.json" } },
+    "aggregate_version": { "type": "integer", "minimum": 1 }
+  }
+}

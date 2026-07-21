@@ -1,4 +1,4 @@
-manifest_version: 1
+manifest_version: 2
 scenario_key: example
 scenario_record:
   display_name: Example scenario
@@ -6,9 +6,41 @@ scenario_record:
   owner_team: team-name
   policy_version: 1
 owner: team-name
+contract:
+  base_contract_version: 1.0.0
+  host_sdk_version: 1.0.0
+  host_abi_range: ^1.0.0
+  source_hash: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+step_type_registry:
+  - step_type: example.collect_context
+    runtime_kind: scenario_action
+    owner: scenario
+    legacy_aliases:
+      - domain_action
+  - step_type: example.generate_output
+    runtime_kind: model_call
+    owner: scenario
+    policy_flags:
+      - generation_record_required
+    legacy_aliases:
+      - llm_generate
+  - step_type: artifact_write
+    runtime_kind: artifact_write
+    owner: host
+  - step_type: human_gate
+    runtime_kind: human_gate
+    owner: host
+    legacy_aliases:
+      - approval_gate
+owner_integration:
+  command_contract: scenario-command-envelope-v1
+  event_contract: scenario-event-envelope-v1
+  receipt_contract: scenario-command-receipt-v1
+  status_lookup_required: true
+  auth_mode: service_authenticated
 launch_phase: dev
 allowed_user_classes:
-  - internal_admin
+  - admin
   - pilot_user
 
 capabilities:
@@ -23,30 +55,35 @@ capabilities:
         input_schema_version: 1
         output_schema_version: 1
         allowed_step_types:
-          - domain_action
-          - llm_generate
+          - example.collect_context
+          - example.generate_output
           - artifact_write
-          - approval_gate
-          - emit_event
+          - human_gate
         steps:
           - step_key: collect_context
-            step_type: domain_action
+            step_type: example.collect_context
+            runtime_kind: scenario_action
             order: 10
             handler_key: example.collect_context
             retry_policy: none
           - step_key: generate_output
-            step_type: llm_generate
+            step_type: example.generate_output
+            runtime_kind: model_call
+            policy_flags:
+              - generation_record_required
             order: 20
             handler_key: example.generate_output
             retry_policy: bounded_exponential
             timeout_ms: 30000
           - step_key: write_artifact
             step_type: artifact_write
+            runtime_kind: artifact_write
             order: 30
             handler_key: example.write_artifact
             retry_policy: bounded_exponential
           - step_key: request_approval
-            step_type: approval_gate
+            step_type: human_gate
+            runtime_kind: human_gate
             order: 40
             handler_key: example.request_approval
             retry_policy: none
@@ -98,6 +135,7 @@ artifact_policy:
       - example_summary
     notification:
       - example_summary
+    external_delivery: []
 
 action_availability:
   shared_actions:
@@ -115,6 +153,7 @@ action_availability:
 
 handoffs:
   - handoff_type: public_draft
+    handoff_key: public_draft
     source_artifact_types:
       - example_summary
     requested_purposes:
@@ -122,7 +161,9 @@ handoffs:
     downstream_owner: public_draft
     policy_key: example.can_create_public_draft_handoff
     receipt_required: true
+    materialization_mode: workflow_step_complete_v1
   - handoff_type: indexing
+    handoff_key: indexing
     source_artifact_types:
       - example_summary
     requested_purposes:
@@ -130,7 +171,9 @@ handoffs:
     downstream_owner: knowledge_index
     policy_key: example.can_create_indexing_handoff
     receipt_required: true
+    materialization_mode: workflow_step_complete_v1
   - handoff_type: notification
+    handoff_key: notification
     source_artifact_types:
       - example_summary
     requested_purposes:
@@ -138,6 +181,7 @@ handoffs:
     downstream_owner: notification
     policy_key: example.can_create_notification_handoff
     receipt_required: true
+    materialization_mode: workflow_step_complete_v1
 
 surface_mapping:
   chat_workflow_control:

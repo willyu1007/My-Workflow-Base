@@ -1,5 +1,7 @@
 export * from "./types/api.js";
 export * from "./types/events.js";
+export * from "./types/federation.js";
+export * from "./types/federation-validation.js";
 export * from "./types/handoff.js";
 export * from "./types/identity.js";
 export * from "./types/manifest.js";

@@ -1,9 +1,12 @@
 import type { EventRegistryManifest } from "./events.js";
+import type { WorkflowRuntimeKind, WorkflowStepPolicyFlag, WorkflowStepTypeDefinition } from "./federation.js";
 import type { WorkflowActivationTarget, WorkflowExposureLevel, WorkflowScenarioStatus, WorkflowSurface } from "./identity.js";
 
 export type ManifestStep = {
   step_key: string;
   step_type: string;
+  runtime_kind?: WorkflowRuntimeKind;
+  policy_flags?: WorkflowStepPolicyFlag[];
   order: number;
   handler_key: string;
   retry_policy: "none" | "bounded_exponential" | string;
@@ -58,6 +61,23 @@ export type ScenarioManifest = {
     policy_version: number;
   };
   owner: string;
+  /** Required for manifest_version >= 2. */
+  contract?: {
+    base_contract_version: string;
+    host_sdk_version: string;
+    host_abi_range: string;
+    source_hash: string;
+  };
+  /** Required for manifest_version >= 2. */
+  step_type_registry?: WorkflowStepTypeDefinition[];
+  /** Required for manifest_version >= 2. */
+  owner_integration?: {
+    command_contract: "scenario-command-envelope-v1";
+    event_contract: "scenario-event-envelope-v1";
+    receipt_contract: "scenario-command-receipt-v1";
+    status_lookup_required: true;
+    auth_mode: "service_authenticated";
+  };
   launch_phase: WorkflowActivationTarget;
   allowed_user_classes: string[];
   capabilities: ManifestCapability[];
