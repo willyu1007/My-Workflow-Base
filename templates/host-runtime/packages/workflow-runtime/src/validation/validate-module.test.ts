@@ -396,6 +396,7 @@ function createFederatedScenarioModule(): WorkflowScenarioModule {
     },
     capabilities: module.manifest.capabilities.map((capability) => ({
       ...capability,
+      enablement_policy: "requires_workspace_activation",
       entrypoints: capability.entrypoints.map((entrypoint) => ({
         ...entrypoint,
         allowed_step_types: ["example.collect_context"],
@@ -485,6 +486,32 @@ describe("workflow module validation and loading", () => {
 
     expect(report.passed).toBe(false);
     expect(report.findings).toContainEqual(expect.objectContaining({ rule_id: "WF-MAN-113", severity: "fatal" }));
+  });
+
+  it.each([
+    ["release launch phase", (module: WorkflowScenarioModule) => {
+      module.manifest.launch_phase = "preview" as never;
+    }, "WF-MAN-115"],
+    ["scenario lifecycle", (module: WorkflowScenarioModule) => {
+      module.manifest.scenario_record = {
+        ...module.manifest.scenario_record,
+        required_status: "pilot" as never,
+      };
+    }, "WF-MAN-116"],
+    ["capability enablement policy", (module: WorkflowScenarioModule) => {
+      module.manifest.capabilities[0].enablement_policy = "workspace_enabled";
+    }, "WF-MAN-117"],
+  ])("fails closed on an invalid %s", (_label, mutate, ruleId) => {
+    const module = createFederatedScenarioModule();
+    mutate(module);
+    const report = validateWorkflowModule({
+      module,
+      host_snapshot: { ...hostSnapshot, host_capabilities: ["scenario_federation_v1"] },
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toContainEqual(expect.objectContaining({ rule_id: ruleId, severity: "fatal" }));
   });
 
   it("fails closed on an unsupported future manifest version", () => {

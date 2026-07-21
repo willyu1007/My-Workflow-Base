@@ -6,7 +6,10 @@ import type {
   WorkflowScenarioModule,
 } from "@host/workflow-contracts";
 import {
+  scenarioCapabilityEnablementPolicies,
+  scenarioLaunchPhases,
   standardWorkflowHandoffTypes,
+  workflowScenarioStatuses,
   workflowRuntimeKinds,
   workflowStepPolicyFlags,
 } from "@host/workflow-contracts";
@@ -29,15 +32,17 @@ function stableStringify(value: unknown): string {
 }
 
 function computeContractHash(module: WorkflowScenarioModule): string {
-  const normalized = {
-    manifest: module.manifest,
-    handler_keys: Object.keys(module.handlers).sort(),
-    action_keys: Object.keys(module.actions).sort(),
-    policy_keys: Object.keys(module.policies).sort(),
-    internal_api_handler_keys: Object.keys(module.internal_api_handlers).sort(),
-    adapter_keys: Object.keys(module.adapters).sort(),
-    presenter_keys: Object.keys(module.presenters).sort(),
-  };
+  const normalized = module.manifest.manifest_version === 2
+    ? module.manifest
+    : {
+        manifest: module.manifest,
+        handler_keys: Object.keys(module.handlers).sort(),
+        action_keys: Object.keys(module.actions).sort(),
+        policy_keys: Object.keys(module.policies).sort(),
+        internal_api_handler_keys: Object.keys(module.internal_api_handlers).sort(),
+        adapter_keys: Object.keys(module.adapters).sort(),
+        presenter_keys: Object.keys(module.presenters).sort(),
+      };
 
   return createHash("sha256").update(stableStringify(normalized)).digest("hex");
 }
@@ -105,6 +110,24 @@ export function validateWorkflowModule(input: {
         message: `Federated manifest contains unknown top-level fields: ${unknownManifestKeys.join(", ")}`,
         path: "manifest",
         remediation: "Remove unknown fields or publish an additive contract minor version before using them.",
+      });
+    }
+
+    if (!(scenarioLaunchPhases as readonly string[]).includes(manifest.launch_phase)) {
+      addFatal(findings, {
+        rule_id: "WF-MAN-115",
+        message: `Unknown release launch phase: ${String(manifest.launch_phase)}`,
+        path: "launch_phase",
+        remediation: "Use dev, pilot, ga, or disabled as release metadata; workspace activation controls traffic.",
+      });
+    }
+
+    if (!(workflowScenarioStatuses as readonly string[]).includes(manifest.scenario_record.required_status)) {
+      addFatal(findings, {
+        rule_id: "WF-MAN-116",
+        message: `Unknown Scenario lifecycle status: ${String(manifest.scenario_record.required_status)}`,
+        path: "scenario_record.required_status",
+        remediation: "Use draft, active, disabled, or archived. Pilot traffic is represented by canary activation.",
       });
     }
 
@@ -192,6 +215,14 @@ export function validateWorkflowModule(input: {
     }
 
     for (const capability of manifest.capabilities) {
+      if (!(scenarioCapabilityEnablementPolicies as readonly string[]).includes(capability.enablement_policy)) {
+        addFatal(findings, {
+          rule_id: "WF-MAN-117",
+          message: `Unsupported capability enablement policy: ${String(capability.enablement_policy)}`,
+          path: `capabilities.${capability.capability_key}.enablement_policy`,
+          remediation: "Use requires_workspace_activation or disabled; capability metadata cannot enable traffic.",
+        });
+      }
       for (const entrypoint of capability.entrypoints) {
         for (const allowedStepType of entrypoint.allowed_step_types) {
           if (!stepTypes.has(allowedStepType)) {

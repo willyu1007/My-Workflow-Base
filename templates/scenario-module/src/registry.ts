@@ -1,4 +1,4 @@
-import type { ScenarioManifest } from "@host/workflow-contracts";
+import type { ScenarioManifestV2 } from "@host/workflow-contracts";
 
 export const scenarioManifest = {
   manifest_version: 2,
@@ -38,7 +38,7 @@ export const scenarioManifest = {
       capability_key: "example_capability",
       label: "Example capability",
       description: "Replace with scenario-specific description.",
-      enablement_policy: "workspace_enabled",
+      enablement_policy: "requires_workspace_activation",
       entrypoints: [
         {
           entrypoint_key: "authoring",
@@ -108,4 +108,4 @@ export const scenarioManifest = {
     deterministic_tests: ["example journey"],
     journey_harness: "example-authoring-happy-path",
   },
-} satisfies ScenarioManifest;
+} satisfies ScenarioManifestV2;

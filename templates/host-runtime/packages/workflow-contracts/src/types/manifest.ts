@@ -1,6 +1,33 @@
 import type { EventRegistryManifest } from "./events.js";
 import type { WorkflowRuntimeKind, WorkflowStepPolicyFlag, WorkflowStepTypeDefinition } from "./federation.js";
-import type { WorkflowActivationTarget, WorkflowExposureLevel, WorkflowScenarioStatus, WorkflowSurface } from "./identity.js";
+import type { ScenarioLaunchPhase, WorkflowExposureLevel, WorkflowScenarioStatus, WorkflowSurface } from "./identity.js";
+
+export const scenarioCapabilityEnablementPolicies = [
+  "requires_workspace_activation",
+  "disabled",
+] as const;
+export type ScenarioCapabilityEnablementPolicy =
+  (typeof scenarioCapabilityEnablementPolicies)[number];
+
+export const legacyScenarioCapabilityEnablementPolicies = [
+  "admin_enabled",
+  "workspace_enabled",
+  "workspace_activation_required",
+  "teacher_workspace_enabled",
+  "always_on",
+] as const;
+export type LegacyScenarioCapabilityEnablementPolicy =
+  (typeof legacyScenarioCapabilityEnablementPolicies)[number];
+
+export const scenarioAdmittedUserClasses = [
+  "teacher",
+  "curriculum_researcher",
+  "subject_expert",
+  "expert",
+  "researcher",
+  "admin",
+] as const;
+export type ScenarioAdmittedUserClass = (typeof scenarioAdmittedUserClasses)[number];
 
 export type ManifestStep = {
   step_key: string;
@@ -28,7 +55,9 @@ export type ManifestCapability = {
   capability_key: string;
   label: string;
   description: string;
-  enablement_policy: string;
+  enablement_policy:
+    | ScenarioCapabilityEnablementPolicy
+    | LegacyScenarioCapabilityEnablementPolicy;
   entrypoints: ManifestEntrypoint[];
 };
 
@@ -78,7 +107,7 @@ export type ScenarioManifest = {
     status_lookup_required: true;
     auth_mode: "service_authenticated";
   };
-  launch_phase: WorkflowActivationTarget;
+  launch_phase: ScenarioLaunchPhase;
   allowed_user_classes: string[];
   capabilities: ManifestCapability[];
   scenario_data: {
@@ -140,4 +169,18 @@ export type ScenarioManifest = {
     deterministic_tests: string[];
     journey_harness: string;
   };
+};
+
+export type ScenarioManifestV2 = Omit<
+  ScenarioManifest,
+  "manifest_version" | "contract" | "step_type_registry" | "owner_integration" | "allowed_user_classes" | "capabilities"
+> & {
+  manifest_version: 2;
+  contract: NonNullable<ScenarioManifest["contract"]>;
+  step_type_registry: NonNullable<ScenarioManifest["step_type_registry"]>;
+  owner_integration: NonNullable<ScenarioManifest["owner_integration"]>;
+  allowed_user_classes: ScenarioAdmittedUserClass[];
+  capabilities: Array<Omit<ManifestCapability, "enablement_policy"> & {
+    enablement_policy: ScenarioCapabilityEnablementPolicy;
+  }>;
 };

@@ -10,7 +10,7 @@
   "files": ["scripts", "fixtures", "tsconfig.json"],
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "node scripts/check-claim-token-boundary.mjs && node scripts/check-contract-source-hash-portability.mjs && node scripts/check-contract-doc-alignment.mjs && node scripts/check-consumer-boundaries.test.mjs && node scripts/check-federation-schemas.mjs && node scripts/check-semantic-lint.mjs && node --test tests/*.test.mjs",
+    "test": "node scripts/check-claim-token-boundary.mjs && node scripts/check-contract-source-hash-portability.mjs && node scripts/check-contract-doc-alignment.mjs && node scripts/check-consumer-boundaries.test.mjs && node scripts/check-federation-schemas.mjs && node scripts/check-scenario-release-contract.mjs && node scripts/check-semantic-lint.mjs && node --test tests/*.test.mjs",
     "semantic-lint": "node scripts/semantic-lint.mjs"
   },
   "dependencies": {

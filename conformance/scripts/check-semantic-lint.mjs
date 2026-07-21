@@ -23,6 +23,9 @@ const futureAndUnsafe = lintFederationDescriptors([{
   manifest: {
     ...valid.manifest,
     manifest_version: 3,
+    launch_phase: "preview",
+    scenario_record: { required_status: "pilot" },
+    capabilities: [{ enablement_policy: "workspace_enabled" }],
     allowed_user_classes: ["internal_admin"],
     event_registry: {
       scenario_internal_events: ["other.event"],
@@ -33,4 +36,17 @@ const futureAndUnsafe = lintFederationDescriptors([{
 const futureAndUnsafeRules = new Set(futureAndUnsafe.map((entry) => entry.rule_id));
 for (const expectedRule of ["FED-MANIFEST-001", "FED-USER-001", "FED-EVENT-001", "FED-EVENT-002"]) {
   if (!futureAndUnsafeRules.has(expectedRule)) throw new Error(`semantic lint did not emit ${expectedRule}`);
+}
+
+const invalidActivationRules = new Set(lintFederationDescriptors([{
+  ...valid,
+  manifest: {
+    ...valid.manifest,
+    launch_phase: "preview",
+    scenario_record: { required_status: "pilot" },
+    capabilities: [{ enablement_policy: "workspace_enabled" }],
+  },
+}]).map((entry) => entry.rule_id));
+for (const expectedRule of ["FED-ACTIVATION-001", "FED-ACTIVATION-002", "FED-ACTIVATION-003"]) {
+  if (!invalidActivationRules.has(expectedRule)) throw new Error(`semantic lint did not emit ${expectedRule}`);
 }

@@ -23,12 +23,20 @@ for (const name of expected) {
   if (schema.$schema !== "https://json-schema.org/draft/2020-12/schema" || typeof schema.$id !== "string") {
     throw new Error(`${name} is not a versioned JSON Schema 2020-12 contract`);
   }
-  if (name !== "scenario-manifest-v2.schema.json" && schema.additionalProperties !== false) {
+  if (schema.additionalProperties !== false) {
     throw new Error(`${name} must reject unknown top-level fields`);
   }
 }
 
 const receipt = JSON.parse(await readFile(new URL("scenario-command-receipt-v1.schema.json", schemaRoot), "utf8"));
 if (!receipt.required.includes("workflow_step_ref")) throw new Error("receipt must bind the exact workflow step identity");
+
+const manifest = JSON.parse(await readFile(new URL("scenario-manifest-v2.schema.json", schemaRoot), "utf8"));
+if (manifest.properties.capabilities.items.properties.enablement_policy.enum.join(",") !== "requires_workspace_activation,disabled") {
+  throw new Error("manifest capability policy must be closed and Host-activation restrictive");
+}
+if (manifest.properties.scenario_record.properties.required_status.enum.includes("pilot")) {
+  throw new Error("pilot must be represented by canary activation, not Scenario lifecycle");
+}
 
 process.stdout.write(`federation schema package ok: ${expected.length} schemas\n`);
