@@ -17,11 +17,11 @@ import type {
 import { legacyCompleteStepInputFixture } from "./legacy-contract.fixture.js";
 
 const sourceContextRef = {
-  namespace: "scenario.example",
+  schema_version: 1,
+  namespace: "example",
   object_type: "care_item",
   object_id: "care-item-1",
   version: 3,
-  owner_scope: "workspace",
 } as const;
 
 export const vnextHandoffManifestFixture = {
@@ -55,7 +55,7 @@ export const handoffDraftFixture = {
   requested_purpose: scenarioSnapshotFixture.requestedPurpose,
   source_context_refs: scenarioSnapshotFixture.sourceContextRefs,
   expected_versions: {
-    "scenario.example:care_item:care-item-1": 3,
+    "example:care_item:care-item-1": 3,
   },
   expires_at: scenarioSnapshotFixture.expiresAt,
 } satisfies WorkflowHandoffDraft;
@@ -63,10 +63,10 @@ export const handoffDraftFixture = {
 export function createScenarioCommandDriverFixture(claimToken: string): ScenarioCommandDriverContext {
   return {
     driverRef: {
-      namespace: "host.workflow",
+      schema_version: 1,
+      namespace: "my_chat",
       object_type: "workflow_step",
       object_id: "step-1",
-      owner_scope: "workspace",
     },
     contractHash: "contract-hash",
     capabilityKey: "example_capability",
@@ -117,8 +117,10 @@ export function createVnextCompleteStepInputFixture(
 export const materializedHandoffFixture = {
   draft_key: handoffDraftFixture.draft_key,
   handoff_ref: {
-    kind: "workflow_handoff",
-    id: "handoff-1",
+    schema_version: 1,
+    namespace: "my_chat",
+    object_type: "workflow_handoff",
+    object_id: "handoff-1",
     version: 1,
   },
   disposition: "created",

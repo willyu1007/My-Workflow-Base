@@ -15,23 +15,17 @@ step_type_registry:
   - step_type: example.collect_context
     runtime_kind: scenario_action
     owner: scenario
-    legacy_aliases:
-      - domain_action
   - step_type: example.generate_output
     runtime_kind: model_call
     owner: scenario
     policy_flags:
       - generation_record_required
-    legacy_aliases:
-      - llm_generate
   - step_type: artifact_write
     runtime_kind: artifact_write
     owner: host
   - step_type: human_gate
     runtime_kind: human_gate
     owner: host
-    legacy_aliases:
-      - approval_gate
 owner_integration:
   command_contract: scenario-command-envelope-v1
   event_contract: scenario-event-envelope-v1

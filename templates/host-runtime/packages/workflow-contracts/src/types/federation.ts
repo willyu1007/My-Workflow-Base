@@ -23,7 +23,6 @@ export type WorkflowStepTypeDefinition = {
   runtime_kind: WorkflowRuntimeKind;
   owner: "host" | "scenario";
   policy_flags?: WorkflowStepPolicyFlag[];
-  legacy_aliases?: string[];
 };
 
 export const standardWorkflowHandoffTypes = [
@@ -38,19 +37,6 @@ export type StandardWorkflowHandoffType = (typeof standardWorkflowHandoffTypes)[
 /** Stable platform namespace for shared My-Chat identity and runtime refs. */
 export const platformCanonicalRefNamespace = "my_chat" as const;
 
-/**
- * Cross-owner reference. The value is deliberately metadata-only: callers must
- * reread the canonical owner and must never place PII, authorization snapshots,
- * or domain bodies in any field.
- */
-export type CanonicalRefV1 = {
-  schema_version: 1;
-  namespace: string;
-  object_type: string;
-  object_id: string;
-  version?: number;
-};
-
 export type ScenarioContractReleaseRefV1 = {
   scenario_key: string;
   release_id: string;
@@ -61,8 +47,8 @@ export type ScenarioContractReleaseRefV1 = {
 };
 
 export type ScenarioActorContextV1 = {
-  actor_ref: CanonicalRefV1;
-  represented_organization_ref?: CanonicalRefV1;
+  actor_ref: CanonicalRef;
+  represented_organization_ref?: CanonicalRef;
 };
 
 export type ScenarioCommandEnvelopeV1 = {
@@ -72,13 +58,13 @@ export type ScenarioCommandEnvelopeV1 = {
   command_schema_version: number;
   idempotency_key: string;
   scenario_release: ScenarioContractReleaseRefV1;
-  workspace_ref: CanonicalRefV1;
-  workflow_run_ref: CanonicalRefV1;
-  workflow_step_ref: CanonicalRefV1;
+  workspace_ref: CanonicalRef;
+  workflow_run_ref: CanonicalRef;
+  workflow_step_ref: CanonicalRef;
   actor: ScenarioActorContextV1;
   purpose: string;
   expected_versions: Record<string, number>;
-  context_refs: CanonicalRefV1[];
+  context_refs: CanonicalRef[];
   correlation_id: string;
   trace_id?: string;
 };
@@ -135,11 +121,11 @@ export type ScenarioCommandReceiptV1 = {
   receipt_version: 1;
   command_id: string;
   idempotency_key: string;
-  workflow_step_ref: CanonicalRefV1;
+  workflow_step_ref: CanonicalRef;
   status: ScenarioCommandExecutionStatus;
-  owner_execution_ref: CanonicalRefV1;
-  result_refs: CanonicalRefV1[];
-  generation_record_refs: CanonicalRefV1[];
+  owner_execution_ref: CanonicalRef;
+  result_refs: CanonicalRef[];
+  generation_record_refs: CanonicalRef[];
   owner_version: number;
   committed_at: string;
   reason_code?: string;
@@ -151,10 +137,10 @@ export type ScenarioEventEnvelopeV1 = {
   event_type: string;
   event_schema_version: number;
   scenario_release: ScenarioContractReleaseRefV1;
-  owner_event_ref: CanonicalRefV1;
-  subject_refs: CanonicalRefV1[];
+  owner_event_ref: CanonicalRef;
+  subject_refs: CanonicalRef[];
   purpose: string;
-  actor_ref?: CanonicalRefV1;
+  actor_ref?: CanonicalRef;
   correlation_id: string;
   trace_id?: string;
   occurred_at: string;
@@ -162,10 +148,10 @@ export type ScenarioEventEnvelopeV1 = {
 
 export type GenerationTicketV1 = {
   ticket_version: 1;
-  generation_record_ref: CanonicalRefV1;
+  generation_record_ref: CanonicalRef;
   scenario_release: ScenarioContractReleaseRefV1;
-  actor_ref: CanonicalRefV1;
-  workspace_ref: CanonicalRefV1;
+  actor_ref: CanonicalRef;
+  workspace_ref: CanonicalRef;
   purpose: string;
   intent_key: string;
   prompt_template_hash: string;
@@ -196,3 +182,4 @@ export type IntegrationLockV3 = {
   scenario_artifact: IntegrationLockRevisionV3;
 };
 import { createHash } from "node:crypto";
+import type { CanonicalRef } from "./identity.js";

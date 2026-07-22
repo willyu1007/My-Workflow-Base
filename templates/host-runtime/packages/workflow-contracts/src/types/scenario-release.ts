@@ -36,7 +36,7 @@ const ownerIntegrationKeys = new Set([
 const capabilityKeys = new Set([
   "capability_key", "label", "description", "enablement_policy", "entrypoints",
 ]);
-const stepTypeKeys = new Set(["step_type", "runtime_kind", "owner", "policy_flags", "legacy_aliases"]);
+const stepTypeKeys = new Set(["step_type", "runtime_kind", "owner", "policy_flags"]);
 const entrypointKeys = new Set([
   "entrypoint_key", "label", "workflow_version", "workflow_version_id",
   "input_schema_version", "output_schema_version", "allowed_step_types", "steps",
@@ -200,9 +200,6 @@ const validateStepTypeRegistry = (
         unique: true,
         allowed: new Set(workflowStepPolicyFlags),
       });
-    }
-    if (definition.legacy_aliases !== undefined) {
-      assertStringArray(definition.legacy_aliases, `${definitionPath}.legacy_aliases`, { unique: true });
     }
     runtimeKinds.set(definition.step_type as string, definition.runtime_kind as string);
   }

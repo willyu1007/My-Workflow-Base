@@ -161,7 +161,7 @@ export function validateWorkflowModule(input: {
     for (const [definitionIndex, definition] of stepTypeRegistry.entries()) {
       const definitionPath = `step_type_registry.${definitionIndex}`;
       const unknownDefinitionKeys = Object.keys(definition).filter(
-        (key) => !["step_type", "runtime_kind", "owner", "policy_flags", "legacy_aliases"].includes(key),
+        (key) => !["step_type", "runtime_kind", "owner", "policy_flags"].includes(key),
       );
       if (unknownDefinitionKeys.length > 0) {
         addFatal(findings, {

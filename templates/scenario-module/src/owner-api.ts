@@ -1,5 +1,5 @@
 import type {
-  CanonicalRefV1,
+  CanonicalRef,
   ScenarioCommandEnvelopeV1,
   ScenarioCommandReceiptV1,
   ScenarioEventEnvelopeV1,
@@ -12,7 +12,7 @@ export type OwnerAuthorizationPort = {
   authorize(input: ScenarioCommandEnvelopeV1): Promise<{ allowed: boolean; reason_code: string }>;
 };
 
-function sameRef(left: CanonicalRefV1, right: CanonicalRefV1): boolean {
+function sameRef(left: CanonicalRef, right: CanonicalRef): boolean {
   return left.namespace === right.namespace && left.object_type === right.object_type && left.object_id === right.object_id && left.version === right.version;
 }
 
@@ -40,7 +40,7 @@ export class ExampleOwnerApi {
       }
 
       const resultRefs = await transaction.example_records.applyCommand(input);
-      const executionRef: CanonicalRefV1 = {
+      const executionRef: CanonicalRef = {
         schema_version: 1,
         namespace: "example",
         object_type: "scenario_command_execution",

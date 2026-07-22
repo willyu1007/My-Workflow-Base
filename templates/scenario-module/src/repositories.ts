@@ -1,5 +1,5 @@
 import type {
-  CanonicalRefV1,
+  CanonicalRef,
   ScenarioCommandEnvelopeV1,
   ScenarioCommandReceiptV1,
   ScenarioEventEnvelopeV1,
@@ -8,7 +8,7 @@ import type {
 export type ScenarioCommandExecutionRecord = {
   command_id: string;
   idempotency_key: string;
-  workflow_step_ref: CanonicalRefV1;
+  workflow_step_ref: CanonicalRef;
   command_identity_hash: string;
   receipt: ScenarioCommandReceiptV1;
 };
@@ -28,7 +28,7 @@ export type ExampleOwnerTransaction = {
     insert(draft: Omit<OwnerIntegrationOutboxDraft, "body">): Promise<void>;
   };
   example_records: {
-    applyCommand(input: ScenarioCommandEnvelopeV1): Promise<CanonicalRefV1[]>;
+    applyCommand(input: ScenarioCommandEnvelopeV1): Promise<CanonicalRef[]>;
   };
 };
 

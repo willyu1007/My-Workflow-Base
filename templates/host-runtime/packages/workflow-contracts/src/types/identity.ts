@@ -36,44 +36,18 @@ export const isScenarioWorkspaceTrafficEnabled = (
   status: ScenarioWorkspaceActivationStatus,
 ): boolean => status === "canary" || status === "enabled";
 
-/** Explicit legacy workflow-ledger ref. New durable/cross-owner writes use CanonicalRefV1. */
-export type LegacyCanonicalRefV0 = {
-  kind:
-    | "scenario"
-    | "capability"
-    | "workflow_version"
-    | "workflow_run"
-    | "workflow_step"
-    | "workflow_artifact"
-    | "workflow_approval"
-    | "workflow_handoff"
-    | "domain_context_ref"
-    | "context_snapshot"
-    | "downstream_object";
-  id: string;
-  version?: number;
-};
-
-/** @deprecated Read/replay compatibility only; never accept this shape on new federation writes. */
-export type CanonicalRef = LegacyCanonicalRefV0;
-
-/** Explicit legacy context ref. New durable/cross-owner writes use CanonicalRefV1. */
-export type LegacyDomainContextRefV0 = {
+/**
+ * The sole public and durable object reference. It is metadata-only: callers
+ * reread the canonical owner and never embed PII, authorization or domain
+ * bodies in a ref.
+ */
+export type CanonicalRef = {
+  schema_version: 1;
   namespace: string;
-  consumer_scenario_key?: string;
   object_type: string;
   object_id: string;
   version?: number;
-  owner_scope: "workspace" | "organization" | "platform" | "external";
-  canonical_ref?: {
-    service: string;
-    object_type: string;
-    object_id: string;
-  };
 };
-
-/** @deprecated Read/replay compatibility only; never accept this shape on new federation writes. */
-export type DomainContextRef = LegacyDomainContextRefV0;
 
 export type WorkflowCommandMeta = {
   workspace_id: string;

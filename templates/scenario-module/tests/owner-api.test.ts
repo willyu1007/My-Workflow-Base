@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import type { CanonicalRefV1, ScenarioCommandEnvelopeV1, ScenarioEventEnvelopeV1 } from "@host/workflow-contracts";
+import type { CanonicalRef, ScenarioCommandEnvelopeV1, ScenarioEventEnvelopeV1 } from "@host/workflow-contracts";
 import { ExampleOwnerApi } from "../src/owner-api.js";
 import type { ExampleScenarioRepositories, ScenarioCommandExecutionRecord } from "../src/repositories.js";
 
-const ref = (namespace: string, object_type: string, object_id: string): CanonicalRefV1 => ({
+const ref = (namespace: string, object_type: string, object_id: string): CanonicalRef => ({
   schema_version: 1,
   namespace,
   object_type,

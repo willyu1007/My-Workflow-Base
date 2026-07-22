@@ -1,15 +1,15 @@
-import type { CanonicalRefV1, GenerationTicketV1 } from "@host/workflow-contracts";
+import type { CanonicalRef, GenerationTicketV1 } from "@host/workflow-contracts";
 
 export type ModelGatewayRequest = {
   generation_ticket: GenerationTicketV1;
   domain_prompt_intent: string;
   domain_template_key: string;
-  input_refs: CanonicalRefV1[];
+  input_refs: CanonicalRef[];
 };
 
 export type ModelGatewayResult = {
-  output_ref: CanonicalRefV1;
-  generation_record_ref: CanonicalRefV1;
+  output_ref: CanonicalRef;
+  generation_record_ref: CanonicalRef;
 };
 
 /**

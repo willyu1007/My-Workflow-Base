@@ -9,7 +9,7 @@
   "manifest": {
     "manifest_version": 2,
     "scenario_key": "scenario-starter",
-    "contract": { "source_hash": "c5ec59f398d4318bba24fdf3df2451d348120529ff536212d5131020429ab238" },
+    "contract": { "source_hash": "caebe85d492724a727b0ccb7a99fe9da15e0536393c4a0ab42069f8264ea7b2e" },
     "step_type_registry": [],
     "handoffs": []
   },

@@ -384,7 +384,6 @@ function createFederatedScenarioModule(): WorkflowScenarioModule {
         step_type: "example.collect_context",
         runtime_kind: "scenario_action",
         owner: "scenario",
-        legacy_aliases: ["domain_action"],
       },
     ],
     owner_integration: {

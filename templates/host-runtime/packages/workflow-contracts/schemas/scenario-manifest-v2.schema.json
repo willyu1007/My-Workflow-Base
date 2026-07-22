@@ -48,8 +48,7 @@
           "step_type": { "type": "string", "minLength": 1 },
           "runtime_kind": { "enum": ["scenario_action", "model_call", "tool_call", "transform", "human_gate", "wait_for_input", "artifact_write", "event_emit"] },
           "owner": { "enum": ["host", "scenario"] },
-          "policy_flags": { "type": "array", "uniqueItems": true, "items": { "enum": ["policy_gate", "generation_record_required"] } },
-          "legacy_aliases": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+          "policy_flags": { "type": "array", "uniqueItems": true, "items": { "enum": ["policy_gate", "generation_record_required"] } }
         }
       }
     },

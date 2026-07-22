@@ -46,8 +46,8 @@ project chooses that.
 This split lets a host project implement a generic canonical domain registry for
 MVP while keeping concrete workflow adapters stable. If a domain object later
 moves to a specialized canonical owner, workflow still sees the same
-`DomainContextRef`. In that ref, `namespace` is the canonical owner namespace
-and `consumer_scenario_key` is optional consuming workflow context.
+schema-versioned `CanonicalRef`. In that ref, `namespace` is the canonical
+owner namespace. Consumer and authorization context stays outside the ref.
 
 ## Minimal standard API closure
 Every concrete workflow must expose the same minimal API or adapter closure.
@@ -103,7 +103,7 @@ type WorkflowStartRequirementsResponse = {
     namespace: string;
     object_type: string;
     resolver_key: string;
-    owner_scope: DomainContextRef["owner_scope"];
+    owner_scope: "workspace" | "organization" | "platform" | "external";
   }>;
   action_availability: WorkflowActionAvailability[];
 };
@@ -135,7 +135,7 @@ export type WorkflowArtifactDraft = {
 
 export type ContextBindingDraft = {
   target_ref: CanonicalRef;
-  context_refs: DomainContextRef[];
+  context_refs: CanonicalRef[];
   snapshot_refs: CanonicalRef[];
   expected_versions?: Record<string, number>;
 };
@@ -321,41 +321,15 @@ export type WorkflowCommandResponse<T> = {
 };
 
 export type CanonicalRef = {
-  kind:
-    | "scenario"
-    | "capability"
-    | "workflow_definition"
-    | "workflow_version"
-    | "workflow_run"
-    | "workflow_step"
-    | "workflow_artifact"
-    | "workflow_approval"
-    | "workflow_handoff"
-    | "downstream_object"
-    | "domain_context_ref"
-    | "context_snapshot";
-  id: string;
-  version?: number;
-};
-
-export type DomainContextRef = {
-  // canonical owner namespace, not the consuming scenario
+  schema_version: 1;
   namespace: string;
-  // optional consumer context for policy and presentation
-  consumer_scenario_key?: string;
   object_type: string;
   object_id: string;
   version?: number;
-  owner_scope: "workspace" | "organization" | "platform" | "external";
-  canonical_ref?: {
-    service: string;
-    object_type: string;
-    object_id: string;
-  };
 };
 
 export type ResolvedDomainContext = {
-  ref: DomainContextRef;
+  ref: CanonicalRef;
   resolved_version: number;
   snapshot_id: string;
   snapshot_schema_version: number;
@@ -483,7 +457,7 @@ type ConflictResolutionView = {
     | "none";
   target_link?: string;
   allowed_resolution_actions: ResolutionAction[];
-  context_ref?: DomainContextRef;
+  context_ref?: CanonicalRef;
   expected_version?: number;
   actual_version?: number;
   affected_bindings?: Array<{
@@ -939,8 +913,8 @@ Request:
   "input": {
     "context_refs": [
       {
+        "schema_version": 1,
         "namespace": "example",
-        "consumer_scenario_key": "example",
         "object_type": "example_context_object",
         "object_id": "ctx_123",
         "version": 4

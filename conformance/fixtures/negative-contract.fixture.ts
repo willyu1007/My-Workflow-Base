@@ -21,10 +21,10 @@ const commandMeta = {
 // @ts-expect-error -- the trusted driver must carry transient claim evidence.
 export const driverWithoutClaimToken: ScenarioCommandDriverContext = {
   driverRef: {
-    namespace: "host.workflow",
+    schema_version: 1,
+    namespace: "my_chat",
     object_type: "workflow_step",
     object_id: "step-negative",
-    owner_scope: "workspace",
   },
   contractHash: "contract-hash",
   capabilityKey: "negative_capability",
@@ -71,8 +71,10 @@ export const draftRejectsClaimToken: WorkflowHandoffDraft = {
 export const materializedHandoffRejectsClaimToken: MaterializedHandoff = {
   draft_key: "request-negative",
   handoff_ref: {
-    kind: "workflow_handoff",
-    id: "handoff-negative",
+    schema_version: 1,
+    namespace: "my_chat",
+    object_type: "workflow_handoff",
+    object_id: "handoff-negative",
     version: 1,
   },
   disposition: "created",
