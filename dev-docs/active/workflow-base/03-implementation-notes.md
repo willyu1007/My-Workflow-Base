@@ -286,3 +286,13 @@ joint release qualification remain separate gates.
 - Frozen source revision:
   `4fdfffa76dbd766bf21449cb7a84122b5454535f`. No package was published and no
   product/runtime activation was enabled.
+
+## 2026-07-22 recovered-receipt Step conformance
+
+- Revision `a982f6f52f0388fa37b7a8f2df47d7df546473ab` adds common case
+  `[FED-REL-004]` to the generated Starter.
+- The case commits one command and proves a response-loss receipt lookup with
+  the same idempotency key but another Workflow Step fails with
+  `idempotency_identity_conflict`.
+- The change is test-only and does not alter Base contract logical bytes,
+  Starter persistence, package versions or any activation policy.

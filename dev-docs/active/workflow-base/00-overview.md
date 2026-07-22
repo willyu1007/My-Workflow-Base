@@ -37,13 +37,15 @@ consumption surfaces
 - Candidate increment: persistence-complete generated Starter and role-aware
   federation descriptors, layered on fail-closed v2 release admission,
   semantic lint and integration-lock v3 verification
-- Frozen source revision:
+- Persistence-complete Starter implementation revision:
   `4fdfffa76dbd766bf21449cb7a84122b5454535f`
+- Current Starter behavior-conformance revision:
+  `a982f6f52f0388fa37b7a8f2df47d7df546473ab`
 - Historical candidate clean qualification revision:
   `92c22ee82ada08ce713519eec4c7f9c7c9ffe12e`
-- Next gate: consume the final CF-013 Host consumer cutover, then run exact
-  joint-candidate qualification before publishing any artifact. Activation
-  remains outside this task.
+- Next gate: complete the shared authorization/replay/privacy/deletion matrix
+  and published-artifact qualification. CF-013 and exact Git-source lock
+  qualification are complete; activation remains outside this task.
 
 ## Federation v1 checkpoint
 
