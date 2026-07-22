@@ -81,7 +81,7 @@ export const scenarioManifest = {
   internal_api: { routes: [] },
   event_registry: {
     standard_workflow_events: ["workflow.run.created", "workflow.run.updated"],
-    scenario_internal_events: [],
+    scenario_internal_events: ["example.command.applied"],
     event_payload_policy: {
       signal_version: 1,
       body: "no_body",
@@ -91,8 +91,10 @@ export const scenarioManifest = {
       idempotency_key: "{event_type}:{aggregate_id}:{aggregate_version}",
     },
     producers: {
-      "workflow.run.created": { owner: "workflow_ledger", write_boundary: "same_transaction" },
-      "workflow.run.updated": { owner: "workflow_ledger", write_boundary: "same_transaction" },
+      "example.command.applied": {
+        owner: "scenario_module",
+        write_boundary: "scenario_internal",
+      },
     },
     consumers: {},
   },
@@ -101,7 +103,7 @@ export const scenarioManifest = {
     rollback: "Disable capability and preserve canonical facts.",
     projection_review_required: true,
     evidence_records: [],
-    outbox_events: ["workflow.run.created", "workflow.run.updated"],
+    outbox_events: ["example.command.applied"],
   },
   verification: {
     deterministic_tests: ["example journey"],

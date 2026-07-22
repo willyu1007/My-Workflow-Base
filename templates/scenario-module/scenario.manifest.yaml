@@ -247,8 +247,7 @@ event_registry:
     - workflow.context.rebound
     - workflow.evidence.recorded
   scenario_internal_events:
-    - example.example_capability.artifact.generated
-    - example.example_capability.review.input_received
+    - example.command.applied
   event_payload_policy:
     signal_version: 1
     body: no_body
@@ -257,48 +256,10 @@ event_registry:
     presenter_output_in_payload: false
     idempotency_key: "{event_type}:{aggregate_id}:{aggregate_version}"
   producers:
-    workflow.run.created:
-      owner: workflow_ledger
-      write_boundary: same_transaction
-    workflow.run.updated:
-      owner: workflow_ledger
-      write_boundary: same_transaction
-    workflow.approval.requested:
-      owner: approval_service
-      write_boundary: same_transaction
-    workflow.artifact.updated:
-      owner: artifact_service
-      write_boundary: same_transaction
-    workflow.handoff.requested:
-      owner: handoff_ledger
-      write_boundary: same_transaction
-    workflow.handoff.receipt_recorded:
-      owner: handoff_ledger
-      write_boundary: same_transaction
-    example.example_capability.artifact.generated:
+    example.command.applied:
       owner: scenario_module
       write_boundary: scenario_internal
-  consumers:
-    projection:
-      allowed_events:
-        - workflow.run.created
-        - workflow.run.updated
-        - workflow.artifact.updated
-      forbidden_events:
-        - example.example_capability.artifact.generated
-    notification_push:
-      allowed_events:
-        - workflow.run.updated
-        - workflow.approval.requested
-        - workflow.artifact.updated
-      forbidden_events:
-        - example.example_capability.artifact.generated
-    rag_knowledge:
-      allowed_events:
-        - workflow.handoff.requested
-        - workflow.handoff.receipt_recorded
-      forbidden_events:
-        - example.example_capability.artifact.generated
+  consumers: {}
 
 governance:
   admin_actions:
@@ -314,13 +275,7 @@ governance:
     - example.example_capability.conflict.resolved
     - example.example_capability.handoff.accepted
   outbox_events:
-    - workflow.run.created
-    - workflow.run.updated
-    - workflow.approval.requested
-    - workflow.artifact.updated
-    - workflow.handoff.requested
-    - workflow.handoff.receipt_recorded
-    - example.example_capability.artifact.generated
+    - example.command.applied
 
 verification:
   deterministic_tests:

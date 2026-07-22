@@ -16,6 +16,8 @@
     "handoffs": [{ "handoff_type": "indexing" }]
   },
   "providers": ["qwen", "deepseek"],
-  "scenario_aliases": [{ "key": "legacy-example", "allows_new_writes": false }],
+  "scenario_aliases": [
+    { "key": "legacy-example", "target": "example", "allows_new_writes": false }
+  ],
   "canonical_objects": [{ "key": "example.record", "owner": "The-Example" }]
 }

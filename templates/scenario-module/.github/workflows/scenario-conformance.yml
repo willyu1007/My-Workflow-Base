@@ -8,6 +8,23 @@ on:
 jobs:
   conformance:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: starter
+          POSTGRES_PASSWORD: starter
+          POSTGRES_DB: scenario_starter_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U starter -d scenario_starter_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://starter:starter@localhost:5432/scenario_starter_test
+      STARTER_DATABASE_URL: postgresql://starter:starter@localhost:5432/scenario_starter_test
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -18,6 +35,10 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm prisma:migrate
       - run: pnpm typecheck
       - run: pnpm test
-      - run: node conformance/verify-integration-lock.mjs integration-lock.json
+      - run: pnpm test:db
+      - run: pnpm build
+      - run: pnpm semantic-lint
+      - run: npm pack --dry-run --json

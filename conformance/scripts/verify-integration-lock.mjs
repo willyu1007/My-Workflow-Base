@@ -2,6 +2,7 @@
 
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
+import { existsSync, realpathSync } from "node:fs";
 import { lstat, readFile, readdir } from "node:fs/promises";
 import { isAbsolute, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -183,4 +184,11 @@ async function main() {
   }
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();
+if (
+  process.argv[1] &&
+  existsSync(resolve(process.argv[1])) &&
+  realpathSync(resolve(process.argv[1])) ===
+    realpathSync(fileURLToPath(import.meta.url))
+) {
+  await main();
+}

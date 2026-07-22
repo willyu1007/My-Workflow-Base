@@ -60,8 +60,10 @@ export class ExampleOwnerApi {
         committed_at: this.now().toISOString(),
       };
       await transaction.command_executions.insert({
+        scenario_key: "example",
         command_id: input.command_id,
         idempotency_key: input.idempotency_key,
+        command_envelope: input,
         workflow_step_ref: input.workflow_step_ref,
         command_identity_hash: identityHash,
         receipt,

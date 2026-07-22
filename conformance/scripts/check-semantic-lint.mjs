@@ -14,7 +14,7 @@ const namespaceConflict = lintFederationDescriptors([
 if (!namespaceConflict.some((entry) => entry.rule_id === "FED-REF-002")) throw new Error("semantic lint did not reject conflicting platform ref namespaces");
 
 const invalidRules = new Set(lintFederationDescriptors([invalid]).map((entry) => entry.rule_id));
-for (const expectedRule of ["FED-REF-001", "FED-KEY-001", "FED-HASH-001", "FED-STEP-001", "FED-STEP-002", "FED-HANDOFF-001", "FED-PROVIDER-001", "FED-ALIAS-001"]) {
+for (const expectedRule of ["FED-REF-001", "FED-KEY-001", "FED-HASH-001", "FED-STEP-001", "FED-STEP-002", "FED-HANDOFF-001", "FED-PROVIDER-001", "FED-ALIAS-001", "FED-ALIAS-002"]) {
   if (!invalidRules.has(expectedRule)) throw new Error(`semantic lint did not emit ${expectedRule}`);
 }
 
@@ -49,4 +49,41 @@ const invalidActivationRules = new Set(lintFederationDescriptors([{
 }]).map((entry) => entry.rule_id));
 for (const expectedRule of ["FED-ACTIVATION-001", "FED-ACTIVATION-002", "FED-ACTIVATION-003"]) {
   if (!invalidActivationRules.has(expectedRule)) throw new Error(`semantic lint did not emit ${expectedRule}`);
+}
+
+const roleAwareRules = new Set(lintFederationDescriptors([
+  {
+    repository: "Broken-Contract",
+    role: "contract_owner",
+    platform_ref_namespace: "my_chat",
+    manifest: valid.manifest,
+    providers: [],
+    scenario_aliases: [],
+    canonical_objects: [{ key: "contract.canonical_ref", owner: "Broken-Contract" }],
+  },
+  {
+    repository: "Broken-Host",
+    role: "platform_host",
+    platform_ref_namespace: "my_chat",
+    manifest: { ...valid.manifest, scenario_key: "platform-host" },
+    providers: [],
+    scenario_aliases: [],
+    canonical_objects: [],
+  },
+  {
+    ...valid,
+    repository: "Broken-Event-Owner",
+    manifest: {
+      ...valid.manifest,
+      event_registry: {
+        scenario_internal_events: [],
+        event_payload_policy: { body: "no_body", pii: "no_pii" },
+        producers: { "workflow.run.created": { owner: "workflow_ledger" } },
+      },
+      governance: { outbox_events: ["workflow.run.created"] },
+    },
+  },
+]).map((entry) => entry.rule_id));
+for (const expectedRule of ["FED-ROLE-002", "FED-CONTRACT-001", "FED-EVENT-004", "FED-EVENT-005"]) {
+  if (!roleAwareRules.has(expectedRule)) throw new Error(`semantic lint did not emit ${expectedRule}`);
 }

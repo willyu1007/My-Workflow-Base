@@ -3,6 +3,25 @@
 Use this template when adding a controlled concrete workflow based on the
 workflow base contracts. The base repository is not a runtime dependency.
 
+Generate a standalone scenario into an empty directory:
+
+```bash
+pnpm generate:scenario -- \
+  --target /tmp/my-scenario \
+  --scenario-key my-scenario \
+  --package-name @example/my-scenario
+cd /tmp/my-scenario
+pnpm install
+```
+
+The generated package consumes the versioned My-Chat Host SDK and Base
+conformance CLI. Its CI starts an isolated PostgreSQL service, applies the
+owner-local migration, runs unit and database journeys, validates the
+role-aware descriptor, builds and performs a package dry-run. Replace the
+integration-lock placeholders with exact revisions and hashes before release.
+Commit the generated `pnpm-lock.yaml` before enabling the frozen-lockfile CI
+gate.
+
 ## Required contract fields
 
 The default artifact is `scenario.manifest.yaml`. A concrete workflow may use an
@@ -46,8 +65,10 @@ equivalent TypeScript contract constant if it preserves the same fields.
 - Outbox payloads are ref-only downstream signals; downstream owners reread
   canonical state before projection, publication, indexing, notification,
   search/vector, PPR, or replay side effects.
-- Shared product consumers depend on platform events and standard `workflow.*`
-  events only; scenario internal events are declared implementation details.
+- `standard_workflow_events` are Host-observed vocabulary. Scenario producers
+  and owner outbox declarations contain only scenario-namespaced events;
+  shared product consumers depend on Host `workflow.*` events, never on the
+  scenario owner outbox.
 - Standard workflow events use refs-only payloads with `signal_version=1`,
   `body=no_body`, `pii=no_pii`, and deterministic idempotency keys.
 - Event producers and consumers are declared so shared consumers cannot depend

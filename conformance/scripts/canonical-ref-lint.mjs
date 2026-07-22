@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
+import { existsSync, realpathSync } from "node:fs";
 import { readdir, readFile, stat } from "node:fs/promises";
 import { extname, relative, resolve, sep } from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 const supportedExtensions = new Set([".js", ".json", ".jsx", ".mjs", ".ts", ".tsx", ".yaml", ".yml"]);
 const ignoredDirectoryNames = new Set([".git", "dist", "migrations", "node_modules"]);
@@ -91,6 +92,11 @@ async function main() {
   if (findings.length > 0) process.exitCode = 1;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+if (
+  process.argv[1] &&
+  existsSync(resolve(process.argv[1])) &&
+  realpathSync(resolve(process.argv[1])) ===
+    realpathSync(fileURLToPath(import.meta.url))
+) {
   await main();
 }

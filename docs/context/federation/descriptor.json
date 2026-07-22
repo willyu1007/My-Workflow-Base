@@ -2,23 +2,19 @@
   "repository": "My-Workflow-Base",
   "role": "contract_owner",
   "platform_ref_namespace": "my_chat",
-  "manifest_module": {
-    "path": "../../../templates/scenario-module/dist/registry.js",
-    "export": "scenarioManifest"
-  },
-  "manifest": {
-    "manifest_version": 2,
-    "scenario_key": "scenario-starter",
-    "contract": { "source_hash": "caebe85d492724a727b0ccb7a99fe9da15e0536393c4a0ab42069f8264ea7b2e" },
-    "step_type_registry": [],
-    "handoffs": []
-  },
   "providers": [],
   "scenario_aliases": [],
   "canonical_objects": [
-    { "key": "contract.scenario_manifest", "owner": "My-Workflow-Base" },
-    { "key": "contract.command_envelope", "owner": "My-Workflow-Base" },
     { "key": "contract.canonical_ref", "owner": "My-Workflow-Base" },
-    { "key": "contract.integration_lock", "owner": "My-Workflow-Base" }
+    { "key": "contract.generation_ticket", "owner": "My-Workflow-Base" },
+    { "key": "contract.integration_lock", "owner": "My-Workflow-Base" },
+    { "key": "contract.scenario_command_envelope", "owner": "My-Workflow-Base" },
+    { "key": "contract.scenario_command_receipt", "owner": "My-Workflow-Base" },
+    { "key": "contract.scenario_contract_release", "owner": "My-Workflow-Base" },
+    { "key": "contract.scenario_event_envelope", "owner": "My-Workflow-Base" },
+    { "key": "contract.scenario_manifest", "owner": "My-Workflow-Base" },
+    { "key": "contract.scenario_workspace_activation", "owner": "My-Workflow-Base" },
+    { "key": "contract.runtime_kind_registry", "owner": "My-Workflow-Base" },
+    { "key": "contract.handoff_kind_registry", "owner": "My-Workflow-Base" }
   ]
 }
