@@ -98,6 +98,12 @@ describe("federated owner API", () => {
     await expect(revokedApi.getReceipt(command())).rejects.toThrow("scenario_authorization_denied:grant_revoked");
   });
 
+  it("[FED-REL-004] rejects a response-loss lookup from another workflow step", async () => {
+    const { api } = setup();
+    await api.execute(command());
+    await expect(api.getReceipt(command("step-2"))).rejects.toThrow("idempotency_identity_conflict");
+  });
+
   it.each([
     ["actor", (input: ScenarioCommandEnvelopeV1) => ({ ...input, actor: { actor_ref: ref("my_chat", "actor", "actor-2") } })],
     ["workspace", (input: ScenarioCommandEnvelopeV1) => ({ ...input, workspace_ref: ref("my_chat", "workspace", "workspace-2") })],
