@@ -12,7 +12,7 @@ owned, and safe for host implementation.
 | Base/runtime boundary | Pass | Base docs state the repository is a template/scaffold, not a runtime service. Host products own runtime code. |
 | Scenario neutrality | Pass | Education appears only as seed/proof language; non-education readiness proof uses `support_case_resolution`. |
 | Canonical identity | Pass | Scenario, capability, entrypoint, workflow version, run, step, artifact, approval, handoff, and contract hash are shared across APIs and loader rules. |
-| Domain ownership | Pass | Canonical domain registry is host/platform-owned; workflow consumes `DomainContextRef`, resolver snapshots, and bindings. |
+| Domain ownership | Pass | Canonical domain registry is host/platform-owned; workflow consumes schema-versioned `CanonicalRef` values, resolver snapshots, and bindings. |
 | Chat boundary | Pass | Chat can recommend, collect start requirements, start runs, confirm actions, summarize dashboard state, and cite eligible sources; it cannot perform step interventions or reminders. |
 | Web/Admin boundary | Pass | Internal scenario APIs are manifest/TS-contract declared and Web/Admin-only. |
 | Handoff boundary | Pass | Workflow creates request/receipt records only; downstream owners reread and own side effects. |

@@ -1,6 +1,5 @@
 import type {
   CanonicalRef,
-  DomainContextRef,
   WorkflowActionAvailability,
   WorkflowCommandMeta,
   WorkflowCommandResponse,
@@ -48,7 +47,7 @@ export type ChatStartRunInput = {
   capability_key: string;
   entrypoint_key: string;
   requirement_values: Record<string, unknown>;
-  context_refs: DomainContextRef[];
+  context_refs: CanonicalRef[];
   meta: WorkflowCommandMeta;
 };
 
@@ -150,7 +149,7 @@ export type WorkflowArtifactDraft = {
 
 export type ContextBindingDraft = {
   target_ref: CanonicalRef;
-  context_refs: DomainContextRef[];
+  context_refs: CanonicalRef[];
   snapshot_refs: CanonicalRef[];
   expected_versions?: Record<string, number>;
 };

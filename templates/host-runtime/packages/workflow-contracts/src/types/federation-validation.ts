@@ -1,11 +1,11 @@
 import {
   platformCanonicalRefNamespace,
-  type CanonicalRefV1,
   type ScenarioCommandEnvelopeV1,
   type ScenarioCommandReceiptV1,
   type ScenarioContractReleaseRefV1,
   type ScenarioEventEnvelopeV1,
 } from "./federation.js";
+import type { CanonicalRef } from "./identity.js";
 
 export class FederationContractValidationError extends Error {
   constructor(readonly code: string, readonly path: string, message: string) {
@@ -72,7 +72,7 @@ const assertPlatformRef = (
   objectType: (typeof platformRefShapes)[keyof typeof platformRefShapes],
   path: string,
 ) => {
-  assertCanonicalRefV1(value, path);
+  assertCanonicalRef(value, path);
   if (value.namespace !== platformCanonicalRefNamespace || value.object_type !== objectType) {
     fail(
       "invalid_platform_ref",
@@ -82,7 +82,7 @@ const assertPlatformRef = (
   }
 };
 
-export const assertCanonicalRefV1: (value: unknown, path?: string) => asserts value is CanonicalRefV1 = (value, path = "ref") => {
+export const assertCanonicalRef: (value: unknown, path?: string) => asserts value is CanonicalRef = (value, path = "ref") => {
   if (!isRecord(value)) fail("invalid_ref", path, `${path} must be an object`);
   const record = value as Record<string, unknown>;
   assertKeys(record, refKeys, path);
@@ -135,7 +135,7 @@ export const assertScenarioCommandEnvelopeV1: (
   const expectedVersions = record.expected_versions as Record<string, unknown>;
   for (const [key, version] of Object.entries(expectedVersions)) assertNonNegativeInteger(version, `${path}.expected_versions.${key}`);
   if (!Array.isArray(record.context_refs)) fail("invalid_context_refs", `${path}.context_refs`, "context_refs must be an array");
-  (record.context_refs as unknown[]).forEach((ref, index) => assertCanonicalRefV1(ref, `${path}.context_refs.${index}`));
+  (record.context_refs as unknown[]).forEach((ref, index) => assertCanonicalRef(ref, `${path}.context_refs.${index}`));
 };
 
 export const assertScenarioCommandReceiptV1: (
@@ -153,11 +153,11 @@ export const assertScenarioCommandReceiptV1: (
   if (typeof record.status !== "string" || !receiptStatuses.has(record.status)) fail("invalid_receipt", `${path}.status`, "Receipt status is invalid");
   assertNonNegativeInteger(record.owner_version, `${path}.owner_version`);
   if (Number.isNaN(Date.parse(record.committed_at as string))) fail("invalid_receipt", `${path}.committed_at`, "Receipt committed_at must be an ISO date-time");
-  assertCanonicalRefV1(record.workflow_step_ref, `${path}.workflow_step_ref`);
-  assertCanonicalRefV1(record.owner_execution_ref, `${path}.owner_execution_ref`);
+  assertCanonicalRef(record.workflow_step_ref, `${path}.workflow_step_ref`);
+  assertCanonicalRef(record.owner_execution_ref, `${path}.owner_execution_ref`);
   for (const field of ["result_refs", "generation_record_refs"] as const) {
     if (!Array.isArray(record[field])) fail("invalid_receipt", `${path}.${field}`, `${field} must be an array`);
-    (record[field] as unknown[]).forEach((ref, index) => assertCanonicalRefV1(ref, `${path}.${field}.${index}`));
+    (record[field] as unknown[]).forEach((ref, index) => assertCanonicalRef(ref, `${path}.${field}.${index}`));
   }
 };
 
@@ -174,8 +174,8 @@ export const assertScenarioEventEnvelopeV1: (
   assertOptionalString(record.trace_id, `${path}.trace_id`);
   if (Number.isNaN(Date.parse(record.occurred_at as string))) fail("invalid_event", `${path}.occurred_at`, "Event occurred_at must be an ISO date-time");
   assertScenarioContractReleaseRefV1(record.scenario_release, `${path}.scenario_release`);
-  assertCanonicalRefV1(record.owner_event_ref, `${path}.owner_event_ref`);
-  if (record.actor_ref !== undefined) assertCanonicalRefV1(record.actor_ref, `${path}.actor_ref`);
+  assertCanonicalRef(record.owner_event_ref, `${path}.owner_event_ref`);
+  if (record.actor_ref !== undefined) assertCanonicalRef(record.actor_ref, `${path}.actor_ref`);
   if (!Array.isArray(record.subject_refs)) fail("invalid_event", `${path}.subject_refs`, "subject_refs must be an array");
-  (record.subject_refs as unknown[]).forEach((ref, index) => assertCanonicalRefV1(ref, `${path}.subject_refs.${index}`));
+  (record.subject_refs as unknown[]).forEach((ref, index) => assertCanonicalRef(ref, `${path}.subject_refs.${index}`));
 };

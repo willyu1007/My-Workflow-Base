@@ -94,10 +94,10 @@ provide a platform/domain registry for cross-scenario objects, schemas,
 relations, versions, lifecycle, permission, and domain evidence/outbox.
 
 Workflow consumes those objects only through the domain context contract:
-- `DomainContextRef`: stable workflow-facing reference where `namespace`
-  identifies the canonical owner and `consumer_scenario_key` is optional
-  consuming context
-- `DomainContextResolver`: host-implemented resolver and policy gate
+- `CanonicalRef`: sole schema-versioned workflow-facing reference where
+  `namespace` identifies the canonical owner; it carries no consumer or
+  authorization context
+- `CanonicalRefResolver`: host-implemented resolver and policy gate
 - `ContextSnapshot`: frozen safe view used by a run or step
 - `ContextBinding`: ledger record of which workflow object depended on which
   context ref/snapshot/version

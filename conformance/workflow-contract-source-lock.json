@@ -1,13 +1,12 @@
 {
   "schema_version": 1,
-  "contract_source_revision": "acba4e792c85131c19e63e08a5f671133c481c57",
   "algorithm": "sha256",
   "normalization": "utf8_lf_workflow_contracts_import_alias_path_nul_length_nul_content_nul_v1",
   "logical_roots": [
     "workflow-contracts",
     "workflow-validator"
   ],
-  "source_hash": "96a1773543efa63f20f6b472dcf09ac6a89ca9aab8bdcde954fac132a0e969a9",
+  "source_hash": "caebe85d492724a727b0ccb7a99fe9da15e0536393c4a0ab42069f8264ea7b2e",
   "files": [
     {
       "path": "workflow-contracts/index.ts",
@@ -16,8 +15,8 @@
     },
     {
       "path": "workflow-contracts/types/api.ts",
-      "bytes": 9156,
-      "sha256": "a5aca2797f1b2dedcd683e7a1790f05619b26959f7337fd0d22b3c9b80e8e172"
+      "bytes": 9128,
+      "sha256": "a700bdf2b734b23e13764b7d323bfa1578ecd43297aec24dddab2dff1bca2896"
     },
     {
       "path": "workflow-contracts/types/events.ts",
@@ -26,23 +25,23 @@
     },
     {
       "path": "workflow-contracts/types/federation-validation.ts",
-      "bytes": 11168,
-      "sha256": "e8ab0fd11045ff2ea3a6e17574601434be17b9a002a270cd5007576ff2a5e71e"
+      "bytes": 11176,
+      "sha256": "56ea11bdbf035bc4ed30ffd5ad7ae396b3e21fd913f39909bec59c90c599f57a"
     },
     {
       "path": "workflow-contracts/types/federation.ts",
-      "bytes": 5780,
-      "sha256": "bb34899615cef881f6b72265d553890b5d41a89122bc116548def171c9480be1"
+      "bytes": 5426,
+      "sha256": "faf38208ea55681eb0a51a6407d63f4fee8c24fe53f6e117bae7ef6729b8902a"
     },
     {
       "path": "workflow-contracts/types/handoff.ts",
-      "bytes": 2166,
-      "sha256": "5f24df8191a6d1a743130c1efe4118eaf6b2a4e63578e6e3db09d2df55effe5c"
+      "bytes": 2153,
+      "sha256": "6791c3ee3a79b865a9c60db48289f5f8a28153a0326555b90cd90cb2e39383b9"
     },
     {
       "path": "workflow-contracts/types/identity.ts",
-      "bytes": 2015,
-      "sha256": "bea400367896410dcac086ef9ad39a0250f7e06508e1085e42c079cb2634d91a"
+      "bytes": 2445,
+      "sha256": "82dcec9daf196246c923f56623365633c6b59490002a6b90bdb7ac0d9a898bd8"
     },
     {
       "path": "workflow-contracts/types/manifest.ts",
@@ -55,14 +54,20 @@
       "sha256": "9752f54c72105fe58c42c42df524c5c71094409ea1d7f01494cc1bb589e76213"
     },
     {
+      "path": "workflow-contracts/types/scenario-release.ts",
+      "bytes": 32337,
+      "sha256": "94b0abf3149b188ffb825c0ce03ac128a75e323adc992039b45f203065aef493"
+    },
+    {
       "path": "workflow-contracts/types/validation.ts",
       "bytes": 1139,
       "sha256": "4ca5e8cff40b0a16d8d7c3fa1b0c58585ad8c30b57fb44f4c9e7837898b41892"
     },
     {
       "path": "workflow-validator/validate-module.ts",
-      "bytes": 25590,
-      "sha256": "d37144326c233b312d4c9f65cde221ed74b607680a8ed4064546ece661c78103"
+      "bytes": 27108,
+      "sha256": "8a9311e67bf97b15b9b0225fc1ce9174eaedd96c667df951e71a15a7385bc5c9"
     }
-  ]
+  ],
+  "contract_source_revision": "305611185e4ac4ff59945b4e4ae30ac1f953c892"
 }

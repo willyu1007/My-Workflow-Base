@@ -53,7 +53,7 @@ owned canonical objects.
 | Data class | Meaning | Owner | Main consumers |
 |---|---|---|---|
 | `canonical_domain_object` | Cross-scenario object with its own schema, lifecycle, version, relation, permission, and evidence trail | Platform/domain registry | Web domain workbench, Admin, resolver |
-| `domain_context_ref` | Workflow-facing stable reference to a domain object or scenario-local MVP record | Workflow contract; object owner remains external | Concrete Workflow API/adapter, chat control, web workbenches, worker runtime |
+| `canonical_ref` | Schema-versioned stable reference to a platform or owner object | Workflow contract; object owner remains external | Concrete Workflow API/adapter, chat control, web workbenches, worker runtime |
 | `context_snapshot` | Frozen safe view of resolved context at run start or step execution time | Workflow ledger, produced through resolver | Run replay, evidence, worker runtime, presenters |
 | `context_binding` | Durable record that a run, step, artifact, approval, or handoff depended on a context ref/snapshot/version | Workflow ledger | Evidence, replay, deletion impact analysis, downstream handoff gates |
 | `run_start_requirements` | Parameters and context refs needed to start one workflow run | Workflow ledger | Chat workflow control, web domain workbench, web run workbench |
@@ -67,14 +67,13 @@ Cross-workflow data sharing happens through domain context refs, context
 snapshots, context bindings, and domain events, not by reading another
 workflow's private run/step state.
 
-`namespace` identifies the canonical owner of the object. It is not the same as
-the consuming scenario. `consumer_scenario_key` is optional context used for
-policy, presentation, and manifest validation when a workflow consumes the
-object.
+`namespace` identifies the canonical owner of the object. Consumer routing,
+authorization snapshots, PII and owner scope are not part of the reference;
+they are supplied and revalidated through the command or resolver context.
 
 ```txt
 canonical_domain_registry
-  -> DomainContextResolver
+  -> CanonicalRefResolver
   -> workflow A records context binding/snapshot
   -> domain event / outbox
   -> workflow B resolves allowed refs through resolver and policy gates
@@ -83,20 +82,12 @@ canonical_domain_registry
 Minimum ref shape:
 
 ```ts
-type DomainContextRef = {
-  // canonical owner namespace, not the consuming scenario
+type CanonicalRef = {
+  schema_version: 1;
   namespace: string;
-  // optional consumer context for policy and presentation
-  consumer_scenario_key?: string;
   object_type: string;
   object_id: string;
   version?: number;
-  owner_scope: "workspace" | "organization" | "platform" | "external";
-  canonical_ref?: {
-    service: string;
-    object_type: string;
-    object_id: string;
-  };
 };
 ```
 
@@ -104,9 +95,9 @@ A concrete workflow must never read the canonical domain registry directly.
 Runtime code calls a resolver contract:
 
 ```ts
-type DomainContextResolver = {
+type CanonicalRefResolver = {
   resolve(input: {
-    refs: DomainContextRef[];
+    refs: CanonicalRef[];
     purpose:
       | "workflow_start"
       | "step_execution"
@@ -116,7 +107,7 @@ type DomainContextResolver = {
     workspace_id: string;
     expected_versions?: Record<string, number>;
   }): Promise<Array<{
-    ref: DomainContextRef;
+    ref: CanonicalRef;
     resolved_version: number;
     snapshot_id: string;
     snapshot_schema_version: number;

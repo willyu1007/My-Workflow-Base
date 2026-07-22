@@ -67,7 +67,7 @@ objects.
 | `WorkflowApproval` | Command API/Postgres | User/admin through confirmation commands | Approval state must not live only in UI or projection. |
 | `ActionAvailability` | API presenter from Postgres policy/state | Not directly edited | UI renders these hints; Command API revalidates before write. |
 | `HandoffContract` | Concrete workflow API plus downstream owner | Source surface starts handoff by canonical refs; downstream owner writes receipt | Template defines request/receipt shape only. Public draft, indexing, notification, and delivery own their gates. |
-| `DomainContextRef` | Workflow contract; canonical object owner remains external | Selected through concrete workflow API/adapter or Web domain workbench after policy checks | Stable pointer to a platform/domain object or scenario-local MVP record. |
+| `CanonicalRef` | Workflow contract; canonical object owner remains external | Selected through concrete workflow API/adapter or Web domain workbench after policy checks | Schema-versioned pointer to a platform/domain object or scenario-local MVP record. |
 | `ContextSnapshot` | Workflow ledger, created through resolver | Created at run start or step execution | Frozen safe view for replay, evidence, and deterministic execution. |
 | `ContextBinding` | Workflow ledger | Created by Workflow API/worker runtime | Records which run, step, artifact, approval, or handoff depended on which context ref/snapshot/version. |
 
@@ -76,24 +76,16 @@ asks the host `DomainContextResolver` to resolve refs into policy-checked
 snapshots:
 
 ```ts
-type DomainContextRef = {
-  // canonical owner namespace, not the consuming scenario
+type CanonicalRef = {
+  schema_version: 1;
   namespace: string;
-  // optional consumer context for policy and presentation
-  consumer_scenario_key?: string;
   object_type: string;
   object_id: string;
   version?: number;
-  owner_scope: "workspace" | "organization" | "platform" | "external";
-  canonical_ref?: {
-    service: string;
-    object_type: string;
-    object_id: string;
-  };
 };
 
 type ResolvedDomainContext = {
-  ref: DomainContextRef;
+  ref: CanonicalRef;
   resolved_version: number;
   snapshot_id: string;
   snapshot_schema_version: number;

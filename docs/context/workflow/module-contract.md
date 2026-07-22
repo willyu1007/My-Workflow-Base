@@ -123,25 +123,17 @@ export type WorkflowStepType =
   | "approval_gate"
   | "emit_event";
 
-export type DomainContextRef = {
-  // canonical owner namespace, not the consuming scenario
+export type CanonicalRef = {
+  schema_version: 1;
   namespace: string;
-  // optional consumer context for policy and presentation
-  consumer_scenario_key?: string;
   object_type: string;
   object_id: string;
   version?: number;
-  owner_scope: "workspace" | "organization" | "platform" | "external";
-  canonical_ref?: {
-    service: string;
-    object_type: string;
-    object_id: string;
-  };
 };
 
-export type DomainContextResolver = {
+export type CanonicalRefResolver = {
   resolve(input: {
-    refs: DomainContextRef[];
+    refs: CanonicalRef[];
     purpose:
       | "workflow_start"
       | "step_execution"
@@ -151,7 +143,7 @@ export type DomainContextResolver = {
     workspace_id: string;
     expected_versions?: Record<string, number>;
   }): Promise<Array<{
-    ref: DomainContextRef;
+    ref: CanonicalRef;
     resolved_version: number;
     snapshot_id: string;
     snapshot_schema_version: number;
@@ -486,19 +478,10 @@ keep the scenario-module scaffold self-contained.
 import type { WorkflowRuntimePort } from "@workflow/contracts/api";
 
 export type CanonicalRef = {
-  kind:
-    | "scenario"
-    | "capability"
-    | "workflow_version"
-    | "workflow_run"
-    | "workflow_step"
-    | "workflow_artifact"
-    | "workflow_approval"
-    | "workflow_handoff"
-    | "domain_context_ref"
-    | "context_snapshot"
-    | "downstream_object";
-  id: string;
+  schema_version: 1;
+  namespace: string;
+  object_type: string;
+  object_id: string;
   version?: number;
 };
 
@@ -670,7 +653,7 @@ export type ScenarioHandoffRequestSnapshot = {
   requestId: string;
   handoffKey: string;
   requestedPurpose: string;
-  sourceContextRefs?: DomainContextRef[];
+  sourceContextRefs?: CanonicalRef[];
   sourceArtifactRefs?: CanonicalRef[];
   expiresAt?: string;
 };
@@ -679,14 +662,14 @@ export type WorkflowHandoffDraft = {
   draft_key: string;
   handoff_key: string;
   requested_purpose: string;
-  source_context_refs?: DomainContextRef[];
+  source_context_refs?: CanonicalRef[];
   source_refs?: CanonicalRef[];
   expected_versions?: Record<string, number>;
   expires_at?: string;
 };
 
 export type ScenarioCommandDriverContext = {
-  driverRef: DomainContextRef;
+  driverRef: CanonicalRef;
   contractHash: string;
   capabilityKey: string;
   entrypointKey: string;
@@ -702,7 +685,7 @@ export type WorkflowHandoffLifecycleStatusV1 =
 
 export type MaterializedHandoff = {
   draft_key: string;
-  handoff_ref: CanonicalRef & { kind: "workflow_handoff" };
+  handoff_ref: CanonicalRef & { namespace: "my_chat"; object_type: "workflow_handoff" };
   disposition: "created" | "existing";
 };
 
@@ -736,7 +719,7 @@ export type WorkflowCitationPackage = {
 };
 
 export type WorkflowDomainWorkbench = {
-  context_refs: DomainContextRef[];
+  context_refs: CanonicalRef[];
   action_availability: WorkflowActionAvailability[];
 };
 
