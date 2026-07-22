@@ -264,3 +264,25 @@ joint release qualification remain separate gates.
   contract/validator file is present at that revision; a merely well-shaped
   but nonexistent revision is rejected.
 - No package publication, database migration, traffic or activation occurred.
+
+## 2026-07-22 CF-010/CF-011 closure
+
+- Added a standalone Starter generator and an independent scenario package
+  with its own Prisma 6.19 client, migration, TypeScript/Vitest toolchain and
+  PostgreSQL-backed CI journey.
+- Implemented `PrismaExampleScenarioRepositories` so one short owner-local
+  transaction writes the domain record, complete command envelope,
+  `ScenarioCommandExecution` and bodyless `OwnerIntegrationOutbox`. Added an
+  idempotent owner inbox with receive/process recovery state.
+- Expanded the migration with explicit refs-only event identity and database
+  constraints for namespaces, CanonicalRef documents and ref arrays.
+- Split the Base `contract_owner` descriptor from the Starter
+  `scenario_owner` descriptor. Added a closed descriptor v1 schema, complete
+  normative contract inventory and role-aware semantic rules for manifests,
+  aliases, producer namespaces and owner outboxes.
+- Made the semantic/integration/ref CLIs executable through package-bin
+  symlinks and import-safe from stdin/eval entrypoints. Conformance now ships
+  without requiring the Host SDK as a runtime dependency.
+- Frozen source revision:
+  `4fdfffa76dbd766bf21449cb7a84122b5454535f`. No package was published and no
+  product/runtime activation was enabled.

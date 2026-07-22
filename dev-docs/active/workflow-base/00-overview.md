@@ -34,16 +34,16 @@ consumption surfaces
 - Created: 2026-05-25
 - Updated: 2026-07-22
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
-- Candidate increment: fail-closed v2 release admission and closed Host
-  activation semantics, layered on the quality-remediated federated contract,
-  Starter, semantic lint and integration-lock v3 verification
+- Candidate increment: persistence-complete generated Starter and role-aware
+  federation descriptors, layered on fail-closed v2 release admission,
+  semantic lint and integration-lock v3 verification
 - Frozen source revision:
-  `c3b422ff43056512499f116927b31852446c4bb4`
+  `4fdfffa76dbd766bf21449cb7a84122b5454535f`
 - Historical candidate clean qualification revision:
   `92c22ee82ada08ce713519eec4c7f9c7c9ffe12e`
-- Next gate: complete the CanonicalRef new-write migration, then close
-  event-ownership, role-aware descriptor and persistence-complete Starter
-  findings before publishing exact artifacts or running joint qualification
+- Next gate: consume the final CF-013 Host consumer cutover, then run exact
+  joint-candidate qualification before publishing any artifact. Activation
+  remains outside this task.
 
 ## Federation v1 checkpoint
 

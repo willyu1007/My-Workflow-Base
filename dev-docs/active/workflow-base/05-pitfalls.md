@@ -120,3 +120,30 @@
 - Fix: build each descriptor's manifest package before running semantic lint.
 - Prevention: qualification order is frozen install, package build, then
   import-based semantic lint; source typecheck alone is insufficient.
+
+### 2026-07-22 — Generated SQL kept the example event namespace
+
+- Symptom: a generated third scenario still contained the `example.` event
+  namespace inside the migration constraint.
+- Root cause: the generator replacement pattern treated the escaped dot as a
+  string escape and did not match the literal SQL token.
+- What we tried: TypeScript replacement and unit tests passed because the stale
+  value existed only in SQL.
+- Fix: replace the exact beginning-of-token `example.` form in generated SQL
+  and inspect the migrated package, not only source files.
+- Prevention: generator qualification must scan every packaged artifact and
+  run the real migration from an empty database.
+
+### 2026-07-22 — Package-bin CLIs silently skipped their main function
+
+- Symptom: the generated scenario's semantic-lint command exited successfully
+  without printing a report when invoked through the installed npm bin link.
+- Root cause: the CLI compared `import.meta.url` with the symlink path, so the
+  main-module guard evaluated false.
+- What we tried: direct `node scripts/semantic-lint.mjs` execution passed and
+  therefore did not exercise installed-package behavior.
+- Fix: resolve both entrypoint and module through `realpathSync`, guard missing
+  or non-file `argv[1]`, and add symlink plus stdin/eval regression tests for
+  all three CLIs.
+- Prevention: conformance must invoke public binaries through a package-bin
+  symlink and assert their output, not only their exit code.

@@ -448,6 +448,32 @@ Passed:
 - Built Base, Education and Nurture manifest modules followed by real
   four-repository semantic lint: `passed: true`, zero findings.
 
-The remaining Base blockers are the complete CF-001 new-write migration,
-CF-008 owner-versus-Host event vocabulary, CF-010 persisted Starter and CF-011
-role-aware descriptor schema. No published artifact or activation is claimed.
+At that checkpoint CF-001, CF-008, CF-010 and CF-011 were still open. The later
+verification below supersedes that blocker list. No published artifact or
+activation is claimed.
+
+## 2026-07-22 CF-010/CF-011 verification
+
+Passed:
+
+- `pnpm verify:workflow-contracts`: runtime 28/28, Starter unit 10/10,
+  federation/descriptor schemas, semantic fixtures, source-lock checks and six
+  package-bin/import/lock tests.
+- Starter real PostgreSQL suite: 4/4 for atomic Execution/outbox/replay,
+  transaction rollback, stale-version/wrong-Step denial and bodyless owner
+  inbox dedupe/process. The applied migration had an empty Prisma diff.
+- Empty-directory third-scenario generation followed by standalone install,
+  fresh migration, typecheck, 10 unit tests, 4 database tests, build, actual
+  package-bin semantic lint and package dry-run.
+- Starter package dry-run: 56 entries, including descriptor and migration,
+  with no build cache. Conformance package dry-run: 20 entries, including the
+  descriptor schema and generator. No tarball was published.
+- Actual role-aware semantic lint across Base, My-Chat, Starter, Education and
+  Nurture returned `passed: true` with zero findings.
+- All disposable Starter/generated databases were dropped; absence was
+  confirmed and the existing development database was not changed.
+- `git diff --check`.
+
+Source revision is `4fdfffa76dbd766bf21449cb7a84122b5454535f`.
+Exact joint-candidate qualification and publication remain open; no production
+runtime, traffic or activation was created.

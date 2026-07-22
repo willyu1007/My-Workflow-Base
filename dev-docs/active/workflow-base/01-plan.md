@@ -156,3 +156,23 @@ record the matching source hash, and keep the host capability absent/disabled.
       stale generated contract.
 - [ ] Publish exact Base/Host candidates and run joint-candidate qualification
       with Education, Nurture and a generated third scenario.
+
+## 2026-07-22 CF-010/CF-011 closure increment
+
+- [x] Add a concrete Starter Prisma repository that commits the domain fact,
+      command execution and bodyless owner outbox in one short transaction.
+- [x] Persist the full refs-only event identity and add an idempotent owner
+      inbox with recovery state.
+- [x] Add a real PostgreSQL migration and deterministic fresh/migrated Starter
+      journey; keep unit tests independent from a database.
+- [x] Split the Base contract-owner descriptor from the generated Starter
+      scenario descriptor.
+- [x] Make descriptor validation role-aware and fail when the contract owner
+      omits a normative contract object or Host/contract descriptors pretend to
+      be registrable scenarios.
+- [x] Update My-Chat to a manifest-free `platform_host` descriptor and pass the
+      common lint with Base, Starter, Education and Nurture.
+
+Exit: an empty generated scenario can migrate, execute, replay, receive an
+event and package without Host special cases; descriptor roles cannot hide a
+second scenario or incomplete contract inventory.
