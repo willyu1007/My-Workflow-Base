@@ -10,6 +10,7 @@
 | 2026-07-23 | Report only owner-observed execution lifecycle; never attest scenario lifecycle credit. |
 | 2026-07-23 | Treat a host recovery grant as policy input and require a higher-fence owner reconciliation claim for post-reservation mutation. |
 | 2026-07-23 | Preserve the existing aggregate source-lock mechanism and use a contract commit followed by a lock/evidence commit. |
+| 2026-07-23 | Publish BC0-C from contract revision `ee7e09b8226a8660f46ec277650c7a6e5ee461e0`; BC0-D binds that revision, aggregate source hash, and canonical-vector file hash without self-reference. |
 
 ## Entry Evidence
 

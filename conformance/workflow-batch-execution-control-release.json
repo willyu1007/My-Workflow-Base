@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "capability_family": "workflow_batch_execution_control_v1",
+  "capability_version": 1,
+  "contract_source_revision": "ee7e09b8226a8660f46ec277650c7a6e5ee461e0",
+  "contract_source_hash": "136bea7a395a18e7c6aa8c3f4d73b475b36f5e0ec5f439fe049df6d345a03ab8",
+  "source_lock_path": "conformance/workflow-contract-source-lock.json",
+  "canonicalization_profile": "rfc8785_jcs_sha256_v1",
+  "vector_file": "conformance/vectors/batch-execution-control-v1.json",
+  "vector_release_hash": "66203a78059467b507083a316c91939c88c9af59d9e09b259d1f7cc5779c2c27"
+}

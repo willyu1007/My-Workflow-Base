@@ -35,19 +35,19 @@
 
 - [x] Add `docs/context/workflow/batch-execution-control-contract.md` with the locked
       method/state/invariant/readback tables.
-- [ ] Create the contract-bearing commit after focused conformance passes.
-- [ ] Regenerate and verify the aggregate source lock using that commit revision.
-- [ ] Add `conformance/workflow-batch-execution-control-release.json` binding the aggregate source hash and
+- [x] Create the contract-bearing commit after focused conformance passes.
+- [x] Regenerate and verify the aggregate source lock using that commit revision.
+- [x] Add `conformance/workflow-batch-execution-control-release.json` binding the aggregate source hash and
       the SHA-256 of canonicalization golden vectors; the BC0-D evidence commit pins this manifest rather
       than creating a second source-hash authority.
-- [ ] Add the exact My-Chat BC1 copy map and disabled-capability handoff.
+- [x] Add the exact My-Chat BC1 copy map and disabled-capability handoff.
 
 ## Phase 4 · Full Verification
 
-- [ ] Run frozen install and `pnpm verify:workflow-contracts`.
-- [ ] Run clean-copy conformance without relying on an existing `node_modules`.
-- [ ] Run Markdown links/fences, JSON/YAML parse, boundary scans, and `git diff --check`.
-- [ ] Obtain independent architecture/security/conformance review.
+- [x] Run frozen install and `pnpm verify:workflow-contracts`.
+- [x] Run clean-copy conformance without relying on an existing `node_modules`.
+- [x] Run Markdown links/fences, JSON/YAML parse, boundary scans, and `git diff --check`.
+- [x] Obtain independent architecture/security/conformance review.
 
 ## Stop Conditions
 

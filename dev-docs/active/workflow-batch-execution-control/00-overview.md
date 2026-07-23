@@ -2,13 +2,14 @@
 
 ## Status
 
-- State: in-progress
+- State: complete
 - Owner: unassigned
 - Created: 2026-07-23
 - Updated: 2026-07-23
-- Completed increments: BC0-A contract/threat-model lock; BC0-B additive contract and conformance
-- Current increment: BC0-C final review and contract-bearing commit
-- Next gate: publish the source lock/release evidence from the exact BC0-C commit
+- Completed increments: BC0-A contract/threat-model lock; BC0-B additive contract and conformance;
+  BC0-C reviewed contract-bearing revision; BC0-D source-lock/release evidence and BC1 handoff
+- Current increment: complete
+- Next gate: My-Chat BC1 exact adoption with the capability absent/disabled
 
 ## Goal
 
@@ -83,9 +84,9 @@ the canonical ledger; scenarios adapt their own work semantics through refs and 
 - [x] Readback is bounded/paginated and reconstructable without embedding unbounded history or registries.
 - [x] Opaque receipts are non-bearer and exact-resolvable; secrets and secret-derived hashes are excluded.
 - [x] Positive and negative compile fixtures plus scenario/secret boundary checks pass.
-- [ ] A contract-bearing commit is followed by a source-lock evidence commit that pins it without
+- [x] A contract-bearing commit is followed by a source-lock evidence commit that pins it without
       self-reference.
-- [ ] My-Chat receives an exact adoption map and keeps the capability disabled until its own gates pass.
+- [x] My-Chat receives an exact adoption map and keeps the capability disabled until its own gates pass.
 
 ## Contract Lock
 
@@ -103,3 +104,4 @@ finding.
 - [Verification](./04-verification.md)
 - [Pitfalls](./05-pitfalls.md)
 - [Contract lock](./06-contract-lock.md)
+- [My-Chat BC1 adoption handoff](./07-my-chat-adoption.md)

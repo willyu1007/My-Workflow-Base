@@ -56,6 +56,12 @@ Additionally verify:
   `136bea7a395a18e7c6aa8c3f4d73b475b36f5e0ec5f439fe049df6d345a03ab8`; canonical-vector file SHA-256 is
   `66203a78059467b507083a316c91939c88c9af59d9e09b259d1f7cc5779c2c27`.
 - 2026-07-23: `git diff --check` passed.
-- 2026-07-23: `check:workflow-contract-source` remains intentionally red against the prior source lock
-  until the reviewed contract-bearing commit exists; portability is independently green against current
-  physical roots, supported aliases, BOM, and LF/CRLF variants.
+- 2026-07-23: contract-bearing revision
+  `ee7e09b8226a8660f46ec277650c7a6e5ee461e0` was created only after the dual final approval.
+- 2026-07-23: the aggregate source lock was regenerated from that exact revision and
+  `corepack pnpm verify:workflow-contracts` passed with source hash
+  `136bea7a395a18e7c6aa8c3f4d73b475b36f5e0ec5f439fe049df6d345a03ab8`.
+- 2026-07-23: the BC0 release checker exact-matched the source lock and the canonical-vector file hash
+  `66203a78059467b507083a316c91939c88c9af59d9e09b259d1f7cc5779c2c27`.
+- 2026-07-23: a clean temporary copy with no existing `node_modules` passed frozen install,
+  `verify:workflow-contracts`, batch boundary/vector/release conformance, and source-lock verification.

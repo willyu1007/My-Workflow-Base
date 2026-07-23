@@ -6,7 +6,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "node scripts/check-claim-token-boundary.mjs && node scripts/check-contract-source-hash-portability.mjs && pnpm check:batch-execution-control",
-    "check:batch-execution-control": "node scripts/check-batch-execution-control-scenario-boundary.mjs && node scripts/check-batch-execution-control-secret-boundary.mjs && node scripts/check-batch-execution-control-canonicalization-vectors.mjs"
+    "check:batch-execution-control": "node scripts/check-batch-execution-control-scenario-boundary.mjs && node scripts/check-batch-execution-control-secret-boundary.mjs && node scripts/check-batch-execution-control-canonicalization-vectors.mjs && node scripts/check-batch-execution-control-release.mjs"
   },
   "dependencies": {
     "@host/workflow-contracts": "workspace:*"
