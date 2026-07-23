@@ -41,4 +41,5 @@ jobs:
       - run: pnpm test:db
       - run: pnpm build
       - run: pnpm semantic-lint
+      - run: pnpm verify:integration-lock
       - run: npm pack --dry-run --json

@@ -56,13 +56,14 @@ Shared product surfaces use concrete workflow surface adapters or
 `/api/workflow/*`-equivalent routes. Chat connects to a concrete workflow's
 standard chat adapter, not to this template repository.
 
-### 3. Contract artifact plus TS handler registry
-YAML is the default declarative module contract. A concrete workflow may use an
-equivalent TypeScript contract constant when YAML adds no runtime value.
-TypeScript registries are the executable binding.
+### 3. One contract artifact plus TS handler registry
+A concrete workflow may publish either a YAML contract or an equivalent
+TypeScript contract constant. It MUST designate exactly one as canonical and
+MUST NOT maintain independently authored YAML and TypeScript manifests for the
+same release. TypeScript registries are the executable binding.
 
 The host loads:
-- `scenario.manifest.yaml`
+- the scenario's designated canonical contract artifact
 - `handlerRegistry`
 - `actionRegistry`
 - `presenters`

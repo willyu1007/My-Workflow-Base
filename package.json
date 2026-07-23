@@ -20,7 +20,7 @@
     "hash:workflow-contract-source": "node conformance/scripts/compute-workflow-contract-source-hash.mjs",
     "check:workflow-contract-source": "node conformance/scripts/compute-workflow-contract-source-hash.mjs --check conformance/workflow-contract-source-lock.json",
     "semantic-lint": "node conformance/scripts/semantic-lint.mjs",
-    "lint:canonical-refs": "node conformance/scripts/canonical-ref-lint.mjs templates/host-runtime/packages/workflow-contracts/src templates/host-runtime/packages/workflow-runtime/src templates/scenario-module/src templates/scenario-module/scenario.manifest.yaml",
+    "lint:canonical-refs": "node conformance/scripts/canonical-ref-lint.mjs templates/host-runtime/packages/workflow-contracts/src templates/host-runtime/packages/workflow-runtime/src templates/scenario-module/src",
     "verify:integration-lock": "node conformance/scripts/verify-integration-lock.mjs",
     "generate:scenario": "node conformance/scripts/generate-scenario-starter.mjs",
     "verify:workflow-contracts": "pnpm typecheck && pnpm lint:canonical-refs && pnpm test && pnpm check:workflow-contract-source",

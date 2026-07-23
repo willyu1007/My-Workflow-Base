@@ -16,10 +16,13 @@ const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "../..");
 const templateRoot = resolve(repositoryRoot, "templates/scenario-module");
 
+const cliArguments = process.argv.slice(2);
+if (cliArguments[0] === "--") cliArguments.shift();
+
 const args = new Map();
-for (let index = 2; index < process.argv.length; index += 2) {
-  const key = process.argv[index];
-  const value = process.argv[index + 1];
+for (let index = 0; index < cliArguments.length; index += 2) {
+  const key = cliArguments[index];
+  const value = cliArguments[index + 1];
   if (!key?.startsWith("--") || !value) {
     throw new Error(
       "usage: generate-scenario-starter.mjs --target <empty-dir> --scenario-key <key> --package-name <name> [--host-sdk-spec <spec>] [--conformance-spec <spec>]",

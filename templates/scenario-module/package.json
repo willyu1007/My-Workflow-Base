@@ -14,7 +14,6 @@
   },
   "files": [
     "dist",
-    "scenario.manifest.yaml",
     "federation-descriptor.json",
     "prisma",
     "integration-lock.example.json"

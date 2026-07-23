@@ -72,9 +72,10 @@ packages/workflow-runtime/
     outbox-dispatcher.ts
 
 scenarios/<scenario_key>/
-  scenario.manifest.yaml
+  registry.ts              # canonical manifest, or generated from one declarative SSOT
   module.ts
-  registry.ts
+  handler-registry.ts
+  action-registry.ts
   handlers/
   actions/
   adapters/

@@ -150,6 +150,16 @@ async function verifyRevision(name, pin, jointCandidate, lockRoot) {
         const head = gitText(repository, ["rev-parse", "HEAD"]);
         const revision = gitText(repository, ["rev-parse", pin.revision]);
         if (head !== revision) fail(`${name}: joint qualification requires checkout HEAD ${head} to equal ${revision}`);
+        const dirtyLogicalSources = gitText(repository, [
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=all",
+          "--",
+          ...pin.logical_paths.map(assertLogicalPath),
+        ]);
+        if (dirtyLogicalSources.length > 0) {
+          fail(`${name}: joint qualification requires clean logical sources; found ${dirtyLogicalSources.replaceAll("\n", "; ")}`);
+        }
       }
     } else if (pin.source === "package") {
       if (!pin.package || !pin.version || !pin.artifact_path) throw new Error("package pins require package, version, and artifact_path");

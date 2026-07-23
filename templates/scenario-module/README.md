@@ -17,15 +17,19 @@ pnpm install
 The generated package consumes the versioned My-Chat Host SDK and Base
 conformance CLI. Its CI starts an isolated PostgreSQL service, applies the
 owner-local migration, runs unit and database journeys, validates the
-role-aware descriptor, builds and performs a package dry-run. Replace the
-integration-lock placeholders with exact revisions and hashes before release.
+role-aware descriptor, verifies the integration lock, builds and performs a
+package dry-run. Replace the integration-lock placeholders with exact revisions
+and hashes before enabling CI; placeholder locks intentionally fail closed.
 Commit the generated `pnpm-lock.yaml` before enabling the frozen-lockfile CI
 gate.
 
 ## Required contract fields
 
-The default artifact is `scenario.manifest.yaml`. A concrete workflow may use an
-equivalent TypeScript contract constant if it preserves the same fields.
+This Starter uses `src/registry.ts` as its only manifest authority. The built
+`dist/registry.js` is the published executable manifest loaded by the federation
+descriptor. Do not add a separately authored YAML/JSON manifest; a second format
+is allowed only when it is generated from this TypeScript source and checked for
+exact structural parity in CI.
 
 - `manifest_version`
 - `scenario_key`
@@ -164,7 +168,7 @@ client, or worker-dispatch contracts.
 A concrete scenario should provide these module files in the host project:
 
 ```txt
-scenario.manifest.yaml
+src/registry.ts
 src/<scenario>/module.ts
 src/<scenario>/repositories.ts
 src/<scenario>/registry.ts
@@ -176,7 +180,7 @@ src/<scenario>/policies.ts
 src/<scenario>/tests/<scenario>.journey.test.ts
 ```
 
-The manifest or equivalent TS constant declares the public contract. `module.ts`
+The manifest TypeScript constant declares the public contract. `module.ts`
 wires repositories, handlers, presenters, adapters, and policies into the
 concrete workflow implementation.
 

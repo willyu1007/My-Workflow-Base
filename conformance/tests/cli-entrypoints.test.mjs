@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdtemp, rm, symlink } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { after, before, test } from "node:test";
@@ -59,6 +59,32 @@ test("canonical-ref lint executes through a package-bin symlink", async () => {
     { encoding: "utf8" },
   );
   assert.equal(JSON.parse(output).passed, true);
+});
+
+test("scenario generator accepts the package-manager argument separator", async () => {
+  const target = resolve(temporaryRoot, "generated-scenario");
+  const output = execFileSync(
+    process.execPath,
+    [
+      resolve(conformanceRoot, "scripts/generate-scenario-starter.mjs"),
+      "--",
+      "--target",
+      target,
+      "--scenario-key",
+      "qualification-scenario",
+      "--package-name",
+      "@morethan/qualification-scenario",
+    ],
+    { encoding: "utf8" },
+  );
+
+  assert.equal(JSON.parse(output).scenario_key, "qualification-scenario");
+  assert.ok((await readdir(target)).includes("federation-descriptor.json"));
+  assert.ok(!(await readdir(target)).includes("scenario.manifest.yaml"));
+  assert.match(
+    await readFile(resolve(target, "src/registry.ts"), "utf8"),
+    /scenario_key: "qualification-scenario"/u,
+  );
 });
 
 test("CLI modules remain importable from stdin and eval entrypoints", () => {

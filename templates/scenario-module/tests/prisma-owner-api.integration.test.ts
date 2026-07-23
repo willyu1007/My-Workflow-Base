@@ -178,6 +178,39 @@ integration("Starter Prisma owner journey", () => {
     );
   });
 
+  it("allows only one concurrent create for the same expected absent version", async () => {
+    const outcomes = await Promise.allSettled([
+      api.execute(command("command-create-a", "step-create-a", 0)),
+      api.execute(command("command-create-b", "step-create-b", 0)),
+    ]);
+
+    expect(outcomes.filter((outcome) => outcome.status === "fulfilled")).toHaveLength(1);
+    expect(outcomes.filter((outcome) => outcome.status === "rejected")).toMatchObject([
+      { reason: { message: "expected_version_conflict" } },
+    ]);
+    await expect(prisma.exampleRecord.count()).resolves.toBe(1);
+    await expect(prisma.scenarioCommandExecution.count()).resolves.toBe(1);
+    await expect(prisma.ownerIntegrationOutbox.count()).resolves.toBe(1);
+  });
+
+  it("allows only one concurrent update for the same expected version", async () => {
+    await api.execute(command("command-seed", "step-seed", 0));
+    const outcomes = await Promise.allSettled([
+      api.execute(command("command-update-a", "step-update-a", 1)),
+      api.execute(command("command-update-b", "step-update-b", 1)),
+    ]);
+
+    expect(outcomes.filter((outcome) => outcome.status === "fulfilled")).toHaveLength(1);
+    expect(outcomes.filter((outcome) => outcome.status === "rejected")).toMatchObject([
+      { reason: { message: "expected_version_conflict" } },
+    ]);
+    await expect(
+      prisma.exampleRecord.findUniqueOrThrow({ where: { id: "record-1" } }),
+    ).resolves.toMatchObject({ version: 2 });
+    await expect(prisma.scenarioCommandExecution.count()).resolves.toBe(2);
+    await expect(prisma.ownerIntegrationOutbox.count()).resolves.toBe(2);
+  });
+
   it("deduplicates and completes a bodyless Host event inbox record", async () => {
     const inbox = new PrismaOwnerIntegrationInbox(prisma);
     const event = hostEvent();
@@ -195,6 +228,21 @@ integration("Starter Prisma owner journey", () => {
     });
     expect(stored.processedAt).not.toBeNull();
     expect(stored.failureCode).toBeNull();
+    await expect(prisma.ownerIntegrationInbox.count()).resolves.toBe(1);
+  });
+
+  it("rejects reuse of a Host event id by a different valid identity", async () => {
+    const inbox = new PrismaOwnerIntegrationInbox(prisma);
+    const event = hostEvent();
+    const ownerTarget = ref("example", "record", "record-1");
+    await inbox.receive(event, ownerTarget);
+
+    await expect(
+      inbox.receive({ ...event, event_type: "workflow.step.failed" }, ownerTarget),
+    ).rejects.toThrow("event_identity_conflict");
+    await expect(
+      inbox.receive(event, ref("example", "record", "record-2")),
+    ).rejects.toThrow("event_identity_conflict");
     await expect(prisma.ownerIntegrationInbox.count()).resolves.toBe(1);
   });
 });
