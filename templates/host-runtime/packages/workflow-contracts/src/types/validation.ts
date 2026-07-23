@@ -1,6 +1,9 @@
 import type { WorkflowActivationTarget } from "./identity.js";
 
-export const workflowHostCapabilities = ["workflow_handoff_materialization_v1"] as const;
+export const workflowHostCapabilities = [
+  "workflow_handoff_materialization_v1",
+  "workflow_batch_execution_control_v1",
+] as const;
 
 export type WorkflowHostCapability = (typeof workflowHostCapabilities)[number];
 

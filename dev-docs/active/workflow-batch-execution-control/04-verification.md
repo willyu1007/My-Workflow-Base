@@ -40,3 +40,22 @@ Additionally verify:
   `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.
 - 2026-07-23: Markdown fence/file checks and `git diff --check` passed for the BC0 task package.
 - 2026-07-23: Final independent contract-lock review returned `APPROVE BC0-B` with no residual P0/P1.
+- 2026-07-23: BC0-B implementation review initially rejected prototype-key handling, cross-field
+  snapshot/event invariants, operation-specific fixed-head reads, resolver verification, and placeholder
+  wire fixtures. Each finding was reproduced, repaired, and covered by a focused negative test.
+- 2026-07-23: `corepack pnpm typecheck` passed all four package typechecks.
+- 2026-07-23: final BC0-C `corepack pnpm typecheck`, `corepack pnpm test`, and
+  `corepack pnpm check:workflow-batch-execution-control` passed: runtime 55/55, scenario 1/1,
+  portability, claim-token, scenario/secret boundaries, three golden vectors, three executed
+  self-reference rejections, and 30 positive runtime DTOs.
+- 2026-07-23: the fixed final tree passed focused no-op/jump/fact-drift, prior fixed-head transition,
+  committed-outcome visibility, opaque resolver/readback pairing, and positive-fence coverage.
+- 2026-07-23: two independent final reviews returned `APPROVE` with no residual P0/P1 after separately
+  checking recovery/event transitions, opaque readback, source neutrality, and the full conformance gate.
+- 2026-07-23: current reviewed aggregate source hash is
+  `136bea7a395a18e7c6aa8c3f4d73b475b36f5e0ec5f439fe049df6d345a03ab8`; canonical-vector file SHA-256 is
+  `66203a78059467b507083a316c91939c88c9af59d9e09b259d1f7cc5779c2c27`.
+- 2026-07-23: `git diff --check` passed.
+- 2026-07-23: `check:workflow-contract-source` remains intentionally red against the prior source lock
+  until the reviewed contract-bearing commit exists; portability is independently green against current
+  physical roots, supported aliases, BOM, and LF/CRLF variants.

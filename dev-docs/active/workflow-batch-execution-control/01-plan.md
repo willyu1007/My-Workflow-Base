@@ -9,31 +9,31 @@
 
 ## Phase 1 · Types And Port
 
-- [ ] Add `templates/host-runtime/packages/workflow-contracts/src/types/batch-execution-control.ts` and
+- [x] Add `templates/host-runtime/packages/workflow-contracts/src/types/batch-execution-control.ts` and
       export it from the contract package.
-- [ ] Define capability, authority/deployment pin, request meta, batch/global CAS, claim/lease, capacity,
+- [x] Define capability, authority/deployment pin, request meta, batch/global CAS, claim/lease, capacity,
       identity reservation, seal, client commit, dispatch, completion, recovery, event, receipt, and page
       types.
-- [ ] Define independent command, read, and opaque receipt resolver ports.
-- [ ] Add `workflow_batch_execution_control_v1` to `workflowHostCapabilities`; absence remains disabled and
+- [x] Define independent command, read, and opaque receipt resolver ports.
+- [x] Add `workflow_batch_execution_control_v1` to `workflowHostCapabilities`; absence remains disabled and
       no manifest or legacy validator rule changes.
-- [ ] Do not attach the ports to existing scenario adapters or runtime ports.
+- [x] Do not attach the ports to existing scenario adapters or runtime ports.
 
 ## Phase 2 · Conformance
 
-- [ ] Add positive compile fixtures for forward, readback, recovery, and later-generation flows.
-- [ ] Add negative compile fixtures for missing pins, invalid discriminators, caller-owned IDs, authority
+- [x] Add positive compile fixtures for forward, readback, recovery, and later-generation flows.
+- [x] Add negative compile fixtures for missing pins, invalid discriminators, caller-owned IDs, authority
       substitution, and scenario/secret field leakage.
-- [ ] Add source scans for forbidden scenario and secret vocabulary.
-- [ ] Add a strict reference decoder in
+- [x] Add source scans for forbidden scenario and secret vocabulary.
+- [x] Add a strict reference decoder in
       `templates/host-runtime/packages/workflow-runtime/src/validation/validate-batch-execution-control.ts`
       with focused runtime tests for unknown keys/discriminators, nulls, malformed cursors/receipts, and
       size/count/depth limits.
-- [ ] Keep the frozen legacy contract hash and existing X0 fixture behavior unchanged.
+- [x] Keep the frozen legacy contract hash and existing X0 fixture behavior unchanged.
 
 ## Phase 3 · Documentation And Handoff
 
-- [ ] Add `docs/context/workflow/batch-execution-control-contract.md` with the locked
+- [x] Add `docs/context/workflow/batch-execution-control-contract.md` with the locked
       method/state/invariant/readback tables.
 - [ ] Create the contract-bearing commit after focused conformance passes.
 - [ ] Regenerate and verify the aggregate source lock using that commit revision.

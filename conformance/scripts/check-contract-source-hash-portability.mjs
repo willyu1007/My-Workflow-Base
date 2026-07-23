@@ -52,16 +52,22 @@ try {
     { recursive: true },
   );
 
-  const validatorFile = join(validatorRoot, "validate-module.ts");
-  const baseSource = readFileSync(validatorFile, "utf8");
-  const myChatSource = baseSource.replace(
-    '"@host/workflow-contracts"',
-    '"@my-chat/workflow-contracts"',
-  );
-  if (myChatSource === baseSource) {
-    throw new Error("validator fixture no longer contains the expected @host import alias");
+  const validatorFiles = typescriptSourceFiles(validatorRoot);
+  let supportedAliasReplacements = 0;
+  for (const validatorFile of validatorFiles) {
+    const hostSource = readFileSync(validatorFile, "utf8");
+    const myChatSource = hostSource.replaceAll(
+      '"@host/workflow-contracts"',
+      '"@my-chat/workflow-contracts"',
+    );
+    if (myChatSource !== hostSource) {
+      supportedAliasReplacements += 1;
+      writeFileSync(validatorFile, myChatSource, "utf8");
+    }
   }
-  writeFileSync(validatorFile, myChatSource, "utf8");
+  if (supportedAliasReplacements === 0) {
+    throw new Error("validator sources no longer contain the expected @host import alias");
+  }
 
   for (const sourceFile of [
     ...typescriptSourceFiles(contractsRoot),
@@ -71,22 +77,30 @@ try {
   }
 
   const actual = computeManifest(contractsRoot, validatorRoot);
-  const expected = JSON.parse(
-    readFileSync(join(repositoryRoot, "conformance/workflow-contract-source-lock.json"), "utf8"),
+  const expected = computeManifest(
+    join(repositoryRoot, "templates/host-runtime/packages/workflow-contracts/src"),
+    join(repositoryRoot, "templates/host-runtime/packages/workflow-runtime/src/validation"),
   );
 
   if (actual.source_hash !== expected.source_hash || JSON.stringify(actual.files) !== JSON.stringify(expected.files)) {
     throw new Error("workflow contract source hash is not portable across host paths/import aliases");
   }
 
-  const unexpectedAliasSource = myChatSource.replace(
-    '"@my-chat/workflow-contracts"',
-    '"@unexpected/workflow-contracts"',
-  );
-  if (unexpectedAliasSource === myChatSource) {
-    throw new Error("validator fixture no longer contains the expected @my-chat import alias");
+  let unexpectedAliasReplacements = 0;
+  for (const validatorFile of validatorFiles) {
+    const myChatSource = readFileSync(validatorFile, "utf8");
+    const unexpectedAliasSource = myChatSource.replaceAll(
+      '"@my-chat/workflow-contracts"',
+      '"@unexpected/workflow-contracts"',
+    );
+    if (unexpectedAliasSource !== myChatSource) {
+      unexpectedAliasReplacements += 1;
+      writeFileSync(validatorFile, unexpectedAliasSource, "utf8");
+    }
   }
-  writeFileSync(validatorFile, unexpectedAliasSource, "utf8");
+  if (unexpectedAliasReplacements === 0) {
+    throw new Error("validator sources no longer contain the expected @my-chat import alias");
+  }
   const unexpectedAliasManifest = computeManifest(contractsRoot, validatorRoot);
   if (unexpectedAliasManifest.source_hash === expected.source_hash) {
     throw new Error("an unexpected workflow-contracts import alias did not change the source hash");

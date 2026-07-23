@@ -56,6 +56,11 @@ dispatched-recovery branch has nested closed effect and completion-status discri
 snapshots retain all previously created owner identities, reservation/seal/dispatch/completion roots, and
 tombstones.
 
+Reservation carries both the logical-unit collection root and a distinct immutable owner identity-
+collection hash. Every recovery claim, recovery record, tombstone, and reconciliation record for that
+reservation repeats the exact identity-collection hash. Seal, client commit, dispatch, effect, and
+completion facts likewise preserve the corresponding reservation/manifest/dispatch hashes and counts.
+
 The nested unions are also closed:
 
 ```text
@@ -75,6 +80,35 @@ completion_status
 
 No `confirmed` client commit permits a different manifest or owner identity collection. Recovery worker
 events monotonically advance these nested unions and never move them backwards.
+
+## Validation Layers And Prior Readback
+
+Strict single-document decoding proves that one observation/receipt/envelope has the closed V1 shape,
+canonical hashes, internally valid event/result state, head arithmetic, and fact-root bindings. It does
+not, by itself, prove that an otherwise valid result snapshot is a monotonic successor of the actual prior
+snapshot.
+
+Cross-version monotonicity therefore requires the exported
+`verifyWorkflowBatchExecutionControlAuthorityTransitionV1(beforeObservation, receipt)` verifier. Except
+for the initial `batch_opened` receipt, whose prior observation is `null`, callers supply a strict
+`read_batch_snapshot` observation at the exact authority `before_batch_head` and `before_global_head`.
+The verifier exact-binds pins/scope, immutable binding/logical units, and all event-preserved facts. It
+then proves the event-specific delta: claim acquisition/renewal/release/expiry, reservation, seal,
+commit, dispatch, effect start, one-receipt completion (`receipt_count + 1`, changed collection root, and
+an all-terminal lifecycle head), quarantine, or reconciliation. Expiry additionally requires owner event
+time at or after the prior lease expiry. This is the normative implementation of the resolver rule that a
+caller reconciles every head, event, and root with independent fixed-head readback.
+
+Claim fences are positive canonical decimals. A renewal verifier proves that claim/lease/fence and all
+reconciliation authority stay fixed while expiry strictly increases. A none-to-present acquisition has no
+prior active claim from which to prove a historical maximum; strict fence increase across separate claim
+cycles remains an owner-ledger/history audit invariant. Hosts must persist and audit that high-water mark;
+the bounded prior-snapshot helper does not claim to prove it.
+
+Committed request-outcome resolution is also visibility-bounded: its observation requires a non-null batch
+head for the resolved batch, batch ledger/snapshot counters and global ledger/registry counters at or after
+the resolved after-heads, exact event hashes whenever those counters are equal, and `observed_at` no earlier
+than envelope issuance. A genesis/pre-commit fixed head cannot attest a committed outcome.
 
 ## Transition Matrix
 
@@ -165,8 +199,9 @@ at a later explicitly bound fixed head; it does not promise mutation-style exact
 
 - Canonical JSON: RFC 8785/JCS.
 - Hash: SHA-256, lowercase hexadecimal.
-- Integers used for fences/sequences/versions cross the boundary as canonical decimal strings; no JSON
-  `BigInt` or floating-point value enters a hash.
+- Claim fences cross the boundary as positive canonical decimal strings. Ledger, snapshot, and registry
+  versions use non-negative canonical decimal strings subject to their genesis/existing-head constraints.
+  No JSON `BigInt` or floating-point value enters a hash.
 - Request domain prefix: UTF-8 `workflow_batch_execution_control_v1/request\u0000`.
 - Authority-envelope domain prefix: UTF-8
   `workflow_batch_execution_control_v1/authority-envelope\u0000`.
@@ -265,22 +300,31 @@ mutation result.
 
 ## Bounds And Strict Decoding
 
-The public contract exports bounds: command 256 KiB, canonical envelope 512 KiB, JSON depth 64, JSON nodes
-50,000, identifier/string 2,048 UTF-8 bytes, reason code 256 bytes, units per batch 64, page size 100, and
-recovery operations 16. My-Chat may configure tighter limits.
+The public contract exports bounds: command 256 KiB, canonical envelope 512 KiB, resolved-envelope wrapper
+1.5 MiB, JSON depth 64, JSON nodes 50,000, identifier/string 2,048 UTF-8 bytes, reason code 256 bytes, units
+per batch 64, page size 100, and recovery operations 16. The wrapper budget accounts for the parsed
+envelope plus its escaped canonical UTF-8 copy; the canonical string itself remains capped at 512 KiB.
+My-Chat may configure tighter limits.
 
-The reference decoder must recursively reject unknown keys, unknown/null discriminators, unsafe canonical
+The reference decoder must recursively reject unknown keys (including prototype-named keys), unknown/null
+discriminators, unsafe canonical
 decimal/timestamp/hash forms, duplicate/canonically unsorted unit keys, mixed trust fields, malformed
 cursors, invalid count/hash combinations, self-referential hash projections, and every byte/count/depth
-limit. TypeScript fixtures do not substitute for runtime decoding. Golden vectors include omitted/changed
+limit. It also strictly decodes resolver inputs and resolved-envelope wrappers, verifies exact canonical
+full-envelope bytes, the domain-separated authority hash, and the raw-byte hash, and compares resolver
+input receipt/pins to the returned envelope through the exported pair verifier. TypeScript fixtures do not
+substitute for runtime decoding. Golden vectors include omitted/changed
 projection fields, mutated output hash fields, a forbidden attempt to include the output hash in its own
 projection, and preallocated receipt/observation refs.
 
 Canonical protocol scalars are closed:
 
 - hashes: lowercase 64-character hexadecimal;
-- fence/ledger/snapshot/registry decimal strings: `0` or a non-zero digit followed by digits, no sign or
-  leading zero, maximum `9223372036854775807`;
+- claim fence decimal strings: a non-zero digit followed by digits, no sign or leading zero, range
+  `1..9223372036854775807`;
+- ledger/snapshot/registry decimal strings: `0` or a non-zero digit followed by digits, no sign or leading
+  zero, maximum `9223372036854775807`; global ledger genesis may use zero, while existing batch heads and
+  their snapshot/ledger versions are strictly positive;
 - owner timestamps: UTC RFC 3339 with exactly millisecond precision,
   `YYYY-MM-DDTHH:mm:ss.SSSZ`;
 - counts, limits, TTL, generation, and page sizes: non-negative JSON safe integers; operation-specific
@@ -300,7 +344,8 @@ Capability, snapshot, history, global-admission, uniqueness, execution-receipt, 
 request-outcome, and opaque-resolution operations are read-only against controller state. They do not
 append batch/global controller events or outbox, alter CAS/capacity/uniqueness/admission, create controller
 idempotency/outcome rows, consume mutation/registry budget, or create mutation receipts. Every
-observation/page binds authority pins, query ID/hash, non-bearer read policy ref/hash, as-of batch and global
+observation/page binds authority pins, the exact read operation, query ID/hash, non-bearer read policy
+ref/hash, as-of batch and global
 heads, cursor range/limit/count, page hash, full collection root, and observation time/hash. The only
 permitted write is an independent security access-audit record outside the controller ledger and hashes.
 
@@ -329,7 +374,8 @@ Every mutation/owner event receipt names all five deltas, including zeros:
 - lifetime counts/roots never decrement or delete entries.
 
 Global before/after snapshots must equal these deltas and their collection roots. Exact retry returns the
-original deltas but does not apply them again.
+original deltas but does not apply them again. The batch event `fact_root` equals the committed result
+snapshot hash; the global event `fact_root` equals the matching after-global admission or uniqueness root.
 
 ## Threat Matrix
 

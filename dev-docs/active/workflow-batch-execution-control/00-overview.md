@@ -6,9 +6,9 @@
 - Owner: unassigned
 - Created: 2026-07-23
 - Updated: 2026-07-23
-- Completed increment: BC0-A contract and threat-model lock
-- Current increment: BC0-B additive types and positive conformance
-- Next gate: implement the approved closed unions/ports without widening legacy contracts
+- Completed increments: BC0-A contract/threat-model lock; BC0-B additive contract and conformance
+- Current increment: BC0-C final review and contract-bearing commit
+- Next gate: publish the source lock/release evidence from the exact BC0-C commit
 
 ## Goal
 
@@ -52,7 +52,8 @@ the canonical ledger; scenarios adapt their own work semantics through refs and 
   and global heads, collection hash, and page boundary.
 - V1 defines opaque, non-bearer receipt references and an independently authenticated resolver. It does not
   provide mixed signed/opaque fallback.
-- V1 freezes RFC 8785/JCS, SHA-256, one domain prefix, exact retry, and request-outcome readback; signed
+- V1 freezes RFC 8785/JCS, SHA-256, three document-specific domain prefixes, exact retry, and
+  request-outcome readback; signed
   receipts are deferred.
 - A host recovery policy reference is policy input only. Post-reservation mutation requires a real owner
   `reconciliation_only` claim with new claim/lease IDs and a strictly higher fence.
@@ -73,15 +74,15 @@ the canonical ledger; scenarios adapt their own work semantics through refs and 
 
 ## Acceptance Criteria
 
-- [ ] New exports are additive; all legacy contracts, module shapes, validators, and fixtures remain valid.
-- [ ] Public types and documentation contain no scenario-specific work or product-data fields.
-- [ ] Every mutation binds capability/deployment/source pins, request/idempotency metadata, batch CAS,
+- [x] New exports are additive; all legacy contracts, module shapes, validators, and fixtures remain valid.
+- [x] Public types and documentation contain no scenario-specific work or product-data fields.
+- [x] Every mutation binds capability/deployment/source pins, request/idempotency metadata, batch CAS,
       global CAS, and current claim/fence where applicable.
-- [ ] One-winner claims, stale-writer rejection, reservation/seal separation, lifetime uniqueness,
+- [x] One-winner claims, stale-writer rejection, reservation/seal separation, lifetime uniqueness,
       tombstone/supersession, record-before-effect, and recovery-only takeover are explicit.
-- [ ] Readback is bounded/paginated and reconstructable without embedding unbounded history or registries.
-- [ ] Opaque receipts are non-bearer and exact-resolvable; secrets and secret-derived hashes are excluded.
-- [ ] Positive and negative compile fixtures plus scenario/secret boundary checks pass.
+- [x] Readback is bounded/paginated and reconstructable without embedding unbounded history or registries.
+- [x] Opaque receipts are non-bearer and exact-resolvable; secrets and secret-derived hashes are excluded.
+- [x] Positive and negative compile fixtures plus scenario/secret boundary checks pass.
 - [ ] A contract-bearing commit is followed by a source-lock evidence commit that pins it without
       self-reference.
 - [ ] My-Chat receives an exact adoption map and keeps the capability disabled until its own gates pass.
