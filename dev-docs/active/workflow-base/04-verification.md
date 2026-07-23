@@ -17,7 +17,8 @@
 - `corepack pnpm verify:x0-a`
 - `corepack pnpm typecheck`
 - `corepack pnpm test`
-- `ruby -e 'require "yaml"; YAML.load_file("templates/scenario-module/scenario.manifest.yaml"); puts "yaml ok"'`
+- build and load `templates/scenario-module/src/registry.ts` through the public
+  descriptor entrypoint
 - `git diff --check`
 - scan X0-A diff for contract-type, Prisma, database, queue, outbox, provider, or
   delivery implementation changes
@@ -254,7 +255,7 @@
 
 ## Planned Checks
 - `git diff --check`
-- YAML parse for `templates/scenario-module/scenario.manifest.yaml`
+- Starter registry build plus descriptor/semantic validation
 - Markdown fence count check for workflow docs and task docs
 - Search for stale local-path references before finalizing docs
 - `pnpm --dir templates/web-workbench typecheck`
@@ -490,3 +491,31 @@ Passed:
   passed.
 
 No database, published package, runtime traffic or activation was accessed.
+
+## 2026-07-22 post-review hardening verification
+
+Passed:
+
+- Full `pnpm verify:workflow-contracts`: runtime 28/28, Starter unit 11/11,
+  integration-lock/CLI suite 9/9, canonical-ref lint and unchanged source-lock
+  verification.
+- Starter dedicated local PostgreSQL journey: 1 file / 7 tests, including
+  concurrent create, atomic concurrent `expected_version` update, exact event
+  replay and event-id identity collision rejection. The exact disposable
+  database was dropped and absence confirmed.
+- Generated third scenario from an empty temporary directory: offline install,
+  typecheck, 11 unit tests, build and installed-package semantic lint. No YAML
+  manifest was generated, and the placeholder integration lock failed closed.
+- Actual role-aware semantic lint across Base, My-Chat, Starter, Education and
+  Nurture returned `passed: true` with zero findings.
+- `git diff --check` passed before the documentation update.
+
+No package was published and no staging/production database, product traffic,
+activation or minor-account capability was accessed.
+
+The first database test invocation supplied only Prisma's `DATABASE_URL`, so
+the opt-in suite correctly reported one skipped file because its explicit gate
+is `STARTER_DATABASE_URL`. The rerun supplied both variables and executed all
+7 database tests. The first documented generator invocation also exposed the
+unsupported package-manager `--` separator; after the parser regression fix,
+the same command generated and qualified the temporary Starter successfully.

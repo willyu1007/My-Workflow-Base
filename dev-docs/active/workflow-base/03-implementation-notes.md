@@ -296,3 +296,28 @@ joint release qualification remain separate gates.
   `idempotency_identity_conflict`.
 - The change is test-only and does not alter Base contract logical bytes,
   Starter persistence, package versions or any activation policy.
+
+## 2026-07-22 post-review hardening
+
+Committed source: `be17a8880aa4aea16dfc303d6af06dcfdbe38ee7`.
+
+- Removed the independently authored Starter YAML manifest. The executable
+  `src/registry.ts` contract is now the sole Starter release authority and the
+  package/docs/CI no longer imply YAML parity maintenance.
+- Replaced read-then-update version checks with a compare-and-swap
+  `updateMany(id, version)` boundary. Concurrent creates map Prisma `P2002` to
+  `expected_version_conflict`; concurrent updates require exactly one affected
+  row before returning the incremented version.
+- Tightened Owner event inbox idempotency: an existing `event_id` is a replay
+  only when the complete refs-only event identity is equal. A different event
+  type, release, target, refs, actor, purpose, trace or occurrence time now
+  fails as `event_identity_conflict`, including a concurrent unique-key race.
+- Generated CI now verifies `integration-lock v3`. Joint-candidate mode checks
+  both exact HEAD equality and a clean logical source set, including untracked
+  files, so the verified bytes cannot differ from the pinned Git object.
+- The Starter generator now accepts the conventional package-manager `--`
+  separator documented by the repository. A CLI regression generates the
+  Starter from an empty directory and verifies that only the executable
+  TypeScript manifest authority is present.
+- No contract source-lock bytes changed because these repairs are Starter and
+  qualification implementation changes, not normative contract changes.

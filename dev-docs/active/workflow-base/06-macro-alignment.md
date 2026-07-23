@@ -30,7 +30,7 @@ Everything else is either:
 |---|---|---|
 | M0 contract stance lock | What does the template define and refuse to implement? | `v0-convergence.md`, `00-overview.md` |
 | M1 matrix convergence | How does each surface consume concrete workflow contract modules? | `architecture-matrix.md` |
-| M2 contract convergence | What must a scenario declare to be accepted? | `module-contract.md`, `scenario.manifest.yaml` |
+| M2 contract convergence | What must a scenario declare to be accepted? | `module-contract.md`, `templates/scenario-module/src/registry.ts` |
 | M3 API/adapter convergence | What standard adapters/APIs must surfaces call? | `api-contract.md` |
 | M4 implementation skeleton | What code boundaries should host repos receive? | future package layout and TS contracts |
 | M5 scenario-readiness proof | Can a second scenario plug in without new surface APIs? | `scenario-readiness-proof.md` |

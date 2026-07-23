@@ -68,6 +68,10 @@
   `scenario_artifact.logical_paths`.
 - Do not load a descriptor's `manifest_module` before building its package;
   semantic lint intentionally imports the declared public module path.
+- Do not assume a package manager strips the `--` script separator; CLI entry
+  points should accept the conventional separator they document.
+- Do not use only `DATABASE_URL` as evidence that the opt-in Starter DB suite
+  executed; the suite gate is `STARTER_DATABASE_URL`.
 
 ## Historical Notes
 - 2026-07-13: X0-A initially used `tests/**/*.test.ts`; Vitest 4 did not select
@@ -147,3 +151,62 @@
   all three CLIs.
 - Prevention: conformance must invoke public binaries through a package-bin
   symlink and assert their output, not only their exit code.
+
+### 2026-07-22 — Two manifest files created two release authorities
+
+- Symptom: the Starter shipped both YAML and TypeScript manifests whose fields
+  could diverge while runtime loaded only the TypeScript registry.
+- Root cause: the declarative example was retained after the executable
+  registry became the real admission artifact.
+- Fix: remove the duplicate YAML and designate `src/registry.ts` as the single
+  canonical Starter contract.
+- Prevention: each release declares one canonical contract artifact; a second
+  independently authored representation is a semantic-lint/review failure.
+
+### 2026-07-22 — `expected_version` was checked before the write
+
+- Symptom: two concurrent commands could both read the same version and then
+  both update the owner fact successfully.
+- Root cause: the repository separated the version predicate from the SQL
+  mutation.
+- Fix: include the expected version in one atomic update predicate and require
+  exactly one affected row; normalize concurrent unique-create failures to the
+  same conflict result.
+- Prevention: optimistic concurrency evidence must contain a simultaneous
+  writer test, not only a sequential stale-version test.
+
+### 2026-07-22 — Exact HEAD did not prove exact working-tree bytes
+
+- Symptom: joint qualification accepted the pinned commit even when a logical
+  source file had an uncommitted or untracked candidate change.
+- Root cause: the lock verifier compared only Git HEAD with the revision.
+- Fix: joint-candidate mode also rejects any dirty logical path while ordinary
+  verification continues to hash the pinned Git object.
+- Prevention: distinguish reproducible locked-object verification from clean
+  candidate-checkout qualification and test both gates independently.
+
+### 2026-07-23 — The documented generator command failed at its separator
+
+- Symptom: `pnpm generate:scenario -- --target ...` stopped with the usage
+  error before copying the Starter.
+- Root cause: pnpm forwarded the conventional `--` token and the generator
+  parsed it as an option requiring a value.
+- What we tried: the first fail-fast-free verification shell continued to an
+  unrelated no-op offline install, which did not create or change a candidate.
+- Fix: strip one leading package-manager separator before parsing option/value
+  pairs and cover the documented command shape through the CLI test suite.
+- Prevention: executable documentation examples must be exercised verbatim,
+  including wrapper/package-manager argument forwarding.
+
+### 2026-07-23 — A configured database test still reported skipped
+
+- Symptom: migration succeeded through `DATABASE_URL`, but `test:db` reported
+  one skipped file and no executed tests.
+- Root cause: Prisma migration and the opt-in test guard intentionally read
+  different variables; the test guard requires `STARTER_DATABASE_URL`.
+- What we tried: supplying only `DATABASE_URL` proved the database was
+  reachable but did not opt into the test suite.
+- Fix: rerun with both URLs pointing at the same disposable local database;
+  all 7 integration tests passed.
+- Prevention: qualification evidence records executed test counts and treats a
+  skipped database file as non-evidence even when the command exits zero.

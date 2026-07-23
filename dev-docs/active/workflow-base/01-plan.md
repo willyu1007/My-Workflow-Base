@@ -100,7 +100,7 @@ Acceptance:
 ## Phase 2: Manifest alignment
 
 Steps:
-1. Map every matrix requirement to `scenario.manifest.yaml` fields.
+1. Map every matrix requirement to the canonical scenario contract fields.
 2. Identify missing fields or overly broad fields.
 3. Update `module-contract.md` and template manifest only after the matrix is
    stable.
@@ -138,9 +138,26 @@ Acceptance:
 - Implementation can start without reopening M1/M2/M3 ownership debates.
 
 ## Current First Move
-Create `dev-docs/active/workflow-handoff-materialization/` in My-Chat and execute
-X1 against `06-x1-adoption-handoff.md`. Adopt types/validator/worker pass-through,
-record the matching source hash, and keep the host capability absent/disabled.
+Generate the fresh third-scenario candidate from committed revision
+`be17a8880aa4aea16dfc303d6af06dcfdbe38ee7`, then run exact joint-candidate
+qualification with the committed Host, Education and Nurture sources. Keep
+every Scenario activation disabled until its independent product decision.
+
+## 2026-07-22 post-review hardening
+
+- [x] Make `src/registry.ts` the Starter's sole canonical manifest authority.
+- [x] Make `expected_version` updates atomic under concurrent commands.
+- [x] Distinguish an exact Owner event replay from an event-id identity
+      collision.
+- [x] Run integration-lock verification in generated CI and reject dirty
+      logical source during joint-candidate qualification.
+- [x] Accept the documented package-manager `--` argument separator when
+      generating a scenario into an empty directory.
+- [x] Regenerate a third scenario from an empty directory and rerun the common
+      five-descriptor semantic lint.
+
+Exit: the review findings are closed locally. Publication, environment
+inventory and activation remain separate gates.
 
 ## 2026-07-21 federation v1 quality checkpoint
 

@@ -32,7 +32,7 @@ consumption surfaces
 - State: in-progress
 - Owner: unassigned
 - Created: 2026-05-25
-- Updated: 2026-07-22
+- Updated: 2026-07-23
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
 - Candidate increment: persistence-complete generated Starter and role-aware
   federation descriptors, layered on fail-closed v2 release admission,
@@ -40,12 +40,14 @@ consumption surfaces
 - Persistence-complete Starter implementation revision:
   `4fdfffa76dbd766bf21449cb7a84122b5454535f`
 - Current Starter behavior-conformance revision:
-  `a982f6f52f0388fa37b7a8f2df47d7df546473ab`
+  `be17a8880aa4aea16dfc303d6af06dcfdbe38ee7`
+- Post-review hardening: committed and verified at the current Starter
+  behavior-conformance revision.
 - Historical candidate clean qualification revision:
   `92c22ee82ada08ce713519eec4c7f9c7c9ffe12e`
-- Next gate: complete the shared authorization/replay/privacy/deletion matrix
-  and published-artifact qualification. CF-013 and exact Git-source lock
-  qualification are complete; activation remains outside this task.
+- Next gate: generate the fresh third-scenario candidate and run exact
+  three-scenario joint-candidate qualification. Publication and activation
+  remain outside this task.
 
 ## Federation v1 checkpoint
 
@@ -82,8 +84,9 @@ The current design stance is:
   contract.
 - The base template defines handoff request/receipt contracts only; concrete
   workflows create the actual requests.
-- Scenario modules use YAML manifest or equivalent TS contract plus TypeScript
-  registries.
+- Scenario modules designate exactly one canonical YAML or TypeScript contract
+  artifact per release, plus TypeScript registries. Independently authored
+  duplicate manifests are forbidden.
 
 ## Scope In
 - v0 architecture matrix convergence.
@@ -224,7 +227,7 @@ The current design stance is:
 - `docs/context/workflow/implementation-skeleton.md`
 - `docs/context/workflow/scenario-readiness-proof.md`
 - `docs/context/workflow/v0-readiness-checklist.md`
-- `templates/scenario-module/scenario.manifest.yaml`
+- `templates/scenario-module/src/registry.ts`
 
 ## Acceptance Criteria
 - [ ] `architecture-matrix.md` is reduced to a v0 contract rather than a broad
