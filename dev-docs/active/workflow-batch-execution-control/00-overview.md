@@ -2,13 +2,17 @@
 
 ## Status
 
-- State: complete
+- State: complete, with one open defect
 - Owner: unassigned
 - Created: 2026-07-23
-- Updated: 2026-07-23
+- Updated: 2026-07-24
 - Completed increments: BC0-A contract/threat-model lock; BC0-B additive contract and conformance;
   BC0-C reviewed contract-bearing revision; BC0-D source-lock/release evidence and BC1 handoff
 - Current increment: complete
+- Open defect: `validateSnapshot` applies the reconciliation allowlist as an every-snapshot invariant rather
+  than a claim-creation gate, which makes recovery `dispatch_batch` unrepresentable. Validator scope only; no
+  contract or type change. See
+  [08-defect-recovery-dispatch-allowlist-scope.md](./08-defect-recovery-dispatch-allowlist-scope.md)
 - Next gate: My-Chat BC1 exact adoption with the capability absent/disabled
 
 ## Goal
@@ -105,3 +109,4 @@ finding.
 - [Pitfalls](./05-pitfalls.md)
 - [Contract lock](./06-contract-lock.md)
 - [My-Chat BC1 adoption handoff](./07-my-chat-adoption.md)
+- [Defect · recovery dispatch allowlist scope](./08-defect-recovery-dispatch-allowlist-scope.md)
