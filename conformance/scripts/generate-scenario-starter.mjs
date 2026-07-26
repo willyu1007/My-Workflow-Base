@@ -9,12 +9,26 @@ import {
   stat,
   writeFile,
 } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "../..");
-const templateRoot = resolve(repositoryRoot, "templates/scenario-module");
+const sourceTemplateRoot = resolve(
+  repositoryRoot,
+  "templates/scenario-module",
+);
+const bundledTemplateRoot = resolve(scriptDirectory, "../starter-template");
+const templateRoot = existsSync(sourceTemplateRoot)
+  ? sourceTemplateRoot
+  : bundledTemplateRoot;
+
+if (!existsSync(templateRoot)) {
+  throw new Error(
+    "scenario Starter template is unavailable; reinstall the conformance package or use a complete Base checkout",
+  );
+}
 
 const cliArguments = process.argv.slice(2);
 if (cliArguments[0] === "--") cliArguments.shift();
@@ -61,6 +75,15 @@ await cp(templateRoot, targetRoot, {
     return !excludedNames.has(name) && !name.endsWith(".tsbuildinfo");
   },
 });
+
+const packagedGitignore = resolve(targetRoot, "gitignore.template");
+if (existsSync(packagedGitignore)) {
+  await rename(packagedGitignore, resolve(targetRoot, ".gitignore"));
+}
+const packagedGithub = resolve(targetRoot, "github-template");
+if (existsSync(packagedGithub)) {
+  await rename(packagedGithub, resolve(targetRoot, ".github"));
+}
 
 const textExtensions = new Set([
   ".json",

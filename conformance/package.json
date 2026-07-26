@@ -5,11 +5,20 @@
   "type": "module",
   "bin": {
     "workflow-canonical-ref-lint": "scripts/canonical-ref-lint.mjs",
+    "workflow-generate-scenario": "scripts/generate-scenario-starter.mjs",
     "workflow-integration-lock": "scripts/verify-integration-lock.mjs",
     "workflow-semantic-lint": "scripts/semantic-lint.mjs"
   },
-  "files": ["scripts", "schemas", "fixtures", "tsconfig.json"],
+  "files": [
+    "scripts",
+    "schemas",
+    "fixtures",
+    "starter-template",
+    "tsconfig.json"
+  ],
   "scripts": {
+    "prepack": "node scripts/stage-scenario-starter.mjs",
+    "postpack": "node scripts/stage-scenario-starter.mjs --clean",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "node scripts/check-claim-token-boundary.mjs && node scripts/check-contract-source-hash-portability.mjs && node scripts/check-federation-schemas.mjs && node scripts/check-federation-descriptor-schema.mjs && node scripts/check-scenario-release-contract.mjs && node scripts/check-semantic-lint.mjs && node scripts/check-canonical-ref-lint.mjs && node --test tests/*.test.mjs",
     "canonical-ref-lint": "node scripts/canonical-ref-lint.mjs",

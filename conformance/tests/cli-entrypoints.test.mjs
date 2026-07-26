@@ -4,6 +4,10 @@ import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { after, before, test } from "node:test";
 import assert from "node:assert/strict";
+import {
+  cleanStagedScenarioStarter,
+  stageScenarioStarter,
+} from "../scripts/stage-scenario-starter.mjs";
 
 const conformanceRoot = resolve(import.meta.dirname, "..");
 let temporaryRoot;
@@ -107,6 +111,28 @@ test("scenario generator accepts the package-manager argument separator", async 
       ),
     ).scenario_artifact.logical_paths.includes("prisma/migrations"),
   );
+});
+
+test("package staging carries the complete Starter without build output", async () => {
+  const target = resolve(temporaryRoot, "packaged-starter-template");
+  await stageScenarioStarter(
+    resolve(conformanceRoot, "../templates/scenario-module"),
+    target,
+  );
+
+  assert.ok((await readdir(target)).includes("gitignore.template"));
+  assert.ok((await readdir(target)).includes("github-template"));
+  assert.ok((await readdir(target)).includes("dev-docs"));
+  assert.ok(
+    (
+      await readdir(
+        resolve(target, "prisma/migrations/20260722000000_init"),
+      )
+    ).includes("migration.sql"),
+  );
+  assert.ok(!(await readdir(target)).includes("node_modules"));
+  assert.ok(!(await readdir(target)).includes("dist"));
+  await cleanStagedScenarioStarter(target);
 });
 
 test("CLI modules remain importable from stdin and eval entrypoints", () => {

@@ -14,6 +14,16 @@ cd /tmp/my-scenario
 pnpm install
 ```
 
+After the versioned conformance package is available, the same Starter can be
+generated without a Base checkout:
+
+```bash
+pnpm dlx @workflow-base/conformance@1 workflow-generate-scenario -- \
+  --target /tmp/my-scenario \
+  --scenario-key my-scenario \
+  --package-name @example/my-scenario
+```
+
 The generated package consumes the versioned My-Chat Host SDK and Base
 conformance CLI. Its CI starts an isolated PostgreSQL service, applies the
 owner-local migration, runs unit and database journeys, validates the
