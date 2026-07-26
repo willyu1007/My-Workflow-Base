@@ -68,7 +68,8 @@ exact structural parity in CI.
   the release. If the concrete Owner API, authorization, repository, Prisma
   adapter, or migration lives outside the scenario package, add those external
   package paths explicitly; hashing only the manifest/public package is not
-  qualification evidence.
+  qualification evidence. Keep both `prisma/schema.prisma` and the applied
+  `prisma/migrations` directory in the lock.
 - High-risk writes append minimal evidence records, but the scenario does not
   need an audit UI, review queue, or reporting workflow for MVP activation.
 - Outbox payloads are ref-only downstream signals; downstream owners reread

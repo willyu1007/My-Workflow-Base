@@ -99,6 +99,14 @@ test("scenario generator accepts the package-manager argument separator", async 
     ),
     /Scenario key: `qualification-scenario`/u,
   );
+  assert.ok(
+    JSON.parse(
+      await readFile(
+        resolve(target, "integration-lock.qualification-scenario.json"),
+        "utf8",
+      ),
+    ).scenario_artifact.logical_paths.includes("prisma/migrations"),
+  );
 });
 
 test("CLI modules remain importable from stdin and eval entrypoints", () => {
