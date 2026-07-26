@@ -23,6 +23,11 @@ and hashes before enabling CI; placeholder locks intentionally fail closed.
 Commit the generated `pnpm-lock.yaml` before enabling the frozen-lockfile CI
 gate.
 
+The generated repository also includes `.gitignore` defaults and a continuity
+bundle at `dev-docs/active/scenario-integration/`. Read its `00-overview.md`,
+`roadmap.md`, `01-plan.md`, and `05-pitfalls.md` before replacing the example
+domain. Keep verification evidence and exact pins in the same bundle.
+
 ## Required contract fields
 
 This Starter uses `src/registry.ts` as its only manifest authority. The built

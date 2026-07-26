@@ -82,8 +82,22 @@ test("scenario generator accepts the package-manager argument separator", async 
   assert.ok((await readdir(target)).includes("federation-descriptor.json"));
   assert.ok(!(await readdir(target)).includes("scenario.manifest.yaml"));
   assert.match(
+    await readFile(resolve(target, ".gitignore"), "utf8"),
+    /^node_modules\/$/mu,
+  );
+  assert.match(
     await readFile(resolve(target, "src/registry.ts"), "utf8"),
     /scenario_key: "qualification-scenario"/u,
+  );
+  assert.match(
+    await readFile(
+      resolve(
+        target,
+        "dev-docs/active/scenario-integration/00-overview.md",
+      ),
+      "utf8",
+    ),
+    /Scenario key: `qualification-scenario`/u,
   );
 });
 

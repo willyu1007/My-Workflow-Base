@@ -91,6 +91,7 @@ for (const path of await collectFiles(targetRoot)) {
   if (!textExtensions.has(extensionOf(path))) continue;
   let content = await readFile(path, "utf8");
   content = content
+    .replaceAll("{{SCENARIO_KEY}}", scenarioKey)
     .replaceAll("@host/workflow-contracts", "@my-chat/workflow-contracts")
     .replaceAll("Generated-Scenario-Example", `Generated-Scenario-${scenarioKey}`)
     .replaceAll("^example\\.", `^${scenarioKey}\\.`)
