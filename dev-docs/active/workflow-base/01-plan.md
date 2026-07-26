@@ -138,10 +138,11 @@ Acceptance:
 - Implementation can start without reopening M1/M2/M3 ownership debates.
 
 ## Current First Move
-Generate the fresh third-scenario candidate from committed revision
-`be17a8880aa4aea16dfc303d6af06dcfdbe38ee7`, then run exact joint-candidate
-qualification with the committed Host, Education and Nurture sources. Keep
-every Scenario activation disabled until its independent product decision.
+Use distributable revision
+`8f82a72dcdd16ae4fcb6f1caf8d4ae380829ed53` as the qualified Git-source
+candidate. Repeat from exact published package artifacts only after a separate
+publication decision. Keep every Scenario activation disabled until its
+independent product decision.
 
 ## 2026-07-22 post-review hardening
 
@@ -171,8 +172,10 @@ inventory and activation remain separate gates.
       integration-lock v3 fields.
 - [x] Build package `dist` before runtime tests so green tests cannot consume a
       stale generated contract.
-- [ ] Publish exact Base/Host candidates and run joint-candidate qualification
-      with Education, Nurture and a generated third scenario.
+- [x] Run exact Git-source joint-candidate qualification with Education,
+      Nurture and a generated third scenario.
+- [ ] Publish exact Base/Host candidates and repeat qualification from the
+      published package artifacts.
 
 ## 2026-07-22 CF-010/CF-011 closure increment
 

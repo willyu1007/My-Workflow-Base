@@ -210,3 +210,35 @@
   all 7 integration tests passed.
 - Prevention: qualification evidence records executed test counts and treats a
   skipped database file as non-evidence even when the command exits zero.
+
+### 2026-07-26 — Source-complete did not mean package-complete
+
+- Symptom: the generator worked from the Base checkout, while the installed
+  conformance tarball lacked the Starter template and executable.
+- Root cause: package `files` and `bin` metadata did not include the generator
+  dependency graph.
+- Fix: stage the complete Starter during prepack and expose the generator as
+  `workflow-generate-scenario`.
+- Prevention: install the real tarball in an empty directory and call its
+  packaged binary before declaring the Starter distributable.
+
+### 2026-07-26 — npm silently excludes Starter dot paths
+
+- Symptom: the first packaged template still lacked `.gitignore` and
+  `.github/workflows/ci.yml`.
+- Root cause: npm's package staging excludes these paths even when copied under
+  an included directory.
+- Fix: stage them as `gitignore.template` and `github-template`, then restore
+  the intended names during generation.
+- Prevention: assert the generated post-install filesystem, not only tarball
+  file counts.
+
+### 2026-07-26 — Pack metadata and lifecycle evidence are distinct
+
+- Symptom: `npm pack --json` output could not be parsed because lifecycle logs
+  preceded the JSON payload.
+- Root cause: prepack output shares the captured stream.
+- Fix: inspect content with `--ignore-scripts`, then separately run and install
+  the lifecycle-produced tarball.
+- Prevention: use separate gates for machine-readable package census and
+  executable artifact qualification.

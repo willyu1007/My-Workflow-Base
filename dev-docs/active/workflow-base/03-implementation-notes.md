@@ -321,3 +321,22 @@ Committed source: `be17a8880aa4aea16dfc303d6af06dcfdbe38ee7`.
   TypeScript manifest authority is present.
 - No contract source-lock bytes changed because these repairs are Starter and
   qualification implementation changes, not normative contract changes.
+
+## 2026-07-26 Slice 4 framework and packaging closure
+
+- Added the generated repository's `.gitignore`, dev-docs routing and complete
+  scenario-integration bundle so a new owner starts with the same project
+  continuity rules as the four convergence repositories.
+- Added `prisma/migrations` to integration-lock logical source and made the
+  initial migration part of the Starter template.
+- Added executable foreign-namespace pre-authorization denial, current
+  authorization negatives, owner-reread presentation, refs-only indexing
+  handoff and atomic deletion journeys.
+- Made the conformance npm package carry the complete Starter and expose
+  `workflow-generate-scenario` as a package binary. Prepack-safe template names
+  preserve `.gitignore` and `.github` through npm's dotfile exclusions.
+- Generated and qualified an independent third scenario without changing the
+  Host API. Final distributable source is `8f82a72…`.
+
+No artifact was published and Base acquired no runtime, database, product fact
+or activation authority.

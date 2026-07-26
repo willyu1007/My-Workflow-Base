@@ -32,22 +32,26 @@ consumption surfaces
 - State: in-progress
 - Owner: unassigned
 - Created: 2026-05-25
-- Updated: 2026-07-23
+- Updated: 2026-07-26
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
-- Candidate increment: persistence-complete generated Starter and role-aware
-  federation descriptors, layered on fail-closed v2 release admission,
-  semantic lint and integration-lock v3 verification
+- Candidate increment: package-complete generated Starter with project
+  continuity, locked Prisma migrations, common authorization/deletion/
+  presenter journeys, role-aware federation descriptors, fail-closed v2
+  release admission, semantic lint and integration-lock v3 verification
 - Persistence-complete Starter implementation revision:
   `4fdfffa76dbd766bf21449cb7a84122b5454535f`
 - Current Starter behavior-conformance revision:
-  `be17a8880aa4aea16dfc303d6af06dcfdbe38ee7`
-- Post-review hardening: committed and verified at the current Starter
-  behavior-conformance revision.
+  `1a33e03bdc0ec59b5315d683183553ad41f08c50`
+- Current distributable Base/conformance revision:
+  `8f82a72dcdd16ae4fcb6f1caf8d4ae380829ed53`
+- Post-review hardening: committed and verified at the current distributable
+  revision, including generation from an installed npm tarball.
 - Historical candidate clean qualification revision:
   `92c22ee82ada08ce713519eec4c7f9c7c9ffe12e`
-- Next gate: generate the fresh third-scenario candidate and run exact
-  three-scenario joint-candidate qualification. Publication and activation
-  remain outside this task.
+- Next gate: repeat qualification from exact published Base/Host package
+  artifacts if publication is independently approved. Exact Git-source
+  three-scenario qualification is complete; publication and activation remain
+  outside this task.
 
 ## Federation v1 checkpoint
 

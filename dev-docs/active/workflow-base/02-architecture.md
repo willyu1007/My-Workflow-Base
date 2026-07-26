@@ -281,3 +281,19 @@ visibly invalid.
   channel. This rule exists in JSON Schema and reference runtime validation.
 - Public contract and Starter packages export built ESM/declarations and build
   during `prepack`; conformance/runtime tests depend on freshly built `dist`.
+
+## 2026-07-26 distributable Starter boundary
+
+- The repository template remains source-owned under
+  `templates/scenario-module`; the conformance package stages an exact copy for
+  npm distribution and the packaged generator consumes that copy.
+- npm-safe names (`gitignore.template` and `github-template`) are transport
+  details only. The generated repository restores `.gitignore` and
+  `.github/workflows`, so source generation and package generation have the
+  same repository contract.
+- Prisma schema and every migration are part of scenario logical source.
+  Evidence-only integration-lock refreshes remain outside logical source to
+  avoid self-referential hashes.
+- Presenter reads are synchronous, closed and owner-reread. Durable handoffs
+  remain refs-only. Delete is a scenario action whose domain deletion,
+  CommandExecution and owner event commit in one Owner transaction.

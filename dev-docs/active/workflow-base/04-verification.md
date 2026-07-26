@@ -476,8 +476,9 @@ Passed:
 - `git diff --check`.
 
 Source revision is `4fdfffa76dbd766bf21449cb7a84122b5454535f`.
-Exact joint-candidate qualification and publication remain open; no production
-runtime, traffic or activation was created.
+At this checkpoint exact joint-candidate qualification and publication were
+open; the later Slice 4 section supersedes the Git-source qualification status.
+No production runtime, traffic or activation was created.
 
 ## 2026-07-22 recovered-receipt Step verification
 
@@ -519,3 +520,26 @@ is `STARTER_DATABASE_URL`. The rerun supplied both variables and executed all
 7 database tests. The first documented generator invocation also exposed the
 unsupported package-manager `--` separator; after the parser regression fix,
 the same command generated and qualified the temporary Starter successfully.
+
+## 2026-07-26 Slice 4 verification
+
+Passed at Base revision `8f82a72dcdd16ae4fcb6f1caf8d4ae380829ed53`:
+
+- `verify:workflow-contracts`: 28 contract/runtime, 17 Starter and 10
+  conformance/CLI tests, source-lock verification and canonical-ref lint.
+- Fresh local PostgreSQL: one Starter migration and 8/8 database tests;
+  deletion left domain, command-execution and owner-outbox counts at zero, and
+  the disposable database was dropped.
+- Freshly generated `qualification-scenario`: 17 unit and 8/8 database tests
+  using the same public Starter behavior.
+- Education, Nurture and generated-scenario locks passed both ordinary and
+  exact joint-candidate verification; five-descriptor semantic lint returned
+  zero findings.
+- A real conformance tarball contained 56 files, installed from disk, and its
+  packaged `workflow-generate-scenario` binary reconstructed CI, dev-docs,
+  dotfiles, Prisma schema/migration and source lock in an empty directory.
+- Package-content inspection passed for Base contracts, Base conformance, Host
+  SDK, Education, Nurture and the generated scenario.
+
+No package was published and no non-local database, traffic, release registry
+or activation was accessed.
