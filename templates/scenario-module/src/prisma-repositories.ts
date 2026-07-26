@@ -104,6 +104,25 @@ function transactionAdapter(
           where: { id: target.object_id },
         });
 
+        if (input.command_type === "example.delete") {
+          if (!existing || expectedVersion !== existing.version) {
+            throw new Error("expected_version_conflict");
+          }
+          const deleted = await transaction.exampleRecord.deleteMany({
+            where: { id: existing.id, version: expectedVersion },
+          });
+          if (deleted.count !== 1) throw new Error("expected_version_conflict");
+          return [
+            {
+              schema_version: 1,
+              namespace: "example",
+              object_type: "record",
+              object_id: existing.id,
+              version: existing.version,
+            },
+          ];
+        }
+
         if (!existing) {
           if (expectedVersion !== undefined && expectedVersion !== 0) {
             throw new Error("expected_version_conflict");

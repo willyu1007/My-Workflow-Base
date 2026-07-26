@@ -34,11 +34,12 @@ function command(
   commandId = "command-1",
   stepId = "step-1",
   expectedVersion?: number,
+  commandType = "example.prepare",
 ): ScenarioCommandEnvelopeV1 {
   return {
     envelope_version: 1,
     command_id: commandId,
-    command_type: "example.prepare",
+    command_type: commandType,
     command_schema_version: 1,
     idempotency_key: `run-1:${stepId}:${commandId}`,
     scenario_release: {
@@ -209,6 +210,42 @@ integration("Starter Prisma owner journey", () => {
     ).resolves.toMatchObject({ version: 2 });
     await expect(prisma.scenarioCommandExecution.count()).resolves.toBe(2);
     await expect(prisma.ownerIntegrationOutbox.count()).resolves.toBe(2);
+  });
+
+  it("[FED-DEL-001] deletes an owner fact atomically and replays the receipt", async () => {
+    await api.execute(command("command-seed", "step-seed", 0));
+    const deletion = command(
+      "command-delete",
+      "step-delete",
+      1,
+      "example.delete",
+    );
+
+    await expect(api.execute(deletion)).resolves.toMatchObject({
+      status: "applied",
+      result_refs: [
+        {
+          namespace: "example",
+          object_type: "record",
+          object_id: "record-1",
+          version: 1,
+        },
+      ],
+    });
+    await expect(api.execute(deletion)).resolves.toMatchObject({
+      status: "already_applied",
+    });
+
+    await expect(prisma.exampleRecord.count()).resolves.toBe(0);
+    await expect(prisma.scenarioCommandExecution.count()).resolves.toBe(2);
+    await expect(prisma.ownerIntegrationOutbox.count()).resolves.toBe(2);
+    await expect(
+      prisma.ownerIntegrationOutbox.findUniqueOrThrow({
+        where: { eventId: "command-delete:applied" },
+      }),
+    ).resolves.toMatchObject({
+      eventType: "example.record.deleted",
+    });
   });
 
   it("deduplicates and completes a bodyless Host event inbox record", async () => {

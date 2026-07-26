@@ -74,6 +74,74 @@ describe("federated owner API", () => {
     expect(events[0]).not.toHaveProperty("body");
   });
 
+  it("[FED-AUTH-005] rejects an authorization context without writing owner facts", async () => {
+    const { repositories, executions, events } = setup();
+    const deniedApi = new ExampleOwnerApi(repositories, {
+      authorize: async () => ({
+        allowed: false,
+        reason_code: "binding_only_not_authorized",
+      }),
+    });
+
+    await expect(deniedApi.execute(command())).rejects.toThrow(
+      "scenario_authorization_denied:binding_only_not_authorized",
+    );
+    expect(executions).toHaveLength(0);
+    expect(events).toHaveLength(0);
+  });
+
+  it("[FED-PRIV-001] rejects unknown body fields before authorization", async () => {
+    const { repositories } = setup();
+    let authorizationCalls = 0;
+    const api = new ExampleOwnerApi(repositories, {
+      authorize: async () => {
+        authorizationCalls += 1;
+        return { allowed: true, reason_code: "scenario_grant_active" };
+      },
+    });
+
+    await expect(
+      api.execute({ ...command(), body: "private text" }),
+    ).rejects.toThrow();
+    expect(authorizationCalls).toBe(0);
+  });
+
+  it("[FED-ISO-005] rejects a foreign owner target before authorization", async () => {
+    const { repositories } = setup();
+    let authorizationCalls = 0;
+    const api = new ExampleOwnerApi(repositories, {
+      authorize: async () => {
+        authorizationCalls += 1;
+        return { allowed: true, reason_code: "scenario_grant_active" };
+      },
+    });
+    const input = {
+      ...command(),
+      context_refs: [ref("foreign-scenario", "record", "record-1")],
+    };
+
+    await expect(api.execute(input)).rejects.toThrow(
+      "owner_target_ref_required",
+    );
+    expect(authorizationCalls).toBe(0);
+  });
+
+  it("rejects an undeclared scenario command before authorization", async () => {
+    const { repositories } = setup();
+    let authorizationCalls = 0;
+    const api = new ExampleOwnerApi(repositories, {
+      authorize: async () => {
+        authorizationCalls += 1;
+        return { allowed: true, reason_code: "scenario_grant_active" };
+      },
+    });
+
+    await expect(
+      api.execute({ ...command(), command_type: "example.unknown" }),
+    ).rejects.toThrow("unsupported_scenario_command");
+    expect(authorizationCalls).toBe(0);
+  });
+
   it("replays the same command identity without duplicating domain or outbox writes", async () => {
     const { api, executions, events } = setup();
     await api.execute(command());

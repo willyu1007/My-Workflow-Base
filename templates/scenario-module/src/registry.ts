@@ -69,19 +69,38 @@ export const scenarioManifest = {
   artifact_policy: {
     artifact_types: ["example_summary"],
     exposure_levels: { L0: [], L1: ["example_summary"], L2: [], L3: [], L4: [] },
-    handoff_eligible: { public_draft: [], indexing: [], notification: [], external_delivery: [] },
+    handoff_eligible: {
+      public_draft: [],
+      indexing: ["example_summary"],
+      notification: [],
+      external_delivery: [],
+    },
   },
   action_availability: {
     shared_actions: ["start_run"],
     scenario_actions: [],
     expected_version_required: true,
   },
-  handoffs: [],
+  handoffs: [
+    {
+      handoff_type: "indexing",
+      handoff_key: "index-example-summary",
+      source_artifact_types: ["example_summary"],
+      requested_purposes: ["knowledge_indexing"],
+      downstream_owner: "indexing",
+      policy_key: "example.can_index",
+      receipt_required: true,
+      materialization_mode: "workflow_step_complete_v1",
+    },
+  ],
   surface_mapping: {},
   internal_api: { routes: [] },
   event_registry: {
     standard_workflow_events: ["workflow.run.created", "workflow.run.updated"],
-    scenario_internal_events: ["example.command.applied"],
+    scenario_internal_events: [
+      "example.command.applied",
+      "example.record.deleted",
+    ],
     event_payload_policy: {
       signal_version: 1,
       body: "no_body",
@@ -95,6 +114,10 @@ export const scenarioManifest = {
         owner: "scenario_module",
         write_boundary: "scenario_internal",
       },
+      "example.record.deleted": {
+        owner: "scenario_module",
+        write_boundary: "scenario_internal",
+      },
     },
     consumers: {},
   },
@@ -103,7 +126,7 @@ export const scenarioManifest = {
     rollback: "Disable capability and preserve canonical facts.",
     projection_review_required: true,
     evidence_records: [],
-    outbox_events: ["example.command.applied"],
+    outbox_events: ["example.command.applied", "example.record.deleted"],
   },
   verification: {
     deterministic_tests: ["example journey"],
