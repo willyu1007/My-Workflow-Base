@@ -212,3 +212,23 @@
 - A diagnostic attempt that ran typecheck/build and tests concurrently exposed
   a fresh-worktree `dist` race. Final evidence uses only the prescribed
   sequential `pnpm verify:workflow-contracts` command.
+
+## 2026-07-28 Public web-workbench distribution alignment
+
+- With explicit owner approval, GitHub package
+  `@willyu1007/web-workbench` was changed from private to public so unrelated
+  public scenario repositories can resolve the shared exact release with their
+  own repository-scoped `GITHUB_TOKEN`.
+- Aligned the source manifest with that irreversible external state by changing
+  `publishConfig.access` from `restricted` to `public`. No new package version
+  was published and no repository visibility, secret, token, or Actions access
+  entry changed.
+- Updated the publishing runbook to preserve authenticated GitHub Packages
+  downloads while forbidding a shared cross-repository PAT as the default read
+  path.
+- Upgraded Base checkout/setup-node actions to v6 and the CI runtime to Node 24
+  to remove deprecated Node 20 action-runtime annotations.
+- Because `templates/web-workbench/package.json` is part of Nurture's exact
+  `web_workbench` source population, the final Base revision and recalculated
+  hash must be adopted by Nurture before the four-repository qualification lock
+  is refreshed.

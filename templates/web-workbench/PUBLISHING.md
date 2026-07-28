@@ -6,6 +6,10 @@ Turbopack-root widening. Those hacks only exist while consuming the package via 
 cross-repo `link:` (see "Local dev" at the bottom).
 
 Target registry: **GitHub Packages** (`https://npm.pkg.github.com`), scope `@willyu1007`.
+Package visibility: **public**. The package was changed to public with owner
+approval on 2026-07-28 so unrelated public scenario repositories can resolve
+the exact release with their own repository-scoped `GITHUB_TOKEN`. GitHub does
+not support changing a public package back to private.
 
 ## Publish (you must run this — it needs your GitHub auth)
 
@@ -27,17 +31,25 @@ Target registry: **GitHub Packages** (`https://npm.pkg.github.com`), scope `@wil
    ```
 
    `pnpm publish` runs `prepublishOnly` → `pnpm build` (tsc → dist + copy CSS), then uploads.
+   Before publishing, verify that `publishConfig.access` remains `public`;
+   `restricted` no longer matches the package's irreversible visibility or its
+   cross-repository distribution contract.
 
 4. **New versions**: bump `version` in package.json, then `pnpm publish` again.
 
 ## Consume from the registry (The-Education and any other project)
 
-1. **Auth + scope** — each consuming repo needs an `.npmrc` (the auth line can live in the
-   global `~/.npmrc` instead, so no token is committed):
+1. **Auth + scope** — GitHub Packages still requires authenticated downloads
+   for public npm packages. Each consuming repo needs an `.npmrc` (the auth
+   line can live in the global `~/.npmrc` instead, so no token is committed):
 
    ```
    @willyu1007:registry=https://npm.pkg.github.com
    ```
+
+   In GitHub Actions, use that repository's own `GITHUB_TOKEN` with
+   `packages: read`; do not share a cross-repository PAT merely to read this
+   public package.
 
 2. **Add the dependency**:
 

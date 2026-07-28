@@ -291,6 +291,28 @@ The source lock points to
 contract/validator source. Evidence-only commits intentionally do not replace
 that source revision.
 
+## Public web-workbench distribution alignment — 2026-07-28
+
+- GitHub package settings: PASS; owner confirmed
+  `@willyu1007/web-workbench` is public.
+- Source publishing SSOT: PASS; `publishConfig.access=public`.
+- Publishing documentation: PASS; public visibility, irreversibility,
+  authenticated download, and repository-scoped `GITHUB_TOKEN` rules are
+  explicit.
+- GitHub Actions runtime inventory: PASS; checkout/setup-node use v6 and no
+  workflow `uses:` entry remains on v4.
+- `pnpm verify:workflow-contracts`: PASS on Node 24; four package typechecks,
+  canonical-ref lint, runtime `28/28`, scenario `10/10`, federation schemas,
+  semantic release, integration-lock `2/2`, and exact logical source lock all
+  pass.
+- Independent web-workbench: initial typecheck correctly failed because this
+  intentionally standalone package had no local `node_modules`; frozen
+  `pnpm --dir templates/web-workbench install --ignore-workspace` followed by
+  typecheck passes without lockfile changes.
+- Workflow YAML parse, package JSON/access assertion, v4 action scan, and
+  `git diff --check`: PASS.
+- Pending at this checkpoint: Base cloud CI and consumer re-pin.
+
 ## Planned Checks
 - `git diff --check`
 - YAML parse for `templates/scenario-module/scenario.manifest.yaml`

@@ -83,6 +83,15 @@
   aggregate hash, and exact source revision must move together.
 - Do not add validator findings without updating the mechanically checked rule
   inventory in the contract documentation.
+- Do not let a public shared package retain `publishConfig.access=restricted`;
+  the source publishing SSOT, irreversible GitHub visibility, and consumer
+  distribution contract must agree.
+- Do not assume public GitHub npm packages are anonymous downloads. Consumers
+  still authenticate, but an unrelated repository's own read-scoped
+  `GITHUB_TOKEN` is sufficient; do not introduce a shared PAT by default.
+- Do not repair Node action-runtime deprecations in only one consumer. Inventory
+  every federated repository's workflow `uses:` entries and re-run cloud
+  annotations after the coordinated upgrade.
 
 ## Historical Notes
 - 2026-07-13: X0-A initially used `tests/**/*.test.ts`; Vitest 4 did not select
@@ -106,3 +115,7 @@
   build/test `dist` race, stale per-file source-lock entries, and 19 newly
   emitted validator ids absent from docs. Sequential verification, a complete
   lock refresh, and the mechanical inventory repair closed all three.
+- 2026-07-28: Public package visibility fixed Nurture's clean-runner 403s, but
+  Base still declared `publishConfig.access=restricted`. The owner-approved
+  repair aligned the manifest and runbook without publishing another version;
+  Nurture's exact Base source pin must move because the manifest is hashed.
