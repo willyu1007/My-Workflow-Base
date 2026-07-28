@@ -241,6 +241,32 @@
   were pushed to Draft PR #1. GitHub Actions run `29240814017` passed frozen
   install and the complete repaired workflow conformance job in 22 seconds.
 
+## N1 ecosystem alignment results
+
+- PASS: `pnpm check:contract-doc-alignment`
+- PASS: `pnpm check:consumer-boundaries` in Base
+- PASS: `pnpm verify:workflow-contracts`
+  - four workspace typechecks passed;
+  - runtime validator tests: 19 passed;
+  - scenario journey tests: 1 passed;
+  - claim-token, source-hash portability, documentation alignment, and consumer
+    self-test conformance passed;
+  - source lock remained
+    `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.
+- PASS: `git diff --check`
+
+Advisory real-repository scan:
+
+| Repository | Role | Findings |
+|---|---|---|
+| My-Workflow-Base | base | none |
+| My-Chat | host | none |
+| The-Education | scenario | `ECO-CONSUMER-001` for `@the-educator/workflow-contracts` and `@the-educator/workflow-runtime` |
+| The-Nurture | scenario | `ECO-CONSUMER-002` for local linked web-workbench; `ECO-CONSUMER-004` for a sibling-source acceptance-test import |
+
+The consumer findings are expected failures owned by the next scenario phases;
+Base's own verification is green.
+
 ## Planned Checks
 - `git diff --check`
 - YAML parse for `templates/scenario-module/scenario.manifest.yaml`

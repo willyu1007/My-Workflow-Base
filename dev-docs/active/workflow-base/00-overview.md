@@ -32,10 +32,12 @@ consumption surfaces
 - State: in-progress
 - Owner: unassigned
 - Created: 2026-05-25
-- Updated: 2026-07-13
+- Updated: 2026-07-28
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
-- Completed increment: X0-D verification plus post-review contract repair and revision/hash refresh
-- Next gate: My-Chat X1 contract adoption with capability disabled
+- Completed increment: N1 ecosystem model adoption and RB-4
+  documentation/template/conformance reconciliation at `df13843`
+- Next gate: `The-Education/T-041` removes its workflow contract/runtime forks
+  and adopts the Base/My-Chat pin lane
 
 ## Context
 This repository is the workflow base template. It defines durable contracts for
@@ -383,3 +385,9 @@ The current design stance is:
   APIs.
 - 2026-05-26: V0 readiness checklist added: semantic drift pass records
   contract readiness and must-not-regress checks.
+- 2026-07-28: N1 adopted the ecosystem development model, distribution lanes,
+  forward-only schema convention, local port allocation, and status labels.
+  RB-4 drift is closed for the implemented module shape, validator inventory,
+  loader claims, scenario package layout, and materialization-v1 worker example.
+  Advisory consumer checks reproduce the known Education and Nurture boundary
+  violations; owner-repository cleanup is the next increment.

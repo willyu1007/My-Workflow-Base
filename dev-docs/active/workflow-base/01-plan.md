@@ -1,6 +1,28 @@
 # Plan
 
-## Current Increment: X0
+## Current increment: N1 ecosystem alignment
+
+- [x] Adopt `docs/context/ecosystem/development-model.md` as the normative
+  cross-repository role and extraction model.
+- [x] Publish the sanctioned contract distribution lanes, re-pin ritual,
+  forward-only schema convention, collision-free target ports, and status
+  labels.
+- [x] Reconcile `WorkflowScenarioModule` documentation with the exported type.
+- [x] Reconcile the validator rule inventory with every rule id emitted by
+  `validate-module.ts`.
+- [x] Remove the unimplemented loader rule-id family and document only
+  executable loader invariants.
+- [x] Select `packages/<scenario-key>-scenario/` as the single template layout.
+- [x] Add a compiling materialization-v1 worker example with a directly
+  injected host port.
+- [x] Add mechanical documentation alignment and advisory consumer-boundary
+  checks to Base conformance.
+- [x] Run the checker against Base, My-Chat, The-Education, and The-Nurture;
+  preserve unresolved consumer findings for their owner phases.
+
+Implementation revision: `df13843`.
+
+## Historical increment: X0
 
 X0 is the additive contract increment required before My-Chat can adopt durable
 handoff materialization. It is split so the validation environment exists before
@@ -138,6 +160,8 @@ Acceptance:
 - Implementation can start without reopening M1/M2/M3 ownership debates.
 
 ## Current First Move
-Create `dev-docs/active/workflow-handoff-materialization/` in My-Chat and execute
-X1 against `06-x1-adoption-handoff.md`. Adopt types/validator/worker pass-through,
-record the matching source hash, and keep the host capability absent/disabled.
+Execute `The-Education/T-041`: replace the local workflow-contracts and
+workflow-runtime forks with the sanctioned Base/My-Chat adoption lane, then run
+the consumer checker with `--consumer-role scenario --strict`. After Education,
+execute `The-Nurture/T-002` for the Base UI-kit link and cross-repository test
+import findings.

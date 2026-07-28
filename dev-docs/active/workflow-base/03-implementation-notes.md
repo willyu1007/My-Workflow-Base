@@ -161,3 +161,30 @@
 - Repair evidence revision `ee84c29b432441f383d27529dbadabc97c9a2c57`
   records the refreshed lock, portability conformance, documentation, and X1
   handoff without changing contract/validator source.
+
+## 2026-07-28 N1 ecosystem alignment and RB-4 repair
+
+- Adopted `docs/context/ecosystem/` as the authority for repository roles,
+  extraction, distribution, forward-only evolution, local ports, and contract
+  status labels. The source decision is recorded as `My-Chat/T-030`.
+- Replaced the stale module-shape example with the exact exported
+  `WorkflowScenarioModule` type and made the validator inventory match all 33
+  emitted `WF-MAN-*` rule ids.
+- Deleted the phantom loader rule-id table. The loader currently throws on a
+  failed validator report and duplicate scenario/handler bindings, returns
+  read-only maps, and uses frozen descriptors.
+- Chose `packages/<scenario-key>-scenario/` as the only documented template
+  layout and aligned the implementation skeleton and scenario README.
+- Added a compiling materialization-v1 worker example that receives
+  `WorkflowRuntimePortMaterializationV1` from the host and forwards transient
+  claim evidence plus typed handoff drafts without a cast.
+- Added `check-contract-doc-alignment.mjs` and
+  `check-consumer-boundaries.mjs`. The first is part of Base CI; the second is
+  advisory until a consumer opts into `--strict`.
+- Real scans found no My-Chat issue, two Education shared-package forks, and two
+  Nurture issues: the Base web-workbench `link:` dependency and a sibling-source
+  import in joint acceptance evidence. These are delegated to
+  `The-Education/T-041` and `The-Nurture/T-002`.
+- Implementation revision: `df13843`. Contract/validator source remained
+  unchanged, so the logical adoption hash remains
+  `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.

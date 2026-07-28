@@ -62,6 +62,16 @@
 - Do not recover `WorkflowRuntimePortMaterializationV1` from the legacy-typed
   scenario adapter through a cast. Inject the host-owned v1 port into the worker
   and prove the call path through compile conformance.
+- Do not document validator or loader rule ids that executable source does not
+  emit. Keep the validator inventory under mechanical conformance and describe
+  loader invariants without a phantom finding-id family.
+- Do not maintain two scenario directory layouts. Use
+  `packages/<scenario-key>-scenario/` with one `src/` tree.
+- Do not treat a local Base UI-kit link, scenario-owned shared workflow fork, or
+  sibling-source test import as release evidence. Use the sanctioned
+  distribution lane and exact pin evidence.
+- Do not mark allocated ports as implemented until the owning repository's
+  environment contract and application defaults agree.
 
 ## Historical Notes
 - 2026-07-13: X0-A initially used `tests/**/*.test.ts`; Vitest 4 did not select
@@ -78,3 +88,6 @@
   explicit unsupported materialization modes warned instead of failing, and the
   generic completion-result union accepted an incomplete v1-looking object.
   Both now have negative regression coverage, and the source lock was refreshed.
+- 2026-07-28: The first documentation-alignment run caught a retired scenario
+  path still repeated in explanatory prose after the directory tree changed.
+  The wording was removed and the path check retained to prevent recurrence.

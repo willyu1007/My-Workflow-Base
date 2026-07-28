@@ -5,6 +5,19 @@ Turn the workflow base from a set of exploratory contracts into a v0 modular
 template that concrete workflow teams can implement against and host products
 can consume without per-scenario API drift.
 
+## Current ecosystem alignment overlay
+
+| Increment | Repository | State | Exit evidence |
+|---|---|---|---|
+| N0 | My-Chat | complete | Published immutable host baseline |
+| N1 | My-Workflow-Base | complete at `df13843` | Ecosystem SSOT, RB-4 reconciliation, materialization-v1 example, conformance green |
+| N2 | The-Education | next | Shared workflow forks removed; exact pins and strict consumer check pass |
+| N3 | The-Nurture | pending | UI-kit semver lane and no sibling-source imports; strict consumer check passes |
+| N4 | My-Chat | pending | Cross-repository evidence reconciled and release/cloud readiness re-evaluated |
+
+N1 establishes policy and mechanical detection. It does not rewrite consumer
+repositories or mark their target ports as implemented.
+
 ## Current X0 Implementation Overlay
 
 The v0 contract remains the base. The current cross-repo increment adds an

@@ -262,6 +262,29 @@ Changing docs, tests, package-manager files, or the hash tool does not change th
 adoption source hash. Changing contract or validator non-test source does and
 requires an intentional new lock/revision.
 
+## N1 ecosystem adoption boundary
+
+Base is the normative owner of cross-repository conventions but remains a
+non-runtime repository. N1 locks three distinct distribution lanes:
+
+| Artifact | Lane |
+|---|---|
+| Base host contracts and validator | Copy plus logical source hash; My-Chat only |
+| Base UI kits | Published npm semver |
+| My-Chat contracts used by scenarios | Exact sibling checkout plus revision/hash pin and CI verifier |
+
+The consumer checker is advisory in Base and opt-in strict in consumers. It
+detects unsupported scenario forks, Base local-source dependencies, unverified
+My-Chat local contract dependencies, and direct sibling-source imports. It does
+not mutate consumer repositories or infer that an allocated target port is
+already implemented.
+
+The implemented validator inventory is mechanically tied to
+`validate-module.ts`; the documented `WorkflowScenarioModule` block is tied to
+the exported source type. Loader behavior has no separate stable finding-id
+family until code emits one. Scenario templates use one package-root layout:
+`packages/<scenario-key>-scenario/`.
+
 ## Key Architectural Risk
 The main risk is accidental second-system creation: a scenario or surface might
 introduce private APIs, private status, private domain stores, or private handoff
