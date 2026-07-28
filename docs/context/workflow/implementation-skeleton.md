@@ -1,5 +1,8 @@
 # Workflow implementation skeleton
 
+Status: mixed; paths and executable scaffold statements labelled implemented,
+while host adoption remains target
+
 ## Purpose
 This document defines the implementation skeleton a host product can use when it
 adopts the workflow base. It is a scaffold contract, not a runtime
@@ -71,22 +74,25 @@ packages/workflow-runtime/
     workflow-worker.ts
     outbox-dispatcher.ts
 
-scenarios/<scenario_key>/
+packages/<scenario-key>-scenario/
   scenario.manifest.yaml
-  module.ts
-  registry.ts
-  handlers/
-  actions/
-  adapters/
-  presenters.ts
-  policies.ts
+  src/module.ts
+  src/registry.ts
+  src/repositories.ts
+  src/handlers/
+  src/actions/
+  src/adapters/
+  src/presenters.ts
+  src/policies.ts
   tests/
-    <scenario_key>.journey.test.ts
+    <scenario-key>.journey.test.ts
     fixtures/
 ```
 
-The base template may provide example files, but the host product owns concrete
-runtime code and persistence.
+This package-root layout is normative for Base templates. The base template
+implements it under `templates/scenario-module/`; consuming repositories rename
+the package but do not add a second scenario-named nesting layer under `src/`.
+The host product owns concrete runtime code and persistence.
 
 A lightweight copyable scaffold is available under
 `templates/host-runtime/packages/`. It mirrors this layout with type-only
@@ -277,9 +283,16 @@ snapshot/draft persists the token.
 The v1 runtime port is host-owned and injected directly into the worker. It is
 not recovered from the legacy-typed scenario `worker_runtime` adapter with a
 cast. A source-repo compile fixture proves the claimed driver, handler result,
-and injected v1 port compose without a type assertion. Worker pass-through is a
-My-Chat X1 adoption task; lease/reclaim and atomic persistence remain X2/X3
-tasks.
+and injected v1 port compose without a type assertion. Host adoption remains
+owned by `My-Chat/T-024`; lease/reclaim and atomic persistence are host runtime
+work, not Base responsibilities.
+
+The implemented copyable example is
+`templates/host-runtime/packages/workflow-runtime/src/workers/workflow-worker.materialization-v1.example.ts`.
+It injects `WorkflowRuntimePortMaterializationV1`, forwards the live
+`claim_token` only to the trusted handler and completion call, and passes typed
+`handoff_drafts` with `completion_contract_version: 1`. It is an adoption
+example, not a Base runtime service.
 
 ## Journey harness skeleton
 

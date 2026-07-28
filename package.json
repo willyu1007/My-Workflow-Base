@@ -19,6 +19,8 @@
     "test": "pnpm test:runtime && pnpm test:scenario && pnpm test:conformance",
     "hash:workflow-contract-source": "node conformance/scripts/compute-workflow-contract-source-hash.mjs",
     "check:workflow-contract-source": "node conformance/scripts/compute-workflow-contract-source-hash.mjs --check conformance/workflow-contract-source-lock.json",
+    "check:contract-doc-alignment": "node conformance/scripts/check-contract-doc-alignment.mjs",
+    "check:consumer-boundaries": "node conformance/scripts/check-consumer-boundaries.mjs",
     "verify:workflow-contracts": "pnpm typecheck && pnpm test && pnpm check:workflow-contract-source",
     "verify:x0-a": "pnpm verify:workflow-contracts",
     "verify:x0-b": "pnpm verify:workflow-contracts",

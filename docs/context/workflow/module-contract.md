@@ -1,24 +1,32 @@
 # Workflow module contract
 
+Status: mixed; implemented sections are bound to the template source, and
+target sections are explicitly labelled.
+
+Status convention: `../ecosystem/contract-status.md`
+
 ## Purpose
 This document defines how a concrete workflow module adopts the base template.
 The base repository does not load or run the module. A module is not a plugin
 marketplace package and does not execute arbitrary code from users. It is a
 controlled product module authored in the host repo or approved distribution.
 
-## Module shape
+## Implemented module shape
+
+The copyable contract package currently exports this exact shape:
 
 ```ts
 export type WorkflowScenarioModule = {
   manifest: ScenarioManifest;
-  repositories: ScenarioRepositoryFactory;
-  handler_registry: WorkflowHandlerRegistry;
-  action_registry: WorkflowActionRegistry;
-  adapters: WorkflowSurfaceAdapters;
+  handlers: WorkflowHandlerRegistry;
+  actions: WorkflowActionRegistry;
+  adapters: WorkflowSurfaceAdapters & {
+    chat_workflow_control: ChatWorkflowAdapter;
+    worker_runtime: WorkflowRuntimePort;
+  };
   presenters: WorkflowPresenters;
   policies: WorkflowPolicies;
-  tests: WorkflowScenarioTestContract;
-  internal_api?: WorkflowInternalApiRegistry;
+  internal_api_handlers: WorkflowInternalApiRegistry;
 };
 ```
 
@@ -30,8 +38,9 @@ registerWorkflowScenario(exampleScenarioModule);
 registerWorkflowScenario(secondScenarioModule);
 ```
 
-Registration or CI validation fails if contract keys, registry bindings,
-presenters, policies, or tests are missing.
+Registration and CI validation enforce the implemented rules listed below.
+Broader activation requirements remain target rules until the template
+validator emits them.
 
 YAML is the default declarative contract artifact. A concrete workflow may use
 an equivalent TypeScript contract constant when it does not need YAML. TypeScript
@@ -294,7 +303,7 @@ Concrete workflow runtime APIs reject disabled scenarios, unknown contract
 hashes, stale expected versions, and modules whose boot-time registry does not
 match the published contract.
 
-## Repository boundary
+## Target repository boundary
 Scenario repositories hide persistence and return domain entities. Business
 services, controllers, presenters, and handlers must not import ORM clients
 directly.
@@ -1212,20 +1221,19 @@ explicitly timeboxed migration bridges.
 An absent or empty `host_capabilities` list means the vNext materialization
 capability is disabled.
 
-Minimum validation rules:
+Implemented validation rules:
 
+<!-- VALIDATOR-RULE-INVENTORY:START -->
 | Rule id | Severity | Check |
 |---|---|---|
-| `WF-MAN-001` | Fatal | `scenario_key` matches a canonical `Scenario` record and the target status is compatible with `launch_phase`. |
-| `WF-MAN-002` | Fatal | Published manifest hash/version is stored on the `Scenario` record before pilot/GA activation. |
-| `WF-MAN-010` | Fatal | Every declared step has exactly one registered handler key. |
-| `WF-MAN-011` | Fatal | Every declared shared/scenario action has a registered action handler and requires expected versions for durable writes. |
-| `WF-MAN-012` | Fatal | Every declared surface has a presenter or adapter binding. |
-| `WF-MAN-013` | Fatal | Policies default-deny unsupported surfaces, actions, handoffs, and artifact exposure paths. |
-| `WF-MAN-014` | Fatal | Every supported shared surface maps to the standard API/adapter closure and does not require scenario-specific product APIs. |
-| `WF-MAN-020` | Fatal | Internal APIs are Web/Admin-only and are declared with owner surface, command class, and handler key. |
-| `WF-MAN-021` | Fatal | Chat, mobile, forum, RAG, notification, public links, and external clients do not consume internal APIs. |
-| `WF-MAN-030` | Fatal | Domain context ref types declare resolver keys and owner scope; workflow does not declare itself as canonical domain owner. |
+| `WF-MAN-001` | Fatal | Canonical `Scenario` record is present. |
+| `WF-MAN-002` | Fatal | Canonical `Scenario` status matches `scenario_record.required_status`. |
+| `WF-MAN-003` | Fatal | Canonical current manifest hash matches the computed module contract hash. |
+| `WF-MAN-010` | Fatal | Every declared step handler is registered. |
+| `WF-MAN-011` | Fatal | Every declared scenario action handler is registered. |
+| `WF-MAN-020` | Fatal | Internal API route owners are restricted to Web/Admin surfaces. |
+| `WF-MAN-021` | Fatal | Every declared internal API handler is registered. |
+| `WF-MAN-030` | Fatal | Every declared domain context resolver is present in the host snapshot. |
 | `WF-MAN-031` | Fatal | `step_interventions` are restricted to `web_run_workbench`; chat does not declare or consume them. |
 | `WF-MAN-040` | Fatal | Every declared handoff requires a downstream receipt. |
 | `WF-MAN-041` | Fatal | Every declared handoff policy key is registered by the scenario module. |
@@ -1234,17 +1242,24 @@ Minimum validation rules:
 | `WF-MAN-044` | Fatal | A `workflow_step_complete_v1` handoff has no non-empty stable `handoff_key`. |
 | `WF-MAN-045` | Fatal | A `workflow_step_complete_v1` handoff declares no non-empty artifact or context source type. |
 | `WF-MAN-046` | Fatal | At least one vNext handoff exists but the host snapshot does not enable `workflow_handoff_materialization_v1`. |
-| `WF-MAN-047` | Fatal | A non-empty `handoff_key` is declared more than once across legacy migration and vNext declarations. |
+| `WF-MAN-047` | Fatal | A non-empty `handoff_key` is declared more than once. |
 | `WF-MAN-048` | Fatal | `materialization_mode` is present but is not the supported `workflow_step_complete_v1` value. |
-| `WF-MAN-050` | Fatal | Standard workflow events match the base registry; scenario internal events use `{scenario_key}.{capability_key}.{aggregate}.{verb}`. |
-| `WF-MAN-051` | Fatal | `event_registry.producers` maps every emitted event to an allowed owner and write boundary. |
-| `WF-MAN-052` | Fatal | Shared consumer `allowed_events` contain no scenario internal events. |
-| `WF-MAN-053` | Fatal | Event payload policy is refs-only: `body=no_body`, `pii=no_pii`, no canonical status, no presenter output. |
-| `WF-MAN-054` | Fatal | Standard event idempotency keys are deterministic. |
-| `WF-MAN-060` | Fatal | Outbox events are registered, classified, and produced with the canonical write where possible. |
-| `WF-MAN-070` | Fatal | P0/P1 authoritative writes have minimal evidence record declarations. |
-| `WF-MAN-080` | Fatal | Projection field changes have a projection review record before activation. |
-| `WF-MAN-090` | Fatal | Deterministic tests and at least one journey harness are declared. |
+| `WF-MAN-050` | Fatal | Event payload policy is refs-only and bodyless. |
+| `WF-MAN-051` | Fatal | Every standard workflow event is registered by the host. |
+| `WF-MAN-052` | Fatal | Every platform event is registered by the host. |
+| `WF-MAN-060` | Fatal | Every governance outbox event is registered. |
+| `WF-MAN-061` | Fatal | Every governance outbox event declares a producer. |
+| `WF-MAN-062` | Fatal | Shared consumers do not depend on scenario-internal events. |
+| `WF-MAN-063` | Fatal | Each non-wildcard consumer allow-list event is registered. |
+| `WF-MAN-070` | Fatal | A required projection review exists before pilot or GA activation. |
+| `WF-MAN-080` | Fatal | Deterministic tests and a journey harness are declared. |
+| `WF-MAN-090` | Fatal | Run-start requirements use only host-supported surfaces. |
+| `WF-MAN-091` | Fatal | Surface mappings use only host-supported surfaces. |
+| `WF-MAN-092` | Fatal | The chat workflow control adapter is present when mapped. |
+| `WF-MAN-093` | Fatal | The web run workbench adapter is present when mapped. |
+| `WF-MAN-094` | Fatal | The mobile dashboard adapter is present when mapped. |
+| `WF-MAN-095` | Fatal | The admin operator adapter is present when mapped. |
+<!-- VALIDATOR-RULE-INVENTORY:END -->
 
 `WF-MAN-043` is warning-only and therefore does not make `report.passed` false.
 The capability check emits one host-level `WF-MAN-046` finding even when a
@@ -1320,18 +1335,12 @@ that the run's stored `contract_hash` and workflow version are compatible before
 executing a step. Surface routing resolves presenters/adapters from the same
 registered descriptor and still rereads canonical state before durable writes.
 
-Minimum loader rules:
-
-| Rule id | Severity | Check |
-|---|---|---|
-| `WF-LOAD-001` | Fatal | Module registration has a passing validation report for the activation target. |
-| `WF-LOAD-002` | Fatal | `scenario_key`, capability keys, entrypoint keys, step keys, handler keys, action keys, presenter keys, and policy keys are unique inside the registered module. |
-| `WF-LOAD-003` | Fatal | Registered `contract_hash` matches the canonical `Scenario` record or approved version record for pilot/GA. |
-| `WF-LOAD-004` | Fatal | Worker dispatch can resolve every declared `handler_key` from canonical run identity and stored contract hash. |
-| `WF-LOAD-005` | Fatal | Surface routing exposes only standard adapters/presenters to chat, mobile, forum, RAG, notification, public links, and external clients. |
-| `WF-LOAD-006` | Fatal | Internal APIs are mounted only for declared Web/Admin owner surfaces. |
-| `WF-LOAD-007` | Fatal | Disabled modules cannot start new runs except through explicit migration/replay tooling. |
-| `WF-LOAD-008` | Warning | Migration bridge events or legacy handlers are present and must have an owner, expiry, and removal checkpoint. |
+The implemented loader does not emit a second family of stable finding ids.
+It throws on a failed validator report, duplicate `scenario_key`, duplicate
+canonical handler-binding key, or a later failed exact binding lookup. It
+returns read-only scenario and handler maps, and descriptors are deep-frozen.
+Additional loader gates remain targets until executable checks and tests land;
+documentation must not allocate phantom rule ids for them.
 
 ## Activation gates
 A module is not plug-and-play until these gates pass:

@@ -5,6 +5,10 @@ Workflow modular base template。这个仓库不提供运行时服务；具体 w
 
 ## 核心契约
 
+- [Ecosystem development model](docs/context/ecosystem/development-model.md)：定义
+  My-Chat、场景仓与 Base 的职责、抽取规则和跨仓仲裁。
+- [Contract distribution](docs/context/ecosystem/contract-distribution.md)：定义
+  copy+hash、npm semver、固定 checkout/pin 三条采用通道及机械检查。
 - [Workflow v0 convergence](docs/context/workflow/v0-convergence.md)：固化当前收敛口径，包括 scenario 一等对象、内部 API 边界、YAML manifest 或等价 TS contract + TS handler registry、handoff-only 底座。
 - [Workflow architecture matrix](docs/context/workflow/architecture-matrix.md)：定义 5 个底座模块与 chat workflow control、chat dashboard summary、web workbench、mobile dashboard、forum、RAG、notification、admin、worker 等消费面的统一关系。
 - [Workflow surface contract](docs/context/workflow/surface-contract.md)：定义 workflow 如何被 chat、论坛、mobile 看板、web workbench、RAG、通知、Admin、worker 消费和编辑。
@@ -60,8 +64,9 @@ journey test，并校验 X1 采用所需的合同源码 lock；不启动运行�
 - 复制 `templates/host-runtime/packages/workflow-contracts` 和
   `templates/host-runtime/packages/workflow-runtime` 到宿主项目，并按宿主项目
   package 命名改 import alias。
-- 复制 `templates/scenario-module` 到宿主项目的场景目录，填写 manifest 或等价
-  TS contract，并实现 handlers/actions/adapters/presenters/policies。
+- 复制 `templates/scenario-module` 到宿主项目的
+  `packages/<scenario-key>-scenario/`，填写 manifest 或等价 TS contract，
+  并实现 handlers/actions/adapters/presenters/policies。
 
 1. 场景 manifest：声明 capability、entrypoint、artifact、action、surface mapping。
 2. TS handler registry：把 manifest 里的 handler key 绑定到受控实现。

@@ -133,16 +133,17 @@ client, or worker-dispatch contracts.
 A concrete scenario should provide these module files in the host project:
 
 ```txt
-scenario.manifest.yaml
-src/<scenario>/module.ts
-src/<scenario>/repositories.ts
-src/<scenario>/registry.ts
-src/<scenario>/handlers/*.ts
-src/<scenario>/actions/*.ts
-src/<scenario>/adapters/*.ts
-src/<scenario>/presenters.ts
-src/<scenario>/policies.ts
-src/<scenario>/tests/<scenario>.journey.test.ts
+packages/<scenario-key>-scenario/
+  scenario.manifest.yaml
+  src/module.ts
+  src/repositories.ts
+  src/registry.ts
+  src/handlers/*.ts
+  src/actions/*.ts
+  src/adapters/*.ts
+  src/presenters.ts
+  src/policies.ts
+  tests/<scenario-key>.journey.test.ts
 ```
 
 The manifest or equivalent TS constant declares the public contract. `module.ts`

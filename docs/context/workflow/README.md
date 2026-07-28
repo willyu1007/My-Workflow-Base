@@ -2,6 +2,8 @@
 
 This directory contains the base-template contracts for workflow modules.
 
+Read `../ecosystem/README.md` first when work crosses repository boundaries.
+
 Read in this order:
 
 1. `v0-convergence.md` for the current architecture stance and plug-in rules.

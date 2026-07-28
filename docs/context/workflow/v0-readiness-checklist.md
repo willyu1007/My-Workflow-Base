@@ -21,7 +21,7 @@ owned, and safe for host implementation.
 | Downstream systems | Pass | Projection, forum/public draft, RAG/knowledge, notification, search/vector, PPR, and replay reread canonical owner state before side effects. |
 | Audit/evidence scope | Pass | MVP uses minimal evidence records for high-risk authoritative writes, not a full audit product. |
 | Validator gates | Pass for contract | `WF-MAN-*` rules define fatal checks; host implementation remains pending. |
-| Registry loader | Pass for contract | `WF-LOAD-*` rules define fail-fast host-owned loading; host implementation remains pending. |
+| Registry loader | Pass for implemented scaffold | Loader throws on validator failure and duplicate scenario/handler bindings, returns read-only maps, and uses deep-frozen descriptors; no separate loader rule-id family is implemented. |
 | Standard API closure | Pass | Discovery, start requirements, run lifecycle, action, artifact, handoff, dashboard, chat citation, admin, and worker runtime groups are defined. |
 | Implementation skeleton | Pass for scaffold | Host package layout, validator, loader, routes, handoff service, worker runtime, and journey harness shape are defined. |
 | Scenario readiness | Pass for proof | Education-like seed and non-education support-case scenarios use the same contracts without new shared product APIs. |
