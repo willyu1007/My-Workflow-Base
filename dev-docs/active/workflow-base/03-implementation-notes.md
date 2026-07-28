@@ -237,3 +237,7 @@
   not contain the locked source ancestor `eb19433`. Base CI now uses
   `fetch-depth: 0`, matching the exact-history requirement already enforced by
   the four-repository gate.
+- Repair run `30348474446` passed the complete Node 24 conformance job at exact
+  config revision `2af7c45e576af272f36400636ca02c122a14e643`.
+  GitHub reports zero check annotations. This documentation-only evidence
+  commit does not change the package manifest or either source hash.

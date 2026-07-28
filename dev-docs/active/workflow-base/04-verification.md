@@ -314,8 +314,10 @@ that source revision.
 - Cloud run `30348263661`: FAIL AFTER ALL FUNCTIONAL CHECKS PASSED. The final
   source-lock step could not resolve ancestor `eb19433` from checkout@v6's
   default shallow clone; no source/hash mismatch occurred.
-- Repair: checkout now uses `fetch-depth: 0`; renewed Base cloud CI and consumer
-  re-pin remain pending.
+- Repair run `30348474446`: PASS at exact config revision `2af7c45`; full
+  history source lock, all conformance checks, and Node 24 action runtime pass.
+  The check run has `annotations_count=0`.
+- Consumer re-pin and renewed four-repository qualification remain pending.
 
 ## Planned Checks
 - `git diff --check`
