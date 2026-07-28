@@ -232,3 +232,8 @@
   `web_workbench` source population, the final Base revision and recalculated
   hash must be adopted by Nurture before the four-repository qualification lock
   is refreshed.
+- First cloud run `30348263661` passed every typecheck/test and failed only at
+  the final source-lock check because checkout@v6's default shallow clone did
+  not contain the locked source ancestor `eb19433`. Base CI now uses
+  `fetch-depth: 0`, matching the exact-history requirement already enforced by
+  the four-repository gate.

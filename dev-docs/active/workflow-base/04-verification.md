@@ -311,7 +311,11 @@ that source revision.
   typecheck passes without lockfile changes.
 - Workflow YAML parse, package JSON/access assertion, v4 action scan, and
   `git diff --check`: PASS.
-- Pending at this checkpoint: Base cloud CI and consumer re-pin.
+- Cloud run `30348263661`: FAIL AFTER ALL FUNCTIONAL CHECKS PASSED. The final
+  source-lock step could not resolve ancestor `eb19433` from checkout@v6's
+  default shallow clone; no source/hash mismatch occurred.
+- Repair: checkout now uses `fetch-depth: 0`; renewed Base cloud CI and consumer
+  re-pin remain pending.
 
 ## Planned Checks
 - `git diff --check`

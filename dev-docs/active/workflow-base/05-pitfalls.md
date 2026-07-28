@@ -92,6 +92,9 @@
 - Do not repair Node action-runtime deprecations in only one consumer. Inventory
   every federated repository's workflow `uses:` entries and re-run cloud
   annotations after the coordinated upgrade.
+- Do not validate an ancestor-bound source lock from a default shallow
+  checkout. Any verifier that resolves a historical source revision requires
+  `fetch-depth: 0`.
 
 ## Historical Notes
 - 2026-07-13: X0-A initially used `tests/**/*.test.ts`; Vitest 4 did not select
@@ -119,3 +122,7 @@
   Base still declared `publishConfig.access=restricted`. The owner-approved
   repair aligned the manifest and runbook without publishing another version;
   Nurture's exact Base source pin must move because the manifest is hashed.
+- 2026-07-28: Base cloud run `30348263661` passed all contract behavior and
+  failed only when the source-lock verifier could not resolve historical commit
+  `eb19433` from checkout@v6's one-commit clone. Full history checkout is now a
+  mechanical CI requirement.
