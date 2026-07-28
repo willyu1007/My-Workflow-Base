@@ -11,12 +11,16 @@ can consume without per-scenario API drift.
 |---|---|---|---|
 | N0 | My-Chat | complete | Published immutable host baseline |
 | N1 | My-Workflow-Base | complete at `df13843` | Ecosystem SSOT, RB-4 reconciliation, materialization-v1 example, conformance green |
-| N2 | The-Education | next | Shared workflow forks removed; exact pins and strict consumer check pass |
-| N3 | The-Nurture | pending | UI-kit semver lane and no sibling-source imports; strict consumer check passes |
+| N2 | The-Education | owner acceptance complete | Candidate integration lock and cross-project acceptance evidence established; fork removal is held behind X-5 upstream convergence |
+| N3a | The-Nurture | complete at `e3c6ba7` | Published UI-kit semver lane, public My-Chat package boundary, exact pins, strict consumer check, and two-database acceptance pass |
+| N3b | My-Workflow-Base | complete at source `eb19433` / evidence `6cf298c` | Federation-v1 source replayed onto N1; exact source hash `caebe85d…7b2e`; complete conformance green |
+| N3c | My-Chat / The-Education | next | My-Chat adopts converged source; Education removes/renames shared forks and re-pins exact upstream revisions |
 | N4 | My-Chat | pending | Cross-repository evidence reconciled and release/cloud readiness re-evaluated |
 
-N1 establishes policy and mechanical detection. It does not rewrite consumer
-repositories or mark their target ports as implemented.
+N1 establishes policy and mechanical detection. N3a has closed Nurture's
+consumer-boundary findings. N3b closes the divergent Base source line without
+discarding N1. N3c is the remaining upstream-adoption and Education fork-cleanup
+gate; no target port is considered implemented solely because it is allocated.
 
 ## Current X0 Implementation Overlay
 

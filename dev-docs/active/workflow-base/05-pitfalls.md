@@ -72,6 +72,17 @@
   distribution lane and exact pin evidence.
 - Do not mark allocated ports as implemented until the owning repository's
   environment contract and application defaults agree.
+- Do not merge an old federation candidate branch wholesale onto a newer
+  ecosystem baseline. Replay the required semantic source changes and preserve
+  later conformance gates explicitly.
+- Do not let federation cherry-picks replace the N1 documentation-alignment or
+  consumer-boundary checks with an older package-script set.
+- Do not run a fresh contract package build/typecheck concurrently with tests
+  that import its generated `dist`; use the prescribed sequential verifier.
+- Do not refresh only the aggregate adoption hash. The per-file source manifest,
+  aggregate hash, and exact source revision must move together.
+- Do not add validator findings without updating the mechanically checked rule
+  inventory in the contract documentation.
 
 ## Historical Notes
 - 2026-07-13: X0-A initially used `tests/**/*.test.ts`; Vitest 4 did not select
@@ -91,3 +102,7 @@
 - 2026-07-28: The first documentation-alignment run caught a retired scenario
   path still repeated in explanatory prose after the directory tree changed.
   The wording was removed and the path check retained to prevent recurrence.
+- 2026-07-28: X-5 initially exposed three evidence hazards: a concurrent
+  build/test `dist` race, stale per-file source-lock entries, and 19 newly
+  emitted validator ids absent from docs. Sequential verification, a complete
+  lock refresh, and the mechanical inventory repair closed all three.

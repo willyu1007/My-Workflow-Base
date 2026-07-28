@@ -188,3 +188,27 @@
 - Implementation revision: `df13843`. Contract/validator source remained
   unchanged, so the logical adoption hash remains
   `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.
+
+## 2026-07-28 X-5 federation convergence
+
+- Used current Base main as the integration baseline and replayed only the four
+  required federation code commits from the candidate line. Stale candidate
+  documentation and unrelated branch history were not merged.
+- Resolved the conformance package as a union: federation schemas, semantic
+  release checks, canonical-reference linting, and integration-lock
+  verification were added while the later N1 documentation and consumer
+  boundary checks were retained.
+- Published contract metadata as public `1.0.0` and exposed the required
+  conformance CLIs without adding runtime persistence or scenario ownership.
+- Refreshed both the aggregate source hash and its per-file source manifest.
+  The resulting hash is
+  `caebe85d492724a727b0ccb7a99fe9da15e0536393c4a0ab42069f8264ea7b2e`.
+- Bound the source lock to the actual last source-bearing revision,
+  `eb19433c6e68ad1abaaddc356e6afe5ea52dcf97`; the subsequent evidence repair is
+  `6cf298c`.
+- The first sequential full verifier caught 19 new validator rule ids missing
+  from the documentation inventory. The inventory was expanded through
+  `WF-MAN-117` and the mechanical documentation check now passes.
+- A diagnostic attempt that ran typecheck/build and tests concurrently exposed
+  a fresh-worktree `dist` race. Final evidence uses only the prescribed
+  sequential `pnpm verify:workflow-contracts` command.

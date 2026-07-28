@@ -34,10 +34,14 @@ consumption surfaces
 - Created: 2026-05-25
 - Updated: 2026-07-28
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
-- Completed increment: N1 ecosystem model adoption and RB-4
-  documentation/template/conformance reconciliation at `df13843`
-- Next gate: `The-Education/T-041` removes its workflow contract/runtime forks
-  and adopts the Base/My-Chat pin lane
+- Completed increments:
+  - N1 ecosystem model adoption and RB-4
+    documentation/template/conformance reconciliation at `df13843`
+  - X-5 Base federation-v1 contract convergence at source revision `eb19433`
+    and evidence revision `6cf298c`
+- Next gate: My-Chat adopts the converged Base contract/validator source before
+  `The-Education/T-041` removes its workflow contract/runtime forks and re-pins
+  both upstream repositories
 
 ## Context
 This repository is the workflow base template. It defines durable contracts for
@@ -391,3 +395,10 @@ The current design stance is:
   loader claims, scenario package layout, and materialization-v1 worker example.
   Advisory consumer checks reproduce the known Education and Nurture boundary
   violations; owner-repository cleanup is the next increment.
+- 2026-07-28: X-5 replayed the federation-v1 contract work onto the N1 baseline
+  without merging the stale candidate branch. The converged source revision is
+  `eb19433c6e68ad1abaaddc356e6afe5ea52dcf97`, the evidence revision is
+  `6cf298c`, and the exact adoption source hash is
+  `caebe85d492724a727b0ccb7a99fe9da15e0536393c4a0ab42069f8264ea7b2e`.
+  The N1 documentation and consumer-boundary gates remain active. My-Chat
+  adoption is now the next cross-repository gate.

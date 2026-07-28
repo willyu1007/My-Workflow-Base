@@ -285,6 +285,26 @@ the exported source type. Loader behavior has no separate stable finding-id
 family until code emits one. Scenario templates use one package-root layout:
 `packages/<scenario-key>-scenario/`.
 
+## X-5 federation convergence boundary
+
+Federation v1 is additive to the N1 ecosystem boundary. Base remains the
+contract and conformance owner; it does not become a host runtime or a scenario
+canonical store.
+
+The converged boundary adds:
+
+- versioned federation, release, provenance, and canonical-reference schemas
+- fail-closed semantic release and canonical-reference validation
+- an integration-lock verifier for exact Base/My-Chat/artifact revisions and
+  source hashes
+- a public conformance package and executable CLI surface for consumers
+
+The N1 checks remain mandatory. Federation changes do not weaken documentation
+alignment, the scenario-fork prohibition, the published UI-kit lane, or the
+exact sibling-checkout evidence required for My-Chat contracts. Base source
+revision, aggregate adoption hash, and per-file source manifest form one
+evidence set; all three must describe the same contract-bearing source.
+
 ## Key Architectural Risk
 The main risk is accidental second-system creation: a scenario or surface might
 introduce private APIs, private status, private domain stores, or private handoff

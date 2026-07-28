@@ -267,6 +267,30 @@ Advisory real-repository scan:
 The consumer findings are expected failures owned by the next scenario phases;
 Base's own verification is green.
 
+## X-5 federation convergence results
+
+Verified from the clean Base convergence worktree on 2026-07-28:
+
+- `pnpm install --frozen-lockfile` — pass
+- `pnpm verify:workflow-contracts` — pass
+  - four package typechecks passed
+  - canonical-reference lint passed with zero findings
+  - runtime tests passed: 2 files / 28 tests
+  - scenario tests passed: 2 files / 10 tests
+  - claim-token boundary, source-hash portability, contract-doc alignment, and
+    consumer-scanner self-test passed
+  - all nine federation schemas and the semantic release contract passed
+  - integration-lock tests passed: 2 / 2
+  - exact source lock passed for
+    `caebe85d492724a727b0ccb7a99fe9da15e0536393c4a0ab42069f8264ea7b2e`
+- `git diff --check` — pass
+- final worktree status before documentation handoff — clean
+
+The source lock points to
+`eb19433c6e68ad1abaaddc356e6afe5ea52dcf97`, the last commit that changed the
+contract/validator source. Evidence-only commits intentionally do not replace
+that source revision.
+
 ## Planned Checks
 - `git diff --check`
 - YAML parse for `templates/scenario-module/scenario.manifest.yaml`

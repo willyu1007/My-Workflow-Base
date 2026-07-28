@@ -1,6 +1,27 @@
 # Plan
 
-## Current increment: N1 ecosystem alignment
+## Current increment: X-5 federation convergence
+
+- [x] Replay the four required federation code changes onto current Base main
+  instead of merging the stale candidate branch.
+- [x] Preserve the N1 documentation-alignment and consumer-boundary checks while
+  adding federation schemas, release validation, canonical-reference linting,
+  and integration-lock verification.
+- [x] Publish `@my-chat/base-contract-conformance` as a public `1.0.0`
+  conformance package with executable integration-lock support.
+- [x] Bind the aggregate source hash and per-file manifest to the exact
+  contract-bearing source revision `eb19433c6e68ad1abaaddc356e6afe5ea52dcf97`.
+- [x] Expand the mechanically checked validator inventory for every newly
+  emitted rule id.
+- [x] Pass the complete sequential `pnpm verify:workflow-contracts` gate from a
+  frozen clean worktree.
+
+Contract source revision: `eb19433c6e68ad1abaaddc356e6afe5ea52dcf97`.
+Evidence revision before this handoff update: `6cf298c`.
+Adoption source hash:
+`caebe85d492724a727b0ccb7a99fe9da15e0536393c4a0ab42069f8264ea7b2e`.
+
+## Completed increment: N1 ecosystem alignment
 
 - [x] Adopt `docs/context/ecosystem/development-model.md` as the normative
   cross-repository role and extraction model.
@@ -160,8 +181,8 @@ Acceptance:
 - Implementation can start without reopening M1/M2/M3 ownership debates.
 
 ## Current First Move
-Execute `The-Education/T-041`: replace the local workflow-contracts and
-workflow-runtime forks with the sanctioned Base/My-Chat adoption lane, then run
-the consumer checker with `--consumer-role scenario --strict`. After Education,
-execute `The-Nurture/T-002` for the Base UI-kit link and cross-repository test
-import findings.
+Adopt the converged Base contract and validator source in `My-Chat/T-030` while
+preserving the already published Nurture API boundary. Then execute
+`The-Education/T-041`: replace scenario-owned shared workflow forks with the
+sanctioned Base/My-Chat lane, update exact revisions and hashes, and run the
+consumer checker with `--consumer-role scenario --strict`.
