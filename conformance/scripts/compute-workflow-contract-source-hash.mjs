@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -123,6 +124,37 @@ function assertLock(expected, actual, lockPath) {
 
   if (!/^[a-f0-9]{40}$/.test(expected.contract_source_revision ?? "")) {
     throw new Error(`workflow contract source lock has no full contract_source_revision: ${lockPath}`);
+  }
+
+  const resolvedRevision = execFileSync(
+    "git",
+    ["rev-parse", "--verify", `${expected.contract_source_revision}^{commit}`],
+    { cwd: repositoryRoot, encoding: "utf8" },
+  ).trim();
+  if (resolvedRevision !== expected.contract_source_revision) {
+    throw new Error(`workflow contract source revision is not an exact reachable commit: ${lockPath}`);
+  }
+
+  for (const root of sourceRoots) {
+    for (const file of sourceFiles(root.physicalRoot)) {
+      const suffix = relative(root.physicalRoot, file).split(sep).join("/");
+      const repositoryPath = root.logicalRoot === "workflow-contracts"
+        ? `templates/host-runtime/packages/workflow-contracts/src/${suffix}`
+        : `templates/host-runtime/packages/workflow-runtime/src/validation/${suffix}`;
+      const committedSource = execFileSync(
+        "git",
+        ["show", `${expected.contract_source_revision}:${repositoryPath}`],
+        { cwd: repositoryRoot, encoding: "utf8" },
+      ).replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
+      const currentSource = readFileSync(file, "utf8")
+        .replace(/^\uFEFF/, "")
+        .replace(/\r\n?/g, "\n");
+      if (committedSource !== currentSource) {
+        throw new Error(
+          `workflow contract source revision does not contain current ${repositoryPath}: ${lockPath}`,
+        );
+      }
+    }
   }
 }
 

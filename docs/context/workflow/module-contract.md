@@ -1242,6 +1242,25 @@ Implemented validation rules:
 | `WF-MAN-093` | Fatal | The web run workbench adapter is present when mapped. |
 | `WF-MAN-094` | Fatal | The mobile dashboard adapter is present when mapped. |
 | `WF-MAN-095` | Fatal | The admin operator adapter is present when mapped. |
+| `WF-MAN-099` | Fatal | The manifest version is supported by the Host SDK. |
+| `WF-MAN-100` | Fatal | The federated manifest pins Base, Host SDK, ABI range, and a lowercase SHA-256 source hash. |
+| `WF-MAN-101` | Fatal | The federated step type registry is non-empty. |
+| `WF-MAN-102` | Fatal | Every durable step type has exactly one registry definition. |
+| `WF-MAN-103` | Fatal | Every step type uses a runtime kind from the closed Base registry. |
+| `WF-MAN-104` | Fatal | Scenario-owned step types use the scenario namespace. |
+| `WF-MAN-105` | Fatal | Step policy flags come from the closed Base registry. |
+| `WF-MAN-106` | Fatal | Entrypoint allow-lists reference declared step types only. |
+| `WF-MAN-107` | Fatal | Durable steps reference declared step types only. |
+| `WF-MAN-108` | Fatal | A durable step's runtime kind matches its step type definition. |
+| `WF-MAN-109` | Fatal | Federated handoffs use a standard workflow handoff type. |
+| `WF-MAN-110` | Fatal | Owner integration declares the versioned command, event, receipt, lookup, and authentication contracts. |
+| `WF-MAN-111` | Fatal | The Host enables `scenario_federation_v1`. |
+| `WF-MAN-112` | Fatal | Generation steps require the Host `generation_ticket_v1` capability. |
+| `WF-MAN-113` | Fatal | A federated manifest has no unknown top-level fields. |
+| `WF-MAN-114` | Fatal | A step type definition has no unknown fields. |
+| `WF-MAN-115` | Fatal | The release launch phase is from the closed Base registry. |
+| `WF-MAN-116` | Fatal | The required Scenario lifecycle status is from the closed Host registry. |
+| `WF-MAN-117` | Fatal | Capability enablement policy is `requires_workspace_activation` or `disabled`. |
 <!-- VALIDATOR-RULE-INVENTORY:END -->
 
 `WF-MAN-043` is warning-only and therefore does not make `report.passed` false.

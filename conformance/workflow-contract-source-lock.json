@@ -10,8 +10,8 @@
   "files": [
     {
       "path": "workflow-contracts/index.ts",
-      "bytes": 340,
-      "sha256": "149c5bf41d95957b1635d365188185cbe38d883efe222326cbdd33de34929e00"
+      "bytes": 385,
+      "sha256": "246e25487a548b39fcd2607550ed67a856e48cf45f6cb9afd11a1162a88c373e"
     },
     {
       "path": "workflow-contracts/types/api.ts",
@@ -45,8 +45,8 @@
     },
     {
       "path": "workflow-contracts/types/manifest.ts",
-      "bytes": 4239,
-      "sha256": "9b3e98ea96681a29c5ba9a351eafa9e39ac03f456f22944bde05df6a56183545"
+      "bytes": 5695,
+      "sha256": "4f19f2769555cbbc749a0a928b21dbb8241215cc13bad44391c2cf23d769d61f"
     },
     {
       "path": "workflow-contracts/types/module.ts",
@@ -69,5 +69,5 @@
       "sha256": "8a9311e67bf97b15b9b0225fc1ce9174eaedd96c667df951e71a15a7385bc5c9"
     }
   ],
-  "contract_source_revision": "305611185e4ac4ff59945b4e4ae30ac1f953c892"
+  "contract_source_revision": "eb19433c6e68ad1abaaddc356e6afe5ea52dcf97"
 }
