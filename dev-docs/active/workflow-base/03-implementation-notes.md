@@ -241,3 +241,20 @@
   config revision `2af7c45e576af272f36400636ca02c122a14e643`.
   GitHub reports zero check annotations. This documentation-only evidence
   commit does not change the package manifest or either source hash.
+
+## 2026-07-29 - Publish-cycle P2: fast-forward publish + KI-12 follow-up
+
+- `origin/main` fast-forwarded `ed69bbd` -> `63d47d2` (packaging
+  alignment, CI shallow-fetch fix, public package evidence) as
+  publish-cycle step P2 driven by `My-Chat/T-030`; ordering constraint
+  P2-before-P4 now satisfied for the Education env-convergence pin.
+- Post-publish verification at `63d47d2`: `pnpm verify:workflow-contracts`
+  passes; the logical contract source lock is unchanged at
+  `caebe85d492724a727b0ccb7a99fe9da15e0536393c4a0ab42069f8264ea7b2e`.
+- Follow-up accepted (KI-12, from `My-Chat/T-030`):
+  `check-contract-doc-alignment.mjs` predates the federation surface and
+  asserts nothing over `federation.ts`, `federation-validation.ts`,
+  `scenario-release.ts`, `ScenarioManifestV2`, or the ten new schemas -
+  drift in the federation docs is mechanically unmonitored. Extend the
+  alignment check to those surfaces in the next Base slice; until then,
+  federation doc changes require manual review against source.
