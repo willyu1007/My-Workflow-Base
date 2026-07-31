@@ -115,3 +115,30 @@ after the check found it missing).
 **Not run:** package build (`prepublishOnly` builds at publish); no visual
 regression run — the reduced-motion change is only observable under an OS
 setting, and the chip-toggle change removes an unintended font-weight tween.
+
+## Consumer adoption — The-Nurture 0.8.0 → 0.10.0 (2026-07-31)
+
+First real-world adoption of the C-step lint expansion, since this app consumes
+the shipped presets directly rather than the source files earlier measurements
+used.
+
+| Check | Result |
+|---|---|
+| Resolved version | 0.10.0, lockfile single resolution |
+| Shipped CSS carries D fixes | `transition: all` count 0; `.wb-sidebar { transition: none }` present |
+| Shipped tokens still A-repaired | `--mt-ink: #111827` |
+| Presets installed with new rules | color keys in `eslint.js`, `COLOR_LITERAL` in `stylelint.cjs`, `design-debt.mjs` present |
+| **Rules actually fire** | probe CSS (`color: #123456`, raw `box-shadow`) rejected in the app's own lint setup |
+| `pnpm --filter @the-nurture/frontend lint` | exit 0 |
+| `tsc --noEmit` | exit 0 |
+
+The probe matters: a clean lint run only counts as evidence once the rules are
+proven live. Zero violations under rules that silently failed to load would look
+identical.
+
+Predicted adoption cost was 0 violations; actual was 0. No host code changed.
+
+**Incidental finding:** a literal on one of the 13 explicit color properties
+reports twice (both the catch-all and the allow-list match). Cosmetic, one fix
+per pair; kept deliberately and documented in GOVERNANCE.md — collapsing it
+would weaken the allow-list into an enumerable blacklist.

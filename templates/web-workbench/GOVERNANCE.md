@@ -40,6 +40,18 @@ opening paren, so `color-mix(in oklab, var(--a) 50%, var(--b))` — the normal w
 to derive a tint from tokens — is **not** mistaken for the `oklab()` color form.
 Matching the bare word would have rejected legitimate host CSS.
 
+### A literal on an explicit color property reports twice
+
+`color: #123456` trips both layers — the catch-all literal pattern and the
+allow-list on the 13 explicit color properties. Two messages, one line, one fix.
+
+Kept deliberately. Collapsing them means turning the allow-list into a
+blacklist of named colors, which would only ever catch the ~17 names enumerated
+and would let any future color syntax through. A whitelist on the properties
+that carry brand color is the stronger shape, and the redundancy costs a
+duplicate line rather than a missed violation. Shorthands, gradients, and custom
+properties — where most real drift hides — report once.
+
 ### Composed depth is allowed, invented color is not
 
 `box-shadow: 0 0 0 2px var(--ui-color-focus_ring)` passes. The geometry is
