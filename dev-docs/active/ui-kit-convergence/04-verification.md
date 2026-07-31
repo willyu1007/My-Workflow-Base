@@ -142,3 +142,36 @@ Predicted adoption cost was 0 violations; actual was 0. No host code changed.
 reports twice (both the catch-all and the allow-list match). Cosmetic, one fix
 per pair; kept deliberately and documented in GOVERNANCE.md — collapsing it
 would weaken the allow-list into an enumerable blacklist.
+
+## Consumer adoption — The-Education 0.6.x → 0.10.0 (2026-07-31)
+
+Landed on `main` as `a382c05`, merging the pending 0.8.0 branch first. Prepared
+in an isolated worktree so the repo's in-flight `codex/t040-*` checkout was never
+touched (confirmed clean and on its own branch afterward).
+
+| Check | Result |
+|---|---|
+| Pin reconciliation | root and `apps/web` both `^0.10.0`; lockfile single resolution (was 0.6.1 + 0.6.5 resolved simultaneously) |
+| Shipped kit sanity | `--mt-ink: #111827`, `--mt-cream: #FBF7F1`, zero active `@import` |
+| stylelint (repo's own config, strict presets) | exit 0 |
+| **Rules actually fire** | probe `color: #123456` rejected |
+| eslint (repo's own config) | 97 files, 0 messages |
+| `tsc -b` | 21 errors — identical to the established pre-existing baseline; 0 in touched files |
+
+**The three violations were fixed, not registered as debt.** All three were real
+drift and the fixes are appearance-preserving:
+
+| Site | Before | After | Why |
+|---|---|---|---|
+| `.wb-share-channel__qr` | `background: #fff` | `var(--mt-paper)` | Pure white is functional (QR scan contrast); `--mt-paper` is the kit's pure-white role, same `#FFFFFF` |
+| `.qb-resource__img` | `background: #fff` | `var(--bg-surface)` | It is a surface |
+| `--kc-focus-ring` | `rgba(40, 62, 104, 0.22)` | `color-mix(in oklab, var(--mt-navy) 22%, transparent)` | `rgb(40,62,104)` **is** `--mt-navy` `#283E68`; same alpha, sourced from the token, matching the kit's own `--bg-tint` idiom |
+
+Deliberately **not** swapped to the kit's `--shadow-focus`: that is orange at 3px
+against this ring's navy at 2px, so it would change how focus looks. Whether the
+host should adopt the kit's focus treatment is a design decision for the owner —
+the same D-A5 principle that kept the off-scale durations.
+
+So the debt gate shipped in C went unused by both consumers. That is the
+intended outcome: it exists so a strict rule can land without forcing a
+same-day cleanup, not because a cleanup was expected to be unaffordable.
