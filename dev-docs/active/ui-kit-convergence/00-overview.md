@@ -14,8 +14,9 @@ ui-visual-system task produced.
   neutrals + scrim restored to reference; `DECISIONS.md` created; 0.8.0
   staged (publish pending — needs owner auth).
 - B — token structuring (`tokens/base.json` + emitter): not started.
-- C — lint expansion (color/shadow/transition) + `legacy_debt` mechanism: not
-  started.
+- **C — lint expansion + debt gate: done 2026-07-31.** Presets now lock color,
+  depth, and `transition: all` alongside typography; `design-debt.mjs` ships as
+  `@willyu1007/web-workbench/lint-debt`. 0.9.0 staged (publish pending).
 - D — contract docs (motion gate, fluid-interaction rules, typography
   validation matrix, de-scenarioized): not started.
 

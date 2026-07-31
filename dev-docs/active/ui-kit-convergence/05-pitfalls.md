@@ -27,3 +27,36 @@
   4.25:1). Fidelity to a design export must not outrank accessibility;
   My-Chat's D-01 correction is the template for how to deviate: hold hue and
   saturation, move lightness, record it, forbid regression.
+
+## From C (lint expansion)
+
+- **Measure the candidate rule before shipping it.** The obvious property-scoped
+  color rule (`color`, `background-color`, `box-shadow`, …) caught **zero of
+  three** real violations in a live consumer. Every one hid somewhere a property
+  list does not look: a shorthand, a gradient, a custom property. Writing the
+  rule that sounds right and trusting it would have shipped a lock that locks
+  nothing.
+
+- **`var()` checks are not a color lock.** `--ring: 0 0 0 2px rgba(...)` followed
+  by `box-shadow: var(--ring)` passes every var()-based rule ever written. Any
+  design-value lock must inspect custom-property *declarations*, not just the
+  properties that consume them.
+
+- **Precision is a design constraint, not a nicety.** Banning the bare word
+  `oklab` would have rejected `color-mix(in oklab, …)` — the sanctioned way to
+  derive a tint from tokens, already used by a consumer. Anchor color-function
+  patterns on the opening paren.
+
+- **A doc comment is not a test.** The eslint preset claimed to cover quoted
+  keys and never had; `{ "fontSize": "14px" }` bypassed the typography lock for
+  the life of the preset. Found only by writing the fixture the comment implied.
+
+- **esquery's `>` has no field awareness.** `Property[key.value=…] > Literal`
+  matches the key node as well as the value node, so the naive fix for the
+  bug above double-reported every quoted-key violation. Verify hit *counts*,
+  not just hit presence.
+
+- **Put the debt registry where the debt is.** A suppression list in the
+  template repo would gate nothing: Base's conformance scans Base's own
+  templates, which have no consumers and no violations. Ship the gate, let the
+  consumer own the registry.

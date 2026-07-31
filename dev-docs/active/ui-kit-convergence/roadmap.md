@@ -30,15 +30,25 @@ expensive-to-retrofit part of the schema.
 Entry condition: My-Chat ui-visual-system token schema stabilized (its dark
 theme completed or explicitly deferred with values frozen).
 
-## C — Governance expansion
+## C — Governance expansion (done 2026-07-31)
 
-- stylelint preset: extend beyond typography to ban literal colors, raw
-  `box-shadow`, and `transition: all` in consumer CSS (allow `var(--…)`).
-- eslint preset: same for inline styles.
-- Conformance: a `legacy_debt`-style allowlist (path + rules + owner +
-  expires_at_utc + reason; per-file per-rule, auto-expiring) so new checks
-  can land strict without forcing same-day fixes on consumers. `.mjs`, in
-  `conformance/scripts/`.
+- stylelint preset: bans color literals in **any** declaration (shorthands,
+  functions, and custom properties — not just color properties), named colors
+  in the explicit color properties, and `transition: all`. Shipped 0.9.0.
+- eslint preset: mirrors it for JSX inline styles, and fixes a pre-existing
+  hole where a quoted key (`"fontSize": "14px"`) bypassed the typography lock.
+- Debt gate: `lint/design-debt.mjs`, exported as
+  `@willyu1007/web-workbench/lint-debt`.
+
+**Design change from the original plan.** The debt registry was scoped to
+`conformance/scripts/` — wrong place. Base's conformance runs against Base's own
+templates, which have no consumers and no violations; a debt filter there would
+gate nothing. Debt has to live where the violations live, so the mechanism ships
+inside the package as a runner the *consumer* invokes against its own lint
+report. Base keeps no registry of its own.
+
+Full rule table, rationale, and measured adoption cost:
+`templates/web-workbench/GOVERNANCE.md`.
 
 ## D — Contract docs
 

@@ -49,3 +49,62 @@ deliberate.
 
 - Publishing 0.8.0 (needs owner GitHub auth — PUBLISHING.md runbook).
 - Consumer re-pins (The-Education, The-Nurture at 0.7.0).
+
+## C — lint expansion and debt gate (2026-07-31)
+
+### What changed
+
+| File | Change |
+|---|---|
+| `lint/stylelint.cjs` | Adds color-literal ban (catch-all property), named-color allow-list on 13 explicit color properties, `transition: all` ban |
+| `lint/eslint.js` | Adds color keys to the inline-style lock; fixes quoted-key bypass; fixes duplicate reporting |
+| `lint/design-debt.mjs` | New — debt gate consuming stylelint or ESLint JSON |
+| `package.json` | `./lint-debt` export, build copies the new file, 0.8.0 → 0.9.0 |
+| `GOVERNANCE.md` | New — rule table, rationale, adoption cost, debt format, known gap |
+| `README.md` | "Typography contract" section becomes "Design-value contract"; 0.9.0 upgrade note |
+
+### Why the color rule is a catch-all rather than a property list
+
+Measured first, as the rule-configuration discipline requires. A property-scoped
+candidate (`color`, `background-color`, `box-shadow`, …) caught **zero** of the
+three real violations in The-Education:
+
+- `background: #fff` ×2 — the *shorthand*, which `background-color` misses.
+- `--kc-focus-ring: 0 0 0 2px rgba(40, 62, 104, 0.22)` — a raw navy inside a
+  host custom property, consumed as `box-shadow: var(--kc-focus-ring)`. Every
+  var()-based check passes; the drift is one line up.
+
+The catch-all (`"/./"`) closes all three. Its precision cost is zero because each
+color-function pattern is anchored on its opening paren, so `color-mix(in oklab,
+var(--a) 50%, var(--b))` — a legitimate token derivation, also present in
+The-Education — is not read as the `oklab()` color form.
+
+### Two pre-existing preset bugs fixed
+
+1. **Quoted keys bypassed the lock.** The preset's doc comment claimed it
+   "covers both identifier keys and string keys", but the selector only matched
+   `key.name`. A string key exposes `key.value` and no `key.name`, so
+   `{ "fontSize": "14px" }` passed. Verified before and after.
+2. **Duplicate reporting on the fix.** Adding a `key.value` selector made every
+   quoted-key violation report twice: esquery's `>` has no field awareness, so
+   `Property[key.value=…] > Literal` matches the key node as well as the value
+   node. Guarded by excluding literals whose text is itself a watched key name.
+
+### Debt gate placement
+
+Roadmap said `conformance/scripts/`. That is wrong for this mechanism — Base's
+conformance runs against Base's own templates, which have no violations and no
+consumers, so a debt filter there would gate nothing. The registry belongs where
+the debt is, so the gate ships in the package and the consumer runs it against
+its own lint report. Mirrors My-Chat, where `legacy_debt` lives in the repo that
+carries the violations.
+
+### Not done here
+
+- Publishing 0.9.0 (needs owner GitHub auth).
+- Consumer adoption. The-Nurture is already clean and can re-pin directly.
+  The-Education has the 3 violations above: fix them, or register them with an
+  owner and expiry. It is still on the unmerged `chore/web-workbench-0.8.0`
+  branch, so its 0.9.0 step should follow that merge.
+- The literal-required gap (`themeColor` and friends) — recorded in
+  GOVERNANCE.md; closing it means exporting brand colors as JS constants.

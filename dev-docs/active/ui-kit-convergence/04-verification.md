@@ -34,3 +34,49 @@ scope untouched.
 
 **Not run:** package build (CSS-only change; `prepublishOnly` builds at
 publish time), workflow-contract suites (out of scope for this directory).
+
+## C — lint expansion and debt gate (2026-07-31)
+
+**Rule precision — 14-case stylelint fixture**, covering token/reset/composed
+passes and shorthand/hex/rgba/named/raw-shadow/gradient/transition-all/
+custom-property failures: **14 correct, 0 wrong**. The two cases that matter:
+
+| Case | Result |
+|---|---|
+| `--kc-field-bg: color-mix(in oklab, var(--a) 50%, var(--b))` | pass (no false positive on the `oklab` word) |
+| `--kc-focus-ring: 0 0 0 2px rgba(40, 62, 104, 0.22)` | fail (escape hatch closed) |
+
+**ESLint fixture — 12 cases** (both key forms, colors, keywords, dynamic
+expressions, layout-only styles): 12/12 correct. Duplicate-report regression
+checked explicitly — exactly 5 messages on exactly the 5 expected lines.
+
+**Measured adoption cost** (final presets, live consumers):
+
+| Repo | Host CSS | Inline styles |
+|---|---|---|
+| The-Nurture | 0 violations / 2 files | 0 / no inline styles |
+| The-Education | 3 violations / 1 file | 0 / 54 TSX files scanned |
+
+All three Education hits are true positives (2× `background: #fff`, 1×
+`--kc-focus-ring`). Zero false positives in either repo.
+
+**Regression — existing consumers still pass.** Both repos re-linted with the
+new presets wired the way they actually wire them (Nurture's
+`@typescript-eslint/parser` setup; Education's `tseslint.config`): stylelint
+exit 0 on Nurture, 0 design-lock ESLint violations on both.
+
+**Debt gate — five scenarios**, run against Education's real 3-violation report:
+
+| Scenario | Exit | Behavior |
+|---|---|---|
+| no registry | 1 | 3 unregistered violations reported |
+| live entry covering the file+rule | 0 | `clean — 3 violation(s), 3 covered by 1 live entry` |
+| expired entry | 1 | stops suppressing, names owner and expiry |
+| entry missing `expires_at_utc` | 1 | `registry is invalid`, field named |
+| entry matching nothing | 0 | needless-entry warning, does not fail |
+
+**Format auto-detection:** the same gate consumed an ESLint JSON report
+(7 messages) and a stylelint JSON report (3 warnings) without configuration.
+
+**Not run:** package build (`prepublishOnly` builds at publish time); no runtime
+code changed in C.

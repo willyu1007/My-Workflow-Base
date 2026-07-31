@@ -34,16 +34,26 @@ Entry: My-Chat ui-visual-system schema stable (dark values landed or frozen).
 3. Acceptance: CSS diff between commits is provably identifiers-only; a
    conformance check fails when `tokens.css` drifts from `base.json`.
 
-## C — governance expansion
+## C — governance expansion (done 2026-07-31)
 
-1. Extend `lint/stylelint.cjs`: `color`, `background(-color)`, `box-shadow`,
-   `transition` join the allowed-list regime (`var(--…)` + resets pass).
-2. Extend `lint/eslint.js` symmetrically for inline styles.
-3. Add allowlist mechanism (five-field `legacy_debt` shape, auto-expiring)
-   as a conformance script so consumers can adopt strict lint incrementally.
-4. Acceptance: kit's own `src/styles` (definition layer) stays exempt;
-   a fixture consumer with a literal color fails; the same fixture with a
-   valid debt entry passes until expiry.
+1. `lint/stylelint.cjs` — color literals banned in **any** declaration (a
+   property list was measured and caught 0 of 3 real violations), named colors
+   banned in the 13 explicit color properties, `transition: all` banned. ✔
+2. `lint/eslint.js` — color keys added to the inline-style lock; the quoted-key
+   bypass and the resulting duplicate-report bug both fixed. ✔
+3. Debt mechanism shipped as `lint/design-debt.mjs`
+   (`@willyu1007/web-workbench/lint-debt`) rather than a Base conformance
+   script — see the roadmap note on why placement changed. ✔
+4. Acceptance, all met (evidence in `04-verification.md`):
+   - kit's own `src/styles` stays exempt (presets target host code by
+     convention; unchanged from the typography lock); ✔
+   - fixture with a literal color fails — 14/14 stylelint cases, 12/12 eslint
+     cases correct; ✔
+   - the same fixture with a valid debt entry passes, and fails again once the
+     entry expires or loses a field. ✔
+5. Follow-ups (owner): publish 0.9.0; adopt in consumers — The-Nurture is
+   already clean, The-Education must fix or register its 3 violations after the
+   0.8.0 branch merges.
 
 ## D — contract docs
 
