@@ -1,6 +1,6 @@
 {
   "name": "@willyu1007/web-workbench",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "type": "module",
   "description": "Scenario-agnostic web workbench UI kit (Scene paradigms) — contracts + presentational React components.",
   "license": "MIT",
@@ -63,15 +63,16 @@
     "./styles": "./dist/styles/index.css",
     "./styles/*": "./dist/styles/*",
     "./stylelint": "./dist/lint/stylelint.cjs",
-    "./eslint": "./dist/lint/eslint.js"
+    "./eslint": "./dist/lint/eslint.js",
+    "./lint-debt": "./dist/lint/design-debt.mjs"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && mkdir -p dist/styles && cp src/styles/*.css dist/styles/ && mkdir -p dist/lint && cp lint/stylelint.cjs lint/eslint.js dist/lint/",
+    "build": "tsc -p tsconfig.build.json && mkdir -p dist/styles && cp src/styles/*.css dist/styles/ && mkdir -p dist/lint && cp lint/stylelint.cjs lint/eslint.js lint/design-debt.mjs dist/lint/",
     "build:css": "mkdir -p dist/styles && cp src/styles/*.css dist/styles/",
-    "build:lint": "mkdir -p dist/lint && cp lint/stylelint.cjs lint/eslint.js dist/lint/",
+    "build:lint": "mkdir -p dist/lint && cp lint/stylelint.cjs lint/eslint.js lint/design-debt.mjs dist/lint/",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "prepublishOnly": "npm run build"
   },

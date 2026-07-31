@@ -59,6 +59,14 @@ import "@willyu1007/web-workbench/styles/index.css";
 > recommended, self-hosted path — and map them onto the `--font-*` tokens. Full recipe:
 > [TYPOGRAPHY.md → Fonts (host-provided)](./TYPOGRAPHY.md#fonts-host-provided).
 
+> ⚠️ **Upgrading to 0.9.0 (lint only, no runtime change).** The shipped lint presets now
+> also ban color literals, raw shadows, and `transition: all` — previously they covered
+> typography only. Nothing in `dist/` that ships to the browser changed. Adopting may
+> surface existing violations in your CSS: fix them, or register them with an owner and an
+> expiry using the new debt gate ([GOVERNANCE.md](./GOVERNANCE.md)). Measured on the two
+> live consumers: 0 and 3 violations respectively. Also fixes a preset bug — a quoted
+> inline-style key (`"fontSize": "14px"`) silently bypassed the typography lock.
+
 > ⚠️ **Upgrading to 0.8.0 (visual, no API change).** The nine neutral tokens (ink 1–5,
 > cream, sand, sand-2, stone) and `--scrim` were restored to the morethan reference
 > values — the previous warm family was unrecorded drift from an outside lineage (full
@@ -114,27 +122,36 @@ import "@willyu1007/web-workbench/styles/index.css";
 - **Controlled variants only**: scenarios tune via enumerated knobs (`emphasis`, `primary`
   kind, column defs) drawn from the token palette — never custom colors or layout.
 
-## Typography contract (enforced)
+## Design-value contract (enforced)
 
-All type comes from **one scale** (`tokens.css`) — never hardcode `font-size` /
-`font-weight` / `font-family`. App-authored text uses a semantic class
-(`.mt-h1`…`.mt-caption`, `.mt-body`, `.mt-small`, `.mt-code`) or a scale token; everything
-structured uses the kit's components (which carry their own tuned type). This keeps every
-project on the kit visually identical. Wire the shipped lint presets into CI:
+All type **and color** come from tokens (`tokens.css`) — never hardcode
+`font-size` / `font-weight` / `font-family`, and never write a color literal
+anywhere, including inside a custom property. App-authored text uses a semantic
+class (`.mt-h1`…`.mt-caption`, `.mt-body`, `.mt-small`, `.mt-code`) or a scale
+token; everything structured uses the kit's components (which carry their own
+tuned type). This keeps every project on the kit visually identical. Wire the
+shipped lint presets into CI:
 
 ```jsonc
-// .stylelintrc.json — bans literal font-size/weight/family in CSS
+// .stylelintrc.json — bans literal font, color, shadow, and `transition: all`
 { "extends": ["@willyu1007/web-workbench/stylelint"] }
 ```
 
 ```js
-// eslint.config.js — bans LITERAL inline fontSize/fontWeight/fontFamily in JSX
+// eslint.config.js — bans LITERAL inline font/color values in JSX
 //                     (var(--…) tokens + dynamic expressions are allowed)
-import workbenchType from "@willyu1007/web-workbench/eslint";
-export default [ ...workbenchType, /* …your config */ ];
+import workbenchDesign from "@willyu1007/web-workbench/eslint";
+export default [ ...workbenchDesign, /* …your config */ ];
 ```
 
-Full rationale, the scale table, and a migration cheatsheet: [TYPOGRAPHY.md](./TYPOGRAPHY.md).
+Adopting on a codebase that is not clean yet? Register the remainder with an
+owner and an expiry rather than weakening the rule — see the debt gate in
+[GOVERNANCE.md](./GOVERNANCE.md).
+
+What each rule blocks and why, the measured adoption cost, and the debt
+mechanism: [GOVERNANCE.md](./GOVERNANCE.md). The scale table and a migration
+cheatsheet: [TYPOGRAPHY.md](./TYPOGRAPHY.md). Why the token values are what they
+are: [DECISIONS.md](./DECISIONS.md).
 
 ## Not yet in the kit (extract next if needed)
 
