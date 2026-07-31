@@ -15,6 +15,21 @@ same way it implements handlers/policies against `workflow-contracts`.
 > *a dashboard's to-dos are rows, never cards* — use `<Hub>` and the wrong thing is
 > unreachable). The components ship the rules; this is why.
 
+> **Read [MOTION.md](./MOTION.md) before you animate anything.** The kit ships motion
+> tokens but the decision gate is what keeps a product from accumulating motion nobody
+> asked for — including when the answer is "no motion". It also covers the two
+> reduced-motion traps the kit itself fell into.
+
+### The rules that ship with the kit
+
+| Read when | Doc |
+| --- | --- |
+| Laying out any screen | [PARADIGMS.md](./PARADIGMS.md) — the 6 Scene paradigms + 6 iron rules |
+| Adding animation, transitions, or gestures | [MOTION.md](./MOTION.md) · [INTERACTION.md](./INTERACTION.md) |
+| Wiring fonts, or touching type | [TYPOGRAPHY.md](./TYPOGRAPHY.md) — the scale, the host font recipe, and how to verify faces actually render |
+| Wiring lint, or hitting a lint error | [GOVERNANCE.md](./GOVERNANCE.md) — what is locked, why, and the debt gate |
+| Wondering why a token has the value it has | [DECISIONS.md](./DECISIONS.md) |
+
 ## What's inside
 
 | Layer | Files |
@@ -58,6 +73,14 @@ import "@willyu1007/web-workbench/styles/index.css";
 > webfont files (no third-party `@import`). Load them once host-side — `next/font` is the
 > recommended, self-hosted path — and map them onto the `--font-*` tokens. Full recipe:
 > [TYPOGRAPHY.md → Fonts (host-provided)](./TYPOGRAPHY.md#fonts-host-provided).
+
+> ⚠️ **Upgrading to 0.10.0 (small behavior fixes).** Reduced motion now also stops the
+> mobile sidebar slide — it was moved by `transition`, which the old
+> `animation: none` block never reached, making a 280px sweep the one vestibular
+> motion that ignored the user's preference. The filter chip no longer uses
+> `transition: all`, so its font-weight change snaps instead of tweening (it was
+> reflowing the chip). Ships [MOTION.md](./MOTION.md) and
+> [INTERACTION.md](./INTERACTION.md). No API change; nothing to do but re-pin.
 
 > ⚠️ **Upgrading to 0.9.0 (lint only, no runtime change).** The shipped lint presets now
 > also ban color literals, raw shadows, and `transition: all` — previously they covered

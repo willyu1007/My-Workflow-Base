@@ -58,6 +58,47 @@ are workbench inventions. All are derived via `color-mix()` from token bases,
 so they tracked the D-A1 repair automatically and need no per-value decision.
 Kept.
 
+## D-A5 — Three off-scale motion durations (2026-07-31)
+
+A motion audit found six hardcoded durations. One — `0.18s` on the nav rail's
+opacity transition — was exactly `--t-base` (180ms) and is now the token: an
+identifier change with no design change.
+
+Three are genuinely off-scale transitions, **kept as-is**:
+
+| Site | Value | Nearest token | Would change by |
+|---|---|---|---|
+| `.wb-nav` grid columns | `0.22s` | `--t-slow` 280ms | +27% |
+| `.wb-nav` margin | `0.22s` | `--t-slow` 280ms | +27% |
+| `.wb-insight__src` color | `0.15s` | `--t-fast` 120ms | −20% |
+
+Snapping them would let a lint rule retime a considered animation. The scale
+governs *host* motion; the kit is the definition layer, the same argument
+TYPOGRAPHY.md already makes for component-tuned type. Revisit only as a
+deliberate motion pass, with the retiming reviewed on screen.
+
+The last two are a **different category** and need no token: `wb-proc` (1.1s
+status pulse) and `wb-shimmer` (1.4s skeleton sweep) are perpetual loops. The
+duration scale covers discrete state changes — 120/180/280ms — and contains no
+loop-period role, correctly. Do not force these onto it.
+
+## D-A6 — `transition: all` removed from `.wb-chip-toggle`
+
+The one `transition: all` in the kit. It also animated `font-weight` (the `--on`
+state changes it), which reflows the chip and thrashes a variable font for no
+legible benefit. Now names `background`, `border-color`, and `color`; weight
+snaps, which is the correct read. MOTION.md prohibits `all` for consumers, and
+the kit now holds itself to it.
+
+## D-A7 — Reduced motion reaches the mobile sidebar
+
+The `prefers-reduced-motion` block nulled `animation` on `.wb-reveal`,
+`.wb-toast`, `.wb-drawer`, `.wb-overlay`, and the skeleton shimmer, but the
+mobile `.wb-sidebar` arrives by `transition: transform` — a 280px panel sweeping
+the viewport, the most vestibular motion in the kit, and the only one the block
+did not reach. `transition: none` added. It still opens and closes; it arrives
+rather than travels.
+
 ## Accepted off-scale literals
 
 - `components.css` `.mt-window-bar` gradient endpoint `#F2EBDF` — decorative

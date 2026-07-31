@@ -74,6 +74,52 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 > original Google-hosted CJK faces? Self-host `Noto Sans SC` / `Noto Serif SC` /
 > `Ma Shan Zheng` too and prepend their variables — the kit stays out of it.
 
+### Load only what you render
+
+Every face you wire is bytes on first paint. Manrope drives `--font-sans` and
+`--font-display` (26 call sites in the kit) and JetBrains Mono drives
+`--font-mono` — including kit chrome like the sidebar's `.wb-nav__count`, so a
+host that never writes a mono class still renders one. `--font-serif` and
+`--font-hand` are declared but unused by the kit: wire them only if your app
+renders `.mt-serif` or `.mt-hand`. Both live consumers load exactly two faces.
+
+## Verifying the faces actually render
+
+A font stack is a **declaration, not evidence.** The kit ships stacks and the
+host supplies the files, so nothing in this package can guarantee what a user
+sees — the first face may be missing, unlicensed, or missing the glyphs your
+copy needs, and the browser will silently substitute without telling anyone.
+That silence is the risk: the whole point of 0.7.0 moving font loading host-side
+is that the host now owns a failure mode it cannot see by reading CSS.
+
+Run this after wiring fonts, and again after changing any face.
+
+| Set | Specimen | Check |
+|---|---|---|
+| Chinese | `新的聊天。请确认后再继续。` | Glyph coverage, punctuation shape, line box, wrapping, weight |
+| Mixed | `workbench 工作流 v2 — actor 记录` | CJK/Latin baseline, spacing, fallback switches mid-run |
+| Numeric | `2026-07-31 12:48 · 38% · ¥1,024.50` | Tabular alignment where it matters, symbol coverage, clipping |
+| States | Label, body, caption, error, disabled, a long heading | Hierarchy, contrast, truncation, vertical centering |
+| Scale | Default plus the browser text sizes you support | Reflow, clipping, fixed-height failures |
+| Weights | Regular, medium, semibold, bold | Whether the real face resolves, or the browser is synthesizing |
+
+For a Chinese-language product the first three rows are release-blocking: they
+all appear on the default screen, so a miss there is not an edge case.
+
+Two things worth checking explicitly, because both fail quietly:
+
+- **Resolved face, not declared face.** Read the rendered font in DevTools
+  (Inspect → Computed → Rendered Fonts), per specimen. A stack whose first entry
+  never loads looks fine in the source and wrong on screen.
+- **Synthetic weights.** If a weight is missing, browsers fake it by smearing the
+  glyphs. It reads as "slightly off" rather than broken, which is why it ships.
+  Variable fonts avoid this — which is why the recipe above passes no `weight`
+  array.
+
+Record, for each platform: declared stack, resolved face, license and
+redistribution terms for anything self-hosted, and any missing-glyph, fallback,
+clipping, or scaling finding.
+
 ## The two rules
 
 1. **App-authored text** → use a semantic class (`.mt-h1`…`.mt-caption`, `.mt-body`,
