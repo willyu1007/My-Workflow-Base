@@ -108,3 +108,58 @@ carries the violations.
   branch, so its 0.9.0 step should follow that merge.
 - The literal-required gap (`themeColor` and friends) — recorded in
   GOVERNANCE.md; closing it means exporting brand colors as JS constants.
+
+## D — contract docs (2026-07-31)
+
+### Approach: audit first, then write
+
+The plan said "port three docs". Translating them as prose would have shipped a
+motion contract the kit itself violated. Auditing the kit's real motion surface
+first turned D from a documentation task into a documentation-plus-repair task,
+and that is the only reason the contracts are true statements about the package.
+
+The audit read every `transition` and `animation` declaration, every
+`prefers-reduced-motion` block, and every hardcoded duration.
+
+### Three inconsistencies found and fixed
+
+| Finding | Fix | Record |
+|---|---|---|
+| `transition: all` on `.wb-chip-toggle` — the exact thing C's lint bans in consumers, and it also animated `font-weight` (reflow + variable-font thrash) | Named `background`, `border-color`, `color` | D-A6 |
+| `prefers-reduced-motion` nulled `animation` only, so `.wb-sidebar` — a 280px panel sliding across a phone viewport by `transition: transform` — was untouched. The kit's most vestibular motion was the one the block missed. | `transition: none` added | D-A7 |
+| `0.18s` was exactly `--t-base` | Swapped to the token | D-A5 |
+
+Deliberately **not** changed: `0.22s` ×2 and `0.15s` are genuinely off-scale, and
+snapping them would retime a considered animation by 20-27% — a lint rule
+driving a design change. `wb-proc` (1.1s) and `wb-shimmer` (1.4s) are perpetual
+loops; the duration scale holds discrete state changes and correctly has no
+loop-period role. All recorded in D-A5.
+
+### What shipped
+
+| File | Content |
+|---|---|
+| `MOTION.md` (new) | Five-question decision gate ("no motion" is a valid outcome), required behavior, reduced-motion section built around the two traps the kit fell into, motion-is-not-authorization, review evidence |
+| `INTERACTION.md` (new) | Shared requirements, platform matrix, fluid-interaction 8 rules, capability fallback table, verification matrix |
+| `TYPOGRAPHY.md` | New "Verifying the faces actually render" section — the six-specimen matrix, resolved-vs-declared face, synthetic weights; plus "load only what you render" |
+| `README.md` | MOTION.md added to the read-first tier; a "rules that ship with the kit" index table |
+| `workbench.css` | The three motion fixes |
+| `DECISIONS.md` | D-A5, D-A6, D-A7 |
+
+The typography matrix went into TYPOGRAPHY.md rather than a fourth file: it is
+the direct continuation of "fonts are host-provided", and that section is where
+someone wiring fonts is already reading.
+
+### De-scenarioizing
+
+Removed: PBR, public-ready draft, outbox, canonical writes, actor provenance,
+scenario keys, skill names, `docs/context` paths, and the host's brand name.
+Kept: everything platform-neutral. Verified by scanning the ported text for
+those nouns; the two remaining hits (`canonical`, `Audit`) are ordinary English
+usage, not runtime vocabulary.
+
+### Not done here
+
+- Publishing 0.10.0 (needs owner GitHub auth).
+- Consumer adoption of the reduced-motion fix — it ships with the version bump,
+  no consumer action required.

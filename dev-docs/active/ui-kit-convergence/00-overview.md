@@ -17,8 +17,10 @@ ui-visual-system task produced.
 - **C — lint expansion + debt gate: done 2026-07-31.** Presets now lock color,
   depth, and `transition: all` alongside typography; `design-debt.mjs` ships as
   `@willyu1007/web-workbench/lint-debt`. 0.9.0 staged (publish pending).
-- D — contract docs (motion gate, fluid-interaction rules, typography
-  validation matrix, de-scenarioized): not started.
+- **D — contract docs: done 2026-07-31.** MOTION.md and INTERACTION.md added,
+  TYPOGRAPHY.md gained the face-verification matrix. The audit behind them found
+  three real kit inconsistencies, all fixed (DECISIONS.md D-A5..D-A7). 0.10.0
+  staged.
 
 ## Scope
 

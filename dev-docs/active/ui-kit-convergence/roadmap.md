@@ -63,4 +63,17 @@ De-scenarioized ports into `templates/web-workbench/docs/` (or kit root):
   weights specimens) from `typography-contract.md` — especially needed here
   because fonts are host-provided.
 
-Strip morethan/PBR/publish vocabulary; keep only platform-neutral rules.
+Strip scenario/runtime vocabulary; keep only platform-neutral rules.
+
+**Ported as three docs, not one:** `MOTION.md` (decision gate + reduced motion),
+`INTERACTION.md` (platform matrix, fluid-interaction rules, capability
+fallbacks), and a new section in `TYPOGRAPHY.md` (face-verification matrix —
+placed there because it is the direct continuation of "fonts are host-provided",
+not a standalone contract).
+
+The port was grounded in an audit of what the kit actually does, rather than
+translated as prose. That surfaced three inconsistencies between the rules being
+written and the kit's own CSS — a `transition: all`, a reduced-motion block that
+missed the kit's most vestibular motion, and an off-token duration that was an
+exact token match. All fixed before the docs shipped, so the contracts describe
+the kit rather than aspiring to it.

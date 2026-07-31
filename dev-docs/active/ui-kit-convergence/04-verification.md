@@ -80,3 +80,38 @@ exit 0 on Nurture, 0 design-lock ESLint violations on both.
 
 **Not run:** package build (`prepublishOnly` builds at publish time); no runtime
 code changed in C.
+
+## D — contract docs (2026-07-31)
+
+**Kit self-compliance after the fixes** — the contracts must describe the kit,
+not aspire:
+
+| Check | Result |
+|---|---|
+| `transition: all` occurrences in kit CSS | 0 (was 1) |
+| `prefers-reduced-motion` covers every spatial motion | yes — reveal, toast, drawer, overlay, skeleton, nav pulse (animations) + `.wb-sidebar` (transition) |
+| Hardcoded durations | 5, each classified: 3 off-scale transitions kept with rationale, 2 perpetual loops correctly tokenless (D-A5) |
+
+Counting note: the first duration sweep reported 4 sites because the `grep`
+filter excluded any line containing `var(--t-`, which hid a second `0.22s`
+sharing a line with the value just tokenized. Re-counted by occurrence rather
+than by line — 6 total, 1 fixed, 5 classified. Same failure mode as the C-step
+duplicate-report bug: verify counts, not presence.
+
+**CSS integrity after edits:** brace balance 0, 48407 bytes, stylelint parses
+without parse errors (rule violations on the kit's own CSS are expected — it is
+the definition layer and is not linted by the host preset).
+
+**De-scenarioization:** scanned MOTION.md, INTERACTION.md, and TYPOGRAPHY.md for
+PBR, public-ready/public draft, outbox, Postgres, canonical, actor provenance,
+audit, scenario_key, My-Chat, AGENTS, skill names, `docs/context`, and the host
+brand name. Two hits, both ordinary English (`no external value is canonical`,
+`Audit both mechanisms`), no runtime vocabulary.
+
+**Authority anchoring:** MOTION.md and INTERACTION.md each state their authority
+order relative to `tokens.css` and `DECISIONS.md` (INTERACTION.md's was added
+after the check found it missing).
+
+**Not run:** package build (`prepublishOnly` builds at publish); no visual
+regression run — the reduced-motion change is only observable under an OS
+setting, and the chip-toggle change removes an unintended font-weight tween.

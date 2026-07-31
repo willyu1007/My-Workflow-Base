@@ -55,12 +55,19 @@ Entry: My-Chat ui-visual-system schema stable (dark values landed or frozen).
    already clean, The-Education must fix or register its 3 violations after the
    0.8.0 branch merges.
 
-## D — contract docs
+## D — contract docs (done 2026-07-31)
 
-1. Port motion gate, fluid-interaction rules, typography validation matrix
-   from My-Chat `docs/context/ui/`; strip scenario vocabulary (morethan
-   casing rules stay — it is the brand; PBR/publish/actor language goes).
-2. Link from README the way PARADIGMS.md is linked ("read first" tier for
-   motion when a consumer adds animation).
-3. Acceptance: no My-Chat-runtime noun survives in the ported text; each doc
-   states its authority relative to `tokens` and `DECISIONS.md`.
+1. Ported as `MOTION.md`, `INTERACTION.md`, and a new verification section in
+   `TYPOGRAPHY.md`; scenario/runtime vocabulary stripped. ✔
+2. `MOTION.md` added to the README read-first tier, plus a "rules that ship
+   with the kit" index table covering all five docs. ✔
+3. Acceptance, both met (evidence in `04-verification.md`):
+   - no runtime noun survives — scan returned two hits, both ordinary English; ✔
+   - each doc states authority relative to `tokens.css` and `DECISIONS.md`
+     (INTERACTION.md's was missing and was added after the check caught it). ✔
+4. Unplanned but required: the audit backing the docs found three kit
+   inconsistencies — a `transition: all`, a reduced-motion block that missed
+   `.wb-sidebar`, and an off-token duration that was an exact token match. All
+   fixed so the contracts describe the kit (D-A5..D-A7). ✔
+5. Follow-up (owner): publish 0.10.0. No consumer action needed — the
+   reduced-motion fix ships with the bump.

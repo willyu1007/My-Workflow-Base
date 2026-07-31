@@ -60,3 +60,30 @@
   template repo would gate nothing: Base's conformance scans Base's own
   templates, which have no consumers and no violations. Ship the gate, let the
   consumer own the registry.
+
+## From D (contract docs)
+
+- **Do not write a contract without auditing what it governs.** Porting the
+  motion rules as prose would have shipped a document prohibiting
+  `transition: all` from a package that used it, and prescribing reduced-motion
+  coverage the package did not have. The audit cost one pass and turned three
+  latent defects into fixes.
+
+- **`animation: none` does not stop a transition.** The kit's reduced-motion
+  block looked thorough — six selectors — and missed the single most vestibular
+  motion it ships, because that one moves by `transition: transform`. When
+  auditing reduced motion, enumerate both mechanisms separately.
+
+- **A token swap is only free when the numbers are equal.** `0.18s` → `--t-base`
+  changed nothing because 180ms *is* `--t-base`. Snapping `0.22s` to the nearest
+  token would have retimed a considered animation by 27% — a lint rule driving a
+  design change. Check the arithmetic before calling a swap a cleanup.
+
+- **Not every hardcoded value wants a token.** Perpetual loop periods (1.1s
+  pulse, 1.4s shimmer) have no place on a 120/180/280ms scale built for discrete
+  state changes. "Unowned by a token" and "drift" are different diagnoses.
+
+- **Grep filters can hide what they are counting.** Excluding lines containing
+  `var(--t-` to find off-token durations also hid an off-token value sharing a
+  line with a tokenized one. Count occurrences, not lines — the same lesson the
+  C-step duplicate-report bug taught, arrived at from the opposite direction.
