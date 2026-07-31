@@ -47,7 +47,7 @@ token even for public packages, so a consumer configures two `.npmrc` entries:
 Then add the dependency and import the styles once at the app root:
 
 ```bash
-pnpm add @willyu1007/web-workbench@^0.7.0
+pnpm add @willyu1007/web-workbench@^0.8.0
 ```
 
 ```ts
@@ -58,6 +58,14 @@ import "@willyu1007/web-workbench/styles/index.css";
 > webfont files (no third-party `@import`). Load them once host-side — `next/font` is the
 > recommended, self-hosted path — and map them onto the `--font-*` tokens. Full recipe:
 > [TYPOGRAPHY.md → Fonts (host-provided)](./TYPOGRAPHY.md#fonts-host-provided).
+
+> ⚠️ **Upgrading to 0.8.0 (visual, no API change).** The nine neutral tokens (ink 1–5,
+> cream, sand, sand-2, stone) and `--scrim` were restored to the morethan reference
+> values — the previous warm family was unrecorded drift from an outside lineage (full
+> record: [DECISIONS.md](./DECISIONS.md)). Text renders slightly cooler and surfaces
+> slightly lighter across every screen; no selector, class, contract, or export changed.
+> Nothing to do beyond re-pinning, unless you overrode a neutral token — then re-check it
+> against DECISIONS.md.
 
 > ⚠️ **Upgrading from 0.6.x (breaking).** 0.7.0 removed the built-in Google Fonts `@import`.
 > If you upgrade and change nothing else, every Latin face silently falls back to a system

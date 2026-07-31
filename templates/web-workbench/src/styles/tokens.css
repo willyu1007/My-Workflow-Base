@@ -30,19 +30,21 @@
   --mt-orange-100:  #FAE2D5;
   --mt-orange-50:   #FDF1E9;
 
-  /* Warm near-black for body text — slightly less cool than #111827 so it
-     sits more comfortably on the cream paper background. */
-  --mt-ink:         #1F1E1B;
-  --mt-ink-2:       #2D2C28;
-  --mt-ink-3:       #4A4843;
-  --mt-ink-4:       #6E6B65;   /* muted text */
-  --mt-ink-5:       #A09D96;   /* placeholder */
+  /* Cold ink foreground on warm surfaces — the reference's single contrast
+     system (the shadow scale below is authored against this same cold ink).
+     Values follow morethan colors_and_type.css; the one intentional deviation
+     is --mt-ink-4 — see DECISIONS.md. */
+  --mt-ink:         #111827;
+  --mt-ink-2:       #2A3142;
+  --mt-ink-3:       #4B5363;
+  --mt-ink-4:       #6B707D;   /* muted text — AA-corrected; reference #717684 fails 4.5:1 on cream (DECISIONS.md D-A2) */
+  --mt-ink-5:       #A2A6B2;   /* placeholder */
 
-  /* ---------- Warm neutrals (Anthropic paper feel) ---------- */
-  --mt-cream:       #F5F2EA;   /* App canvas — slightly khaki paper */
-  --mt-sand:        #EDE9DD;   /* Card / panel */
-  --mt-sand-2:      #E3DDCD;   /* Hover surface */
-  --mt-stone:       #CFC8B6;   /* Divider on warm */
+  /* ---------- Warm neutrals (Mac-like, earthy) ---------- */
+  --mt-cream:       #FBF7F1;   /* App canvas */
+  --mt-sand:        #F5EFE6;   /* Card / panel */
+  --mt-sand-2:      #ECE4D6;   /* Hover surface */
+  --mt-stone:       #DDD3C0;   /* Divider on warm */
   --mt-paper:       #FFFFFF;   /* Pure surface (white card on cream) */
 
   /* ---------- Semantic ---------- */
@@ -71,7 +73,7 @@
   --bg-tint:    color-mix(in oklab, var(--mt-navy) 3%, transparent); /* subtle navy row hover */
   --bg-float:   color-mix(in oklab, var(--mt-paper) 40%, var(--mt-cream)); /* floating panel — warm off-white, not stark white */
   --bg-field-quiet: color-mix(in oklab, var(--bg-surface) 50%, var(--bg-canvas)); /* quiet filter-toolbar field — softer than a white data-entry field */
-  --scrim:      rgba(20, 25, 35, 0.36);   /* overlay / drawer backdrop */
+  --scrim:      rgba(17, 24, 39, 0.33);   /* overlay / drawer backdrop — cold ink @ .33 (DECISIONS.md D-A3) */
 
   --border-1:  rgba(40, 62, 104, 0.10);   /* hairline on warm bg */
   --border-2:  rgba(40, 62, 104, 0.18);   /* control border */
