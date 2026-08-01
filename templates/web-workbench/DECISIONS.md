@@ -132,14 +132,26 @@ the canonical pressed/disabled/hover values, which currently live as literals
 inside `components.css`. Pointing those at variables is a behaviour-affecting
 refactor and is deliberately not part of this change — see D-A9.
 
-## D-A9 — Disabled opacity is inconsistent in the kit (open)
+## D-A9 RESOLVED 2026-08-01 — disabled opacity unifies on 0.5
 
-Recorded while extracting the `state` group: `components.css` uses
-`opacity: 0.5` for disabled on `.mt-btn` and `.wb-action`, and `opacity: 0.55`
-on two other surfaces. The reference specifies 0.5. One of the two is drift, but
-deciding which — and whether the 0.55 surfaces were tuned deliberately — is a
-design call, not a tokenization call, so nothing was unified. Whoever wires
-`components.css` to the `state` tokens owns this.
+`components.css` carried `opacity: 0.5` for disabled on `.mt-btn` and
+`.wb-action` and `opacity: 0.55` on `.mt-date-button` and
+`.mt-expandable-text-field`. All four are the same semantic role; the reference
+specifies 0.5. Owner decided to unify on 0.5.
+
+Fixed at the source rather than by editing four literals: `state.disabled.opacity`
+is now emitted as `--state-disabled-opacity`, and all four sites read it. The
+split cannot silently return, because there is one value and the token gate
+fails if the CSS stops matching it.
+
+**This is a visual change**, small but real: the date button and the expandable
+text field render slightly more faded when disabled (0.55 → 0.5). Nothing else
+moves.
+
+Only this leaf of `state` is emitted. `pressed` and `hover` stay structural —
+the reference expresses them as a transform and a `color-mix()` inside component
+rules, so consuming them is a refactor rather than a token emission, and there
+is no drift to fix there today.
 
 ## Accepted off-scale literals
 

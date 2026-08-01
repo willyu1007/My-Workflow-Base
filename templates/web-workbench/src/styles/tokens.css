@@ -152,6 +152,9 @@
   /* Scene reveal-on-mount. The Scene root carries `.wb-reveal`, which replays every time a Scene mounts — i.e. on every route change. Keep it brief so it never reads as lag stacked on top of navigation. Hosts can tune these, or set `--wb-reveal-duration: 0ms` to disable the reveal entirely (e.g. when the host owns its own route transitions). */
   --wb-reveal-duration:  var(--t-base);
   --wb-reveal-shift:     6px;
+
+  /* ---------- State ---------- */
+  --state-disabled-opacity:  0.5;
 }
 
 /* ---------- Base resets bound to tokens ---------- */

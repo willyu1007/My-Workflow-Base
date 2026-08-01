@@ -70,6 +70,23 @@ for (const [i, section] of source.sections.entries()) {
   }
 }
 
+// `state` is mostly structural (it exists for a native kit), but any leaf listed
+// under `state.css` is a value the stylesheet consumes, so it is emitted here —
+// one value, one place, read by both platforms.
+const stateCss = source.state?.css ?? {};
+if (Object.keys(stateCss).length > 0) {
+  out.push("", "  /* ---------- State ---------- */");
+  const width = Math.max(...Object.keys(stateCss).map((v) => v.length)) + 1;
+  for (const [cssVar, path] of Object.entries(stateCss)) {
+    const value = path.split(".").reduce((node, key) => node?.[key], source.state);
+    if (value === undefined) {
+      console.error(`tokens: state.css maps ${cssVar} to "${path}", which does not exist`);
+      process.exit(2);
+    }
+    out.push(`  ${`${cssVar}:`.padEnd(width + 1)} ${value};`);
+  }
+}
+
 out.push("}", "", tail.trimEnd(), "");
 const css = out.join("\n");
 
@@ -87,5 +104,6 @@ if (process.argv.includes("--check")) {
 }
 
 writeFileSync(OUT, css);
-const count = source.sections.reduce((n, s) => n + s.tokens.length, 0);
+const count =
+  source.sections.reduce((n, s) => n + s.tokens.length, 0) + Object.keys(stateCss).length;
 console.log(`tokens: wrote ${OUT} — ${count} custom properties`);

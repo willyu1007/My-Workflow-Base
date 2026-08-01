@@ -75,6 +75,12 @@ import "@willyu1007/web-workbench/styles/index.css";
 > recommended, self-hosted path — and map them onto the `--font-*` tokens. Full recipe:
 > [TYPOGRAPHY.md → Fonts (host-provided)](./TYPOGRAPHY.md#fonts-host-provided).
 
+> ⚠️ **Upgrading to 0.12.0 (one small visual change).** Disabled opacity was split
+> across the kit — 0.5 on buttons and actions, 0.55 on the date button and the
+> expandable text field. All four now read `--state-disabled-opacity`, unified on the
+> reference value 0.5, so those two controls render slightly more faded when disabled.
+> Nothing else moves. Overriding the variable retunes all disabled states at once.
+
 > ⚠️ **Upgrading to 0.11.0 (no value change).** Tokens now have a machine-readable
 > source: `tokens/base.json` generates `src/styles/tokens.css`. All 114 custom
 > properties keep their exact names and values — the shipped CSS differs only in

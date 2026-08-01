@@ -208,3 +208,17 @@ check reads two files and needs no install, so the CI step runs standalone.
 
 **Not run:** package build (`prepublishOnly` builds at publish); no visual check
 needed — no value changed.
+
+## D-A9 resolution (2026-08-01)
+
+| Check | Result |
+|---|---|
+| Literal disabled opacities in `components.css` | 4 → 0 |
+| Sites reading `--state-disabled-opacity` | 4 |
+| `tokens.css` diff | purely additive — 3 lines (section header + one variable), nothing changed or removed |
+| **Source actually drives the CSS** | set `state.disabled.opacity` to 0.42 in the JSON, regenerated, CSS read 0.42; restored to 0.5 and re-verified |
+| Token gate | exit 0 |
+| CSS integrity | `components.css` and `tokens.css` both brace-balanced |
+
+The 0.42 probe is the check that matters: without it, four sites reading a
+variable proves only that the variable exists, not that the JSON is what sets it.

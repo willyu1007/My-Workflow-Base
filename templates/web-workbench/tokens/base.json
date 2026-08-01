@@ -622,9 +622,9 @@
   "state": {
     "meta": {
       "source": "The reference expresses these as concrete CSS on .mt-btn and friends rather than as tokens; the values are adopted verbatim and only the encoding is new.",
-      "not_emitted_to_css": "Intentionally absent from tokens.css for now. The kit's components.css still carries these as literals, and pointing it at variables is a behaviour-affecting refactor that needs its own review — see the known inconsistency below. This group records the canonical values so that refactor has a target, and so a native kit does not have to re-derive them.",
-      "known_inconsistency": "components.css uses opacity 0.5 for disabled on .mt-btn and .wb-action but 0.55 on two other surfaces. One of those is drift; deciding which is a design call, not a tokenization call, so nothing was unified here.",
-      "hover_note": "mix_percent is the surviving portion of the base color in color-mix(in oklab, base <pct>%, white). Touch platforms have no hover; the value exists so web and native share one definition rather than diverging."
+      "not_emitted_to_css": "Only the leaves listed under `css` become custom properties — today that is disabled.opacity, which components.css consumes in four places. pressed and hover stay structural: the reference expresses them as a transform and a color-mix() inside component rules, and converting those is a refactor rather than a token emission. They are recorded here so a native kit does not re-derive them.",
+      "hover_note": "mix_percent is the surviving portion of the base color in color-mix(in oklab, base <pct>%, white). Touch platforms have no hover; the value exists so web and native share one definition rather than diverging.",
+      "disabled_unification": "components.css carried 0.5 on two surfaces and 0.55 on two others. Owner decided 2026-08-01 to unify on 0.5, the reference value; all four now read the emitted variable so the split cannot silently return. See DECISIONS.md D-A9."
     },
     "pressed": {
       "scale": 0.99,
@@ -636,6 +636,9 @@
     },
     "hover": {
       "mix_percent": 92
+    },
+    "css": {
+      "--state-disabled-opacity": "disabled.opacity"
     }
   }
 }

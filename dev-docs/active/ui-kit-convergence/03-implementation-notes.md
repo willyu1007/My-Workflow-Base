@@ -214,3 +214,20 @@ tail is byte-identical.
   unused custom properties on every page is a real cost for no benefit.
 - **Typography not taken from the host schema.** Base's is the richer shape;
   see the roadmap note.
+
+## D-A9 resolution — disabled opacity unified (2026-08-01)
+
+Owner decided 0.5. Fixed at the source rather than as four literal edits, which
+is what the B-step token pipeline makes possible: `state.disabled.opacity` gained
+a `css` mapping in `tokens/base.json`, the emitter now emits any leaf listed
+there, and all four `components.css` sites read `--state-disabled-opacity`.
+
+Emitting is opt-in per leaf, not all of `state`. `pressed` and `hover` remain
+structural — the reference expresses them as a transform and a `color-mix()`
+inside component rules, so consuming them is a refactor, and unlike disabled
+they carry no drift to fix. Emitting them "because we can" would add unused
+custom properties to every page, which is the same cost B avoided.
+
+Visual effect: the date button and the expandable text field render slightly
+more faded when disabled (0.55 → 0.5). Ships as 0.12.0 with a README note,
+since it is a real if small change to how two controls look.
