@@ -1,6 +1,6 @@
 {
   "name": "@willyu1007/web-workbench",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "type": "module",
   "description": "Scenario-agnostic web workbench UI kit (Scene paradigms) — contracts + presentational React components.",
   "license": "MIT",
@@ -67,7 +67,8 @@
     "./lint-debt": "./dist/lint/design-debt.mjs"
   },
   "files": [
-    "dist"
+    "dist",
+    "*.md"
   ],
   "scripts": {
     "tokens": "node tokens/emit.mjs",

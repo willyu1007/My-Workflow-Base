@@ -22,6 +22,15 @@ same way it implements handlers/policies against `workflow-contracts`.
 
 ### The rules that ship with the kit
 
+**They ship literally — since 0.12.1 the contracts are inside the published tarball**, so
+a consumer reads them at `node_modules/@willyu1007/web-workbench/MOTION.md` and the links
+below resolve there too. Before 0.12.1 `files` was `["dist"]`: the kit governed consumers
+with a set of documents none of them could open, and every link in this table was dead the
+moment it arrived in `node_modules`. Point agents and reviewers at those paths.
+
+Note the split: rows about *changing* the kit reference `tokens/…`, which is source-side and
+still not published — consumers do not change token values, they consume them.
+
 | Read when | Doc |
 | --- | --- |
 | Laying out any screen | [PARADIGMS.md](./PARADIGMS.md) — the 6 Scene paradigms + 6 iron rules |
