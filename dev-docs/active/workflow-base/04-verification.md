@@ -317,7 +317,11 @@ that source revision.
 - Repair run `30348474446`: PASS at exact config revision `2af7c45`; full
   history source lock, all conformance checks, and Node 24 action runtime pass.
   The check run has `annotations_count=0`.
-- Consumer re-pin and renewed four-repository qualification remain pending.
+- Consumer re-pin and renewed four-repository qualification completed
+  2026-07-31 (recorded 2026-08-01 by My-Chat/T-030 R6): lock v4
+  `r3-derived-read-2026-07-31-v4` at Base `06303e9` / My-Chat `a019566` /
+  Education `e12605b` / Nurture `7a0090b`, Education-caller cloud run
+  `30641376220` success.
 
 ## Planned Checks
 - `git diff --check`

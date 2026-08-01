@@ -32,16 +32,19 @@ consumption surfaces
 - State: in-progress
 - Owner: unassigned
 - Created: 2026-05-25
-- Updated: 2026-07-28
+- Updated: 2026-08-01
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
 - Completed increments:
   - N1 ecosystem model adoption and RB-4
     documentation/template/conformance reconciliation at `df13843`
   - X-5 Base federation-v1 contract convergence at source revision `eb19433`
     and evidence revision `6cf298c`
-- Next gate: My-Chat adopts the converged Base contract/validator source before
-  `The-Education/T-041` removes its workflow contract/runtime forks and re-pins
-  both upstream repositories
+- Next-gate outcome (recorded 2026-08-01 by My-Chat/T-030 R6): satisfied -
+  My-Chat adopted the converged contract layer at `042b880`, Education
+  removed its forks and re-pinned (their `e12605b`), Nurture re-pinned
+  (their `7a0090b`), and the four-repository qualification lock v4
+  `r3-derived-read-2026-07-31-v4` passed locally and in the
+  Education-caller cloud run `30641376220`
 
 ## Context
 This repository is the workflow base template. It defines durable contracts for
