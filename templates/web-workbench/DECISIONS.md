@@ -153,6 +153,54 @@ the reference expresses them as a transform and a `color-mix()` inside component
 rules, so consuming them is a refactor rather than a token emission, and there
 is no drift to fix there today.
 
+## D-A10 — Motion roles are bound to the platform host by name, not by luck (2026-08-01)
+
+The cross-repo rule at the top of this file says same-named roles carry the same
+value in every repo. The five motion values are **not** same-named:
+
+| Shared role | My-Chat `ui/tokens/base.json` | This kit |
+|---|---|---|
+| fast duration | `motion.duration_fast` | `--t-fast` |
+| normal duration | `motion.duration_normal` | `--t-base` |
+| slow duration | `motion.duration_slow` | `--t-slow` |
+| standard curve | `motion.ease_standard` | `--ease-out` |
+| spring curve | `motion.ease_spring` | `--ease-spring` |
+
+So the rule that was supposed to hold them together could not see them. Audited
+2026-08-01: all five values match today — 120/180/280ms,
+`cubic-bezier(0.2, 0.8, 0.2, 1)`, `cubic-bezier(0.34, 1.56, 0.64, 1)`. Nothing
+was enforcing that; it was hand-maintained agreement, and the failure mode is
+silent. A curve retuned on either side produces a clean diff in its own repo and
+no signal in the other, while Web and Mobile drift apart in feel.
+
+`tokens/motion-role-lock.json` is the missing name mapping, and `tokens/emit.mjs`
+enforces it on every `pnpm tokens` / `pnpm tokens:check` — so also on every
+`build`, which means a drifted value cannot be published. Three rules:
+
+1. Each bound role's kit var exists at exactly the locked value.
+2. Kit value equals upstream value, unless the role records a `deviation` — the
+   same discipline `meta.deviations_from_source` already applies to color.
+3. **Every var in the Motion section is classified** as either a bound role or a
+   kit-local invention with a reason.
+
+Rule 3 is the point. Rules 1–2 catch a changed value, which someone would
+plausibly notice anyway. Rule 3 catches the case nobody notices: a *new* motion
+token added on one side only. That is how the two vocabularies actually diverge.
+
+Two vars are recorded as kit-local: `--wb-reveal-duration` (derived from the
+bound `--t-base`, so it tracks the role) and `--wb-reveal-shift` (a distance, not
+a timing role). Both are D-A4 inventions.
+
+Scope limit, deliberate: this binds the *token* layer. It does not reach the
+three off-scale component literals D-A5 kept, and it does not bind motion
+*vocabulary* — the kit reasons in CSS transitions, Mobile in Reanimated. Only the
+numbers are guaranteed identical; whether both platforms spend them the same way
+is a review question, not a lint question.
+
+**Changing a bound value is a cross-repo change.** Update My-Chat first, then
+re-pin `upstream.revision` and the values here. Editing this side alone now
+fails the build rather than shipping a split.
+
 ## Accepted off-scale literals
 
 - `components.css` `.mt-window-bar` gradient endpoint `#F2EBDF` — decorative

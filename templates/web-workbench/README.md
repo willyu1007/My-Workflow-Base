@@ -29,6 +29,7 @@ same way it implements handlers/policies against `workflow-contracts`.
 | Wiring fonts, or touching type | [TYPOGRAPHY.md](./TYPOGRAPHY.md) — the scale, the host font recipe, and how to verify faces actually render |
 | Wiring lint, or hitting a lint error | [GOVERNANCE.md](./GOVERNANCE.md) — what is locked, why, and the debt gate |
 | Changing a token value | `tokens/base.json` — the source; `src/styles/tokens.css` is generated, never hand-edited |
+| Changing a **motion** token, or adding one | `tokens/motion-role-lock.json` — durations and curves are the platform host's roles under kit names; `pnpm tokens:check` fails on drift *and* on a new motion token nobody classified. See [DECISIONS.md](./DECISIONS.md) D-A10 |
 | Wondering why a token has the value it has | [DECISIONS.md](./DECISIONS.md) |
 
 ## What's inside

@@ -12,6 +12,10 @@
  * `elevation` and `state` are deliberately NOT emitted; see their `meta` notes in
  * base.json. They are the platform-neutral source for a future native kit, and
  * the web already has --shadow-* and component-level state rules.
+ *
+ * Both modes also verify the Motion section against `tokens/motion-role-lock.json`
+ * — the cross-repo name mapping onto the platform host's motion roles. See
+ * `verifyMotionRoles` below and DECISIONS.md D-A10.
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -23,6 +27,7 @@ const OUT = join(kit, "src/styles/tokens.css");
 
 const source = JSON.parse(readFileSync(join(here, "base.json"), "utf8"));
 const tail = readFileSync(join(here, "tail.css"), "utf8");
+const motionLock = JSON.parse(readFileSync(join(here, "motion-role-lock.json"), "utf8"));
 
 const HEADER = `/* =========================================================
    morethan — Foundations
@@ -38,6 +43,87 @@ const HEADER = `/* =========================================================
    tokens below still define the family stacks (one source of truth); the host
    loads the actual faces. See TYPOGRAPHY.md → "Fonts (host-provided)". */
 `;
+
+/**
+ * Hold the Motion section to `tokens/motion-role-lock.json`.
+ *
+ * The kit's motion values are the platform host's, under kit names. Nothing else
+ * enforces that: the cross-repo rule in DECISIONS.md keys on same-named roles, and
+ * `--t-base` is not named `duration_normal`. Without this, a curve tuned here and a
+ * curve tuned in the host drift apart silently and the diff shows nothing wrong.
+ *
+ * Runs in both write and check mode — a drifted value must not be emittable, only
+ * reportable.
+ */
+function verifyMotionRoles() {
+  const section = source.sections.find((s) => s.title === "Motion");
+  const errors = [];
+
+  if (!section) {
+    errors.push("base.json has no Motion section, but motion-role-lock.json locks one.");
+    return errors;
+  }
+
+  const byVar = new Map(section.tokens.map((t) => [t.var, t.value]));
+
+  for (const role of motionLock.roles) {
+    const actual = byVar.get(role.kit_var);
+
+    if (actual === undefined) {
+      errors.push(
+        `role "${role.role}" is locked onto ${role.kit_var}, which the Motion section does not define.`,
+      );
+      continue;
+    }
+
+    if (actual !== role.kit_value) {
+      errors.push(
+        `${role.kit_var} is "${actual}" but the lock records "${role.kit_value}" ` +
+          `(role "${role.role}", upstream ${motionLock.upstream.repo} ${role.upstream_key}).\n` +
+          `      Changing a bound role is a cross-repo change: update the upstream first, ` +
+          `then re-pin this lock — do not edit the value here alone.`,
+      );
+      continue;
+    }
+
+    // A deliberate divergence is allowed, but it has to be written down — same
+    // discipline as meta.deviations_from_source.
+    if (!role.deviation && role.kit_value !== role.upstream_value) {
+      errors.push(
+        `role "${role.role}" holds "${role.kit_value}" while upstream ${role.upstream_key} ` +
+          `holds "${role.upstream_value}", with no "deviation" recorded on the role.\n` +
+          `      Either match upstream or record why this repo differs.`,
+      );
+    }
+  }
+
+  const known = new Set([
+    ...motionLock.roles.map((r) => r.kit_var),
+    ...motionLock.kit_local.map((l) => l.kit_var),
+  ]);
+
+  for (const token of section.tokens) {
+    if (!known.has(token.var)) {
+      errors.push(
+        `${token.var} is a new motion token that the lock does not classify.\n` +
+          `      Add it to "roles" if the platform host carries the same role, or to ` +
+          `"kit_local" with a reason if it is a kit invention.`,
+      );
+    }
+  }
+
+  return errors;
+}
+
+const motionErrors = verifyMotionRoles();
+if (motionErrors.length > 0) {
+  console.error(
+    `tokens: Motion section does not match tokens/motion-role-lock.json\n` +
+      motionErrors.map((e) => `  - ${e}`).join("\n") +
+      `\n\nSee DECISIONS.md D-A10 and MOTION.md → "Where the values come from".`,
+  );
+  process.exit(3);
+}
 
 /** Wrap a note as a comment block indented into the :root body. */
 const noteBlock = (text, indent = "  ") =>

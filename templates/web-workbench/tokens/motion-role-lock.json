@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "_note": [
+    "Cross-repo binding for the motion roles. DECISIONS.md D-A10 is the rationale.",
+    "",
+    "The kit and the platform host (My-Chat) carry the same five motion values under",
+    "DIFFERENT names: the host publishes `motion.duration_normal`, the kit publishes",
+    "`--t-base`. The cross-repo rule in DECISIONS.md keys on *same-named* roles, so a",
+    "differently-named pair is invisible to it — the two repos agreeing today is a",
+    "coincidence maintained by hand, not a guarantee. This file is the missing name",
+    "mapping, and `tokens/emit.mjs` turns it into a mechanical check that runs on every",
+    "`pnpm tokens` and `pnpm tokens:check` (and therefore on every `pnpm build`).",
+    "",
+    "What the check enforces:",
+    "  1. Each locked role's `kit_var` exists in the Motion section at exactly `kit_value`.",
+    "  2. `kit_value` equals `upstream_value`, unless the role carries a `deviation` string.",
+    "  3. Every var in the Motion section is either a locked role or listed in `kit_local`.",
+    "",
+    "Rule 3 is the one that matters: a new motion token cannot be added without deciding",
+    "whether it is a shared cross-platform role or a kit invention. That decision is the",
+    "thing that used to be skippable."
+  ],
+
+  "upstream": {
+    "repo": "My-Chat",
+    "path": "ui/tokens/base.json",
+    "node": "motion",
+    "revision": "b794d7ecfdd0c4d8f991f3ba1f4c311b92186716",
+    "revision_note": [
+      "Last commit touching the upstream token file when this lock was written",
+      "(2026-07-31, 'feat(ui): expand token ssot for depth and state').",
+      "The upstream node also feeds Mobile through My-Chat's",
+      "`.ai/scripts/ctl-ui-native-tokens.mjs`, so these five values reach Web (this kit),",
+      "Admin, and React Native from one source. Re-pin the revision whenever an",
+      "`upstream_value` here changes."
+    ]
+  },
+
+  "roles": [
+    {
+      "role": "duration_fast",
+      "upstream_key": "motion.duration_fast",
+      "upstream_value": "120ms",
+      "kit_var": "--t-fast",
+      "kit_value": "120ms"
+    },
+    {
+      "role": "duration_normal",
+      "upstream_key": "motion.duration_normal",
+      "upstream_value": "180ms",
+      "kit_var": "--t-base",
+      "kit_value": "180ms"
+    },
+    {
+      "role": "duration_slow",
+      "upstream_key": "motion.duration_slow",
+      "upstream_value": "280ms",
+      "kit_var": "--t-slow",
+      "kit_value": "280ms"
+    },
+    {
+      "role": "ease_standard",
+      "upstream_key": "motion.ease_standard",
+      "upstream_value": "cubic-bezier(0.2, 0.8, 0.2, 1)",
+      "kit_var": "--ease-out",
+      "kit_value": "cubic-bezier(0.2, 0.8, 0.2, 1)",
+      "name_note": "The kit name states the curve's UI role (entering/exiting elements ease out); the upstream name states its position in the set (the default curve). Same curve, two vocabularies — this is exactly the pair the same-named rule could not see."
+    },
+    {
+      "role": "ease_spring",
+      "upstream_key": "motion.ease_spring",
+      "upstream_value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+      "kit_var": "--ease-spring",
+      "kit_value": "cubic-bezier(0.34, 1.56, 0.64, 1)"
+    }
+  ],
+
+  "kit_local": [
+    {
+      "kit_var": "--wb-reveal-duration",
+      "reason": "Scene reveal-on-mount, a kit-specific composition with no host counterpart. Derived from the bound --t-base rather than authored, so it tracks the role automatically. See DECISIONS.md D-A4."
+    },
+    {
+      "kit_var": "--wb-reveal-shift",
+      "reason": "Travel distance for the same reveal. A layout value, not a timing role; nothing upstream corresponds to it. See DECISIONS.md D-A4."
+    }
+  ]
+}

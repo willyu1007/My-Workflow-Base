@@ -63,6 +63,23 @@ What the kit already handles for you, in `prefers-reduced-motion: reduce`:
 scene reveal, toast, drawer, overlay, skeleton shimmer, nav status pulse, and
 the mobile sidebar. Host motion is the host's to cover.
 
+## Where the values come from
+
+The three durations and two curves are not this kit's to choose. They are the
+platform host's motion roles (`My-Chat` `ui/tokens/base.json` → `motion.*`),
+which also reach React Native through that repo's native token emitter. The kit
+publishes them under its own names, so the same value is `motion.duration_normal`
+upstream and `--t-base` here.
+
+`tokens/motion-role-lock.json` records that mapping, and `pnpm tokens:check`
+enforces it — including on every `build`, so a drifted value cannot be
+published. The check also fails on a **new** motion token that has not been
+classified as either a shared role or a kit-local invention; that classification
+is the decision the lock exists to force. Rationale: DECISIONS.md D-A10.
+
+Practical consequence: retuning a curve or a duration is a cross-repo change,
+not a local one. Change the host first, then re-pin the lock.
+
 ## Motion is not authorization
 
 Motion may confirm that input was received, expose progress, or make a
