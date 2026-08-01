@@ -1,6 +1,6 @@
 {
   "name": "@willyu1007/web-workbench",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "type": "module",
   "description": "Scenario-agnostic web workbench UI kit (Scene paradigms) — contracts + presentational React components.",
   "license": "MIT",
@@ -70,7 +70,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && mkdir -p dist/styles && cp src/styles/*.css dist/styles/ && mkdir -p dist/lint && cp lint/stylelint.cjs lint/eslint.js lint/design-debt.mjs dist/lint/",
+    "tokens": "node tokens/emit.mjs",
+    "tokens:check": "node tokens/emit.mjs --check",
+    "build": "pnpm tokens:check && tsc -p tsconfig.build.json && mkdir -p dist/styles && cp src/styles/*.css dist/styles/ && mkdir -p dist/lint && cp lint/stylelint.cjs lint/eslint.js lint/design-debt.mjs dist/lint/",
     "build:css": "mkdir -p dist/styles && cp src/styles/*.css dist/styles/",
     "build:lint": "mkdir -p dist/lint && cp lint/stylelint.cjs lint/eslint.js lint/design-debt.mjs dist/lint/",
     "typecheck": "tsc --noEmit -p tsconfig.json",

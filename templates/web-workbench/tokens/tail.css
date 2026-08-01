@@ -1,0 +1,69 @@
+/* ---------- Base resets bound to tokens ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-canvas);
+  color: var(--fg-1);
+  font-family: var(--font-sans);
+  font-size: var(--body-size);
+  line-height: var(--body-lh);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- Semantic typography (drop-in) ---------- */
+.mt-display, h1.mt-display {
+  font-family: var(--font-display);
+  font-size: var(--display-size);
+  line-height: var(--display-lh);
+  letter-spacing: var(--display-tracking);
+  font-weight: var(--display-weight);
+  color: var(--fg-1);
+}
+.mt-h1 {
+  font-family: var(--font-display);
+  font-size: var(--h1-size); line-height: var(--h1-lh);
+  letter-spacing: var(--h1-tracking); font-weight: var(--h1-weight);
+}
+.mt-h2 {
+  font-family: var(--font-display);
+  font-size: var(--h2-size); line-height: var(--h2-lh);
+  letter-spacing: var(--h2-tracking); font-weight: var(--h2-weight);
+}
+.mt-h3 { font-size: var(--h3-size); line-height: var(--h3-lh); font-weight: var(--h3-weight); }
+.mt-h4 { font-size: var(--h4-size); line-height: var(--h4-lh); font-weight: var(--h4-weight); }
+.mt-body { font-size: var(--body-size); line-height: var(--body-lh); color: var(--fg-1); }
+.mt-small { font-size: var(--small-size); line-height: var(--small-lh); color: var(--fg-2); }
+.mt-caption {
+  font-size: var(--caption-size); line-height: var(--caption-lh);
+  letter-spacing: var(--caption-tracking);
+  text-transform: uppercase; color: var(--fg-3); font-weight: 600;
+}
+.mt-code {
+  font-family: var(--font-mono);
+  font-size: var(--code-size);
+  background: var(--mt-sand);
+  padding: 2px 6px; border-radius: var(--r-xs);
+  color: var(--mt-navy-700);
+}
+/* Handwritten — for marginalia, signatures, expressive callouts */
+.mt-hand {
+  font-family: var(--font-hand);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.mt-hand-cn {
+  font-family: var(--font-hand-cn);
+  font-weight: 400;
+}
+a, .mt-link {
+  color: var(--fg-link);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+}
+a:hover, .mt-link:hover {
+  color: var(--mt-navy);
+  border-bottom-color: var(--mt-navy-300);
+}

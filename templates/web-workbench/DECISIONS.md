@@ -99,6 +99,48 @@ the viewport, the most vestibular motion in the kit, and the only one the block
 did not reach. `transition: none` added. It still opens and closes; it arrives
 rather than travels.
 
+## D-A8 — `tokens/base.json` is the token source; `tokens.css` is generated
+
+The CSS was its own source of truth, which is the wrong shape for a template
+repo: values could only be diffed as CSS, nothing could verify a consumer had
+not drifted, and a future native kit would have had to re-derive every value by
+reading stylesheets. `tokens/base.json` now holds all 114 custom properties and
+`tokens/emit.mjs` writes `src/styles/tokens.css`. `pnpm tokens:check` fails when
+the committed CSS does not match the source, and `build` runs it, so a stale
+artifact cannot be published.
+
+**CSS variable names are a public API.** Consumers write `var(--fg-1)` in their
+own stylesheets, so the source stores name and value explicitly rather than
+deriving names from a category path. A nested schema would have renamed `--fg-1`
+to `--color-fg-1` and broken every consumer silently; the flat mapping is
+deliberate.
+
+**Fidelity was proven by value, not by bytes.** The old file was hand-aligned ad
+hoc — 114 declarations across 12 different value-start columns, inconsistent even
+within a section — so byte-identical output would have required storing per-token
+padding and turning a design document into a formatting record. The emitter
+normalizes alignment instead, and the guarantee is stronger than byte-identity:
+all 114 name→value pairs are unchanged, with none added, removed, or altered.
+Everything after the `:root` block is byte-identical.
+
+**`elevation` and `state` are in the source but not in the CSS.** `elevation` is
+the platform-neutral depth encoding a future native kit needs (iOS shadow
+primitives plus an Android scalar, with the two-layer reduction rule recorded
+next to the values); the web already has `--shadow-*`, so emitting 25 unused
+custom properties onto every page would cost bytes for nothing. `state` records
+the canonical pressed/disabled/hover values, which currently live as literals
+inside `components.css`. Pointing those at variables is a behaviour-affecting
+refactor and is deliberately not part of this change — see D-A9.
+
+## D-A9 — Disabled opacity is inconsistent in the kit (open)
+
+Recorded while extracting the `state` group: `components.css` uses
+`opacity: 0.5` for disabled on `.mt-btn` and `.wb-action`, and `opacity: 0.55`
+on two other surfaces. The reference specifies 0.5. One of the two is drift, but
+deciding which — and whether the 0.55 surfaces were tuned deliberately — is a
+design call, not a tokenization call, so nothing was unified. Whoever wires
+`components.css` to the `state` tokens owns this.
+
 ## Accepted off-scale literals
 
 - `components.css` `.mt-window-bar` gradient endpoint `#F2EBDF` — decorative

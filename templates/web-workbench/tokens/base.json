@@ -1,0 +1,641 @@
+{
+  "$schema_note": "Design-token source of truth for @willyu1007/web-workbench. src/styles/tokens.css is GENERATED from this file by tokens/emit.mjs — edit here, never there.",
+  "meta": {
+    "token_version": "1.0.0",
+    "source_of_truth": "morethan design reference (colors_and_type.css), as adjudicated in DECISIONS.md",
+    "css_var_names_are_public_api": "Consumers write var(--fg-1) in their own CSS, so every CSS variable name here is a published contract. The emitter therefore maps name to value explicitly rather than deriving names from the JSON path — a category-nested schema would silently rename --fg-1 to --color-fg-1 and break every consumer.",
+    "deviations_from_source": {
+      "--mt-ink-4": "Reference #717684 measures 4.25:1 on cream and fails WCAG AA for body text. Held at #6B707D (4.64:1), hue and saturation preserved. See DECISIONS.md D-A2. Do not restore #717684.",
+      "--scrim": "Derived, not adopted — the reference defines no backdrop token. Cold ink at 0.33 alpha, matching the host platform's overlay_backdrop. See DECISIONS.md D-A3.",
+      "--bg-tint / --bg-float / --bg-field-quiet": "Kit inventions with no reference counterpart, derived via color-mix() from token bases so they track repairs automatically. See DECISIONS.md D-A4.",
+      "--wb-reveal-duration / --wb-reveal-shift": "Kit inventions for the Scene reveal-on-mount; host-tunable. See DECISIONS.md D-A4."
+    }
+  },
+  "sections": [
+    {
+      "title": "Brand core",
+      "note": null,
+      "tokens": [
+        {
+          "var": "--mt-navy",
+          "value": "#283E68",
+          "comment": "Primary — reliability"
+        },
+        {
+          "var": "--mt-navy-700",
+          "value": "#1F3354"
+        },
+        {
+          "var": "--mt-navy-600",
+          "value": "#324A78"
+        },
+        {
+          "var": "--mt-navy-500",
+          "value": "#4761A0",
+          "comment": "Hover/links"
+        },
+        {
+          "var": "--mt-navy-300",
+          "value": "#8FA0C2"
+        },
+        {
+          "var": "--mt-navy-100",
+          "value": "#DCE2EE"
+        },
+        {
+          "var": "--mt-navy-50",
+          "value": "#EEF1F7"
+        },
+        {
+          "var": "--mt-orange",
+          "value": "#E1703C",
+          "comment": "Accent — CTA"
+        },
+        {
+          "var": "--mt-orange-700",
+          "value": "#C75D2C"
+        },
+        {
+          "var": "--mt-orange-600",
+          "value": "#D26735",
+          "comment": "press"
+        },
+        {
+          "var": "--mt-orange-500",
+          "value": "#E68559",
+          "comment": "hover"
+        },
+        {
+          "var": "--mt-orange-300",
+          "value": "#F0A989"
+        },
+        {
+          "var": "--mt-orange-100",
+          "value": "#FAE2D5"
+        },
+        {
+          "var": "--mt-orange-50",
+          "value": "#FDF1E9"
+        },
+        {
+          "var": "--mt-ink",
+          "value": "#111827",
+          "note": "Cold ink foreground on warm surfaces — the reference's single contrast system (the shadow scale below is authored against this same cold ink). Values follow morethan colors_and_type.css; the one intentional deviation is --mt-ink-4 — see DECISIONS.md."
+        },
+        {
+          "var": "--mt-ink-2",
+          "value": "#2A3142"
+        },
+        {
+          "var": "--mt-ink-3",
+          "value": "#4B5363"
+        },
+        {
+          "var": "--mt-ink-4",
+          "value": "#6B707D",
+          "comment": "muted text — AA-corrected; reference #717684 fails 4.5:1 on cream (DECISIONS.md D-A2)"
+        },
+        {
+          "var": "--mt-ink-5",
+          "value": "#A2A6B2",
+          "comment": "placeholder"
+        }
+      ]
+    },
+    {
+      "title": "Warm neutrals (Mac-like, earthy)",
+      "note": null,
+      "tokens": [
+        {
+          "var": "--mt-cream",
+          "value": "#FBF7F1",
+          "comment": "App canvas"
+        },
+        {
+          "var": "--mt-sand",
+          "value": "#F5EFE6",
+          "comment": "Card / panel"
+        },
+        {
+          "var": "--mt-sand-2",
+          "value": "#ECE4D6",
+          "comment": "Hover surface"
+        },
+        {
+          "var": "--mt-stone",
+          "value": "#DDD3C0",
+          "comment": "Divider on warm"
+        },
+        {
+          "var": "--mt-paper",
+          "value": "#FFFFFF",
+          "comment": "Pure surface (white card on cream)"
+        }
+      ]
+    },
+    {
+      "title": "Semantic",
+      "note": null,
+      "tokens": [
+        {
+          "var": "--mt-success",
+          "value": "#2E8B6B"
+        },
+        {
+          "var": "--mt-success-bg",
+          "value": "#E4F2EC"
+        },
+        {
+          "var": "--mt-warning",
+          "value": "#C98A2B"
+        },
+        {
+          "var": "--mt-warning-bg",
+          "value": "#FBEFD8"
+        },
+        {
+          "var": "--mt-danger",
+          "value": "#B5402F"
+        },
+        {
+          "var": "--mt-danger-bg",
+          "value": "#FBE3DD"
+        },
+        {
+          "var": "--mt-info",
+          "value": "var(--mt-navy-500)"
+        },
+        {
+          "var": "--mt-info-bg",
+          "value": "var(--mt-navy-50)"
+        }
+      ]
+    },
+    {
+      "title": "Foreground / Background tokens",
+      "note": null,
+      "tokens": [
+        {
+          "var": "--fg-1",
+          "value": "var(--mt-ink)",
+          "comment": "primary text"
+        },
+        {
+          "var": "--fg-2",
+          "value": "var(--mt-ink-3)",
+          "comment": "secondary"
+        },
+        {
+          "var": "--fg-3",
+          "value": "var(--mt-ink-4)",
+          "comment": "tertiary / hint"
+        },
+        {
+          "var": "--fg-on-navy",
+          "value": "#FFFFFF"
+        },
+        {
+          "var": "--fg-on-orange",
+          "value": "#FFFFFF"
+        },
+        {
+          "var": "--fg-link",
+          "value": "var(--mt-navy-500)"
+        },
+        {
+          "var": "--bg-canvas",
+          "value": "var(--mt-cream)"
+        },
+        {
+          "var": "--bg-surface",
+          "value": "var(--mt-paper)"
+        },
+        {
+          "var": "--bg-sunken",
+          "value": "var(--mt-sand)"
+        },
+        {
+          "var": "--bg-raised",
+          "value": "#FFFFFF"
+        },
+        {
+          "var": "--bg-hover",
+          "value": "var(--mt-sand-2)"
+        },
+        {
+          "var": "--bg-tint",
+          "value": "color-mix(in oklab, var(--mt-navy) 3%, transparent)",
+          "comment": "subtle navy row hover"
+        },
+        {
+          "var": "--bg-float",
+          "value": "color-mix(in oklab, var(--mt-paper) 40%, var(--mt-cream))",
+          "comment": "floating panel — warm off-white, not stark white"
+        },
+        {
+          "var": "--bg-field-quiet",
+          "value": "color-mix(in oklab, var(--bg-surface) 50%, var(--bg-canvas))",
+          "comment": "quiet filter-toolbar field — softer than a white data-entry field"
+        },
+        {
+          "var": "--scrim",
+          "value": "rgba(17, 24, 39, 0.33)",
+          "comment": "overlay / drawer backdrop — cold ink @ .33 (DECISIONS.md D-A3)"
+        },
+        {
+          "var": "--border-1",
+          "value": "rgba(40, 62, 104, 0.10)",
+          "comment": "hairline on warm bg"
+        },
+        {
+          "var": "--border-2",
+          "value": "rgba(40, 62, 104, 0.18)",
+          "comment": "control border"
+        },
+        {
+          "var": "--border-3",
+          "value": "rgba(40, 62, 104, 0.28)",
+          "comment": "focused / strong"
+        }
+      ]
+    },
+    {
+      "title": "Type",
+      "note": "- --font-sans:    UI / body / small text (Manrope grotesque + Noto Sans SC)\n- --font-display: brand wordmark + UI titles that should stay sans\n- --font-serif:   editorial headlines (page H1 / section H2) — Anthropic feel\n- --font-mono:    inline code, timestamps, meta",
+      "tokens": [
+        {
+          "var": "--font-sans",
+          "value": "'Manrope', 'Inter', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Noto Sans SC', 'PingFang SC', 'HarmonyOS Sans', 'Source Han Sans SC', system-ui, sans-serif"
+        },
+        {
+          "var": "--font-display",
+          "value": "'Manrope', 'Inter', 'SF Pro Display', 'Noto Sans SC', 'PingFang SC', system-ui, sans-serif"
+        },
+        {
+          "var": "--font-serif",
+          "value": "'Source Serif 4', 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif"
+        },
+        {
+          "var": "--font-mono",
+          "value": "'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, Consolas, monospace"
+        },
+        {
+          "var": "--font-hand",
+          "value": "'Caveat', 'Ma Shan Zheng', 'Kaiti SC', 'STKaiti', 'KaiTi', cursive"
+        },
+        {
+          "var": "--font-hand-cn",
+          "value": "'Ma Shan Zheng', 'Kaiti SC', 'STKaiti', 'KaiTi', 'Caveat', cursive"
+        },
+        {
+          "var": "--display-size",
+          "value": "56px",
+          "note": "Type scale (semantic)"
+        },
+        {
+          "var": "--display-lh",
+          "value": "1.05"
+        },
+        {
+          "var": "--display-tracking",
+          "value": "-0.02em"
+        },
+        {
+          "var": "--display-weight",
+          "value": "800"
+        },
+        {
+          "var": "--h1-size",
+          "value": "40px"
+        },
+        {
+          "var": "--h1-lh",
+          "value": "1.1"
+        },
+        {
+          "var": "--h1-tracking",
+          "value": "-0.02em"
+        },
+        {
+          "var": "--h1-weight",
+          "value": "700"
+        },
+        {
+          "var": "--h2-size",
+          "value": "28px"
+        },
+        {
+          "var": "--h2-lh",
+          "value": "1.2"
+        },
+        {
+          "var": "--h2-tracking",
+          "value": "-0.01em"
+        },
+        {
+          "var": "--h2-weight",
+          "value": "700"
+        },
+        {
+          "var": "--h3-size",
+          "value": "20px"
+        },
+        {
+          "var": "--h3-lh",
+          "value": "1.3"
+        },
+        {
+          "var": "--h3-tracking",
+          "value": "-0.005em"
+        },
+        {
+          "var": "--h3-weight",
+          "value": "600"
+        },
+        {
+          "var": "--h4-size",
+          "value": "16px"
+        },
+        {
+          "var": "--h4-lh",
+          "value": "1.35"
+        },
+        {
+          "var": "--h4-weight",
+          "value": "600"
+        },
+        {
+          "var": "--body-size",
+          "value": "15px"
+        },
+        {
+          "var": "--body-lh",
+          "value": "1.55"
+        },
+        {
+          "var": "--body-weight",
+          "value": "400"
+        },
+        {
+          "var": "--small-size",
+          "value": "13px"
+        },
+        {
+          "var": "--small-lh",
+          "value": "1.5"
+        },
+        {
+          "var": "--caption-size",
+          "value": "12px"
+        },
+        {
+          "var": "--caption-lh",
+          "value": "1.4"
+        },
+        {
+          "var": "--caption-tracking",
+          "value": "0.01em"
+        },
+        {
+          "var": "--code-size",
+          "value": "13px"
+        }
+      ]
+    },
+    {
+      "title": "Spacing (8pt grid)",
+      "note": null,
+      "tokens": [
+        {
+          "var": "--sp-1",
+          "value": "4px"
+        },
+        {
+          "var": "--sp-2",
+          "value": "8px"
+        },
+        {
+          "var": "--sp-3",
+          "value": "12px"
+        },
+        {
+          "var": "--sp-4",
+          "value": "16px"
+        },
+        {
+          "var": "--sp-5",
+          "value": "24px"
+        },
+        {
+          "var": "--sp-6",
+          "value": "32px"
+        },
+        {
+          "var": "--sp-7",
+          "value": "48px"
+        },
+        {
+          "var": "--sp-8",
+          "value": "64px"
+        },
+        {
+          "var": "--sp-9",
+          "value": "96px"
+        }
+      ]
+    },
+    {
+      "title": "Radii",
+      "note": null,
+      "tokens": [
+        {
+          "var": "--r-xs",
+          "value": "4px"
+        },
+        {
+          "var": "--r-sm",
+          "value": "6px"
+        },
+        {
+          "var": "--r-md",
+          "value": "8px",
+          "comment": "controls"
+        },
+        {
+          "var": "--r-lg",
+          "value": "12px",
+          "comment": "cards"
+        },
+        {
+          "var": "--r-xl",
+          "value": "16px",
+          "comment": "large cards / sheets"
+        },
+        {
+          "var": "--r-2xl",
+          "value": "20px"
+        },
+        {
+          "var": "--r-pill",
+          "value": "999px"
+        }
+      ]
+    },
+    {
+      "title": "Shadows (Mac-like, soft, layered)",
+      "note": null,
+      "tokens": [
+        {
+          "var": "--shadow-xs",
+          "value": "0 1px 1px rgba(17, 24, 39, 0.04)"
+        },
+        {
+          "var": "--shadow-sm",
+          "value": "0 1px 2px rgba(17, 24, 39, 0.06), 0 1px 1px rgba(17, 24, 39, 0.04)"
+        },
+        {
+          "var": "--shadow-md",
+          "value": "0 4px 12px rgba(17, 24, 39, 0.06), 0 1px 2px rgba(17, 24, 39, 0.05)"
+        },
+        {
+          "var": "--shadow-lg",
+          "value": "0 12px 32px rgba(17, 24, 39, 0.10), 0 2px 6px rgba(17, 24, 39, 0.06)"
+        },
+        {
+          "var": "--shadow-xl",
+          "value": "0 24px 56px rgba(17, 24, 39, 0.16), 0 4px 12px rgba(17, 24, 39, 0.08)"
+        },
+        {
+          "var": "--shadow-inset",
+          "value": "inset 0 1px 0 rgba(255, 255, 255, 0.6)"
+        },
+        {
+          "var": "--shadow-focus",
+          "value": "0 0 0 3px rgba(225, 112, 60, 0.28)"
+        }
+      ]
+    },
+    {
+      "title": "Motion",
+      "note": null,
+      "tokens": [
+        {
+          "var": "--ease-out",
+          "value": "cubic-bezier(0.2, 0.8, 0.2, 1)"
+        },
+        {
+          "var": "--ease-spring",
+          "value": "cubic-bezier(0.34, 1.56, 0.64, 1)"
+        },
+        {
+          "var": "--t-fast",
+          "value": "120ms"
+        },
+        {
+          "var": "--t-base",
+          "value": "180ms"
+        },
+        {
+          "var": "--t-slow",
+          "value": "280ms"
+        },
+        {
+          "var": "--wb-reveal-duration",
+          "value": "var(--t-base)",
+          "note": "Scene reveal-on-mount. The Scene root carries `.wb-reveal`, which replays every time a Scene mounts — i.e. on every route change. Keep it brief so it never reads as lag stacked on top of navigation. Hosts can tune these, or set `--wb-reveal-duration: 0ms` to disable the reveal entirely (e.g. when the host owns its own route transitions)."
+        },
+        {
+          "var": "--wb-reveal-shift",
+          "value": "6px"
+        }
+      ]
+    }
+  ],
+  "elevation": {
+    "meta": {
+      "purpose": "Platform-neutral encoding of the shadow scale, so a future React Native kit can consume the same depth system as the web. The --shadow-* CSS strings in `sections` stay the web source; this group is the same design intent expressed structurally.",
+      "not_emitted_to_css": "Intentionally absent from tokens.css. The web already has --shadow-*, and emitting 25 unused custom properties onto every page would cost bytes for nothing. This group exists for a native emitter.",
+      "reduction_rule": "Reference shadows sm through xl are two-layer and iOS supports one layer per view, so iOS takes the primary (larger, outer) layer and the secondary contact layer is dropped. shadow_radius is the CSS blur halved, because CSS blur is roughly twice the Gaussian radius iOS expects. Android has no per-layer control, so elevation is a single scalar tracked to the primary layer's y-offset. --shadow-inset has no React Native equivalent and degrades to nothing; do not emulate it with a border.",
+      "color_note": "Every level shares the cold ink #111827 as shadow color, matching the reference. Do not warm this — the depth system was authored against the cold foreground."
+    },
+    "xs": {
+      "ios": {
+        "color": "#111827",
+        "offset_x": 0,
+        "offset_y": 1,
+        "radius": 0.5,
+        "opacity": 0.04
+      },
+      "android": {
+        "elevation": 1
+      }
+    },
+    "sm": {
+      "ios": {
+        "color": "#111827",
+        "offset_x": 0,
+        "offset_y": 1,
+        "radius": 1,
+        "opacity": 0.06
+      },
+      "android": {
+        "elevation": 2
+      }
+    },
+    "md": {
+      "ios": {
+        "color": "#111827",
+        "offset_x": 0,
+        "offset_y": 4,
+        "radius": 6,
+        "opacity": 0.06
+      },
+      "android": {
+        "elevation": 4
+      }
+    },
+    "lg": {
+      "ios": {
+        "color": "#111827",
+        "offset_x": 0,
+        "offset_y": 12,
+        "radius": 16,
+        "opacity": 0.1
+      },
+      "android": {
+        "elevation": 12
+      }
+    },
+    "xl": {
+      "ios": {
+        "color": "#111827",
+        "offset_x": 0,
+        "offset_y": 24,
+        "radius": 28,
+        "opacity": 0.16
+      },
+      "android": {
+        "elevation": 24
+      }
+    }
+  },
+  "state": {
+    "meta": {
+      "source": "The reference expresses these as concrete CSS on .mt-btn and friends rather than as tokens; the values are adopted verbatim and only the encoding is new.",
+      "not_emitted_to_css": "Intentionally absent from tokens.css for now. The kit's components.css still carries these as literals, and pointing it at variables is a behaviour-affecting refactor that needs its own review — see the known inconsistency below. This group records the canonical values so that refactor has a target, and so a native kit does not have to re-derive them.",
+      "known_inconsistency": "components.css uses opacity 0.5 for disabled on .mt-btn and .wb-action but 0.55 on two other surfaces. One of those is drift; deciding which is a design call, not a tokenization call, so nothing was unified here.",
+      "hover_note": "mix_percent is the surviving portion of the base color in color-mix(in oklab, base <pct>%, white). Touch platforms have no hover; the value exists so web and native share one definition rather than diverging."
+    },
+    "pressed": {
+      "scale": 0.99,
+      "translate_y": "0.5px",
+      "shadow": "xs"
+    },
+    "disabled": {
+      "opacity": 0.5
+    },
+    "hover": {
+      "mix_percent": 92
+    }
+  }
+}

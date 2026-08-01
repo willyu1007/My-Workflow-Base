@@ -1,16 +1,16 @@
 /* =========================================================
    morethan — Foundations
-   Colors + Type tokens. Import this file once at the top of
-   any HTML/CSS that needs the brand.
+   GENERATED FILE. DO NOT EDIT BY HAND.
+   Source: tokens/base.json  ·  Emitter: tokens/emit.mjs
+   Run `pnpm tokens` after changing the source.
    ========================================================= */
 
-/* Fonts are HOST-PROVIDED — the kit no longer self-loads webfonts.
-   A render-blocking `@import url('fonts.googleapis.com/...')` used to live here;
+/* Fonts are HOST-PROVIDED — the kit does not self-load webfonts. A
+   render-blocking `@import url('fonts.googleapis.com/...')` used to live here;
    it was removed so the kit never forces a third-party network dependency (a
-   first-paint stall, and a hard block behind the Great Firewall). The `--font-*`
-   tokens below still define the family stacks (one source of truth); the host is
-   responsible for loading the actual faces (recommended: `next/font`, self-hosted).
-   See TYPOGRAPHY.md → "Fonts (host-provided)" for the exact recipe. */
+   first-paint stall, and a hard block behind the Great Firewall). The --font-*
+   tokens below still define the family stacks (one source of truth); the host
+   loads the actual faces. See TYPOGRAPHY.md → "Fonts (host-provided)". */
 
 :root {
   /* ---------- Brand core ---------- */
@@ -21,7 +21,6 @@
   --mt-navy-300:    #8FA0C2;
   --mt-navy-100:    #DCE2EE;
   --mt-navy-50:     #EEF1F7;
-
   --mt-orange:      #E1703C;   /* Accent — CTA */
   --mt-orange-700:  #C75D2C;
   --mt-orange-600:  #D26735;   /* press */
@@ -29,11 +28,7 @@
   --mt-orange-300:  #F0A989;
   --mt-orange-100:  #FAE2D5;
   --mt-orange-50:   #FDF1E9;
-
-  /* Cold ink foreground on warm surfaces — the reference's single contrast
-     system (the shadow scale below is authored against this same cold ink).
-     Values follow morethan colors_and_type.css; the one intentional deviation
-     is --mt-ink-4 — see DECISIONS.md. */
+  /* Cold ink foreground on warm surfaces — the reference's single contrast system (the shadow scale below is authored against this same cold ink). Values follow morethan colors_and_type.css; the one intentional deviation is --mt-ink-4 — see DECISIONS.md. */
   --mt-ink:         #111827;
   --mt-ink-2:       #2A3142;
   --mt-ink-3:       #4B5363;
@@ -41,11 +36,11 @@
   --mt-ink-5:       #A2A6B2;   /* placeholder */
 
   /* ---------- Warm neutrals (Mac-like, earthy) ---------- */
-  --mt-cream:       #FBF7F1;   /* App canvas */
-  --mt-sand:        #F5EFE6;   /* Card / panel */
-  --mt-sand-2:      #ECE4D6;   /* Hover surface */
-  --mt-stone:       #DDD3C0;   /* Divider on warm */
-  --mt-paper:       #FFFFFF;   /* Pure surface (white card on cream) */
+  --mt-cream:   #FBF7F1;   /* App canvas */
+  --mt-sand:    #F5EFE6;   /* Card / panel */
+  --mt-sand-2:  #ECE4D6;   /* Hover surface */
+  --mt-stone:   #DDD3C0;   /* Divider on warm */
+  --mt-paper:   #FFFFFF;   /* Pure surface (white card on cream) */
 
   /* ---------- Semantic ---------- */
   --mt-success:     #2E8B6B;
@@ -58,26 +53,24 @@
   --mt-info-bg:     var(--mt-navy-50);
 
   /* ---------- Foreground / Background tokens ---------- */
-  --fg-1: var(--mt-ink);        /* primary text */
-  --fg-2: var(--mt-ink-3);      /* secondary */
-  --fg-3: var(--mt-ink-4);      /* tertiary / hint */
-  --fg-on-navy: #FFFFFF;
-  --fg-on-orange: #FFFFFF;
-  --fg-link: var(--mt-navy-500);
-
-  --bg-canvas:  var(--mt-cream);
-  --bg-surface: var(--mt-paper);
-  --bg-sunken:  var(--mt-sand);
-  --bg-raised:  #FFFFFF;
-  --bg-hover:   var(--mt-sand-2);
-  --bg-tint:    color-mix(in oklab, var(--mt-navy) 3%, transparent); /* subtle navy row hover */
-  --bg-float:   color-mix(in oklab, var(--mt-paper) 40%, var(--mt-cream)); /* floating panel — warm off-white, not stark white */
-  --bg-field-quiet: color-mix(in oklab, var(--bg-surface) 50%, var(--bg-canvas)); /* quiet filter-toolbar field — softer than a white data-entry field */
-  --scrim:      rgba(17, 24, 39, 0.33);   /* overlay / drawer backdrop — cold ink @ .33 (DECISIONS.md D-A3) */
-
-  --border-1:  rgba(40, 62, 104, 0.10);   /* hairline on warm bg */
-  --border-2:  rgba(40, 62, 104, 0.18);   /* control border */
-  --border-3:  rgba(40, 62, 104, 0.28);   /* focused / strong */
+  --fg-1:            var(--mt-ink);   /* primary text */
+  --fg-2:            var(--mt-ink-3);   /* secondary */
+  --fg-3:            var(--mt-ink-4);   /* tertiary / hint */
+  --fg-on-navy:      #FFFFFF;
+  --fg-on-orange:    #FFFFFF;
+  --fg-link:         var(--mt-navy-500);
+  --bg-canvas:       var(--mt-cream);
+  --bg-surface:      var(--mt-paper);
+  --bg-sunken:       var(--mt-sand);
+  --bg-raised:       #FFFFFF;
+  --bg-hover:        var(--mt-sand-2);
+  --bg-tint:         color-mix(in oklab, var(--mt-navy) 3%, transparent);   /* subtle navy row hover */
+  --bg-float:        color-mix(in oklab, var(--mt-paper) 40%, var(--mt-cream));   /* floating panel — warm off-white, not stark white */
+  --bg-field-quiet:  color-mix(in oklab, var(--bg-surface) 50%, var(--bg-canvas));   /* quiet filter-toolbar field — softer than a white data-entry field */
+  --scrim:           rgba(17, 24, 39, 0.33);   /* overlay / drawer backdrop — cold ink @ .33 (DECISIONS.md D-A3) */
+  --border-1:        rgba(40, 62, 104, 0.10);   /* hairline on warm bg */
+  --border-2:        rgba(40, 62, 104, 0.18);   /* control border */
+  --border-3:        rgba(40, 62, 104, 0.28);   /* focused / strong */
 
   /* ---------- Type ----------
      - --font-sans:    UI / body / small text (Manrope grotesque + Noto Sans SC)
@@ -85,70 +78,80 @@
      - --font-serif:   editorial headlines (page H1 / section H2) — Anthropic feel
      - --font-mono:    inline code, timestamps, meta
   */
-  --font-sans: 'Manrope', 'Inter', 'SF Pro Text', -apple-system, BlinkMacSystemFont,
-               'Noto Sans SC', 'PingFang SC', 'HarmonyOS Sans', 'Source Han Sans SC', system-ui, sans-serif;
-  --font-display: 'Manrope', 'Inter', 'SF Pro Display',
-               'Noto Sans SC', 'PingFang SC', system-ui, sans-serif;
-  --font-serif: 'Source Serif 4', 'Noto Serif SC', 'Source Han Serif SC',
-               'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
-  --font-hand: 'Caveat', 'Ma Shan Zheng', 'Kaiti SC', 'STKaiti', 'KaiTi', cursive;
-  --font-hand-cn: 'Ma Shan Zheng', 'Kaiti SC', 'STKaiti', 'KaiTi', 'Caveat', cursive;
-
+  --font-sans:         'Manrope', 'Inter', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Noto Sans SC', 'PingFang SC', 'HarmonyOS Sans', 'Source Han Sans SC', system-ui, sans-serif;
+  --font-display:      'Manrope', 'Inter', 'SF Pro Display', 'Noto Sans SC', 'PingFang SC', system-ui, sans-serif;
+  --font-serif:        'Source Serif 4', 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;
+  --font-mono:         'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
+  --font-hand:         'Caveat', 'Ma Shan Zheng', 'Kaiti SC', 'STKaiti', 'KaiTi', cursive;
+  --font-hand-cn:      'Ma Shan Zheng', 'Kaiti SC', 'STKaiti', 'KaiTi', 'Caveat', cursive;
   /* Type scale (semantic) */
-  --display-size: 56px;  --display-lh: 1.05; --display-tracking: -0.02em; --display-weight: 800;
-  --h1-size: 40px;       --h1-lh: 1.1;  --h1-tracking: -0.02em;  --h1-weight: 700;
-  --h2-size: 28px;       --h2-lh: 1.2;  --h2-tracking: -0.01em;  --h2-weight: 700;
-  --h3-size: 20px;       --h3-lh: 1.3;  --h3-tracking: -0.005em; --h3-weight: 600;
-  --h4-size: 16px;       --h4-lh: 1.35; --h4-weight: 600;
-  --body-size: 15px;     --body-lh: 1.55; --body-weight: 400;
-  --small-size: 13px;    --small-lh: 1.5;
-  --caption-size: 12px;  --caption-lh: 1.4; --caption-tracking: 0.01em;
-  --code-size: 13px;
+  --display-size:      56px;
+  --display-lh:        1.05;
+  --display-tracking:  -0.02em;
+  --display-weight:    800;
+  --h1-size:           40px;
+  --h1-lh:             1.1;
+  --h1-tracking:       -0.02em;
+  --h1-weight:         700;
+  --h2-size:           28px;
+  --h2-lh:             1.2;
+  --h2-tracking:       -0.01em;
+  --h2-weight:         700;
+  --h3-size:           20px;
+  --h3-lh:             1.3;
+  --h3-tracking:       -0.005em;
+  --h3-weight:         600;
+  --h4-size:           16px;
+  --h4-lh:             1.35;
+  --h4-weight:         600;
+  --body-size:         15px;
+  --body-lh:           1.55;
+  --body-weight:       400;
+  --small-size:        13px;
+  --small-lh:          1.5;
+  --caption-size:      12px;
+  --caption-lh:        1.4;
+  --caption-tracking:  0.01em;
+  --code-size:         13px;
 
   /* ---------- Spacing (8pt grid) ---------- */
-  --sp-1: 4px;
-  --sp-2: 8px;
-  --sp-3: 12px;
-  --sp-4: 16px;
-  --sp-5: 24px;
-  --sp-6: 32px;
-  --sp-7: 48px;
-  --sp-8: 64px;
-  --sp-9: 96px;
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  24px;
+  --sp-6:  32px;
+  --sp-7:  48px;
+  --sp-8:  64px;
+  --sp-9:  96px;
 
   /* ---------- Radii ---------- */
-  --r-xs: 4px;
-  --r-sm: 6px;
-  --r-md: 8px;     /* controls */
-  --r-lg: 12px;    /* cards */
-  --r-xl: 16px;    /* large cards / sheets */
-  --r-2xl: 20px;
-  --r-pill: 999px;
+  --r-xs:    4px;
+  --r-sm:    6px;
+  --r-md:    8px;   /* controls */
+  --r-lg:    12px;   /* cards */
+  --r-xl:    16px;   /* large cards / sheets */
+  --r-2xl:   20px;
+  --r-pill:  999px;
 
   /* ---------- Shadows (Mac-like, soft, layered) ---------- */
-  --shadow-xs: 0 1px 1px rgba(17, 24, 39, 0.04);
-  --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.06), 0 1px 1px rgba(17, 24, 39, 0.04);
-  --shadow-md: 0 4px 12px rgba(17, 24, 39, 0.06), 0 1px 2px rgba(17, 24, 39, 0.05);
-  --shadow-lg: 0 12px 32px rgba(17, 24, 39, 0.10), 0 2px 6px rgba(17, 24, 39, 0.06);
-  --shadow-xl: 0 24px 56px rgba(17, 24, 39, 0.16), 0 4px 12px rgba(17, 24, 39, 0.08);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  --shadow-focus: 0 0 0 3px rgba(225, 112, 60, 0.28);
+  --shadow-xs:     0 1px 1px rgba(17, 24, 39, 0.04);
+  --shadow-sm:     0 1px 2px rgba(17, 24, 39, 0.06), 0 1px 1px rgba(17, 24, 39, 0.04);
+  --shadow-md:     0 4px 12px rgba(17, 24, 39, 0.06), 0 1px 2px rgba(17, 24, 39, 0.05);
+  --shadow-lg:     0 12px 32px rgba(17, 24, 39, 0.10), 0 2px 6px rgba(17, 24, 39, 0.06);
+  --shadow-xl:     0 24px 56px rgba(17, 24, 39, 0.16), 0 4px 12px rgba(17, 24, 39, 0.08);
+  --shadow-inset:  inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --shadow-focus:  0 0 0 3px rgba(225, 112, 60, 0.28);
 
   /* ---------- Motion ---------- */
-  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --t-fast: 120ms;
-  --t-base: 180ms;
-  --t-slow: 280ms;
-
-  /* Scene reveal-on-mount. The Scene root carries `.wb-reveal`, which replays
-     every time a Scene mounts — i.e. on every route change. Keep it brief so it
-     never reads as lag stacked on top of navigation. Hosts can tune these, or
-     set `--wb-reveal-duration: 0ms` to disable the reveal entirely (e.g. when
-     the host owns its own route transitions). */
-  --wb-reveal-duration: var(--t-base);
-  --wb-reveal-shift: 6px;
+  --ease-out:            cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring:         cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-fast:              120ms;
+  --t-base:              180ms;
+  --t-slow:              280ms;
+  /* Scene reveal-on-mount. The Scene root carries `.wb-reveal`, which replays every time a Scene mounts — i.e. on every route change. Keep it brief so it never reads as lag stacked on top of navigation. Hosts can tune these, or set `--wb-reveal-duration: 0ms` to disable the reveal entirely (e.g. when the host owns its own route transitions). */
+  --wb-reveal-duration:  var(--t-base);
+  --wb-reveal-shift:     6px;
 }
 
 /* ---------- Base resets bound to tokens ---------- */

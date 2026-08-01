@@ -20,6 +20,7 @@
     "hash:workflow-contract-source": "node conformance/scripts/compute-workflow-contract-source-hash.mjs",
     "check:workflow-contract-source": "node conformance/scripts/compute-workflow-contract-source-hash.mjs --check conformance/workflow-contract-source-lock.json",
     "check:contract-doc-alignment": "node conformance/scripts/check-contract-doc-alignment.mjs",
+    "check:ui-tokens": "node templates/web-workbench/tokens/emit.mjs --check",
     "check:consumer-boundaries": "node conformance/scripts/check-consumer-boundaries.mjs",
     "semantic-lint": "node conformance/scripts/semantic-lint.mjs",
     "lint:canonical-refs": "node conformance/scripts/canonical-ref-lint.mjs templates/host-runtime/packages/workflow-contracts/src templates/host-runtime/packages/workflow-runtime/src templates/scenario-module/src templates/scenario-module/scenario.manifest.yaml",

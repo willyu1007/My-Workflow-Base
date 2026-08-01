@@ -37,3 +37,8 @@ jobs:
 
       - name: Verify workflow contract conformance
         run: pnpm verify:workflow-contracts
+
+      # The UI kit is not a workspace member (own lockfile, published
+      # separately), but this check needs no dependencies — it reads two files.
+      - name: Verify UI kit tokens are generated from their source
+        run: pnpm check:ui-tokens

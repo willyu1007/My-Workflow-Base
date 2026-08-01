@@ -28,6 +28,7 @@ same way it implements handlers/policies against `workflow-contracts`.
 | Adding animation, transitions, or gestures | [MOTION.md](./MOTION.md) · [INTERACTION.md](./INTERACTION.md) |
 | Wiring fonts, or touching type | [TYPOGRAPHY.md](./TYPOGRAPHY.md) — the scale, the host font recipe, and how to verify faces actually render |
 | Wiring lint, or hitting a lint error | [GOVERNANCE.md](./GOVERNANCE.md) — what is locked, why, and the debt gate |
+| Changing a token value | `tokens/base.json` — the source; `src/styles/tokens.css` is generated, never hand-edited |
 | Wondering why a token has the value it has | [DECISIONS.md](./DECISIONS.md) |
 
 ## What's inside
@@ -73,6 +74,12 @@ import "@willyu1007/web-workbench/styles/index.css";
 > webfont files (no third-party `@import`). Load them once host-side — `next/font` is the
 > recommended, self-hosted path — and map them onto the `--font-*` tokens. Full recipe:
 > [TYPOGRAPHY.md → Fonts (host-provided)](./TYPOGRAPHY.md#fonts-host-provided).
+
+> ⚠️ **Upgrading to 0.11.0 (no value change).** Tokens now have a machine-readable
+> source: `tokens/base.json` generates `src/styles/tokens.css`. All 114 custom
+> properties keep their exact names and values — the shipped CSS differs only in
+> comment wording and alignment. Nothing to do but re-pin. If you contribute to the
+> kit, edit the JSON and run `pnpm tokens`; `build` refuses a stale CSS artifact.
 
 > ⚠️ **Upgrading to 0.10.0 (small behavior fixes).** Reduced motion now also stops the
 > mobile sidebar slide — it was moved by `transition`, which the old
