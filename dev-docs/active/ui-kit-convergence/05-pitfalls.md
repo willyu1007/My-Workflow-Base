@@ -87,3 +87,29 @@
   `var(--t-` to find off-token durations also hid an off-token value sharing a
   line with a tokenized one. Count occurrences, not lines — the same lesson the
   C-step duplicate-report bug taught, arrived at from the opposite direction.
+
+## From B (token structuring)
+
+- **A parser's own total is not a count.** The extractor reported 95 tokens and
+  the number looked right; an independent count of `--name:` occurrences said
+  114. Nineteen typography tokens would have vanished from the generated CSS.
+  When extracting, always count the target a second way, with a different method.
+
+- **CSS packs more than one declaration per line, and headers span lines.** Two
+  separate parser generations died on this — first the four-per-line type scale,
+  then a multi-line section header that swallowed a whole section. Line-oriented
+  regex is the wrong tool for CSS; scan characters.
+
+- **Byte-identity is a weaker proof than it sounds.** It would pass if two
+  comments were swapped and fail if alignment improved. The invariant worth
+  proving was the name→value map. Pick the assertion that matches the risk.
+
+- **Do not derive public names from a private schema.** Nesting tokens by
+  category would have renamed `--fg-1` to `--color-fg-1`. Consumers write these
+  names in their own stylesheets: the variable list is an API, and a schema
+  refactor must not rewrite it as a side effect.
+
+- **Adopting a schema is not adopting every group in it.** Base's typography was
+  already richer than the source it was supposedly converging toward. Compare
+  group by group before copying; convergence can be host-ward for one part and
+  Base-ward for the rest.

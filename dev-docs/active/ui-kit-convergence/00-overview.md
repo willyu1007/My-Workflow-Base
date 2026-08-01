@@ -13,7 +13,11 @@ ui-visual-system task produced.
 - **A — value fidelity repair: done 2026-07-31** (this session). Nine
   neutrals + scrim restored to reference; `DECISIONS.md` created; 0.8.0
   staged (publish pending — needs owner auth).
-- B — token structuring (`tokens/base.json` + emitter): not started.
+- **B — token structuring: done 2026-08-01 (scoped).** `tokens/base.json` is now
+  the source for all 114 custom properties; `tokens/emit.mjs` generates the CSS
+  and `check:ui-tokens` gates drift in CI. `elevation` and `state` adopted from
+  the host platform's schema. Typography deliberately kept in the kit's own
+  richer shape — see the roadmap note. 0.11.0 staged.
 - **C — lint expansion + debt gate: done 2026-07-31.** Presets now lock color,
   depth, and `transition: all` alongside typography; `design-debt.mjs` ships as
   `@willyu1007/web-workbench/lint-debt`. 0.9.0 staged (publish pending).

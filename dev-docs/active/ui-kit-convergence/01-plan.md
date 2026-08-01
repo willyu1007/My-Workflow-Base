@@ -21,18 +21,29 @@ Remaining A follow-ups (owner):
 - [ ] Re-pin The-Education and The-Nurture; visual QA one screen each
       (expect: cooler text, lighter surfaces, nothing structural).
 
-## B — token structuring (blocked on entry condition)
+## B — token structuring (done 2026-08-01, scoped)
 
-Entry: My-Chat ui-visual-system schema stable (dark values landed or frozen).
+Entry condition re-checked and found half met (dark is deferred *by design* in
+the host task's non-goals, not merely unfinished) and half unreachable (three
+groups still open, gated on a Phase 5 that is itself blocked on an unbuilt local
+backend). Proceeded because the retrofit-hostile piece — `elevation`'s structure
+— is done, and what remains is additive. See the roadmap for the full re-check.
 
-1. Copy schema shape (not values pipeline) into
-   `templates/web-workbench/tokens/base.json`; include `elevation.*`,
-   `state.*`, `meta.deviations_from_source` seeded from `DECISIONS.md`.
-2. Emitter (`.mjs`) → `src/styles/tokens.css`. Commit 1: generated output
-   byte-identical to hand-written file (proves emitter fidelity). Commit 2:
-   structural renames only, values held byte-identical.
-3. Acceptance: CSS diff between commits is provably identifiers-only; a
-   conformance check fails when `tokens.css` drifts from `base.json`.
+1. `tokens/base.json` holds all 114 custom properties plus `elevation` and
+   `state`; `meta.deviations_from_source` seeded from `DECISIONS.md`. ✔
+2. `tokens/emit.mjs` generates `src/styles/tokens.css`, with `--check`. ✔
+3. Acceptance, met with two deliberate substitutions (evidence in
+   `04-verification.md`):
+   - fidelity proven on the **value map** (114/114 unchanged, tail byte-identical)
+     rather than by byte-identity, which the ad-hoc hand alignment made
+     unachievable without storing padding in the source; ✔
+   - **no rename commit** — variable names are a consumer-facing API and were
+     held fixed, so the planned second commit has nothing to do; ✔
+   - drift check proven to fail on a hand-edited value, wired into `build` and
+     into Base CI as `check:ui-tokens`. ✔
+4. Follow-ups (owner): publish 0.11.0; decide D-A9 (0.5 vs 0.55 disabled
+   opacity) before pointing `components.css` at the `state` tokens; append
+   `state.selected` and `motion.spring.*` when the host settles them.
 
 ## C — governance expansion (done 2026-07-31)
 

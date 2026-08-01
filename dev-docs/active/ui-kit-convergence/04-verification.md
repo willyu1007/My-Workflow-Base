@@ -175,3 +175,36 @@ the same D-A5 principle that kept the off-scale durations.
 So the debt gate shipped in C went unused by both consumers. That is the
 intended outcome: it exists so a strict rule can land without forcing a
 same-day cleanup, not because a cleanup was expected to be unaffordable.
+
+## B — token structuring (2026-08-01)
+
+**Fidelity — the invariant that matters:**
+
+| Check | Result |
+|---|---|
+| Tokens in source vs old CSS | 114 vs 114 |
+| Missing / added / changed values | 0 / 0 / 0 — **value map identical** |
+| Non-`:root` tail (resets + `.mt-*` classes) | byte-identical |
+| Generated CSS integrity | brace balance 0, 9564 bytes, 0 parse errors |
+
+**Extraction counting, twice corrected.** First parser: 95 tokens — wrong, missed
+19 because the type scale packs four declarations per line. Second: still wrong,
+a multi-line section header hid the entire Type section. Third (character
+scanner): 114, matching an independent raw count of `--name:` occurrences. The
+independent count is what caught it; the parser's own total looked reasonable
+both times it was wrong.
+
+**Drift gate proven to fail, not just to pass:**
+
+| State | `tokens:check` |
+|---|---|
+| Clean | exit 0 |
+| One hex hand-edited in the CSS (`#283E68` → `#283E69`) | exit 1, names the fix |
+| Regenerated | exit 0 |
+
+Wired into the kit's `build` (so a stale artifact cannot be published) and into
+Base CI as `check:ui-tokens`. The kit is not a pnpm workspace member, but the
+check reads two files and needs no install, so the CI step runs standalone.
+
+**Not run:** package build (`prepublishOnly` builds at publish); no visual check
+needed — no value changed.

@@ -163,3 +163,54 @@ usage, not runtime vocabulary.
 - Publishing 0.10.0 (needs owner GitHub auth).
 - Consumer adoption of the reduced-motion fix — it ships with the version bump,
   no consumer action required.
+
+## B — token structuring (2026-08-01)
+
+### What changed
+
+| File | Change |
+|---|---|
+| `tokens/base.json` | New — 114 custom properties in 9 ordered sections, plus `elevation` and `state` |
+| `tokens/emit.mjs` | New — emitter with a `--check` drift mode |
+| `tokens/tail.css` | New — the non-token part of the stylesheet (resets + `.mt-*` classes), appended verbatim |
+| `src/styles/tokens.css` | Now generated |
+| `package.json` | `tokens` / `tokens:check` scripts; `build` gated on the check; 0.10.0 → 0.11.0 |
+| root `package.json`, `.github/workflows/ci.yml` | `check:ui-tokens` wired into CI |
+| `DECISIONS.md` | D-A8 (the source move), D-A9 (an inconsistency found on the way) |
+
+### The extraction had to be measured, twice
+
+The source was built by parsing the existing CSS rather than retyping 114 values.
+The first parser reported **95** tokens and looked plausible. Cross-checking
+against a raw count of `--name:` occurrences showed **114**. The 19 missing ones
+were the type scale, where four declarations share a line:
+
+```css
+--h1-size: 40px;  --h1-lh: 1.1;  --h1-tracking: -0.02em;  --h1-weight: 700;
+```
+
+A line-oriented regex captured the first and swallowed the rest into its value.
+Trusting 95 would have silently dropped every line-height, tracking, and weight
+in the scale, breaking `.mt-h1` and its siblings. Replaced with a character
+scanner over the `:root` body. Third time also caught a multi-line section header
+(`/* ---------- Type ----------` spanning lines) that the first two passes had
+absorbed as a note, hiding the whole Type section.
+
+### Why fidelity is proven by value, not by bytes
+
+See D-A8. Short version: the old file's alignment was ad hoc (114 declarations,
+12 distinct value-start columns, inconsistent within sections), so byte-identity
+would have required storing padding per token. The emitter normalizes alignment;
+the guarantee is that all 114 name→value pairs are unchanged and the non-`:root`
+tail is byte-identical.
+
+### Deliberately not done
+
+- **No variable renames.** The names are a consumer-facing API.
+- **`components.css` not pointed at the `state` tokens.** That is a
+  behaviour-affecting refactor, and it would have to resolve the 0.5 / 0.55
+  disabled-opacity split first (D-A9) — a design call.
+- **`elevation` / `state` not emitted to CSS.** No web consumer for either; 25
+  unused custom properties on every page is a real cost for no benefit.
+- **Typography not taken from the host schema.** Base's is the richer shape;
+  see the roadmap note.

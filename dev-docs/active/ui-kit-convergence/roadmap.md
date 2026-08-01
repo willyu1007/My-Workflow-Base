@@ -14,21 +14,58 @@ Risk: consumers (The-Education, The-Nurture, pinned 0.7.0) see a subtle
 global visual change on re-pin. Mitigation: README upgrade note; no API
 change, so rollback is a version pin.
 
-## B — Token structuring
+## B — Token structuring (done 2026-08-01, scoped)
 
-Introduce `templates/web-workbench/tokens/base.json` (schema shape from
-My-Chat: color / typography / space / radius / shadow / **elevation** /
-**state** / motion / z / sizing + meta.deviations) and an emitter that
-generates `src/styles/tokens.css`. Two-commit discipline copied from
-My-Chat's mobile migration: values-only first (byte-comparable CSS output),
-then structure-only.
+`tokens/base.json` holds all 114 custom properties; `tokens/emit.mjs` generates
+`src/styles/tokens.css`; `check:ui-tokens` fails the build and CI when the
+committed CSS drifts from the source. `elevation` (platform-neutral depth) and
+`state` (pressed/disabled/hover) are adopted from the host platform's schema —
+they are the prerequisite for a future native kit and the expensive-to-retrofit
+part — and are deliberately *not* emitted to CSS, since the web already has
+`--shadow-*` and component-level state rules.
 
-`elevation.*` (platform-neutral depth) and `state.*` (pressed/disabled/hover)
-land here — they are the prerequisite for a future mobile kit and are the
-expensive-to-retrofit part of the schema.
+**Two plan assumptions turned out wrong and were changed:**
 
-Entry condition: My-Chat ui-visual-system token schema stabilized (its dark
-theme completed or explicitly deferred with values frozen).
+*Category-nested schema.* Rejected. Base's variable names (`--fg-1`, `--r-md`,
+`--t-fast`) are a published API that consumers write in their own stylesheets,
+and they are not derivable from a category path. A nested schema would have
+renamed `--fg-1` to `--color-fg-1` and broken every consumer silently, so the
+source stores name and value explicitly. The second commit in the planned
+"values-only then structure-only" pair therefore does not apply: there is no
+rename to make.
+
+*Byte-identical output as the fidelity proof.* Not achievable, and not the right
+bar. The hand-written file aligned its 114 declarations across 12 different
+columns, inconsistently even within a section, so reproducing it byte-for-byte
+would have meant storing per-token padding in the source — turning a design
+document into a formatting record. The emitter normalizes alignment and fidelity
+is proven on the value map instead: all 114 name→value pairs unchanged, none
+added or removed. That is the stronger guarantee, since byte-identity would also
+pass if two comments were swapped.
+
+**Typography stays in the kit's own shape.** The plan assumed Base would adopt
+My-Chat's `typography` group. Comparing them shows the opposite: Base already
+carries per-role size, line-height, tracking, and weight across nine roles, while
+My-Chat has six sizes sharing three line heights and no tracking at all — a gap
+its own Phase 0 flagged. Copying would have been a downgrade. Base holds its
+shape; convergence on this one group should run host-ward.
+
+Entry condition re-checked 2026-08-01 and found **half met, half unreachable**:
+
+- Dark: **met, and the original reading was wrong.** The host task's non-goals
+  say plainly "Do not implement dark theme values; only reserve the schema
+  layer". Dark is deferred by design and the theme layer exists — a decision,
+  not a gap.
+- Full schema freeze: **not met and not dated.** Three groups are still open —
+  `typography` (Phase 1b, blocked on font-validation evidence), `state.selected`
+  (listed in Phase 1, absent), and `motion` spring parameters (D-05 unresolved,
+  and explicitly to be tuned on-device in Phase 5). Phase 5 has not started and
+  is blocked on a local backend that is itself still `planned`.
+
+Proceeded anyway because the blocking risk was mis-scoped. The expensive,
+retrofit-hostile piece was `elevation`'s *structure* — and that is done. What is
+still coming (`state.selected`, `motion.spring.*`) is **additive**: appending
+keys to a JSON file, not restructuring emitted consumers.
 
 ## C — Governance expansion (done 2026-07-31)
 
