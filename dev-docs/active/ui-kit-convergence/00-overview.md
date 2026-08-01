@@ -10,21 +10,49 @@ ui-visual-system task produced.
 
 ## Status
 
-- **A — value fidelity repair: done 2026-07-31** (this session). Nine
-  neutrals + scrim restored to reference; `DECISIONS.md` created; 0.8.0
-  staged (publish pending — needs owner auth).
-- **B — token structuring: done 2026-08-01 (scoped).** `tokens/base.json` is now
-  the source for all 114 custom properties; `tokens/emit.mjs` generates the CSS
-  and `check:ui-tokens` gates drift in CI. `elevation` and `state` adopted from
-  the host platform's schema. Typography deliberately kept in the kit's own
-  richer shape — see the roadmap note. 0.11.0 staged.
-- **C — lint expansion + debt gate: done 2026-07-31.** Presets now lock color,
-  depth, and `transition: all` alongside typography; `design-debt.mjs` ships as
-  `@willyu1007/web-workbench/lint-debt`. 0.9.0 staged (publish pending).
-- **D — contract docs: done 2026-07-31.** MOTION.md and INTERACTION.md added,
-  TYPOGRAPHY.md gained the face-verification matrix. The audit behind them found
-  three real kit inconsistencies, all fixed (DECISIONS.md D-A5..D-A7). 0.10.0
-  staged.
+**Program complete 2026-08-01.** All four steps landed, published, and adopted by
+both consumers; CI enforces the one new gate. Remaining items are follow-ups
+owned elsewhere, listed at the bottom.
+
+| Step | Done | Shipped |
+|---|---|---|
+| A — value fidelity repair | 2026-07-31 | 0.8.0 |
+| C — lint expansion + debt gate | 2026-07-31 | 0.9.0 |
+| D — contract docs | 2026-07-31 | 0.10.0 |
+| B — token structuring (scoped) | 2026-08-01 | 0.11.0 |
+| D-A9 — disabled opacity unified | 2026-08-01 | 0.12.0 |
+
+- **A** — nine neutrals + scrim restored to the reference; `DECISIONS.md` created.
+- **C** — presets lock color, depth, and `transition: all` alongside typography;
+  `design-debt.mjs` ships as `@willyu1007/web-workbench/lint-debt`. Both
+  consumers adopted with zero registered debt.
+- **D** — `MOTION.md` and `INTERACTION.md` added, `TYPOGRAPHY.md` gained the
+  face-verification matrix. The audit behind them found three real kit
+  inconsistencies, all fixed (D-A5..D-A7).
+- **B** — `tokens/base.json` is the source for all 114 custom properties;
+  `tokens/emit.mjs` generates the CSS; `check:ui-tokens` gates drift and is
+  green in CI (run `30679995148`). `elevation` and `state` adopted from the host
+  platform's schema. Typography deliberately kept in the kit's own richer shape.
+- **D-A9** — disabled opacity unified on 0.5 through an emitted token.
+
+**Consumer adoption.** The-Nurture and The-Education are both on 0.12.0. Neither
+registered any lint debt: The-Nurture had zero violations, The-Education's three
+were fixed at the source.
+
+**Cross-repo record.** The typography convergence direction is recorded on both
+sides — here in the roadmap's step B, and in My-Chat
+`dev-docs/active/ui-visual-system/01-plan.md` under Phase 1b.
+
+### Follow-ups (not blocking, owned elsewhere)
+
+- `state.selected` and `motion.spring.*` — additive, append once My-Chat's
+  Phase 5 settles them on-device.
+- The literal-required gap (`themeColor`, web-app manifests, email templates)
+  recorded in `GOVERNANCE.md`: no lint rule can reach a value that cannot be a
+  `var()`. Closing it means the kit exporting brand colors as JS constants.
+  **Unowned.**
+- My-Chat Phase 1b adopting Base's typography shape and validating it on iOS and
+  Android — owned by that task.
 
 ## Scope
 

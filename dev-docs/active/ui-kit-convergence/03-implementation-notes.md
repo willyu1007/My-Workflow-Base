@@ -231,3 +231,32 @@ custom properties to every page, which is the same cost B avoided.
 Visual effect: the date button and the expandable text field render slightly
 more faded when disabled (0.55 → 0.5). Ships as 0.12.0 with a README note,
 since it is a real if small change to how two controls look.
+
+## Close-out (2026-08-01)
+
+The "Not done here" lists above are phase-local records, accurate when written.
+All of their publish and adoption items were subsequently completed; this section
+supersedes them rather than rewriting the chronology.
+
+| Deferred item | Resolution |
+|---|---|
+| Publishing 0.8.0, 0.9.0, 0.10.0 | All published, along with 0.11.0 and 0.12.0 |
+| Consumer re-pins | The-Nurture and The-Education both on 0.12.0 |
+| The-Education's three lint violations | Fixed at the source, not registered as debt |
+| `check:ui-tokens` in CI | Green on run `30679995148`; log confirms the step executed and reported a match, rather than being skipped |
+| D-A9 (0.5 vs 0.55) | Resolved — unified on 0.5 through an emitted token |
+| Typography convergence direction | Recorded on both sides |
+
+Still open, and deliberately so:
+
+- `state.selected` and `motion.spring.*` — additive, gated on My-Chat Phase 5,
+  which is itself blocked on an unbuilt local backend.
+- The literal-required gap (`themeColor` and friends) in `GOVERNANCE.md` — no
+  lint rule can reach a value that cannot be a `var()`. **Unowned**; closing it
+  means the kit exporting brand colors as JS constants.
+- My-Chat Phase 1b — owned by that task.
+
+The debt gate built in C went unused by both consumers. That is the intended
+outcome: it exists so a strict rule can land without forcing a same-day cleanup,
+not because a cleanup was expected to be unaffordable. Actual cleanup cost was
+three lines of CSS.
