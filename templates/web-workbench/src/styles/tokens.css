@@ -107,6 +107,9 @@
   --body-size:         15px;
   --body-lh:           1.55;
   --body-weight:       400;
+  /* Control text — button faces, field text, nav rows. Ratio is 20/14; see DECISIONS.md D-A11. */
+  --label-size:        14px;
+  --label-lh:          1.43;
   --small-size:        13px;
   --small-lh:          1.5;
   --caption-size:      12px;
@@ -193,6 +196,9 @@ html, body {
 .mt-h3 { font-size: var(--h3-size); line-height: var(--h3-lh); font-weight: var(--h3-weight); }
 .mt-h4 { font-size: var(--h4-size); line-height: var(--h4-lh); font-weight: var(--h4-weight); }
 .mt-body { font-size: var(--body-size); line-height: var(--body-lh); color: var(--fg-1); }
+/* Control text — button faces, field text, nav rows. Not running text: prose is
+   .mt-body at 15px, secondary meta is .mt-small at 13px. */
+.mt-label { font-size: var(--label-size); line-height: var(--label-lh); color: var(--fg-1); }
 .mt-small { font-size: var(--small-size); line-height: var(--small-lh); color: var(--fg-2); }
 .mt-caption {
   font-size: var(--caption-size); line-height: var(--caption-lh);

@@ -128,18 +128,30 @@ non-zero unless every violation is covered by a live entry.
   fixing your debt early should not break your build.
 - No debt file at all is a valid state: zero debt.
 
-## Known gap: values that must be literals
+## Literal-required values: use the brand constants
 
-Some places genuinely cannot hold a `var(--…)`, and the presets do not reach
-them — the clearest case being Next's viewport export:
+Some places genuinely cannot hold a `var(--…)` — a Next viewport `themeColor`, a
+web-app manifest's `theme_color`/`background_color`, an email template. No lint
+rule can reach them, and a real consumer drifted to the pre-repair warm cream
+exactly there, by hand.
+
+The kit exports those colors instead:
 
 ```ts
-export const viewport: Viewport = { themeColor: "#FBF7F1" }; // must be a literal
+import { brand } from "@willyu1007/web-workbench/brand";
+
+export const viewport: Viewport = { themeColor: brand.canvas };
 ```
 
-A real drift instance was found there (`#F5F2EA`, the pre-0.8.0 warm cream) and
-had to be fixed by hand. A meta tag takes no CSS variable, so no lint rule can
-fix this class of value; closing it properly means the kit exporting its brand
-colors as JS constants for the handful of literal-required contexts
-(`themeColor`, web-app manifests, email templates). Not yet done — tracked in
-the `ui-kit-convergence` task bundle.
+Available: `canvas`, `surface`, `ink`, `navy`, `orange` — generated from
+`tokens/base.json`, so they cannot drift from the stylesheet.
+
+Deliberately small. This is an escape hatch for contexts that take no variable,
+not a second way to consume the design system. **Anything that can take a
+`var()` must take one**, and the presets still enforce that in CSS and JSX.
+
+One safety rule is worth knowing about, because it protects a silent failure:
+the emitter rejects any export whose token value is not a plain hex literal.
+Mapping an alias such as `--bg-canvas`, whose value is `var(--mt-cream)`, would
+otherwise ship the *string* `"var(--mt-cream)"` into a meta tag — valid TypeScript,
+invisible in review, and wrong in the browser.

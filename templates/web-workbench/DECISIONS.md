@@ -201,6 +201,42 @@ is a review question, not a lint question.
 re-pin `upstream.revision` and the values here. Editing this side alone now
 fails the build rather than shipping a split.
 
+## D-A11 — `label` role adopted from the platform host (2026-08-03)
+
+The host's Phase 1b added a `label` role — 14px, ratio 1.43 — for control text:
+button faces, field text, nav rows. This kit already rendered 14px in **seven**
+such places with no name for it, so the role was not an import so much as a name
+for something already here. Added as `--label-size` / `--label-lh` plus a
+`.mt-label` class, and the seven sites now read the token.
+
+Two other 14px sites were deliberately left as literals: `.wb-stat__unit` (a
+unit suffix inside a figure) and `.wb-insight__summary` (running prose). They are
+14px by coincidence, not because they are control text. Folding them in would
+have been visually identical today and wrong the moment `label` is retuned.
+
+`body_lg` was **not** adopted. The host carries it at 16px alongside `h4` at
+16px — two names for one size, with no line height on `body_lg` — which is a
+leftover from the pre-Phase-1b naming rather than a role this kit lacks.
+
+## D-A12 — brand colors exported as JS constants (2026-08-03)
+
+Closes the gap GOVERNANCE.md had recorded as unowned. A Next `themeColor`, a
+web-app manifest, an email template: none can hold a `var()`, so the only way to
+write one was a hardcoded hex — and The-Education drifted to the pre-0.8.0 warm
+cream `#F5F2EA` exactly that way, caught by hand rather than by any rule.
+
+`tokens/base.json` → `literals.exports` names five colors; the emitter resolves
+them from the same `sections` the stylesheet comes from and writes `src/brand.ts`,
+published as `@willyu1007/web-workbench/brand`.
+
+The emitter **rejects any export whose value is not a plain hex literal**. This
+is the part worth keeping: mapping an alias like `--bg-canvas` (value
+`var(--mt-cream)`) would compile, pass review, and put the string `var(--mt-cream)`
+into a `<meta>` tag. Verified by probe — the alias is refused with the reason.
+
+Scope is deliberately five colors. This is an escape hatch for contexts that take
+no variable, not a parallel way to consume the system.
+
 ## Accepted off-scale literals
 
 - `components.css` `.mt-window-bar` gradient endpoint `#F2EBDF` — decorative

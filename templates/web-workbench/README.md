@@ -38,6 +38,7 @@ still not published — consumers do not change token values, they consume them.
 | Wiring fonts, or touching type | [TYPOGRAPHY.md](./TYPOGRAPHY.md) — the scale, the host font recipe, and how to verify faces actually render |
 | Wiring lint, or hitting a lint error | [GOVERNANCE.md](./GOVERNANCE.md) — what is locked, why, and the debt gate |
 | Changing a token value | `tokens/base.json` — the source; `src/styles/tokens.css` is generated, never hand-edited |
+| Needing a color where `var()` is impossible (meta tag, manifest, email) | `@willyu1007/web-workbench/brand` — see [GOVERNANCE.md](./GOVERNANCE.md) |
 | Changing a **motion** token, or adding one | `tokens/motion-role-lock.json` — durations and curves are the platform host's roles under kit names; `pnpm tokens:check` fails on drift *and* on a new motion token nobody classified. See [DECISIONS.md](./DECISIONS.md) D-A10 |
 | Wondering why a token has the value it has | [DECISIONS.md](./DECISIONS.md) |
 | Reviewing or planning motion in a consuming app | [skills/](./skills/) — copyable agent skills, starting with `audit-workbench-motion` |
@@ -74,7 +75,7 @@ token even for public packages, so a consumer configures two `.npmrc` entries:
 Then add the dependency and import the styles once at the app root:
 
 ```bash
-pnpm add @willyu1007/web-workbench@^0.8.0
+pnpm add @willyu1007/web-workbench@^0.13.0
 ```
 
 ```ts
@@ -85,6 +86,14 @@ import "@willyu1007/web-workbench/styles/index.css";
 > webfont files (no third-party `@import`). Load them once host-side — `next/font` is the
 > recommended, self-hosted path — and map them onto the `--font-*` tokens. Full recipe:
 > [TYPOGRAPHY.md → Fonts (host-provided)](./TYPOGRAPHY.md#fonts-host-provided).
+
+> ⚠️ **Upgrading to 0.13.0 (additive).** Two things arrive, neither breaking. A `label`
+> role (14px / 1.43) for control text — button faces, field text, nav rows — as
+> `--label-size` / `--label-lh` and a `.mt-label` class; the kit's own seven control
+> sites now read it, at the same 14px they already were. And
+> `@willyu1007/web-workbench/brand` exports the five brand colors as JS constants for
+> places that cannot hold a `var()` — a Next `themeColor`, a manifest, an email. Use
+> `brand.canvas` instead of hardcoding a hex; see [GOVERNANCE.md](./GOVERNANCE.md).
 
 > ⚠️ **Upgrading to 0.12.0 (one small visual change).** Disabled opacity was split
 > across the kit — 0.5 on buttons and actions, 0.55 on the date button and the

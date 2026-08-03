@@ -176,20 +176,68 @@ if (Object.keys(stateCss).length > 0) {
 out.push("}", "", tail.trimEnd(), "");
 const css = out.join("\n");
 
+/**
+ * Brand constants for contexts that cannot hold a var() — a meta tag, a web-app
+ * manifest, an email template. Values are resolved from `sections` so there is
+ * still one source; anything that is not a plain hex literal is rejected,
+ * because an alias like `--bg-canvas` resolves to the *string* "var(--mt-cream)"
+ * and would fail silently wherever it landed.
+ */
+const HEX = /^#[0-9a-fA-F]{3,8}$/;
+function buildBrand() {
+  const exportsMap = source.literals?.exports ?? {};
+  const byVar = new Map(
+    source.sections.flatMap((s) => s.tokens.map((t) => [t.var, t.value])),
+  );
+  const lines = [];
+  for (const [name, cssVar] of Object.entries(exportsMap)) {
+    const value = byVar.get(cssVar);
+    if (value === undefined) {
+      console.error(`tokens: literals.exports maps ${name} to ${cssVar}, which does not exist`);
+      process.exit(2);
+    }
+    if (!HEX.test(value)) {
+      console.error(
+        `tokens: literals.exports maps ${name} to ${cssVar}, whose value "${value}" is not a hex literal.\n` +
+          "Only literal colors can be exported — an alias would ship the string var(--…) into a meta tag.",
+      );
+      process.exit(2);
+    }
+    lines.push(`  /** ${cssVar} */\n  ${name}: "${value}",`);
+  }
+  return `/* GENERATED FILE. DO NOT EDIT BY HAND.
+ * Source: tokens/base.json  ·  Emitter: tokens/emit.mjs
+ *
+ * Brand colors for the few contexts that cannot hold a CSS variable — a Next
+ * viewport themeColor, a web-app manifest, an email template. Everything that
+ * CAN take a var() must: see GOVERNANCE.md.
+ */
+export const brand = {
+${lines.join("\n")}
+} as const;
+
+export type BrandColor = keyof typeof brand;
+`;
+}
+const brand = buildBrand();
+const BRAND_OUT = join(kit, "src/brand.ts");
+
 if (process.argv.includes("--check")) {
   const current = readFileSync(OUT, "utf8");
-  if (current === css) {
-    console.log("tokens: src/styles/tokens.css matches tokens/base.json");
+  const currentBrand = readFileSync(BRAND_OUT, "utf8");
+  if (current === css && currentBrand === brand) {
+    console.log("tokens: src/styles/tokens.css and src/brand.ts match tokens/base.json");
     process.exit(0);
   }
   console.error(
-    "tokens: src/styles/tokens.css is out of date with tokens/base.json.\n" +
-      "Run `pnpm tokens` and commit the result. Never hand-edit the CSS.",
+    "tokens: generated output is out of date with tokens/base.json.\n" +
+      "Run `pnpm tokens` and commit the result. Never hand-edit the generated files.",
   );
   process.exit(1);
 }
 
 writeFileSync(OUT, css);
+writeFileSync(BRAND_OUT, brand);
 const count =
   source.sections.reduce((n, s) => n + s.tokens.length, 0) + Object.keys(stateCss).length;
 console.log(`tokens: wrote ${OUT} — ${count} custom properties`);

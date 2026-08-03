@@ -377,6 +377,15 @@
           "value": "400"
         },
         {
+          "var": "--label-size",
+          "value": "14px",
+          "note": "Control text — button faces, field text, nav rows. Ratio is 20/14; see DECISIONS.md D-A11."
+        },
+        {
+          "var": "--label-lh",
+          "value": "1.43"
+        },
+        {
           "var": "--small-size",
           "value": "13px"
         },
@@ -639,6 +648,20 @@
     },
     "css": {
       "--state-disabled-opacity": "disabled.opacity"
+    }
+  },
+  "literals": {
+    "meta": {
+      "purpose": "Brand colors as JS constants, for the few places that cannot hold a var(): a Next viewport themeColor, a web-app manifest's theme_color/background_color, an email template. No lint rule can reach those, so before this existed the only way to write one was to hardcode a hex — and a real consumer drifted to the pre-repair warm cream exactly that way.",
+      "scope": "Deliberately small. This is an escape hatch for literal-required contexts, not a second way to consume the design system. Anything that can take a var() must take a var(); the lint presets still apply.",
+      "safety": "The emitter resolves each entry from `sections` and REJECTS any value that is not a plain hex literal. Mapping an alias such as --bg-canvas, whose value is `var(--mt-cream)`, would otherwise put the string \"var(--mt-cream)\" into a meta tag, where it fails silently."
+    },
+    "exports": {
+      "canvas": "--mt-cream",
+      "surface": "--mt-paper",
+      "ink": "--mt-ink",
+      "navy": "--mt-navy",
+      "orange": "--mt-orange"
     }
   }
 }
