@@ -244,3 +244,31 @@ harness** (no runner, no test files, `scripts` has only tokens/build/typecheck).
 The 11 cases ran as a standalone node script against `dist/`. That is a real gap:
 components ship untested, and this one only has coverage because its logic is
 pure and could be pulled out.
+
+## Test harness (2026-08-03, 0.15.0–0.15.2)
+
+Supersedes the "no test harness" gap named above — closed the same day.
+
+**Every suite was mutation-checked before being trusted** — a green suite proves
+nothing until it has been seen to go red for the right reason:
+
+| Component | Mutation | Failed |
+|---|---|---|
+| FormFrame | drop the `required` check | 6 |
+| FormFrame | stop clearing a field's error on edit / drop the blank select option / stop focusing the first offender | 1 each |
+| Queue | always open the first item's drawer | 2 |
+| Queue | make `close` a no-op | 3 |
+| SettingsFrame | dirty as "was touched" instead of value comparison | 1 |
+| SettingsFrame | clear dirty before the save resolves | 2 |
+| ListView | count filters against the current view / keep the load-more window across a filter change | 1 each |
+| Toast | flat 3.8s for errors / auto-close the busy toast / silent no-op outside a provider | 1 each |
+
+Every mutation failed exactly the test written for that behaviour, then 57/57 on
+restore.
+
+**CI**: runs `30858493346` (19), `30858797098` (38), `30859253720` (57) — each
+log checked to confirm the step executed rather than being skipped.
+
+**Lockfile fix verified the hard way**: empty `node_modules`, then
+`pnpm install --ignore-workspace --frozen-lockfile`, then 57/57 — the same
+sequence CI runs.

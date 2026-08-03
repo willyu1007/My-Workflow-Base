@@ -311,3 +311,32 @@ described them as compositions. Since that file is the read-first document,
 following it would mean hand-assembling what the kit already locks — which is
 how the Form gap produced a create flow on SettingsFrame. Both rows now name
 their component; the README table lists all six paradigms.
+
+## Test harness (2026-08-03, 0.15.0–0.15.2)
+
+The gap named at the end of the FormFrame verification — 31 components, no way
+to test any of them — was closed the same day. vitest + testing-library + jsdom,
+running against `src/` rather than `dist/` (a suite that reads dist cannot run
+before a build, and silently tests the previous build when someone forgets one).
+57 tests over the five components that hold state: FormFrame 19, SettingsFrame
+12, Toast 10, ListView 9, Queue 7. Enforced in `prepublishOnly` (test before
+build) and in Base CI. `TESTING.md` carries the conventions.
+
+Two holes in my own setup were found and fixed while building it:
+
+- **Tests were outside typecheck.** `tsconfig.json` included only `src/**`, and
+  vitest transpiles without checking types — so a type error in a test passed
+  silently. `tests/` is now in the dev tsconfig; `tsconfig.build.json` still
+  excludes it (probed: `dist/` carries nothing test-related).
+- **The dependencies landed in the wrong lockfile.** The kit keeps its own
+  lockfile and is deliberately absent from `pnpm-workspace.yaml`, but it sits
+  inside the workspace root — so plain `pnpm add` wrote vitest into the ROOT
+  lockfile (+1039 lines) and left the kit's own at 0 vitest entries. CI would
+  have failed on the very step that commit added, and the local "CI-equivalent"
+  check passed for the wrong reason, against node_modules the root install had
+  already linked. Fixed with `--ignore-workspace` on both the local install and
+  the CI step, re-verified from an empty node_modules.
+
+Coverage stops at five deliberately: the rest map props onto markup, where
+typecheck already catches the likely mistakes. The rule going forward is in
+TESTING.md — a component gets a suite when it grows state.

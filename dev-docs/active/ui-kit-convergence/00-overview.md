@@ -43,6 +43,20 @@ were fixed at the source.
 sides — here in the roadmap's step B, and in My-Chat
 `dev-docs/active/ui-visual-system/01-plan.md` under Phase 1b.
 
+### Post-program work (2026-08-03, after close-out)
+
+The program closed at 0.12.0; consumer-driven work continued in the same bundle:
+
+| Shipped | What |
+|---|---|
+| 0.13.0 / 0.13.1 | `label` role (host-ward adoption from Phase 1b); `brand` constants for literal-required contexts (`themeColor` gap closed — was the unowned follow-up below); dead `.mt-label` class removed |
+| 0.14.0 / 0.14.1 | Form paradigm component (`FormFrame` + shared field contract); Queue/Record named in PARADIGMS.md — all six paradigms now name their renderer |
+| 0.15.0–0.15.2 | Test harness: vitest + testing-library, 57 mutation-checked tests over the five stateful components, gating publish and CI |
+
+Consumers are on 0.13.1; 0.14+/0.15+ carry no runtime value changes, so
+re-pinning rides the next real change (the natural one: migrating Nurture's
+create-project flow from SettingsFrame to FormFrame).
+
 ### Follow-ups (not blocking, owned elsewhere)
 
 - `state.selected` and `motion.spring.*` — additive, append once My-Chat's

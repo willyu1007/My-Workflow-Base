@@ -113,3 +113,32 @@
   already richer than the source it was supposedly converging toward. Compare
   group by group before copying; convergence can be host-ward for one part and
   Base-ward for the rest.
+
+## From the test harness (0.15.x)
+
+- **A nested package with its own lockfile is a trap inside a workspace root.**
+  Plain `pnpm add` in `templates/web-workbench` resolved against the ROOT
+  lockfile and left the kit's own untouched — 0 entries for the deps just
+  installed. Everything worked locally (the root install had linked
+  node_modules) and CI would have failed on the exact step the same commit
+  added. `--ignore-workspace`, always, and verify from an empty node_modules.
+
+- **A "CI-equivalent" check is only equivalent if it starts from nothing.**
+  The first frozen-lockfile check passed against node_modules that a different
+  install had already populated. Green for the wrong reason looks identical to
+  green.
+
+- **vitest does not typecheck.** Tests outside the tsconfig `include` are
+  transpiled, never checked — a type error in a test passes silently. Put
+  `tests/` in the dev tsconfig and probe that an injected error actually fails.
+
+- **`userEvent` + fake timers = timeout, not failure.** userEvent schedules its
+  own inter-event delays on the timer queue; fake timers never advance them, so
+  the click never lands and the test times out — a misleading signal that looks
+  like slowness rather than a bug. `fireEvent` for plain clicks under fake
+  timers.
+
+- **Test the tone asymmetry, not just the timer.** An error toast closing as
+  fast as a success is a real defect that no "does it auto-close" test catches.
+  The case worth writing is the differential one: advance past 3.8s and assert
+  the success is gone while the error remains.
