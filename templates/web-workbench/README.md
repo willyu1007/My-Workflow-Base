@@ -89,8 +89,10 @@ import "@willyu1007/web-workbench/styles/index.css";
 
 > ⚠️ **Upgrading to 0.13.0 (additive).** Two things arrive, neither breaking. A `label`
 > role (14px / 1.43) for control text — button faces, field text, nav rows — as
-> `--label-size` / `--label-lh` and a `.mt-label` class; the kit's own seven control
-> sites now read it, at the same 14px they already were. And
+> `--label-size` / `--label-lh`; the kit's own seven control sites now read it, at the
+> same 14px they already were. (0.13.0 also shipped a `.mt-label` class; 0.13.1 removes
+> it — `components.css` already owned that name for the form field label, so the new
+> class lost the cascade and never applied. Nothing rendered differently either way.) And
 > `@willyu1007/web-workbench/brand` exports the five brand colors as JS constants for
 > places that cannot hold a `var()` — a Next `themeColor`, a manifest, an email. Use
 > `brand.canvas` instead of hardcoding a hex; see [GOVERNANCE.md](./GOVERNANCE.md).

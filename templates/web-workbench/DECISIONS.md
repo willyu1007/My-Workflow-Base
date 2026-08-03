@@ -206,8 +206,21 @@ fails the build rather than shipping a split.
 The host's Phase 1b added a `label` role — 14px, ratio 1.43 — for control text:
 button faces, field text, nav rows. This kit already rendered 14px in **seven**
 such places with no name for it, so the role was not an import so much as a name
-for something already here. Added as `--label-size` / `--label-lh` plus a
-`.mt-label` class, and the seven sites now read the token.
+for something already here. Added as `--label-size` / `--label-lh`, and the seven
+sites now read the token.
+
+**Corrected in 0.13.1 — no `.mt-label` class.** 0.13.0 shipped one, which was a
+mistake: `components.css` has owned `.mt-label` since long before, for the form
+*field* label (12px / 600). `tokens.css` imports first, so the new class lost the
+cascade and was dead on arrival — a documented class that could never apply. No
+visual regression reached anyone, because the pre-existing rule kept winning.
+Removed. Control text uses `font-size: var(--label-size)`, which is what the
+kit's own seven sites do.
+
+Two meanings under one name is the underlying problem: this kit's `.mt-label` is a
+12px field caption, while the host's `label` *role* is 14px control text. Renaming
+the class is breaking — consumers write `className="mt-label"` in JSX — so it waits
+for a major. Until then the token carries the role and the class keeps its old job.
 
 Two other 14px sites were deliberately left as literals: `.wb-stat__unit` (a
 unit suffix inside a figure) and `.wb-insight__summary` (running prose). They are
