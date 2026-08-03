@@ -42,3 +42,11 @@ jobs:
       # separately), but this check needs no dependencies — it reads two files.
       - name: Verify UI kit tokens are generated from their source
         run: pnpm check:ui-tokens
+
+      # The kit has its own lockfile and is not a workspace member, so it needs
+      # its own install before its component tests can run.
+      - name: Test the UI kit
+        working-directory: templates/web-workbench
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm test

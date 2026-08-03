@@ -41,6 +41,7 @@ still not published — consumers do not change token values, they consume them.
 | Needing a color where `var()` is impossible (meta tag, manifest, email) | `@willyu1007/web-workbench/brand` — see [GOVERNANCE.md](./GOVERNANCE.md) |
 | Changing a **motion** token, or adding one | `tokens/motion-role-lock.json` — durations and curves are the platform host's roles under kit names; `pnpm tokens:check` fails on drift *and* on a new motion token nobody classified. See [DECISIONS.md](./DECISIONS.md) D-A10 |
 | Wondering why a token has the value it has | [DECISIONS.md](./DECISIONS.md) |
+| Changing a component, or adding one | [TESTING.md](./TESTING.md) — `pnpm test`; the suite runs against `src/` and gates publish |
 | Reviewing or planning motion in a consuming app | [skills/](./skills/) — copyable agent skills, starting with `audit-workbench-motion` |
 
 ## What's inside
@@ -89,6 +90,11 @@ import "@willyu1007/web-workbench/styles/index.css";
 > webfont files (no third-party `@import`). Load them once host-side — `next/font` is the
 > recommended, self-hosted path — and map them onto the `--font-*` tokens. Full recipe:
 > [TYPOGRAPHY.md → Fonts (host-provided)](./TYPOGRAPHY.md#fonts-host-provided).
+
+> ⚠️ **Upgrading to 0.15.0 (no runtime change).** The kit finally has a test harness —
+> vitest + testing-library, 19 tests on `FormFrame`, mutation-checked. `prepublishOnly`
+> and CI now run it, so a failing component cannot ship. Nothing in `dist/` changed;
+> tests are source-side and stay out of the tarball. See [TESTING.md](./TESTING.md).
 
 > ⚠️ **Upgrading to 0.14.0 (additive).** The Form paradigm finally has a component:
 > `<FormFrame>` at `@willyu1007/web-workbench/form` — one guided column, required

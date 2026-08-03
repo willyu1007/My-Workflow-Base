@@ -1,6 +1,6 @@
 {
   "name": "@willyu1007/web-workbench",
-  "version": "0.14.1",
+  "version": "0.15.0",
   "type": "module",
   "description": "Scenario-agnostic web workbench UI kit (Scene paradigms) — contracts + presentational React components.",
   "license": "MIT",
@@ -85,7 +85,9 @@
     "build:css": "mkdir -p dist/styles && cp src/styles/*.css dist/styles/",
     "build:lint": "mkdir -p dist/lint && cp lint/stylelint.cjs lint/eslint.js lint/design-debt.mjs dist/lint/",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "prepublishOnly": "npm run build"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run test && npm run build"
   },
   "peerDependencies": {
     "next": ">=15",
@@ -93,12 +95,16 @@
     "react-dom": ">=19"
   },
   "devDependencies": {
+    "@testing-library/react": "^16",
+    "@testing-library/user-event": "^14",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "jsdom": "^30.0.1",
     "next": "^16",
     "react": "^19",
     "react-dom": "^19",
-    "typescript": "^5.4.0"
+    "typescript": "^5.4.0",
+    "vitest": "^4"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
