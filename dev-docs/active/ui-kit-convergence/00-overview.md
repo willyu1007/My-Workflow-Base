@@ -59,8 +59,16 @@ create-project flow from SettingsFrame to FormFrame).
 
 ### Follow-ups (not blocking, owned elsewhere)
 
-- `state.selected` and `motion.spring.*` — additive, append once My-Chat's
-  Phase 5 settles them on-device.
+- ~~`state.selected`~~ — resolved 2026-08-04: **not dropped, never coming as
+  planned**. My-Chat's D-07 encoding deliberately omits it (the reference
+  expresses selection through palette surfaces that are already tokens); the
+  live question is naming — `brand.accent` vs a `selected` state role — tracked
+  in its `08-open-items.md` §6, which now also states the cross-repo
+  consequence: whichever name lands, this kit appends the same one.
+- `motion.spring.*` — My-Chat's Phase 5 completed **without** spring tokens
+  (release velocity selects a duration from the existing scale; D-05 refused
+  invented values). Springs get minted only if the owner judges the settle
+  insufficiently alive on-device. If minted, append here + `motion-role-lock`.
 - The literal-required gap (`themeColor`, web-app manifests, email templates)
   recorded in `GOVERNANCE.md`: no lint rule can reach a value that cannot be a
   `var()`. Closing it means the kit exporting brand colors as JS constants.
