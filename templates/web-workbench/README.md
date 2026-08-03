@@ -53,6 +53,8 @@ still not published — consumers do not change token values, they consume them.
 | **Hub paradigm** | `<Hub modules={…}/>` — aggregation台 renderer; structure is component-locked (to-dos = rows, per-workflow stats, topbar filter) |
 | **List paradigm** | `EntityCard` · `EntityRow` · `EntityTable` + cell kit (`CellIdentity`/`CellMetric`/`CellProgress`/`CellStatus`) · `ListView` (shared container: topbar filter + stats + empty + load-more) |
 | **Insight paradigm** | `InsightCard` (narrative → breakdown → overview, one hairline + whitespace) |
+| **Queue paradigm** | `Queue` (rows + trailing action → right `Drawer`; shape is component-locked) |
+| **Record paradigm** | `Record` (intro + tabs + top-right action + `Drawer`; shape is component-locked) |
 | **Form paradigm** | `FormFrame` (single guided column, required + declarative constraints, validate → submit) · shared `Field` schema |
 | **Styles** | `tokens.css` · `components.css` · `workbench.css` |
 

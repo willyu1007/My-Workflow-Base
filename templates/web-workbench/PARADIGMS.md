@@ -19,8 +19,8 @@ it does not invent layouts. The components are built so the right structure is t
 | --- | --- | --- | --- |
 | **Hub** (概览台) | "What do I act on today?" | **`<Hub modules={…}/>`** | To-dos are **`EntityRow` rows, never cards**. Stats = per-workflow `StatStrip`. Filter + quick-actions live in the **topbar** menu, not the body. |
 | **List** (列表) | "Browse a kind of object, pick one." | **`<ListView present={…}/>`** + a presentation: `EntityCard` (live objects), `EntityTable` (compare/sort), `EntityRow` (directory) | Filter is a **topbar dropdown**; whole card/row → detail. |
-| **Queue** (队列) | "Work a pile down, one by one." | `EntityRow` with a `trailing` action button | Inline button = 去做; act in a right-side `Drawer`, no page jump. |
-| **Record** (详情) | "See one object whole, act on it." | `Scene` (intro + `Tabs`) | Primary action top-right; sub-actions in a `Drawer`. |
+| **Queue** (队列) | "Work a pile down, one by one." | **`<Queue items={…}/>`** | Rows with a trailing action button; inline button = 去做, and it opens a right-side `Drawer` — never a page jump. The component locks that shape. |
+| **Record** (详情) | "See one object whole, act on it." | **`<Record intro={…} tabs={…}/>`** | Intro + required tabs, primary action top-right, sub-actions in a `Drawer`. The component locks that shape. |
 | **Insight** (洞察) | "Read data + conclusion." | **`<InsightCard model={…}/>`** | Narrative → breakdown → overview; one hairline + whitespace; tone = signal only. |
 | **Form** (表单) | "Create / edit one object." | **`<FormFrame schema={…}/>`** | Validate → submit → toast; whole page or in a `Drawer`. Not `SettingsFrame` — that has a section nav and a save bar and no required fields. |
 
