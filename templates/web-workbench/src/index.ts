@@ -44,9 +44,16 @@ export * from "./components/app-shell.js";
 // ---- Toast (Batch 3) — host notification chrome (ToastProvider + useToast) ----
 export * from "./components/toast.js";
 
-// ---- Settings / Form paradigm (Batch 4) — locked SettingsFrame + field schema ----
+// ---- Field schema shared by Settings and Form ----
+export * from "./contracts/field.js";
+
+// ---- Settings paradigm — locked SettingsFrame + section nav + save bar ----
 export * from "./contracts/settings.js";
 export * from "./components/settings.js";
+
+// ---- Form paradigm — create/edit one object; validate → submit → toast ----
+export * from "./contracts/form.js";
+export * from "./components/form.js";
 
 // ---- List paradigm presentations ----
 export * from "./components/entity-card.js";

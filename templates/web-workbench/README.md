@@ -53,6 +53,7 @@ still not published — consumers do not change token values, they consume them.
 | **Hub paradigm** | `<Hub modules={…}/>` — aggregation台 renderer; structure is component-locked (to-dos = rows, per-workflow stats, topbar filter) |
 | **List paradigm** | `EntityCard` · `EntityRow` · `EntityTable` + cell kit (`CellIdentity`/`CellMetric`/`CellProgress`/`CellStatus`) · `ListView` (shared container: topbar filter + stats + empty + load-more) |
 | **Insight paradigm** | `InsightCard` (narrative → breakdown → overview, one hairline + whitespace) |
+| **Form paradigm** | `FormFrame` (single guided column, required + declarative constraints, validate → submit) · shared `Field` schema |
 | **Styles** | `tokens.css` · `components.css` · `workbench.css` |
 
 ## Install
@@ -86,6 +87,13 @@ import "@willyu1007/web-workbench/styles/index.css";
 > webfont files (no third-party `@import`). Load them once host-side — `next/font` is the
 > recommended, self-hosted path — and map them onto the `--font-*` tokens. Full recipe:
 > [TYPOGRAPHY.md → Fonts (host-provided)](./TYPOGRAPHY.md#fonts-host-provided).
+
+> ⚠️ **Upgrading to 0.14.0 (additive).** The Form paradigm finally has a component:
+> `<FormFrame>` at `@willyu1007/web-workbench/form` — one guided column, required
+> fields and declarative constraints, validate → submit, works in a page or a Drawer.
+> Use it instead of `SettingsFrame` for create/edit; that one is for settings and has
+> no notion of required. The field kinds moved to a shared `contracts/field.ts`, but
+> every `Settings*` type name is preserved as an alias, so nothing breaks.
 
 > ⚠️ **Upgrading to 0.13.0 (additive).** Two things arrive, neither breaking. A `label`
 > role (14px / 1.43) for control text — button faces, field text, nav rows — as

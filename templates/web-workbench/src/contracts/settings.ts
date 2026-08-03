@@ -1,70 +1,37 @@
 /**
- * Settings / Form paradigm contract — a scenario DECLARES its settings as data;
- * the kit's <SettingsFrame> renders the locked chrome (section nav + field rows
- * + sticky save bar). Declared field values are kit-managed (draft → dirty →
+ * Settings paradigm contract — a scenario DECLARES its settings as data; the
+ * kit's <SettingsFrame> renders the locked chrome (section nav + field rows +
+ * sticky save bar). Declared field values are kit-managed (draft → dirty →
  * save). Bespoke panels plug in as render-slots resolved by `key`; they
  * self-manage their own persistence and are NOT part of the unified save bar.
  *
  * This file is pure data (no React) so a schema can be a constant or come from
  * a server; the host supplies slot JSX separately via <SettingsFrame slots>.
+ *
+ * The field kinds moved to `contracts/field.ts` in 0.14.0, because the Form
+ * paradigm needs the same shapes and a create form should not have to import
+ * `SettingsTextField` to declare a text input. Every `Settings*` name below is
+ * preserved as an alias — the definition site moved, the API did not.
  */
 
-export type SettingsFieldValue = string | number | boolean;
+import type {
+  Field,
+  FieldValue,
+  FieldValues,
+  NumberField,
+  SelectField,
+  TextField,
+  TextareaField,
+  ToggleField,
+} from "./field.js";
 
-/** A boolean switch. */
-export interface SettingsToggleField {
-  readonly kind: "toggle";
-  readonly key: string;
-  readonly label: string;
-  readonly desc?: string;
-}
-
-/** A single-choice dropdown over a fixed option set. */
-export interface SettingsSelectField {
-  readonly kind: "select";
-  readonly key: string;
-  readonly label: string;
-  readonly options: readonly { readonly value: string; readonly label: string }[];
-  readonly desc?: string;
-}
-
-/** A single-line text input. */
-export interface SettingsTextField {
-  readonly kind: "text";
-  readonly key: string;
-  readonly label: string;
-  readonly placeholder?: string;
-  readonly desc?: string;
-}
-
-/** A numeric input. Yields a `number`, or `""` when the field is cleared. */
-export interface SettingsNumberField {
-  readonly kind: "number";
-  readonly key: string;
-  readonly label: string;
-  readonly min?: number;
-  readonly max?: number;
-  readonly step?: number;
-  readonly placeholder?: string;
-  readonly desc?: string;
-}
-
-/** A multi-line text input — renders stacked (label above, full-width control). */
-export interface SettingsTextareaField {
-  readonly kind: "textarea";
-  readonly key: string;
-  readonly label: string;
-  readonly placeholder?: string;
-  readonly rows?: number;
-  readonly desc?: string;
-}
-
-export type SettingsField =
-  | SettingsToggleField
-  | SettingsSelectField
-  | SettingsTextField
-  | SettingsNumberField
-  | SettingsTextareaField;
+export type SettingsFieldValue = FieldValue;
+export type SettingsToggleField = ToggleField;
+export type SettingsSelectField = SelectField;
+export type SettingsTextField = TextField;
+export type SettingsNumberField = NumberField;
+export type SettingsTextareaField = TextareaField;
+export type SettingsField = Field;
 
 /** A run of declared fields under an optional quiet sub-label (批改 / 提交 …). */
 export interface SettingsGroupBlock {
@@ -107,4 +74,4 @@ export interface SettingsSchema {
  * renders. (A schema-typed values map is intentionally not enforced in v1 to
  * keep the host API ergonomic — declare a typed constant host-side if needed.)
  */
-export type SettingsValues = Record<string, SettingsFieldValue>;
+export type SettingsValues = FieldValues;

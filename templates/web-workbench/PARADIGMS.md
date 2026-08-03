@@ -22,7 +22,7 @@ it does not invent layouts. The components are built so the right structure is t
 | **Queue** (队列) | "Work a pile down, one by one." | `EntityRow` with a `trailing` action button | Inline button = 去做; act in a right-side `Drawer`, no page jump. |
 | **Record** (详情) | "See one object whole, act on it." | `Scene` (intro + `Tabs`) | Primary action top-right; sub-actions in a `Drawer`. |
 | **Insight** (洞察) | "Read data + conclusion." | **`<InsightCard model={…}/>`** | Narrative → breakdown → overview; one hairline + whitespace; tone = signal only. |
-| **Form** (表单) | "Create / edit one object." | Single-column guided form | Validate → submit → toast; whole page or in a `Drawer`. |
+| **Form** (表单) | "Create / edit one object." | **`<FormFrame schema={…}/>`** | Validate → submit → toast; whole page or in a `Drawer`. Not `SettingsFrame` — that has a section nav and a save bar and no required fields. |
 
 ## 6 iron rules (hold in every paradigm)
 

@@ -948,6 +948,16 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
 .wb-form { display: flex; flex-direction: column; gap: 16px; }
 .wb-form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .wb-form__row--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+/* FormFrame: one guided column. Groups stack; fields inside a group sit closer
+   to each other than groups do to each other, so the grouping reads without
+   rules or boxes. */
+.wb-form__group { display: flex; flex-direction: column; gap: 12px; }
+.wb-form__hint { margin: -4px 0 0; }
+.wb-form__req { color: var(--mt-danger); }
+.wb-form__actions {
+  display: flex; justify-content: flex-end; gap: 8px;
+  padding-top: 4px;
+}
 @media (max-width: 560px) { .wb-form__row, .wb-form__row--3 { grid-template-columns: 1fr; } }
 .wb-chipset { display: flex; flex-wrap: wrap; gap: 8px; }
 /* Dashboard workflow-scope chips: a quiet "range" control below the pulse row. */
