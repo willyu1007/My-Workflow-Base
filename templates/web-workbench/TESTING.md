@@ -70,6 +70,11 @@ four deliberate breakages before being trusted:
 | Queue | make the `close` callback a no-op | 3 failed |
 | SettingsFrame | treat dirty as "was touched" instead of a value comparison | 1 failed |
 | SettingsFrame | clear dirty before the save resolves | 2 failed |
+| ListView | count filters against the current view instead of the full list | 1 failed |
+| ListView | keep the load-more window when the filter changes | 1 failed |
+| Toast | give errors the same 3.8s as everything else | 1 failed |
+| Toast | let the busy toast auto-close | 1 failed |
+| Toast | return a silent no-op API outside a provider | 1 failed |
 
 Each failure landed on the test written for that behaviour, which is the part
 worth checking — a suite where every mutation trips the same generic assertion
@@ -80,15 +85,26 @@ directly; only behaviour that needs a DOM goes through `render`.
 
 ## Coverage today
 
-38 tests across the three components that carry real branching logic:
+57 tests across the five components that carry real state or branching logic:
 
 | Component | Tests | What is held |
 |---|---|---|
 | `FormFrame` | 19 | validation gates submit, first-offender focus, error clears on edit, aria wiring, in-flight disable, rejected submit stays retryable |
 | `SettingsFrame` | 12 | draft → dirty → save, dirty as a *value comparison* (typing and undoing is not dirty), edits surviving a section switch, failed save staying dirty |
+| `Toast` | 10 | stacking, tone-dependent auto-close, busy toasts that do not expire mid-flight, `run()` resolving `undefined` on failure, throwing outside a provider |
+| `ListView` | 9 | filter predicates, counts against the full list, load-more window and its reset on filter change, the presenter receiving only filtered+capped items |
 | `Queue` | 7 | rows get a trailing action, the action opens a Drawer rather than navigating, the clicked row's drawer, close by callback and Escape, reopen with a new item |
 
-The other 28 components remain untested. That is honest rather than complete —
-these three were chosen because they hold state and branch; most of the rest map
+The other 26 components remain untested. That is honest rather than complete —
+these five were chosen because they hold state and branch; most of the rest map
 props onto markup, where a typecheck already catches the likely mistakes. Adding
 a suite to one is now a file, not a project.
+
+### Fake timers and `userEvent`
+
+`Toast` runs on fake timers, because its auto-close windows are 3.8s and 6s and a
+suite that waits them out is a suite nobody runs. One trap comes with that:
+`userEvent` schedules its own inter-event delays on the timer queue, so under
+fake timers a click never lands and the test **times out rather than failing** —
+a misleading signal. Use `fireEvent` for plain clicks in a fake-timer test;
+`userEvent` is still right everywhere else.

@@ -92,8 +92,8 @@ import "@willyu1007/web-workbench/styles/index.css";
 > [TYPOGRAPHY.md → Fonts (host-provided)](./TYPOGRAPHY.md#fonts-host-provided).
 
 > ⚠️ **Upgrading to 0.15.x (no runtime change).** The kit has a test harness —
-> vitest + testing-library, 38 tests across `FormFrame`, `SettingsFrame`, and `Queue`,
-> all mutation-checked. `prepublishOnly`
+> vitest + testing-library, 57 tests across the five stateful components, all
+> mutation-checked. `prepublishOnly`
 > and CI now run it, so a failing component cannot ship. Nothing in `dist/` changed;
 > tests are source-side and stay out of the tarball. See [TESTING.md](./TESTING.md).
 
