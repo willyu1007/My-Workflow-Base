@@ -91,8 +91,9 @@ import "@willyu1007/web-workbench/styles/index.css";
 > recommended, self-hosted path — and map them onto the `--font-*` tokens. Full recipe:
 > [TYPOGRAPHY.md → Fonts (host-provided)](./TYPOGRAPHY.md#fonts-host-provided).
 
-> ⚠️ **Upgrading to 0.15.0 (no runtime change).** The kit finally has a test harness —
-> vitest + testing-library, 19 tests on `FormFrame`, mutation-checked. `prepublishOnly`
+> ⚠️ **Upgrading to 0.15.x (no runtime change).** The kit has a test harness —
+> vitest + testing-library, 38 tests across `FormFrame`, `SettingsFrame`, and `Queue`,
+> all mutation-checked. `prepublishOnly`
 > and CI now run it, so a failing component cannot ship. Nothing in `dist/` changed;
 > tests are source-side and stay out of the tarball. See [TESTING.md](./TESTING.md).
 

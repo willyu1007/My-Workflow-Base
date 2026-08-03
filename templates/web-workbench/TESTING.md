@@ -60,12 +60,16 @@ which is part of the kit's API.
 go red for the right reason. The FormFrame suite was mutation-checked against
 four deliberate breakages before being trusted:
 
-| Mutation | Result |
-|---|---|
-| drop the `required` check | 6 failed |
-| stop clearing a field's error on edit | 1 failed |
-| drop the blank option on a required select | 1 failed |
-| stop focusing the first offending field | 1 failed |
+| Component | Mutation | Result |
+|---|---|---|
+| FormFrame | drop the `required` check | 6 failed |
+| FormFrame | stop clearing a field's error on edit | 1 failed |
+| FormFrame | drop the blank option on a required select | 1 failed |
+| FormFrame | stop focusing the first offending field | 1 failed |
+| Queue | always open the first item's drawer | 2 failed |
+| Queue | make the `close` callback a no-op | 3 failed |
+| SettingsFrame | treat dirty as "was touched" instead of a value comparison | 1 failed |
+| SettingsFrame | clear dirty before the save resolves | 2 failed |
 
 Each failure landed on the test written for that behaviour, which is the part
 worth checking — a suite where every mutation trips the same generic assertion
@@ -76,7 +80,15 @@ directly; only behaviour that needs a DOM goes through `render`.
 
 ## Coverage today
 
-`FormFrame` only — 19 tests. That is honest rather than complete: the harness
-exists so the next component to change gets tests, and so a regression in the
-one component with real branching logic is caught. The other 30 components
-remain untested; adding a suite to one is now a file, not a project.
+38 tests across the three components that carry real branching logic:
+
+| Component | Tests | What is held |
+|---|---|---|
+| `FormFrame` | 19 | validation gates submit, first-offender focus, error clears on edit, aria wiring, in-flight disable, rejected submit stays retryable |
+| `SettingsFrame` | 12 | draft → dirty → save, dirty as a *value comparison* (typing and undoing is not dirty), edits surviving a section switch, failed save staying dirty |
+| `Queue` | 7 | rows get a trailing action, the action opens a Drawer rather than navigating, the clicked row's drawer, close by callback and Escape, reopen with a new item |
+
+The other 28 components remain untested. That is honest rather than complete —
+these three were chosen because they hold state and branch; most of the rest map
+props onto markup, where a typecheck already catches the likely mistakes. Adding
+a suite to one is now a file, not a project.
