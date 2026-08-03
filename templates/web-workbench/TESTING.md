@@ -1,9 +1,20 @@
 # Testing
 
 ```bash
-pnpm test        # once
-pnpm test:watch  # while working
+pnpm install --ignore-workspace   # first time, and after changing deps
+pnpm test                          # once
+pnpm test:watch                    # while working
 ```
+
+**`--ignore-workspace` is not optional.** This package has its own lockfile and
+is deliberately absent from the repo's `pnpm-workspace.yaml`, but it sits inside
+the workspace root — so a plain `pnpm install` here resolves against the ROOT
+lockfile, writes the kit's dependencies into it, and leaves this package's own
+lockfile untouched. Everything then appears to work locally while CI, which
+installs from the committed lockfile, gets a tree that never had the test
+dependencies in it. That happened while this harness was being added; the
+"CI-equivalent" check passed for the wrong reason, against node_modules the root
+install had already linked.
 
 The kit shipped 31 components with no test harness until 0.15.0. `pnpm build`
 and `pnpm typecheck` proved a component *compiled*; nothing proved it *behaved*.
