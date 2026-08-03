@@ -160,3 +160,84 @@ describe("required select", () => {
     expect(select.value).toBe("");
   });
 });
+
+describe("column layout", () => {
+  const grouped = (columns?: 1 | 2 | 3): FormSchema => ({
+    groups: [
+      {
+        key: "region",
+        label: "地区",
+        ...(columns ? { columns } : {}),
+        fields: [
+          { kind: "text", key: "a", label: "省份" },
+          { kind: "text", key: "b", label: "城市" },
+          { kind: "text", key: "c", label: "区县" },
+        ],
+      },
+    ],
+  });
+
+  const fieldsBox = (): HTMLElement =>
+    document.querySelector(".wb-form__fields") as HTMLElement;
+
+  /**
+   * classList, never className.toContain — "wb-form__row--3" CONTAINS the
+   * substring "wb-form__row", so a substring assertion passes even when the base
+   * class is missing, which is precisely the defect these tests exist to catch.
+   * A mutation run found that: dropping the base class left the suite green.
+   */
+  const hasClass = (name: string): boolean => fieldsBox().classList.contains(name);
+
+  it("stacks by default", () => {
+    render(<FormFrame schema={grouped()} onSubmit={vi.fn()} />);
+    expect(hasClass("wb-form__row")).toBe(false);
+  });
+
+  it("pairs the modifier with its base class at 3 columns", () => {
+    // `--3` alone sets no display, so a host writing it by hand gets a silent
+    // stack. A live consumer shipped exactly that.
+    render(<FormFrame schema={grouped(3)} onSubmit={vi.fn()} />);
+    expect(hasClass("wb-form__row")).toBe(true);
+    expect(hasClass("wb-form__row--3")).toBe(true);
+  });
+
+  it("uses the base class alone at 2 columns", () => {
+    render(<FormFrame schema={grouped(2)} onSubmit={vi.fn()} />);
+    expect(hasClass("wb-form__row")).toBe(true);
+    expect(hasClass("wb-form__row--3")).toBe(false);
+  });
+
+  it("keeps the group label out of the grid", () => {
+    // The label must sit above the columns, not become a cell in them.
+    render(<FormFrame schema={grouped(3)} onSubmit={vi.fn()} />);
+    expect(fieldsBox().textContent).not.toContain("地区");
+  });
+
+  it("still validates and submits when laid out in columns", async () => {
+    const onSubmit = vi.fn();
+    render(
+      <FormFrame
+        schema={{
+          groups: [
+            {
+              key: "r",
+              columns: 2,
+              fields: [
+                { kind: "text", key: "a", label: "甲", required: true },
+                { kind: "text", key: "b", label: "乙" },
+              ],
+            },
+          ],
+        }}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "提交" }));
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    await userEvent.type(screen.getByLabelText(/甲/), "x");
+    await userEvent.click(screen.getByRole("button", { name: "提交" }));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+  });
+});

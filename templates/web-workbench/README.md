@@ -91,6 +91,12 @@ import "@willyu1007/web-workbench/styles/index.css";
 > recommended, self-hosted path — and map them onto the `--font-*` tokens. Full recipe:
 > [TYPOGRAPHY.md → Fonts (host-provided)](./TYPOGRAPHY.md#fonts-host-provided).
 
+> ⚠️ **Upgrading to 0.16.0 (additive).** `FormGroup` gains `columns?: 1 | 2 | 3`,
+> wiring the grid CSS the kit already shipped. Use it instead of writing
+> `.wb-form__row--3` by hand — that class is a modifier and sets no `display`, so
+> alone it silently stacks. Multi-select and searchable-select were assessed and
+> deliberately NOT added; see [DECISIONS.md](./DECISIONS.md) D-A13.
+
 > ⚠️ **Upgrading to 0.15.x (no runtime change).** The kit has a test harness —
 > vitest + testing-library, 57 tests across the five stateful components, all
 > mutation-checked. `prepublishOnly`

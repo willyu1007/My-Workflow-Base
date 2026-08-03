@@ -104,6 +104,7 @@ export function FormFrame({
         <section className="wb-form__group" key={group.key}>
           {group.label && <div className="wb-settings__grouplabel">{group.label}</div>}
           {group.hint && <p className="mt-help wb-form__hint">{group.hint}</p>}
+          <div className={fieldsClass(group.columns)}>
           {group.fields.map((field) => (
             <FieldRow
               key={field.key}
@@ -115,6 +116,7 @@ export function FormFrame({
               register={(el) => controls.current.set(field.key, el)}
             />
           ))}
+          </div>
         </section>
       ))}
 
@@ -130,6 +132,19 @@ export function FormFrame({
       </div>
     </form>
   );
+}
+
+/**
+ * The grid class for a group. `--3` is a MODIFIER: it sets only
+ * grid-template-columns, so used alone the element keeps `display: block` and
+ * the fields stack — silently, and it looks like a layout that simply did not
+ * apply. Always paired here; that pairing is why `columns` exists as an API
+ * rather than a class the host remembers to write correctly.
+ */
+function fieldsClass(columns: 1 | 2 | 3 | undefined): string {
+  if (columns === 3) return "wb-form__fields wb-form__row wb-form__row--3";
+  if (columns === 2) return "wb-form__fields wb-form__row";
+  return "wb-form__fields";
 }
 
 /** Seed every declared key so a control is never uncontrolled-then-controlled. */

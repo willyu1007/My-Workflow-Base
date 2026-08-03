@@ -250,6 +250,44 @@ into a `<meta>` tag. Verified by probe — the alias is refused with the reason.
 Scope is deliberately five colors. This is an escape hatch for contexts that take
 no variable, not a parallel way to consume the system.
 
+## D-A13 — `FormGroup.columns`, and the two field kinds deliberately not added
+
+Assessing whether The-Education's onboarding form could move to `<FormFrame>`
+produced three candidate capabilities. They got three different answers, and the
+reasoning is worth keeping because the demand evidence was identical for all
+three — **one consumer, zero others**, which by the rule of two justifies none of
+them on demand alone.
+
+**`columns` — added (0.16.0).** Not an extraction: `.wb-form__row` and
+`.wb-form__row--3` were already in the kit's CSS, complete with a 560px collapse.
+A component that cannot reach CSS the package already ships is incomplete, not
+under-featured, so the consumer count does not apply. It also removes a real
+foot-gun: `--3` is a modifier that sets only `grid-template-columns`, so using it
+alone leaves `display: block` and the fields stack **silently**. The-Education
+had exactly that bug in its province/city/district row — three columns rendering
+as three stacked rows, in production, invisible in review because the markup
+looks right. Pairing the classes is now the component's job.
+
+**Multi-select — not added.** The blocker is not demand, it is a shared type.
+`FieldValue` is `string | number | boolean` and `SettingsValues` is an alias of
+`FieldValues`, so admitting arrays widens the **settings** API too — and
+`SettingsFrame`'s dirty check is `Object.is(a[k], b[k])`, which compares arrays
+by reference. Dirty tracking would break the moment an array value existed: the
+"typing and undoing is not dirty" behaviour, which has a test holding it, would
+start reporting dirty forever. That makes this a deliberate contract change with
+a component fix and new tests attached, not a new field kind. Revisit when a
+second consumer needs it, or when someone commits to migrating onboarding.
+
+**Searchable select — not added.** The consumer's `SearchSelect` is a 17-line
+wrapper around a native `<datalist>`: no keyboard navigation, no filter logic, no
+async options. Lifting it would publish `datalist`'s cross-browser rendering
+differences as a kit promise. Building a real one is a component-sized project,
+and the three call sites are a province/city/district cascade — a domain control,
+not a generic one. The consumer keeps its own.
+
+Consequence to state plainly, so nobody reads the `columns` release as a green
+light: **onboarding still cannot move.** It needs all three, and it has one.
+
 ## Accepted off-scale literals
 
 - `components.css` `.mt-window-bar` gradient endpoint `#F2EBDF` — decorative

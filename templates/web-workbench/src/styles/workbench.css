@@ -952,6 +952,11 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
    to each other than groups do to each other, so the grouping reads without
    rules or boxes. */
 .wb-form__group { display: flex; flex-direction: column; gap: 12px; }
+/* The field container inside a group. Plain (1 column) it is a stack; with
+   .wb-form__row it becomes the grid. Separate from __group so the group label
+   and hint stay above the grid rather than becoming cells in it. */
+.wb-form__fields { display: flex; flex-direction: column; gap: 12px; }
+.wb-form__fields.wb-form__row { display: grid; }
 .wb-form__hint { margin: -4px 0 0; }
 .wb-form__req { color: var(--mt-danger); }
 .wb-form__actions {

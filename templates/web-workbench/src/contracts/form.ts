@@ -31,6 +31,20 @@ export interface FormGroup {
   readonly label?: string;
   /** One quiet line under the group label. Explain the group, not each field. */
   readonly hint?: string;
+  /**
+   * Lay this group's fields side by side. Defaults to 1 — a guided form reads
+   * top to bottom, and columns are for genuinely paired values (province /
+   * city / district), not for shortening the page.
+   *
+   * The kit's grid collapses to one column under 560px on its own, so a
+   * `columns` group stays usable on a phone without the host doing anything.
+   *
+   * This exists because the underlying CSS is a base class plus a modifier
+   * (`.wb-form__row` + `.wb-form__row--3`) and the modifier alone sets no
+   * `display`, so using it by itself silently stacks. A live consumer had
+   * exactly that bug. Pairing them is the component's job, not the caller's.
+   */
+  readonly columns?: 1 | 2 | 3;
   readonly fields: readonly Field[];
 }
 
