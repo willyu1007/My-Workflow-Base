@@ -222,3 +222,25 @@ needed — no value changed.
 
 The 0.42 probe is the check that matters: without it, four sites reading a
 variable proves only that the variable exists, not that the JSON is what sets it.
+
+## Form paradigm component (2026-08-03)
+
+| Check | Result |
+|---|---|
+| `pnpm typecheck` | clean (one fix needed: `exactOptionalPropertyTypes` rejects passing `undefined` to `?:`) |
+| Back-compat probe | Nurture's exact `SettingsSchema` / `SettingsValues` import shape compiles unchanged against the moved field kinds |
+| New API probe | all five field kinds with `required`, `maxLength`, `pattern`, `min`/`max`, plus `validate` and `onCancel`, typecheck |
+| Constraint logic | **11/11 cases pass** |
+| Build + publish | 0.14.0, then 0.14.1 for the paradigm-table correction |
+| Export integrity | 18 entries, none pointing at a missing file; every component in `src/components` is exported from `index.ts` |
+| Paradigm coverage | 6/6 rows now name a component (was 4/6) |
+
+The constraint cases include the one that is easy to get wrong:
+**`required` on a toggle stays valid at `false`.** False is an answer; treating
+it as blank would make the field un-submittable.
+
+`checkConstraints` is exported so it can be tested at all — the kit has **no test
+harness** (no runner, no test files, `scripts` has only tokens/build/typecheck).
+The 11 cases ran as a standalone node script against `dist/`. That is a real gap:
+components ship untested, and this one only has coverage because its logic is
+pure and could be pulled out.

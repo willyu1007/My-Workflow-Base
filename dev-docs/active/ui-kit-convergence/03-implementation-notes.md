@@ -260,3 +260,54 @@ The debt gate built in C went unused by both consumers. That is the intended
 outcome: it exists so a strict rule can land without forcing a same-day cleanup,
 not because a cleanup was expected to be unaffordable. Actual cleanup cost was
 three lines of CSS.
+
+## Form paradigm component (2026-08-03)
+
+### The gap was found by asymmetry, confirmed by consumers
+
+PARADIGMS.md named a bolded component for four of six paradigms. Form said
+"Single-column guided form" — a description. That asymmetry turned out to be
+real, and the consumers had already paid for it:
+
+- The-Nurture builds its **create-project** flow on `SettingsFrame` (2 refs).
+- The-Education hand-rolls **three** `<form>` elements against the kit's CSS
+  classes (`.mt-input`, `.mt-field`, `.wb-form`) with no kit component.
+
+SettingsFrame is genuinely the wrong shape for creating an object: section nav,
+sticky save bar with draft/dirty, and no notion of `required` — so a create flow
+shows "有未保存更改" for an object that does not exist, and cannot block an empty
+submit.
+
+### What shipped (0.14.0)
+
+| File | Role |
+|---|---|
+| `contracts/field.ts` | Field kinds shared by both paradigms, plus `required` and declarative constraints |
+| `contracts/settings.ts` | Now re-exports the shared kinds under every original `Settings*` name |
+| `contracts/form.ts` | `FormSchema` / `FormGroup` / `FormErrors` |
+| `components/form.tsx` | `<FormFrame>` |
+| `src/form.ts`, `./form` export | Grouped entry |
+| `workbench.css` | `.wb-form__group` / `__hint` / `__req` / `__actions` |
+
+Three decisions worth keeping:
+
+- **Constraints are data, not functions.** A `validate` in the schema would make
+  it un-serialisable and break the property that a schema can come from a server.
+  Cross-field rules live on the component (`validate` prop) and are merged over
+  the declarative pass.
+- **No toast from inside.** "Validate → submit → toast" is the paradigm, but
+  firing one here assumes a `ToastProvider` above every form. The host toasts in
+  `onSubmit`.
+- **Field kinds moved rather than duplicated.** A create form importing
+  `SettingsTextField` is the same two-names-one-meaning trap as the `.mt-label`
+  collision. Aliases preserve the old API; a typecheck probe confirms Nurture's
+  exact import shape still compiles.
+
+### Audit follow-up (0.14.1)
+
+Checking the other five rows after writing the sixth found the same asymmetry
+reversed: `<Queue>` and `<Record>` exist and are used, but PARADIGMS.md still
+described them as compositions. Since that file is the read-first document,
+following it would mean hand-assembling what the kit already locks — which is
+how the Form gap produced a create flow on SettingsFrame. Both rows now name
+their component; the README table lists all six paradigms.
