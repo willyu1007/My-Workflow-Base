@@ -230,8 +230,25 @@ would reach nobody unnoticed. Second, and more to the point, no break was needed
 at all.
 
 `.mt-field-label` is now the name; `.mt-label` remains in the same selector list
-and is deprecated. Consumers keep working — The-Education writes it in 8 files —
-and the class disappears in a later minor, once those move.
+and is deprecated.
+
+**Amended 2026-08-04, after actually migrating the consumer: `.mt-label` cannot
+be removed, and the premise that it would was wrong.** The-Education writes it 27
+times, and only **14** sit inside an `.mt-field` — the row this kit documents as
+label + control + help. The other **13** caption a value or a list (已验证, 题目,
+学生, 总分, 教师代传上传). Calling those `.mt-field-label` would assert they label a
+control when they do not.
+
+So the class carries two jobs, and the rename only names one. What is actually
+missing from the kit is a **small-caption** role: 12px/600 without `.mt-caption`'s
+uppercase transform. Until that exists, `.mt-label` stays as the name for the
+second job and the deprecation covers only the field-label use.
+
+Worth recording how the classification was reached, because the first attempt was
+wrong: proximity to an `<input>` misses wrappers that take their control through
+`children` — three real field labels looked like captions. **Container membership
+(`.mt-field`) is the reliable signal**, and it is reliable because it is the kit's
+own documented contract rather than a guess about markup shape.
 
 **The token name did NOT change, deliberately.** `--label-size` is externally
 unused (0 consumer references) and would have been the cheapest thing to rename,

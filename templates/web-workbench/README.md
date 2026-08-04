@@ -93,8 +93,9 @@ import "@willyu1007/web-workbench/styles/index.css";
 
 > ⚠️ **Upgrading to 0.17.0 (additive, one deprecation).** The form field label class
 > is now `.mt-field-label`. `.mt-label` still works and is styled identically — it is
-> deprecated, not removed — but it collided in meaning with the `label` type role
-> (14px control text), so move when convenient. See [DECISIONS.md](./DECISIONS.md) D-A11.
+> deprecated for that use, not removed — it collided in meaning with the `label` type
+> role (14px control text). Move the labels that sit inside an `.mt-field`; leave the
+> ones captioning a value or a list, which `.mt-field-label` would mis-describe. See [DECISIONS.md](./DECISIONS.md) D-A11.
 
 > ⚠️ **Upgrading to 0.16.0 (additive).** `FormGroup` gains `columns?: 1 | 2 | 3`,
 > wiring the grid CSS the kit already shipped. Use it instead of writing
