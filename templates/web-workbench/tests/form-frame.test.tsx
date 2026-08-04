@@ -6,6 +6,7 @@
  * Written against behaviour a consumer can observe, not internals: no assertions
  * on state shape or class names beyond the ones the kit documents.
  */
+import { readFileSync } from "node:fs";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
@@ -239,5 +240,29 @@ describe("column layout", () => {
     await userEvent.type(screen.getByLabelText(/甲/), "x");
     await userEvent.click(screen.getByRole("button", { name: "提交" }));
     await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+  });
+});
+
+describe("field label class", () => {
+  it("uses the unambiguous name", () => {
+    render(<FormFrame schema={schema} onSubmit={vi.fn()} />);
+    const label = screen.getByText("备注");
+    expect(label.classList.contains("mt-field-label")).toBe(true);
+  });
+
+  it("keeps .mt-label styled during the deprecation window", () => {
+    // A consumer has 8 files writing className="mt-label". Dropping the
+    // selector before removing the class is a silent restyle, not a rename.
+    // Plain path, not import.meta.url: under jsdom that is not a file: URL.
+    // Comments are stripped FIRST — the doc comment above this rule names both
+    // classes, so an assertion over the raw text passes no matter what the
+    // selector says. A mutation run caught exactly that.
+    const css = readFileSync("src/styles/components.css", "utf8").replace(
+      /\/\*[\s\S]*?\*\//g,
+      "",
+    );
+    const selector = css.slice(0, css.indexOf("{", css.indexOf(".mt-field-label")));
+    const selectorList = selector.slice(selector.lastIndexOf(";") + 1);
+    expect(selectorList).toContain(".mt-label");
   });
 });

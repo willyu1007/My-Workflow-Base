@@ -94,8 +94,20 @@
 .mt-field {
   display: flex; flex-direction: column; gap: 6px;
 }
+/* The form FIELD label — a 12px caption above a control.
+ *
+ * `.mt-field-label` is the name to use. `.mt-label` is the original and stays
+ * working, but it collides in meaning with the `label` TYPE ROLE (14px control
+ * text, `--label-size`), which is a different thing entirely: one names a
+ * control, the other is the text inside one. Two "label"s in one package is a
+ * question every reader has to re-answer. `.mt-label` is deprecated and will be
+ * removed in a later minor; see DECISIONS.md D-A11.
+ *
+ * 12px was exactly `--caption-size`, so it is now the token — an identifier
+ * change with no design change (D-A5's arithmetic rule). */
+.mt-field-label,
 .mt-label {
-  font-size: 12px; font-weight: 600; color: var(--fg-2);
+  font-size: var(--caption-size); font-weight: 600; color: var(--fg-2);
 }
 .mt-input, .mt-textarea, .mt-select {
   font-family: var(--font-sans); font-size: var(--label-size);

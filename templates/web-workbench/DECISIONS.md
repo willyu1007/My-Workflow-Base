@@ -218,9 +218,31 @@ Removed. Control text uses `font-size: var(--label-size)`, which is what the
 kit's own seven sites do.
 
 Two meanings under one name is the underlying problem: this kit's `.mt-label` is a
-12px field caption, while the host's `label` *role* is 14px control text. Renaming
-the class is breaking — consumers write `className="mt-label"` in JSX — so it waits
-for a major. Until then the token carries the role and the class keeps its old job.
+12px field caption, while the `label` *role* is 14px control text. One names a
+control; the other is the text inside one.
+
+**Resolved 0.17.0 — and the earlier reasoning here was wrong twice.**
+
+It said the rename "waits for a major". First, a 0.x package does not need one:
+breaking changes go in the minor position, and neither consumer's pin crosses a
+minor (`0.15.2` exact, `^0.13.1` → `>=0.13.1 <0.14.0`), so even a hard rename
+would reach nobody unnoticed. Second, and more to the point, no break was needed
+at all.
+
+`.mt-field-label` is now the name; `.mt-label` remains in the same selector list
+and is deprecated. Consumers keep working — The-Education writes it in 8 files —
+and the class disappears in a later minor, once those move.
+
+**The token name did NOT change, deliberately.** `--label-size` is externally
+unused (0 consumer references) and would have been the cheapest thing to rename,
+which is exactly the trap: `label` is the role name shared with the platform
+host, and renaming it here would break the same-named/same-value rule at the top
+of this file. The collision is Base-local — the host has no `.mt-label` — so the
+Base-local name is the one that moves.
+
+Also tokenized on the way: the rule's `font-size: 12px` was exactly
+`--caption-size`, so it now reads the token (D-A5's arithmetic rule — free only
+because the numbers were equal).
 
 Two other 14px sites were deliberately left as literals: `.wb-stat__unit` (a
 unit suffix inside a figure) and `.wb-insight__summary` (running prose). They are
@@ -275,8 +297,15 @@ looks right. Pairing the classes is now the component's job.
 by reference. Dirty tracking would break the moment an array value existed: the
 "typing and undoing is not dirty" behaviour, which has a test holding it, would
 start reporting dirty forever. That makes this a deliberate contract change with
-a component fix and new tests attached, not a new field kind. Revisit when a
-second consumer needs it, or when someone commits to migrating onboarding.
+a component fix and new tests attached, not a new field kind.
+
+**Correcting the word "blocked" above**: nothing prevents this technically. The
+work is known and doable today — widen the type, fix `valuesEqual` for arrays,
+add the kind against the existing `.wb-chip-toggle` CSS, extend the tests. What
+is missing is *benefit*: the only consumer that wants it is The-Education's
+onboarding, and that form also needs a searchable select, which is not being
+added. Shipping multi-select alone moves nothing. Revisit when a second consumer
+needs it, or when someone commits to the searchable select as well.
 
 **Searchable select — not added.** The consumer's `SearchSelect` is a 17-line
 wrapper around a native `<datalist>`: no keyboard navigation, no filter logic, no

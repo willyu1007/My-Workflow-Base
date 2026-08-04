@@ -13,7 +13,7 @@
  * yet. See contracts/form.ts for the full comparison.
  *
  * Controls reuse the kit's `mt-input` / `mt-select` / `mt-textarea` atoms and the
- * `mt-field` / `mt-label` / `mt-help` row, so a form looks like the rest of the
+ * `mt-field` / `mt-field-label` / `mt-help` row, so a form looks like the rest of the
  * kit without new CSS.
  *
  * The toast in "validate → submit → toast" is the HOST's: firing one from here
@@ -234,7 +234,7 @@ function FieldRow({
 
   return (
     <div className="mt-field">
-      <label className="mt-label" htmlFor={id}>
+      <label className="mt-field-label" htmlFor={id}>
         {field.label}
         {field.required && field.kind !== "toggle" && (
           <span className="wb-form__req" aria-label={requiredHint}>
