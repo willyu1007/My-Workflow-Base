@@ -69,12 +69,21 @@ create-project flow from SettingsFrame to FormFrame).
   (release velocity selects a duration from the existing scale; D-05 refused
   invented values). Springs get minted only if the owner judges the settle
   insufficiently alive on-device. If minted, append here + `motion-role-lock`.
-- The literal-required gap (`themeColor`, web-app manifests, email templates)
-  recorded in `GOVERNANCE.md`: no lint rule can reach a value that cannot be a
-  `var()`. Closing it means the kit exporting brand colors as JS constants.
-  **Unowned.**
-- My-Chat Phase 1b adopting Base's typography shape and validating it on iOS and
-  Android — owned by that task.
+- ~~The literal-required gap~~ — **closed in 0.13.0**. `@willyu1007/web-workbench/brand`
+  exports the five colours a meta tag, manifest or email needs, generated from
+  the same token source; The-Education's `themeColor` reads `brand.canvas`.
+- ~~My-Chat Phase 1b typography~~ — **landed**. Nine per-role line-height ratios
+  and the five tracking values are in its `ui/tokens/base.json`, credited to this
+  kit in the token file's own note. Cross-platform validation on iOS/Android
+  remains that task's, not this one's.
+- **`label` naming collision (D-A11)** — this kit's `.mt-label` is a 12px field
+  caption while the role it now carries is 14px control text. Renaming the class
+  is breaking (consumers write it in JSX), so it waits for a major. Kit-side.
+- **Multi-select field kind (D-A13)** — blocked on a contract change, not on
+  demand: admitting arrays to `FieldValue` widens `SettingsValues` and breaks
+  `SettingsFrame`'s `Object.is` dirty check. Kit-side, deliberate.
+- **26 of 31 components untested** — a deliberate stop, not an omission. The
+  rule in `TESTING.md` is that a component gets a suite when it grows state.
 
 ## Scope
 
