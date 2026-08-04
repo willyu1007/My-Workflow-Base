@@ -266,3 +266,28 @@ describe("field label class", () => {
     expect(selectorList).toContain(".mt-label");
   });
 });
+
+describe("small label roles", () => {
+  const rules = (): string =>
+    readFileSync("src/styles/components.css", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+
+  it("styles field, value and the deprecated name identically", () => {
+    // One appearance, three names: two current roles plus the original. If the
+    // selector list ever splits, the 13 consumer sites still on .mt-label
+    // silently restyle.
+    const css = rules();
+    const list = css.slice(0, css.indexOf("{", css.indexOf(".mt-field-label")));
+    const selectors = list.slice(list.lastIndexOf(";") + 1);
+    for (const name of [".mt-field-label", ".mt-value-label", ".mt-label"]) {
+      expect(selectors).toContain(name);
+    }
+  });
+
+  it("keeps the value role out of .mt-caption's uppercase treatment", () => {
+    // .mt-caption is a Latin eyebrow: uppercase is a no-op in CJK while its
+    // tracking still applies. The value role must not inherit that.
+    const css = rules();
+    const block = css.slice(css.indexOf(".mt-field-label"));
+    expect(block.slice(0, block.indexOf("}"))).not.toContain("text-transform");
+  });
+});

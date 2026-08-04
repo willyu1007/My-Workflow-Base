@@ -239,10 +239,22 @@ label + control + help. The other **13** caption a value or a list (已验证, �
 学生, 总分, 教师代传上传). Calling those `.mt-field-label` would assert they label a
 control when they do not.
 
-So the class carries two jobs, and the rename only names one. What is actually
-missing from the kit is a **small-caption** role: 12px/600 without `.mt-caption`'s
-uppercase transform. Until that exists, `.mt-label` stays as the name for the
-second job and the deprecation covers only the field-label use.
+So the class carries two jobs, and the rename only named one. **Resolved in
+0.18.0**: `.mt-value-label` names the second — text that labels a displayed
+value rather than a control. Both roles now have a name, so `.mt-label` can
+finish deprecating.
+
+The two are identical CSS and deliberately separate names. Only one of them will
+ever grow required markers, error colouring and `htmlFor` semantics; merging them
+now would mean splitting them later, against consumers.
+
+**Why `.mt-caption` was not the answer**, which is the part worth keeping:
+`.mt-caption` is a **Latin eyebrow** — `text-transform: uppercase` plus tracking
+tuned for uppercase Latin. In Chinese the transform is a no-op while the tracking
+still applies, so it renders as loosened text with none of the eyebrow effect it
+exists for. A bilingual product therefore has no working caption role, which is
+exactly why the consumer captioned 13 Chinese values with the label class instead.
+That is a gap in the type scale, not consumer sloppiness.
 
 Worth recording how the classification was reached, because the first attempt was
 wrong: proximity to an `<input>` misses wrappers that take their control through

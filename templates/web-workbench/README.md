@@ -91,6 +91,11 @@ import "@willyu1007/web-workbench/styles/index.css";
 > recommended, self-hosted path — and map them onto the `--font-*` tokens. Full recipe:
 > [TYPOGRAPHY.md → Fonts (host-provided)](./TYPOGRAPHY.md#fonts-host-provided).
 
+> ⚠️ **Upgrading to 0.18.0 (additive).** `.mt-value-label` joins `.mt-field-label` —
+> same appearance, different job: one names a control, the other names a displayed
+> value. Together they replace `.mt-label`, which covered both. Note neither is
+> `.mt-caption`: that role is a Latin eyebrow whose uppercase is a no-op in CJK.
+
 > ⚠️ **Upgrading to 0.17.0 (additive, one deprecation).** The form field label class
 > is now `.mt-field-label`. `.mt-label` still works and is styled identically — it is
 > deprecated for that use, not removed — it collided in meaning with the `label` type

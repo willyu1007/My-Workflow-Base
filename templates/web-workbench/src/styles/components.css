@@ -94,18 +94,29 @@
 .mt-field {
   display: flex; flex-direction: column; gap: 6px;
 }
-/* The form FIELD label — a 12px caption above a control.
+/* Small labels — 12px, semibold, secondary ink. Two roles, one appearance:
  *
- * `.mt-field-label` is the name to use. `.mt-label` is the original and stays
- * working, but it collides in meaning with the `label` TYPE ROLE (14px control
- * text, `--label-size`), which is a different thing entirely: one names a
- * control, the other is the text inside one. Two "label"s in one package is a
- * question every reader has to re-answer. `.mt-label` is deprecated and will be
- * removed in a later minor; see DECISIONS.md D-A11.
+ *   .mt-field-label  names a CONTROL  (inside .mt-field, beside an input)
+ *   .mt-value-label  names a VALUE    (a read view: 总分 / 95, 已验证 / 张三)
+ *
+ * Identical today and deliberately separate, because only one of them will grow
+ * required markers, error colouring and `htmlFor` semantics. Pick by what the
+ * text names, not by how it looks.
+ *
+ * Neither is `.mt-caption`. That role is a **Latin eyebrow** — uppercase plus
+ * tracking tuned for uppercase Latin — and in CJK the transform is a no-op while
+ * the tracking still applies, so it reads as loosened text with no eyebrow
+ * effect. A bilingual product has no caption role that works in Chinese; these
+ * two are it. That is why a live consumer captioned 13 Chinese values with the
+ * label class rather than `.mt-caption`.
+ *
+ * `.mt-label` is the original name, kept working and deprecated. It covered both
+ * roles, which is why it could not simply be renamed; see DECISIONS.md D-A11.
  *
  * 12px was exactly `--caption-size`, so it is now the token — an identifier
  * change with no design change (D-A5's arithmetic rule). */
 .mt-field-label,
+.mt-value-label,
 .mt-label {
   font-size: var(--caption-size); font-weight: 600; color: var(--fg-2);
 }
