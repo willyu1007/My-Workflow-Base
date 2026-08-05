@@ -37,5 +37,82 @@
     "driver": "workflow_claimed_step_v1",
     "client_mutation_id": "mutation_example_01",
     "request_correlation_hash": "3333333333333333333333333333333333333333333333333333333333333333"
-  }
+  },
+  "prepare_input": {
+    "prepare_version": 1,
+    "action_key": "example.record",
+    "target_ref": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+    "expected_version": "version-01",
+    "action_input": {
+      "example_value": "neutral"
+    }
+  },
+  "prepare_results": [
+    {
+      "status": "prepared",
+      "submit_token": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "confirmation": {
+        "confirmation_class": "explicit",
+        "prompt": {
+          "kind": "plain_text",
+          "value": "Confirm this example action.",
+          "locale": "en-US"
+        }
+      },
+      "issued_at": "2026-08-05T00:00:00.000Z",
+      "expires_at": "2026-08-05T00:05:00.000Z"
+    },
+    {
+      "status": "context_changed",
+      "safe_reason": {
+        "reason_code": "example_context_changed",
+        "message": {
+          "kind": "plain_text",
+          "value": "The example context changed.",
+          "locale": "en-US"
+        },
+        "retry_class": "refresh"
+      }
+    },
+    {
+      "status": "unavailable",
+      "safe_reason": {
+        "reason_code": "example_unavailable",
+        "message": {
+          "kind": "plain_text",
+          "value": "The example action is unavailable.",
+          "locale": "en-US"
+        },
+        "retry_class": "retry_later"
+      }
+    }
+  ],
+  "submit_inputs": [
+    {
+      "submit_request_version": 1,
+      "client_echo": {
+        "submit_version": 1,
+        "submit_token": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+        "confirmation": "confirmed",
+        "client_mutation_id": "mutation_example_01"
+      }
+    },
+    {
+      "submit_request_version": 1,
+      "client_echo": {
+        "submit_version": 1,
+        "submit_token": "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
+        "confirmation": "confirmed",
+        "client_mutation_id": "mutation_example_02"
+      },
+      "authentication_assurance": {
+        "assurance_evidence_version": 1,
+        "assurance_class": "example.recent_authentication",
+        "principal_binding_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+        "ceremony_evidence_hash": "5555555555555555555555555555555555555555555555555555555555555555",
+        "verified_at": "2026-08-05T00:01:00.000Z",
+        "expires_at": "2026-08-05T00:03:00.000Z"
+      }
+    }
+  ]
 }

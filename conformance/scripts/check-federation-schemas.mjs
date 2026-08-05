@@ -7,7 +7,10 @@ const expected = [
   "canonical-ref-v1.schema.json",
   "generation-ticket-v1.schema.json",
   "integration-lock-v3.schema.json",
+  "prepare-scenario-domain-action-input-v1.schema.json",
+  "prepare-scenario-domain-action-result-v1.schema.json",
   "scenario-action-offer-v1.schema.json",
+  "scenario-authentication-assurance-evidence-v1.schema.json",
   "scenario-canonical-binding-expected-head-v1.schema.json",
   "scenario-canonical-binding-intent-v1.schema.json",
   "scenario-canonical-binding-pair-request-v1.schema.json",
@@ -18,7 +21,9 @@ const expected = [
   "scenario-contract-release-v1.schema.json",
   "scenario-current-owner-binding-pair-evidence-v1.schema.json",
   "scenario-domain-action-claimed-step-assertion-v1.schema.json",
+  "scenario-domain-action-confirmation-prompt-v1.schema.json",
   "scenario-domain-action-contract-v1.schema.json",
+  "scenario-domain-action-submit-echo-v1.schema.json",
   "scenario-domain-action-workflow-step-ref-v1.schema.json",
   "scenario-event-envelope-v1.schema.json",
   "scenario-human-principal-v1.schema.json",
@@ -43,6 +48,7 @@ const expected = [
   "scenario-semantic-presentation-v1.schema.json",
   "scenario-subject-context-option-v1.schema.json",
   "scenario-workspace-activation-v1.schema.json",
+  "submit-scenario-domain-action-input-v1.schema.json",
 ];
 
 const actual = (await readdir(schemaRoot)).filter((name) => name.endsWith(".schema.json")).sort();

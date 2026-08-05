@@ -1,4 +1,9 @@
 import type { CanonicalRef } from "./identity.js";
+import type {
+  ScenarioActionTargetRefV1,
+  ScenarioSafeReasonV1,
+  ScenarioSafeTextV1,
+} from "./scenario-presentation.js";
 
 export const scenarioDomainActionDriversV1 = [
   "scenario_direct_empty_v1",
@@ -52,4 +57,50 @@ export type ScenarioDomainActionClaimedStepAssertionV1 = {
   driver: "workflow_claimed_step_v1";
   client_mutation_id: string;
   request_correlation_hash: string;
+};
+
+export type PrepareScenarioDomainActionInputV1 = {
+  prepare_version: 1;
+  action_key: string;
+  target_ref: ScenarioActionTargetRefV1;
+  expected_version?: string;
+  action_input: Record<string, unknown>;
+};
+
+export type ScenarioDomainActionConfirmationPromptV1 = {
+  confirmation_class: ScenarioDomainActionConfirmationClassV1;
+  prompt: ScenarioSafeTextV1;
+};
+
+export type PrepareScenarioDomainActionResultV1 =
+  | {
+      status: "prepared";
+      submit_token: string;
+      confirmation: ScenarioDomainActionConfirmationPromptV1;
+      issued_at: string;
+      expires_at: string;
+    }
+  | { status: "context_changed"; safe_reason: ScenarioSafeReasonV1 }
+  | { status: "unavailable"; safe_reason: ScenarioSafeReasonV1 };
+
+export type ScenarioDomainActionSubmitEchoV1 = {
+  submit_version: 1;
+  submit_token: string;
+  confirmation: "confirmed";
+  client_mutation_id: string;
+};
+
+export type ScenarioAuthenticationAssuranceEvidenceV1 = {
+  assurance_evidence_version: 1;
+  assurance_class: string;
+  principal_binding_hash: string;
+  ceremony_evidence_hash: string;
+  verified_at: string;
+  expires_at: string;
+};
+
+export type SubmitScenarioDomainActionInputV1 = {
+  submit_request_version: 1;
+  client_echo: ScenarioDomainActionSubmitEchoV1;
+  authentication_assurance?: ScenarioAuthenticationAssuranceEvidenceV1;
 };

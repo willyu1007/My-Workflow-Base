@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-domain-action-confirmation-prompt-v1.schema.json",
+  "title": "ScenarioDomainActionConfirmationPromptV1",
+  "description": "Owner-safe prompt for the static action confirmation class.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["confirmation_class", "prompt"],
+  "properties": {
+    "confirmation_class": { "enum": ["explicit", "strong_authorization"] },
+    "prompt": { "$ref": "scenario-safe-text-v1.schema.json" }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/prepare-scenario-domain-action-result-v1.schema.json",
+  "title": "PrepareScenarioDomainActionResultV1",
+  "description": "Closed prepare outcome that never echoes owner target or action input.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "status": { "enum": ["prepared", "context_changed", "unavailable"] },
+    "submit_token": { "$ref": "#/$defs/opaqueLocator" },
+    "confirmation": { "$ref": "scenario-domain-action-confirmation-prompt-v1.schema.json" },
+    "issued_at": { "$ref": "#/$defs/canonicalInstant" },
+    "expires_at": { "$ref": "#/$defs/canonicalInstant" },
+    "safe_reason": { "$ref": "scenario-safe-reason-v1.schema.json" }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "status": { "const": "prepared" },
+        "submit_token": { "$ref": "#/$defs/opaqueLocator" },
+        "confirmation": { "$ref": "scenario-domain-action-confirmation-prompt-v1.schema.json" },
+        "issued_at": { "$ref": "#/$defs/canonicalInstant" },
+        "expires_at": { "$ref": "#/$defs/canonicalInstant" }
+      },
+      "required": ["status", "submit_token", "confirmation", "issued_at", "expires_at"]
+    },
+    {
+      "properties": {
+        "status": { "enum": ["context_changed", "unavailable"] },
+        "safe_reason": { "$ref": "scenario-safe-reason-v1.schema.json" }
+      },
+      "required": ["status", "safe_reason"]
+    }
+  ],
+  "$defs": {
+    "opaqueLocator": { "type": "string", "minLength": 32, "maxLength": 512, "pattern": "^[A-Za-z0-9_-]+$" },
+    "canonicalInstant": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    }
+  }
+}

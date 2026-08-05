@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-authentication-assurance-evidence-v1.schema.json",
+  "title": "ScenarioAuthenticationAssuranceEvidenceV1",
+  "description": "Body-free Host-established evidence of a registered authentication ceremony.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["assurance_evidence_version", "assurance_class", "principal_binding_hash", "ceremony_evidence_hash", "verified_at", "expires_at"],
+  "properties": {
+    "assurance_evidence_version": { "const": 1 },
+    "assurance_class": { "$ref": "#/$defs/machineKey" },
+    "principal_binding_hash": { "$ref": "#/$defs/sha256" },
+    "ceremony_evidence_hash": { "$ref": "#/$defs/sha256" },
+    "verified_at": { "$ref": "#/$defs/canonicalInstant" },
+    "expires_at": { "$ref": "#/$defs/canonicalInstant" }
+  },
+  "$defs": {
+    "machineKey": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-z][a-z0-9._:-]*$" },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "canonicalInstant": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    }
+  }
+}

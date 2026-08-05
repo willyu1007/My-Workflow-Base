@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/submit-scenario-domain-action-input-v1.schema.json",
+  "title": "SubmitScenarioDomainActionInputV1",
+  "description": "Host-private submit wrapper around the exact client echo and optional Host assurance.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["submit_request_version", "client_echo"],
+  "properties": {
+    "submit_request_version": { "const": 1 },
+    "client_echo": { "$ref": "scenario-domain-action-submit-echo-v1.schema.json" },
+    "authentication_assurance": { "$ref": "scenario-authentication-assurance-evidence-v1.schema.json" }
+  }
+}
