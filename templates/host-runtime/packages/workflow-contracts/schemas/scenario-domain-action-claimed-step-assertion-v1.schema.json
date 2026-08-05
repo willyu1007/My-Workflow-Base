@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-domain-action-claimed-step-assertion-v1.schema.json",
+  "title": "ScenarioDomainActionClaimedStepAssertionV1",
+  "description": "Content-free Host assertion for the original non-claimable Workflow Step.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["step_assertion_version", "workflow_step_ref", "workspace_ref", "principal_provenance_hash", "scenario_key", "action_key", "handler_key", "action_contract_hash", "driver", "client_mutation_id", "request_correlation_hash"],
+  "properties": {
+    "step_assertion_version": { "const": 1 },
+    "workflow_step_ref": { "$ref": "scenario-domain-action-workflow-step-ref-v1.schema.json" },
+    "workspace_ref": { "$ref": "#/$defs/workspaceRef" },
+    "principal_provenance_hash": { "$ref": "#/$defs/sha256" },
+    "scenario_key": { "$ref": "#/$defs/machineKey" },
+    "action_key": { "$ref": "#/$defs/machineKey" },
+    "handler_key": { "$ref": "#/$defs/machineKey" },
+    "action_contract_hash": { "$ref": "#/$defs/sha256" },
+    "driver": { "const": "workflow_claimed_step_v1" },
+    "client_mutation_id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$" },
+    "request_correlation_hash": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "machineKey": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-z][a-z0-9._:-]*$" },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "workspaceRef": {
+      "allOf": [
+        { "$ref": "canonical-ref-v1.schema.json" },
+        {
+          "type": "object",
+          "properties": {
+            "namespace": { "const": "my_chat" },
+            "object_type": { "const": "workspace" },
+            "object_id": { "type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$" }
+          }
+        }
+      ]
+    }
+  }
+}

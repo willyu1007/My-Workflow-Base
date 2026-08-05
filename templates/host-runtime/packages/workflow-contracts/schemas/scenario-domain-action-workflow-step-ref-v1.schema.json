@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-domain-action-workflow-step-ref-v1.schema.json",
+  "title": "ScenarioDomainActionWorkflowStepRefV1",
+  "description": "Exact content-free My-Chat Workflow Step reference for a claimed domain action.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "namespace", "object_type", "object_id"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "namespace": { "const": "my_chat" },
+    "object_type": { "const": "workflow_step" },
+    "object_id": { "type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$" }
+  }
+}

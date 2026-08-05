@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-domain-action-contract-v1.schema.json",
+  "title": "ScenarioDomainActionContractV1",
+  "description": "Static Base-neutral declaration for one scenario-owned domain action.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["action_contract_version", "scenario_key", "action_key", "input_schema_key", "input_schema_version", "target_ref_class", "confirmation_class", "entitled_ingress_keys", "handler_key", "command_contract", "driver"],
+  "properties": {
+    "action_contract_version": { "const": 1 },
+    "scenario_key": { "$ref": "#/$defs/machineKey" },
+    "action_key": { "$ref": "#/$defs/machineKey" },
+    "input_schema_key": { "$ref": "#/$defs/machineKey" },
+    "input_schema_version": { "type": "integer", "minimum": 1 },
+    "target_ref_class": { "$ref": "#/$defs/machineKey" },
+    "confirmation_class": { "enum": ["explicit", "strong_authorization"] },
+    "entitled_ingress_keys": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/machineKey" }
+    },
+    "handler_key": { "$ref": "#/$defs/machineKey" },
+    "command_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command_key", "command_contract_version"],
+      "properties": {
+        "command_key": { "$ref": "#/$defs/machineKey" },
+        "command_contract_version": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "driver": { "enum": ["scenario_direct_empty_v1", "workflow_claimed_step_v1"] }
+  },
+  "$defs": {
+    "machineKey": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-z][a-z0-9._:-]*$" }
+  }
+}
