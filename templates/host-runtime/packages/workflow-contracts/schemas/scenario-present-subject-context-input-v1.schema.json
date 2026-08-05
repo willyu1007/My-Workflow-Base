@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-present-subject-context-input-v1.schema.json",
+  "title": "PresentScenarioSubjectContextInputV1",
+  "description": "Read-only semantic presentation input after current subject-context resolution.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["presentation_version", "subject_context_ref", "presentation_key"],
+  "properties": {
+    "presentation_version": { "const": 1 },
+    "subject_context_ref": { "$ref": "#/$defs/opaqueLocator" },
+    "presentation_key": { "$ref": "#/$defs/machineKey" },
+    "view_query": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["view_mode"],
+      "properties": {
+        "view_mode": { "enum": ["current", "recent", "history"] },
+        "presentation_item_ref": { "$ref": "#/$defs/opaqueLocator" },
+        "cursor": { "$ref": "#/$defs/opaqueLocator" },
+        "page_size": { "type": "integer", "minimum": 1, "maximum": 20 }
+      }
+    }
+  },
+  "$defs": {
+    "machineKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._:-]*$"
+    },
+    "opaqueLocator": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 512,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    }
+  }
+}

@@ -7,6 +7,7 @@ const expected = [
   "canonical-ref-v1.schema.json",
   "generation-ticket-v1.schema.json",
   "integration-lock-v3.schema.json",
+  "scenario-action-offer-v1.schema.json",
   "scenario-canonical-binding-expected-head-v1.schema.json",
   "scenario-canonical-binding-intent-v1.schema.json",
   "scenario-canonical-binding-pair-request-v1.schema.json",
@@ -24,14 +25,19 @@ const expected = [
   "scenario-list-subject-contexts-input-v1.schema.json",
   "scenario-list-subject-contexts-result-v1.schema.json",
   "scenario-manifest-v2.schema.json",
+  "scenario-navigation-offer-v1.schema.json",
   "scenario-owner-binding-ref-v1.schema.json",
   "scenario-owner-binding-reservation-request-v1.schema.json",
   "scenario-owner-binding-reservation-result-v1.schema.json",
+  "scenario-present-subject-context-input-v1.schema.json",
+  "scenario-presentation-result-v1.schema.json",
   "scenario-private-invocation-v1.schema.json",
   "scenario-resolve-subject-context-input-v1.schema.json",
   "scenario-resolve-subject-context-result-v1.schema.json",
   "scenario-safe-reason-v1.schema.json",
   "scenario-safe-text-v1.schema.json",
+  "scenario-semantic-block-v1.schema.json",
+  "scenario-semantic-presentation-v1.schema.json",
   "scenario-subject-context-option-v1.schema.json",
   "scenario-workspace-activation-v1.schema.json",
 ];
@@ -101,6 +107,26 @@ for (const [schemaName, values] of [
   const validate = ajv.getSchema(`https://morethan.local/contracts/${schemaName}.schema.json`);
   if (!validate || values.some((value) => !validate(value))) {
     throw new Error(`subject-context provider fixture failed ${schemaName}: ${JSON.stringify(validate?.errors)}`);
+  }
+}
+
+const semanticPresentationFixture = JSON.parse(await readFile(
+  new URL("../fixtures/scenario-semantic-presentation.valid.json", import.meta.url),
+  "utf8",
+));
+for (const [schemaName, values] of [
+  ["scenario-present-subject-context-input-v1", [semanticPresentationFixture.input]],
+  ["scenario-semantic-block-v1", semanticPresentationFixture.presentation.blocks],
+  ["scenario-navigation-offer-v1", semanticPresentationFixture.presentation.navigation],
+  ["scenario-action-offer-v1", semanticPresentationFixture.presentation.actions],
+  ["scenario-semantic-presentation-v1", [semanticPresentationFixture.presentation]],
+  ["scenario-presentation-result-v1", [
+    { status: "ready", presentation: semanticPresentationFixture.presentation },
+  ]],
+]) {
+  const validate = ajv.getSchema(`https://morethan.local/contracts/${schemaName}.schema.json`);
+  if (!validate || values.some((value) => !validate(value))) {
+    throw new Error(`semantic presentation fixture failed ${schemaName}: ${JSON.stringify(validate?.errors)}`);
   }
 }
 

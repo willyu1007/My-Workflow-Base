@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-semantic-presentation-v1.schema.json",
+  "title": "ScenarioSemanticPresentationV1",
+  "description": "Bounded ephemeral semantic presentation with read-only navigation and prepare-only action offers.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "presentation_version",
+    "presentation_key",
+    "subject_context_ref",
+    "context_version",
+    "generated_at",
+    "blocks",
+    "navigation",
+    "actions"
+  ],
+  "properties": {
+    "presentation_version": { "const": 1 },
+    "presentation_key": { "$ref": "#/$defs/machineKey" },
+    "subject_context_ref": { "$ref": "#/$defs/opaqueLocator" },
+    "context_version": { "$ref": "#/$defs/opaqueVersion" },
+    "generated_at": { "$ref": "#/$defs/canonicalInstant" },
+    "blocks": {
+      "type": "array",
+      "maxItems": 20,
+      "items": { "$ref": "scenario-semantic-block-v1.schema.json" }
+    },
+    "navigation": {
+      "type": "array",
+      "maxItems": 8,
+      "items": { "$ref": "scenario-navigation-offer-v1.schema.json" }
+    },
+    "actions": {
+      "type": "array",
+      "maxItems": 8,
+      "items": { "$ref": "scenario-action-offer-v1.schema.json" }
+    }
+  },
+  "$defs": {
+    "machineKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._:-]*$"
+    },
+    "opaqueLocator": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 512,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "opaqueVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$"
+    },
+    "canonicalInstant": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    }
+  }
+}

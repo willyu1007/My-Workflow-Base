@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-semantic-block-v1.schema.json",
+  "title": "ScenarioSemanticBlockV1",
+  "description": "Closed flat semantic block union with no renderer or arbitrary extension payload.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "block_key", "tone", "narration"],
+  "properties": {
+    "kind": {
+      "enum": ["summary", "notice", "fact_group", "metric_group", "item_collection", "timeline"]
+    },
+    "block_key": { "$ref": "#/$defs/machineKey" },
+    "tone": { "$ref": "#/$defs/tone" },
+    "narration": { "enum": ["allowed", "display_only"] },
+    "title": { "$ref": "#/$defs/safeTitle" },
+    "body": { "$ref": "scenario-safe-text-v1.schema.json" },
+    "facts": {
+      "type": "array",
+      "maxItems": 20,
+      "items": { "$ref": "#/$defs/fact" }
+    },
+    "metrics": {
+      "type": "array",
+      "maxItems": 20,
+      "items": { "$ref": "#/$defs/metric" }
+    },
+    "items": {
+      "type": "array",
+      "maxItems": 20,
+      "items": { "$ref": "#/$defs/item" }
+    },
+    "entries": {
+      "type": "array",
+      "maxItems": 20,
+      "items": { "$ref": "#/$defs/entry" }
+    },
+    "next_cursor": { "$ref": "#/$defs/opaqueLocator" }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["body"],
+      "properties": {
+        "kind": { "enum": ["summary", "notice"] },
+        "title": true,
+        "body": true
+      },
+      "propertyNames": {
+        "enum": ["kind", "block_key", "tone", "narration", "title", "body"]
+      },
+      "minProperties": 5,
+      "maxProperties": 6
+    },
+    {
+      "type": "object",
+      "required": ["facts"],
+      "properties": { "kind": { "const": "fact_group" }, "title": true, "facts": true },
+      "propertyNames": {
+        "enum": ["kind", "block_key", "tone", "narration", "title", "facts"]
+      },
+      "minProperties": 5,
+      "maxProperties": 6
+    },
+    {
+      "type": "object",
+      "required": ["metrics"],
+      "properties": { "kind": { "const": "metric_group" }, "title": true, "metrics": true },
+      "propertyNames": {
+        "enum": ["kind", "block_key", "tone", "narration", "title", "metrics"]
+      },
+      "minProperties": 5,
+      "maxProperties": 6
+    },
+    {
+      "type": "object",
+      "required": ["items"],
+      "properties": {
+        "kind": { "const": "item_collection" },
+        "title": true,
+        "items": true,
+        "next_cursor": true
+      },
+      "propertyNames": {
+        "enum": ["kind", "block_key", "tone", "narration", "title", "items", "next_cursor"]
+      },
+      "minProperties": 5,
+      "maxProperties": 7
+    },
+    {
+      "type": "object",
+      "required": ["entries"],
+      "properties": {
+        "kind": { "const": "timeline" },
+        "title": true,
+        "entries": true,
+        "next_cursor": true
+      },
+      "propertyNames": {
+        "enum": ["kind", "block_key", "tone", "narration", "title", "entries", "next_cursor"]
+      },
+      "minProperties": 5,
+      "maxProperties": 7
+    }
+  ],
+  "$defs": {
+    "machineKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._:-]*$"
+    },
+    "metricKey": {
+      "allOf": [
+        { "$ref": "#/$defs/machineKey" },
+        {
+          "not": {
+            "type": "string",
+            "pattern": "(?:^|[._:-])(?:rank|ranking|score|trend|comparison|comparative)(?:$|[._:-])"
+          }
+        }
+      ]
+    },
+    "tone": {
+      "enum": ["neutral", "informational", "positive", "warning", "critical"]
+    },
+    "opaqueLocator": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 512,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "canonicalInstant": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    },
+    "safeLabel": {
+      "allOf": [
+        { "$ref": "scenario-safe-text-v1.schema.json" },
+        {
+          "type": "object",
+          "properties": { "value": { "type": "string", "maxLength": 80 } }
+        }
+      ]
+    },
+    "safeTitle": {
+      "allOf": [
+        { "$ref": "scenario-safe-text-v1.schema.json" },
+        {
+          "type": "object",
+          "properties": { "value": { "type": "string", "maxLength": 120 } }
+        }
+      ]
+    },
+    "badge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "tone"],
+      "properties": {
+        "label": { "$ref": "#/$defs/safeLabel" },
+        "tone": { "$ref": "#/$defs/tone" }
+      }
+    },
+    "fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fact_key", "label", "value", "tone"],
+      "properties": {
+        "fact_key": { "$ref": "#/$defs/machineKey" },
+        "label": { "$ref": "#/$defs/safeLabel" },
+        "value": { "$ref": "scenario-safe-text-v1.schema.json" },
+        "tone": { "$ref": "#/$defs/tone" }
+      }
+    },
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric_key", "label", "value", "tone"],
+      "properties": {
+        "metric_key": { "$ref": "#/$defs/metricKey" },
+        "label": { "$ref": "#/$defs/safeLabel" },
+        "value": { "$ref": "scenario-safe-text-v1.schema.json" },
+        "tone": { "$ref": "#/$defs/tone" }
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["item_key", "title", "badges"],
+      "properties": {
+        "item_key": { "$ref": "#/$defs/machineKey" },
+        "title": { "$ref": "#/$defs/safeTitle" },
+        "summary": { "$ref": "scenario-safe-text-v1.schema.json" },
+        "badges": { "type": "array", "items": { "$ref": "#/$defs/badge" } },
+        "occurred_at": { "$ref": "#/$defs/canonicalInstant" },
+        "presentation_item_ref": { "$ref": "#/$defs/opaqueLocator" }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entry_key", "title", "badges", "occurred_at"],
+      "properties": {
+        "entry_key": { "$ref": "#/$defs/machineKey" },
+        "title": { "$ref": "#/$defs/safeTitle" },
+        "summary": { "$ref": "scenario-safe-text-v1.schema.json" },
+        "badges": { "type": "array", "items": { "$ref": "#/$defs/badge" } },
+        "occurred_at": { "$ref": "#/$defs/canonicalInstant" },
+        "presentation_item_ref": { "$ref": "#/$defs/opaqueLocator" }
+      }
+    }
+  }
+}

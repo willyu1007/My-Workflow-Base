@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-navigation-offer-v1.schema.json",
+  "title": "ScenarioNavigationOfferV1",
+  "description": "Read-only registered route offer with no URL, target or durable effect.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["route_class", "label", "priority", "narration"],
+  "properties": {
+    "route_class": { "$ref": "#/$defs/machineKey" },
+    "label": { "$ref": "#/$defs/safeLabel" },
+    "view_mode": { "enum": ["current", "recent", "history"] },
+    "continuation_ref": { "$ref": "#/$defs/opaqueLocator" },
+    "priority": { "enum": ["primary", "secondary", "tertiary"] },
+    "narration": { "enum": ["allowed", "display_only"] }
+  },
+  "$defs": {
+    "machineKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._:-]*$"
+    },
+    "opaqueLocator": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 512,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "safeLabel": {
+      "allOf": [
+        { "$ref": "scenario-safe-text-v1.schema.json" },
+        {
+          "type": "object",
+          "properties": { "value": { "type": "string", "maxLength": 80 } }
+        }
+      ]
+    }
+  }
+}

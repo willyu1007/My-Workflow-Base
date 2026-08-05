@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-action-offer-v1.schema.json",
+  "title": "ScenarioActionOfferV1",
+  "description": "Closed prepare-only action offer. Available target refs never authorize submit.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["availability", "action_key", "label", "priority", "tone", "narration"],
+  "properties": {
+    "availability": { "enum": ["available", "unavailable"] },
+    "action_key": { "$ref": "#/$defs/machineKey" },
+    "label": { "$ref": "#/$defs/safeLabel" },
+    "help": { "$ref": "#/$defs/safeHelp" },
+    "target_ref": { "$ref": "#/$defs/opaqueLocator" },
+    "expected_version": { "$ref": "#/$defs/opaqueVersion" },
+    "confirmation_class": { "enum": ["explicit", "strong_authorization"] },
+    "safe_reason": { "$ref": "scenario-safe-reason-v1.schema.json" },
+    "priority": { "enum": ["primary", "secondary", "tertiary"] },
+    "tone": { "enum": ["neutral", "informational", "positive", "warning", "critical"] },
+    "narration": { "enum": ["allowed", "display_only"] }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["target_ref", "confirmation_class"],
+      "properties": {
+        "availability": { "const": "available" },
+        "help": true,
+        "target_ref": true,
+        "expected_version": true,
+        "confirmation_class": true
+      },
+      "propertyNames": {
+        "enum": [
+          "availability",
+          "action_key",
+          "label",
+          "help",
+          "target_ref",
+          "expected_version",
+          "confirmation_class",
+          "priority",
+          "tone",
+          "narration"
+        ]
+      },
+      "minProperties": 8,
+      "maxProperties": 10
+    },
+    {
+      "type": "object",
+      "required": ["safe_reason"],
+      "properties": {
+        "availability": { "const": "unavailable" },
+        "safe_reason": true
+      },
+      "propertyNames": {
+        "enum": [
+          "availability",
+          "action_key",
+          "label",
+          "safe_reason",
+          "priority",
+          "tone",
+          "narration"
+        ]
+      },
+      "minProperties": 7,
+      "maxProperties": 7
+    }
+  ],
+  "$defs": {
+    "machineKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._:-]*$"
+    },
+    "opaqueLocator": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 512,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "opaqueVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$"
+    },
+    "safeLabel": {
+      "allOf": [
+        { "$ref": "scenario-safe-text-v1.schema.json" },
+        {
+          "type": "object",
+          "properties": { "value": { "type": "string", "maxLength": 80 } }
+        }
+      ]
+    },
+    "safeHelp": {
+      "allOf": [
+        { "$ref": "scenario-safe-text-v1.schema.json" },
+        {
+          "type": "object",
+          "properties": { "value": { "type": "string", "maxLength": 240 } }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-presentation-result-v1.schema.json",
+  "title": "ScenarioPresentationResultV1",
+  "description": "Closed semantic presentation result. Provider outage remains an HTTP boundary failure, not a result variant.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status"],
+  "properties": {
+    "status": { "enum": ["ready", "empty", "context_changed", "unavailable"] },
+    "presentation": { "$ref": "scenario-semantic-presentation-v1.schema.json" },
+    "safe_reason": { "$ref": "scenario-safe-reason-v1.schema.json" }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["presentation"],
+      "properties": {
+        "status": { "enum": ["ready", "empty"] },
+        "presentation": true
+      },
+      "minProperties": 2,
+      "maxProperties": 2
+    },
+    {
+      "type": "object",
+      "required": ["safe_reason"],
+      "properties": {
+        "status": { "enum": ["context_changed", "unavailable"] },
+        "safe_reason": true
+      },
+      "minProperties": 2,
+      "maxProperties": 2
+    }
+  ]
+}

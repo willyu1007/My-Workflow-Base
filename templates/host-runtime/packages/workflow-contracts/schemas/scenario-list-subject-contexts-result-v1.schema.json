@@ -37,6 +37,9 @@
         "candidates": true,
         "next_cursor": true
       },
+      "propertyNames": {
+        "enum": ["status", "scope_kind", "candidates", "next_cursor"]
+      },
       "minProperties": 3,
       "maxProperties": 4
     },

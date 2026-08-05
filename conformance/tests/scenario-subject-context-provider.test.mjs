@@ -150,6 +150,12 @@ test("selection remains owner-curated, bounded and unique", () => {
     code: "duplicate_subject_context_ref",
   });
 
+  const mixed = clone(fixture.list_results[1]);
+  delete mixed.next_cursor;
+  mixed.safe_reason = clone(fixture.list_results[2].safe_reason);
+  assertSchemaRejects(validateListResult, mixed);
+  assert.throws(() => assertListScenarioSubjectContextsResultV1(mixed));
+
   const over = clone(fixture.list_results[1]);
   over.candidates = Array.from({ length: 21 }, (_, index) => ({
     ...clone(fixture.options[0]),
