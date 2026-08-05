@@ -21,13 +21,18 @@ const expected = [
   "scenario-identity-operation-status-lookup-request-v1.schema.json",
   "scenario-identity-operation-status-lookup-result-v1.schema.json",
   "scenario-ingress-surface-v1.schema.json",
+  "scenario-list-subject-contexts-input-v1.schema.json",
+  "scenario-list-subject-contexts-result-v1.schema.json",
   "scenario-manifest-v2.schema.json",
   "scenario-owner-binding-ref-v1.schema.json",
   "scenario-owner-binding-reservation-request-v1.schema.json",
   "scenario-owner-binding-reservation-result-v1.schema.json",
   "scenario-private-invocation-v1.schema.json",
+  "scenario-resolve-subject-context-input-v1.schema.json",
+  "scenario-resolve-subject-context-result-v1.schema.json",
   "scenario-safe-reason-v1.schema.json",
   "scenario-safe-text-v1.schema.json",
+  "scenario-subject-context-option-v1.schema.json",
   "scenario-workspace-activation-v1.schema.json",
 ];
 
@@ -79,6 +84,23 @@ for (const [schemaName, value] of [
   const validate = ajv.getSchema(`https://morethan.local/contracts/${schemaName}.schema.json`);
   if (!validate || !validate(value)) {
     throw new Error(`presentation primitive fixture failed ${schemaName}: ${JSON.stringify(validate?.errors)}`);
+  }
+}
+
+const subjectContextProviderFixture = JSON.parse(await readFile(
+  new URL("../fixtures/scenario-subject-context-provider.valid.json", import.meta.url),
+  "utf8",
+));
+for (const [schemaName, values] of [
+  ["scenario-list-subject-contexts-input-v1", [subjectContextProviderFixture.list_input]],
+  ["scenario-resolve-subject-context-input-v1", [subjectContextProviderFixture.resolve_input]],
+  ["scenario-subject-context-option-v1", subjectContextProviderFixture.options],
+  ["scenario-list-subject-contexts-result-v1", subjectContextProviderFixture.list_results],
+  ["scenario-resolve-subject-context-result-v1", subjectContextProviderFixture.resolve_results],
+]) {
+  const validate = ajv.getSchema(`https://morethan.local/contracts/${schemaName}.schema.json`);
+  if (!validate || values.some((value) => !validate(value))) {
+    throw new Error(`subject-context provider fixture failed ${schemaName}: ${JSON.stringify(validate?.errors)}`);
   }
 }
 

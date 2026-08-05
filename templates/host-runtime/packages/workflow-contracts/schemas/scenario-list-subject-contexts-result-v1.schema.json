@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-list-subject-contexts-result-v1.schema.json",
+  "title": "ListScenarioSubjectContextsResultV1",
+  "description": "Closed owner-curated discovery result. Host selection, ranking and inference are forbidden.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status"],
+  "properties": {
+    "status": { "enum": ["resolved", "needs_selection", "unavailable"] },
+    "context": { "$ref": "scenario-subject-context-option-v1.schema.json" },
+    "scope_kind": { "const": "unresolved" },
+    "candidates": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": { "$ref": "scenario-subject-context-option-v1.schema.json" }
+    },
+    "next_cursor": { "$ref": "#/$defs/opaqueLocator" },
+    "safe_reason": { "$ref": "scenario-safe-reason-v1.schema.json" }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["context"],
+      "properties": { "status": { "const": "resolved" }, "context": true },
+      "minProperties": 2,
+      "maxProperties": 2
+    },
+    {
+      "type": "object",
+      "required": ["scope_kind", "candidates"],
+      "properties": {
+        "status": { "const": "needs_selection" },
+        "scope_kind": true,
+        "candidates": true,
+        "next_cursor": true
+      },
+      "minProperties": 3,
+      "maxProperties": 4
+    },
+    {
+      "type": "object",
+      "required": ["safe_reason"],
+      "properties": { "status": { "const": "unavailable" }, "safe_reason": true },
+      "minProperties": 2,
+      "maxProperties": 2
+    }
+  ],
+  "$defs": {
+    "opaqueLocator": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 512,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    }
+  }
+}

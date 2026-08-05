@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-list-subject-contexts-input-v1.schema.json",
+  "title": "ListScenarioSubjectContextsInputV1",
+  "description": "Scenario-private discovery input. Verified principal, Workspace and route remain in the enclosing invocation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["provider_version"],
+  "properties": {
+    "provider_version": { "const": 1 },
+    "cursor": { "$ref": "#/$defs/opaqueLocator" },
+    "page_size": { "type": "integer", "minimum": 1, "maximum": 20 }
+  },
+  "$defs": {
+    "opaqueLocator": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 512,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    }
+  }
+}

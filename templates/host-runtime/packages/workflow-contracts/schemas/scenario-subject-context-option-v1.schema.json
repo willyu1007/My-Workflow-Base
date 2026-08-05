@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-subject-context-option-v1.schema.json",
+  "title": "ScenarioSubjectContextOptionV1",
+  "description": "Owner-issued display-safe subject-context option. It carries no canonical identity or authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "subject_context_ref",
+    "scope_kind",
+    "route_class",
+    "safe_label",
+    "context_version",
+    "issued_at",
+    "expires_at"
+  ],
+  "properties": {
+    "subject_context_ref": { "$ref": "#/$defs/opaqueLocator" },
+    "scope_kind": { "enum": ["single_subject", "subject_collection"] },
+    "route_class": { "enum": ["subject_detail", "subject_collection"] },
+    "safe_label": { "$ref": "#/$defs/safeLabel" },
+    "safe_disambiguation": { "$ref": "#/$defs/safeLabel" },
+    "context_version": { "$ref": "#/$defs/opaqueVersion" },
+    "issued_at": { "$ref": "#/$defs/canonicalInstant" },
+    "expires_at": { "$ref": "#/$defs/canonicalInstant" }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "scope_kind": { "const": "single_subject" },
+        "route_class": { "const": "subject_detail" }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "scope_kind": { "const": "subject_collection" },
+        "route_class": { "const": "subject_collection" }
+      }
+    }
+  ],
+  "$defs": {
+    "opaqueLocator": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 512,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "opaqueVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$"
+    },
+    "canonicalInstant": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    },
+    "safeLabel": {
+      "allOf": [
+        { "$ref": "scenario-safe-text-v1.schema.json" },
+        {
+          "type": "object",
+          "properties": { "value": { "type": "string", "maxLength": 80 } }
+        }
+      ]
+    }
+  }
+}

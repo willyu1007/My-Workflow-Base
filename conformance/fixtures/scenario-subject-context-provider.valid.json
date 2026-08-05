@@ -1,0 +1,126 @@
+{
+  "list_input": {
+    "provider_version": 1,
+    "cursor": "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
+    "page_size": 10
+  },
+  "resolve_input": {
+    "provider_version": 1,
+    "subject_context_ref": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+    "known_context_version": "context-version-0"
+  },
+  "options": [
+    {
+      "subject_context_ref": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+      "scope_kind": "single_subject",
+      "route_class": "subject_detail",
+      "safe_label": {
+        "kind": "plain_text",
+        "value": "Example A",
+        "locale": "en-US"
+      },
+      "safe_disambiguation": {
+        "kind": "plain_text",
+        "value": "Current scope",
+        "locale": "en-US"
+      },
+      "context_version": "context-version-1",
+      "issued_at": "2026-08-05T10:00:00.000Z",
+      "expires_at": "2026-08-05T10:30:00.000Z"
+    },
+    {
+      "subject_context_ref": "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+      "scope_kind": "subject_collection",
+      "route_class": "subject_collection",
+      "safe_label": {
+        "kind": "plain_text",
+        "value": "Example collection",
+        "locale": "en-US"
+      },
+      "context_version": "context-version-2",
+      "issued_at": "2026-08-05T10:00:00.000Z",
+      "expires_at": "2026-08-05T10:29:59.000Z"
+    }
+  ],
+  "list_results": [
+    {
+      "status": "resolved",
+      "context": {
+        "subject_context_ref": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+        "scope_kind": "single_subject",
+        "route_class": "subject_detail",
+        "safe_label": { "kind": "plain_text", "value": "Example A", "locale": "en-US" },
+        "safe_disambiguation": { "kind": "plain_text", "value": "Current scope", "locale": "en-US" },
+        "context_version": "context-version-1",
+        "issued_at": "2026-08-05T10:00:00.000Z",
+        "expires_at": "2026-08-05T10:30:00.000Z"
+      }
+    },
+    {
+      "status": "needs_selection",
+      "scope_kind": "unresolved",
+      "candidates": [
+        {
+          "subject_context_ref": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+          "scope_kind": "single_subject",
+          "route_class": "subject_detail",
+          "safe_label": { "kind": "plain_text", "value": "Example A", "locale": "en-US" },
+          "safe_disambiguation": { "kind": "plain_text", "value": "Current scope", "locale": "en-US" },
+          "context_version": "context-version-1",
+          "issued_at": "2026-08-05T10:00:00.000Z",
+          "expires_at": "2026-08-05T10:30:00.000Z"
+        },
+        {
+          "subject_context_ref": "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+          "scope_kind": "subject_collection",
+          "route_class": "subject_collection",
+          "safe_label": { "kind": "plain_text", "value": "Example collection", "locale": "en-US" },
+          "context_version": "context-version-2",
+          "issued_at": "2026-08-05T10:00:00.000Z",
+          "expires_at": "2026-08-05T10:29:59.000Z"
+        }
+      ],
+      "next_cursor": "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII"
+    },
+    {
+      "status": "unavailable",
+      "safe_reason": {
+        "reason_code": "example_unavailable",
+        "message": { "kind": "plain_text", "value": "This context is unavailable.", "locale": "en-US" },
+        "retry_class": "refresh"
+      }
+    }
+  ],
+  "resolve_results": [
+    {
+      "status": "resolved",
+      "context": {
+        "subject_context_ref": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+        "scope_kind": "single_subject",
+        "route_class": "subject_detail",
+        "safe_label": { "kind": "plain_text", "value": "Example A", "locale": "en-US" },
+        "safe_disambiguation": { "kind": "plain_text", "value": "Current scope", "locale": "en-US" },
+        "context_version": "context-version-1",
+        "issued_at": "2026-08-05T10:00:00.000Z",
+        "expires_at": "2026-08-05T10:30:00.000Z"
+      },
+      "resolved_at": "2026-08-05T10:00:01.000Z"
+    },
+    {
+      "status": "context_changed",
+      "safe_reason": {
+        "reason_code": "example_context_changed",
+        "message": { "kind": "plain_text", "value": "The current context changed.", "locale": "en-US" },
+        "retry_class": "refresh"
+      }
+    },
+    {
+      "status": "unavailable",
+      "safe_reason": {
+        "reason_code": "example_unavailable",
+        "message": { "kind": "plain_text", "value": "This context is unavailable.", "locale": "en-US" },
+        "retry_class": "refresh"
+      }
+    }
+  ]
+}
