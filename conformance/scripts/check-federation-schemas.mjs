@@ -26,6 +26,8 @@ const expected = [
   "scenario-owner-binding-reservation-request-v1.schema.json",
   "scenario-owner-binding-reservation-result-v1.schema.json",
   "scenario-private-invocation-v1.schema.json",
+  "scenario-safe-reason-v1.schema.json",
+  "scenario-safe-text-v1.schema.json",
   "scenario-workspace-activation-v1.schema.json",
 ];
 
@@ -64,6 +66,20 @@ const validateInvocation = ajv.getSchema(
 );
 if (!validateInvocation || !validateInvocation(invocationFixture)) {
   throw new Error(`scenario private invocation fixture failed schema execution: ${JSON.stringify(validateInvocation?.errors)}`);
+}
+
+const presentationPrimitiveFixture = JSON.parse(await readFile(
+  new URL("../fixtures/scenario-presentation-primitives.valid.json", import.meta.url),
+  "utf8",
+));
+for (const [schemaName, value] of [
+  ["scenario-safe-text-v1", presentationPrimitiveFixture.safe_text],
+  ["scenario-safe-reason-v1", presentationPrimitiveFixture.safe_reason],
+]) {
+  const validate = ajv.getSchema(`https://morethan.local/contracts/${schemaName}.schema.json`);
+  if (!validate || !validate(value)) {
+    throw new Error(`presentation primitive fixture failed ${schemaName}: ${JSON.stringify(validate?.errors)}`);
+  }
 }
 
 for (const [schemaName, fixtureName] of [

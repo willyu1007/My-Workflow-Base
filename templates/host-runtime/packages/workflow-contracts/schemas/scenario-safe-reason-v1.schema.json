@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-safe-reason-v1.schema.json",
+  "title": "ScenarioSafeReasonV1",
+  "description": "Entitled owner-safe reason copy with generic Host retry routing.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["reason_code", "message", "retry_class"],
+  "properties": {
+    "reason_code": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._:-]*$"
+    },
+    "message": { "$ref": "scenario-safe-text-v1.schema.json" },
+    "help": {
+      "allOf": [
+        { "$ref": "scenario-safe-text-v1.schema.json" },
+        {
+          "type": "object",
+          "properties": { "value": { "type": "string", "maxLength": 240 } }
+        }
+      ]
+    },
+    "retry_class": {
+      "enum": ["none", "refresh", "retry_later", "contact_support"]
+    }
+  }
+}

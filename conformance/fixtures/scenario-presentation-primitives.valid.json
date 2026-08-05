@@ -1,0 +1,26 @@
+{
+  "safe_text": {
+    "kind": "plain_text",
+    "value": "Current information is ready.",
+    "locale": "en-US"
+  },
+  "safe_reason": {
+    "reason_code": "example_temporarily_unavailable",
+    "message": {
+      "kind": "plain_text",
+      "value": "This view is temporarily unavailable.",
+      "locale": "en-US"
+    },
+    "help": {
+      "kind": "plain_text",
+      "value": "Try again later.",
+      "locale": "en-US"
+    },
+    "retry_class": "retry_later"
+  },
+  "subject_context_ref": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+  "presentation_item_ref": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+  "action_target_ref": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+  "cursor": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+  "continuation_ref": "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"
+}

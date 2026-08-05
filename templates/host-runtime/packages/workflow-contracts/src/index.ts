@@ -10,5 +10,7 @@ export * from "./types/scenario-binding.js";
 export * from "./types/scenario-binding-validation.js";
 export * from "./types/scenario-invocation.js";
 export * from "./types/scenario-invocation-validation.js";
+export * from "./types/scenario-presentation.js";
+export * from "./types/scenario-presentation-validation.js";
 export * from "./types/scenario-release.js";
 export * from "./types/validation.js";
