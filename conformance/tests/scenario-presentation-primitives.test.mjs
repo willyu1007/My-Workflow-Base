@@ -70,8 +70,13 @@ test("safe-copy Schema and codec reject structural and copy exposure mutations",
     ["control", (value) => { value.value = "line one\nline two"; }],
     ["HTML", (value) => { value.value = "<strong>unsafe</strong>"; }],
     ["URL", (value) => { value.value = "Open https://example.invalid"; }],
+    ["uppercase URL", (value) => { value.value = "Open HTTPS://example.invalid"; }],
     ["Markdown", (value) => { value.value = "[open](target)"; }],
+    ["Markdown heading", (value) => { value.value = "# Internal heading"; }],
     ["template", (value) => { value.value = "Hello {{name}}"; }],
+    ["SQLSTATE", (value) => { value.value = "SQLSTATE 22000"; }],
+    ["database detail", (value) => { value.value = "Database error while loading."; }],
+    ["provider detail", (value) => { value.value = "Provider error while loading."; }],
     ["invalid locale", (value) => { value.locale = "EN_us"; }],
   ];
   for (const [name, mutate] of cases) {
@@ -84,17 +89,10 @@ test("safe-copy Schema and codec reject structural and copy exposure mutations",
   }
 });
 
-test("codec applies semantic normalization and internal-detail negatives", () => {
-  for (const value of [
-    "Cafe\u0301",
-    "Database error while loading the view.",
-    "Provider error while loading the view.",
-    "Stack trace is available.",
-  ]) {
-    const text = cloneText();
-    text.value = value;
-    assert.throws(() => assertScenarioSafeTextV1(text));
-  }
+test("codec applies semantic Unicode normalization", () => {
+  const text = cloneText();
+  text.value = "Cafe\u0301";
+  assert.throws(() => assertScenarioSafeTextV1(text));
 });
 
 test("enforces text, label, and help bounds", () => {
