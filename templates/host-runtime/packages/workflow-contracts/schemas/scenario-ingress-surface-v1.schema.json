@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-ingress-surface-v1.schema.json",
+  "title": "ScenarioIngressSurfaceV1",
+  "description": "Registered host ingress that produced a scenario-private invocation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ingress_version", "ingress_category", "ingress_key"],
+  "properties": {
+    "ingress_version": { "const": 1 },
+    "ingress_category": { "enum": ["product_surface", "host_transition", "workflow_runtime"] },
+    "ingress_key": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-z][a-z0-9._:-]*$" }
+  }
+}

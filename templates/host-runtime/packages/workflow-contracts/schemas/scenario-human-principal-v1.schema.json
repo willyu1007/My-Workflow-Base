@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-human-principal-v1.schema.json",
+  "title": "ScenarioHumanPrincipalV1",
+  "description": "Human principal projected by My-Chat for a scenario-private invocation. It carries identity context, never authorization or business facts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["principal_version", "principal_kind", "account_ref", "actor_ref", "workspace_ref", "principal_origin"],
+  "properties": {
+    "principal_version": { "const": 1 },
+    "principal_kind": { "const": "human_user" },
+    "account_ref": { "$ref": "#/$defs/accountRef" },
+    "actor_ref": { "$ref": "#/$defs/actorRef" },
+    "workspace_ref": { "$ref": "#/$defs/workspaceRef" },
+    "principal_origin": { "enum": ["interactive_session", "durable_run_actor"] }
+  },
+  "$defs": {
+    "accountRef": {
+      "allOf": [
+        { "$ref": "canonical-ref-v1.schema.json" },
+        {
+          "type": "object",
+          "properties": {
+            "namespace": { "const": "my_chat" },
+            "object_type": { "const": "user" },
+            "object_id": { "type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$" }
+          }
+        }
+      ]
+    },
+    "actorRef": {
+      "allOf": [
+        { "$ref": "canonical-ref-v1.schema.json" },
+        {
+          "type": "object",
+          "properties": {
+            "namespace": { "const": "my_chat" },
+            "object_type": { "const": "actor" },
+            "object_id": { "type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$" }
+          }
+        }
+      ]
+    },
+    "workspaceRef": {
+      "allOf": [
+        { "$ref": "canonical-ref-v1.schema.json" },
+        {
+          "type": "object",
+          "properties": {
+            "namespace": { "const": "my_chat" },
+            "object_type": { "const": "workspace" },
+            "object_id": { "type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$" }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -16,6 +16,8 @@
     "semantic-lint": "node scripts/semantic-lint.mjs"
   },
   "dependencies": {
-    "@host/workflow-contracts": "workspace:*"
+    "@host/workflow-contracts": "workspace:*",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1"
   }
 }
