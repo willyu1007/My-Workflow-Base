@@ -214,6 +214,11 @@ test("D4 recovers a lost bind response only through the same body-free Step look
   ));
   assert.doesNotThrow(() => assertLookupScenarioDomainActionStepBindingExchangeV1(
     fixture.binding_lookup_input,
+    fixture.binding_lookup_results[2],
+    storedBinding,
+  ));
+  assert.doesNotThrow(() => assertLookupScenarioDomainActionStepBindingExchangeV1(
+    fixture.binding_lookup_input,
     fixture.binding_lookup_results[1],
   ));
 

@@ -113,6 +113,28 @@ test("D2 codec enforces 32 KiB action input and five-minute lifetimes", () => {
   });
 });
 
+test("D2 codec rejects values that JSON serialization would silently rewrite", () => {
+  for (const actionInput of [
+    { value: undefined },
+    { value: Number.NaN },
+    { value: new Date("2026-08-05T00:00:00.000Z") },
+    { value: () => "omitted" },
+  ]) {
+    const input = clone(fixture.prepare_input);
+    input.action_input = actionInput;
+    assert.throws(() => assertPrepareScenarioDomainActionInputV1(input), {
+      code: "invalid_json_value",
+    });
+  }
+  const cyclic = {};
+  cyclic.self = cyclic;
+  const input = clone(fixture.prepare_input);
+  input.action_input = cyclic;
+  assert.throws(() => assertPrepareScenarioDomainActionInputV1(input), {
+    code: "invalid_json_value",
+  });
+});
+
 test("D2 prepare exchange binds contract, target, ingress and delegated input codec", () => {
   const context = {
     scenario_key: fixture.contract.scenario_key,

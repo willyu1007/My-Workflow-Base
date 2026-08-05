@@ -174,6 +174,16 @@ test("D3 exact replay rejects payload drift, wrong Step and changed seed", () =>
     { code: "request_conflict" },
   );
 
+  assert.throws(
+    () => assertScenarioDomainActionExactReplayV1(
+      fixture.execution_bindings[0],
+      fixture.execution_bindings[0],
+      fixture.execution_results[0],
+      fixture.execution_results[2],
+    ),
+    { code: "invalid_replay_state" },
+  );
+
   const wrongStep = clone(fixture.execution_bindings[1]);
   wrongStep.effect_identity.original_workflow_step_ref.object_id = "step_example_02";
   const claimedReplay = clone(fixture.execution_results[1]);

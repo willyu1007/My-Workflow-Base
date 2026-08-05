@@ -274,6 +274,44 @@ const serializedUtf8Bytes = (value: unknown, path: string): number => {
   return Buffer.byteLength(serialized, "utf8");
 };
 
+const assertJsonValue = (
+  value: unknown,
+  path: string,
+  ancestors = new Set<object>(),
+): void => {
+  if (
+    value === null ||
+    typeof value === "string" ||
+    typeof value === "boolean"
+  ) {
+    return;
+  }
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) {
+      fail("invalid_json_value", path, `${path} must contain only finite JSON numbers`);
+    }
+    return;
+  }
+  if (typeof value !== "object") {
+    fail("invalid_json_value", path, `${path} must contain only JSON values`);
+  }
+  if (ancestors.has(value)) {
+    fail("invalid_json_value", path, `${path} must not contain a cyclic value`);
+  }
+  const nextAncestors = new Set(ancestors).add(value);
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => assertJsonValue(item, `${path}.${index}`, nextAncestors));
+    return;
+  }
+  const prototype = Object.getPrototypeOf(value);
+  if (prototype !== Object.prototype && prototype !== null) {
+    fail("invalid_json_value", path, `${path} must contain only plain JSON objects`);
+  }
+  Object.entries(value).forEach(([key, item]) =>
+    assertJsonValue(item, `${path}.${key}`, nextAncestors),
+  );
+};
+
 const assertWorkspaceRef: (
   value: unknown,
   path: string,
@@ -467,6 +505,7 @@ export const assertPrepareScenarioDomainActionInputV1: (
   if (!isRecord(record.action_input)) {
     fail("invalid_action_input", `${path}.action_input`, "action_input must be a JSON object");
   }
+  assertJsonValue(record.action_input, `${path}.action_input`);
   if (serializedUtf8Bytes(record.action_input, `${path}.action_input`) > maximumActionInputBytes) {
     fail(
       "action_input_too_large",
@@ -1090,21 +1129,26 @@ export const assertScenarioDomainActionExactReplayV1 = (
       "changed immutable identity or payload cannot exact-replay",
     );
   }
-  if (originalResult.status === "committed" && replayResult.status === "committed") {
-    if (replayResult.disposition !== "replayed") {
-      fail(
-        "invalid_replay_disposition",
-        "replay_result.disposition",
-        "an exact replay invocation must report replayed",
-      );
-    }
-    if (committedReplayProjection(originalResult) !== committedReplayProjection(replayResult)) {
-      fail(
-        "replay_result_mismatch",
-        "replay_result",
-        "exact replay must preserve outcome, refs and snapshots",
-      );
-    }
+  if (originalResult.status !== "committed" || replayResult.status !== "committed") {
+    fail(
+      "invalid_replay_state",
+      "replay_result.status",
+      "exact replay comparison requires committed original and replay results",
+    );
+  }
+  if (replayResult.disposition !== "replayed") {
+    fail(
+      "invalid_replay_disposition",
+      "replay_result.disposition",
+      "an exact replay invocation must report replayed",
+    );
+  }
+  if (committedReplayProjection(originalResult) !== committedReplayProjection(replayResult)) {
+    fail(
+      "replay_result_mismatch",
+      "replay_result",
+      "exact replay must preserve outcome, refs and snapshots",
+    );
   }
 };
 
@@ -1419,6 +1463,9 @@ export const assertLookupScenarioDomainActionStepBindingExchangeV1 = (
 ): void => {
   assertLookupScenarioDomainActionStepBindingInputV1(input);
   assertLookupScenarioDomainActionStepBindingResultV1(result);
+  if (result.status === "unavailable") {
+    return;
+  }
   if (storedBinding === undefined) {
     if (result.status === "bound") {
       fail("unexpected_binding", "binding_lookup_result", "lookup cannot invent a binding");
