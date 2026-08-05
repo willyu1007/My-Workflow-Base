@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-owner-binding-ref-v1.schema.json",
+  "title": "ScenarioOwnerBindingRefV1",
+  "description": "Body-free Scenario-owned endpoint for one registered canonical-object binding slot. The reference grants no business authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["owner_binding_ref_version", "binding_slot", "owner_ref"],
+  "properties": {
+    "owner_binding_ref_version": { "const": 1 },
+    "binding_slot": { "$ref": "#/$defs/machineKey" },
+    "owner_ref": { "$ref": "canonical-ref-v1.schema.json" }
+  },
+  "$defs": {
+    "machineKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._:-]*$"
+    }
+  }
+}

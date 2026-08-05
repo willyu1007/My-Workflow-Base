@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-owner-binding-reservation-result-v1.schema.json",
+  "title": "ScenarioOwnerBindingReservationResultV1",
+  "description": "Scenario-private reservation result containing only the typed Scenario owner endpoint and opaque reservation evidence.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["reservation_result_version", "identity_operation_id", "disposition", "owner_binding", "reservation_version", "reservation_evidence_hash"],
+  "properties": {
+    "reservation_result_version": { "const": 1 },
+    "identity_operation_id": { "$ref": "#/$defs/opaqueId" },
+    "disposition": { "enum": ["reserved", "exact_replay"] },
+    "owner_binding": { "$ref": "scenario-owner-binding-ref-v1.schema.json" },
+    "reservation_version": { "type": "integer", "minimum": 0 },
+    "reservation_evidence_hash": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

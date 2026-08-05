@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-owner-binding-reservation-request-v1.schema.json",
+  "title": "ScenarioOwnerBindingReservationRequestV1",
+  "description": "Scenario-private reservation request that keeps canonical object identity inside the Host owner.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["reservation_request_version", "identity_operation_id", "binding_slot", "canonical_object_evidence_hash", "canonical_request_hash"],
+  "properties": {
+    "reservation_request_version": { "const": 1 },
+    "identity_operation_id": { "$ref": "#/$defs/opaqueId" },
+    "binding_slot": { "$ref": "#/$defs/machineKey" },
+    "canonical_object_evidence_hash": { "$ref": "#/$defs/sha256" },
+    "canonical_request_hash": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "machineKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._:-]*$"
+    },
+    "opaqueId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

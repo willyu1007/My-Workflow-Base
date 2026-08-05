@@ -1,0 +1,7 @@
+{
+  "reservation_request_version": 1,
+  "identity_operation_id": "identity-operation-01",
+  "binding_slot": "canonical.subject.primary",
+  "canonical_object_evidence_hash": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "canonical_request_hash": "123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"
+}
