@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-current-owner-binding-pair-evidence-v1.schema.json",
+  "title": "ScenarioCurrentOwnerBindingPairEvidenceV1",
+  "description": "Scenario-private current-owner evidence carried only as an I1-A operation input.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["binding_evidence_version", "purpose_key", "owner_bindings", "pair_relation_evidence_hash", "current_owner_evidence_hash"],
+  "properties": {
+    "binding_evidence_version": { "const": 1 },
+    "purpose_key": { "$ref": "#/$defs/machineKey" },
+    "owner_bindings": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "$ref": "scenario-owner-binding-ref-v1.schema.json" }
+    },
+    "pair_relation_evidence_hash": { "$ref": "#/$defs/sha256" },
+    "current_owner_evidence_hash": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "machineKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._:-]*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

@@ -2,12 +2,16 @@ import { assertCanonicalRef } from "./federation-validation.js";
 import {
   scenarioCanonicalBindingEffects,
   scenarioCanonicalBindingPairDispositions,
+  scenarioIdentityOperationUnknownReasons,
   scenarioOwnerBindingReservationDispositions,
   type ScenarioCanonicalBindingExpectedHeadV1,
   type ScenarioCanonicalBindingIntentV1,
   type ScenarioCanonicalBindingPairRequestV1,
   type ScenarioCanonicalBindingPairResultV1,
   type ScenarioCanonicalBindingResultItemV1,
+  type ScenarioCurrentOwnerBindingPairEvidenceV1,
+  type ScenarioIdentityOperationStatusLookupRequestV1,
+  type ScenarioIdentityOperationStatusLookupResultV1,
   type ScenarioOwnerBindingRefV1,
   type ScenarioOwnerBindingReservationRequestV1,
   type ScenarioOwnerBindingReservationResultV1,
@@ -82,13 +86,55 @@ const pairResultKeys = new Set([
   "bindings",
   "pair_commit_evidence_hash",
 ]);
+const currentOwnerEvidenceKeys = new Set([
+  "binding_evidence_version",
+  "purpose_key",
+  "owner_bindings",
+  "pair_relation_evidence_hash",
+  "current_owner_evidence_hash",
+]);
+const statusLookupRequestKeys = new Set([
+  "status_lookup_request_version",
+  "identity_operation_id",
+  "owner_bindings",
+  "association_expectation_hash",
+  "scenario_command_id",
+  "scenario_command_hash",
+  "principal_provenance_hash",
+  "host_identity_evidence_hash",
+  "deadline_evidence_hash",
+  "attempt_ledger_hash",
+]);
+const statusLookupResultCommonKeys = [
+  "status_lookup_result_version",
+  "identity_operation_id",
+  "scenario_command_id",
+  "checked_at",
+  "request_nonce_hash",
+  "status",
+] as const;
+const committedStatusResultKeys = new Set([
+  ...statusLookupResultCommonKeys,
+  "scenario_execution_ref",
+  "scenario_commit_evidence_hash",
+]);
+const confirmedNoEffectStatusResultKeys = new Set([
+  ...statusLookupResultCommonKeys,
+  "no_effect_fence_evidence_hash",
+]);
+const unknownStatusResultKeys = new Set([
+  ...statusLookupResultCommonKeys,
+  "reason_code",
+]);
 const reservationDispositions = new Set<string>(scenarioOwnerBindingReservationDispositions);
 const bindingEffects = new Set<string>(scenarioCanonicalBindingEffects);
 const pairDispositions = new Set<string>(scenarioCanonicalBindingPairDispositions);
+const identityOperationUnknownReasons = new Set<string>(scenarioIdentityOperationUnknownReasons);
 const machineKeyPattern = /^[a-z][a-z0-9._:-]{0,127}$/u;
 const scenarioKeyPattern = /^[a-z][a-z0-9-]{0,63}$/u;
 const opaqueIdPattern = /^[A-Za-z0-9][A-Za-z0-9._:~-]{0,199}$/u;
 const sha256Pattern = /^[a-f0-9]{64}$/u;
+const canonicalInstantPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u;
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === "object" && !Array.isArray(value);
@@ -134,6 +180,16 @@ const assertSha256 = (value: unknown, path: string) => {
 const assertNonNegativeInteger = (value: unknown, path: string) => {
   if (!Number.isInteger(value) || Number(value) < 0) {
     fail("invalid_integer", path, `${path} must be a non-negative integer`);
+  }
+};
+
+const assertCanonicalInstant = (value: unknown, path: string) => {
+  if (typeof value !== "string" || !canonicalInstantPattern.test(value)) {
+    fail("invalid_instant", path, `${path} must be a canonical UTC instant`);
+  }
+  const epoch = Date.parse(value);
+  if (!Number.isFinite(epoch) || new Date(epoch).toISOString() !== value) {
+    fail("invalid_instant", path, `${path} must be a valid canonical UTC instant`);
   }
 };
 
@@ -420,4 +476,113 @@ export const assertScenarioCanonicalBindingPairExchangeV1 = (
       );
     }
   });
+};
+
+export const assertScenarioCurrentOwnerBindingPairEvidenceV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is ScenarioCurrentOwnerBindingPairEvidenceV1 = (
+  value,
+  path = "current_owner_binding_evidence",
+) => {
+  const record = assertRecord(value, path);
+  assertKeys(record, currentOwnerEvidenceKeys, path);
+  assertVersion(record.binding_evidence_version, 1, `${path}.binding_evidence_version`);
+  assertMachineKey(record.purpose_key, `${path}.purpose_key`);
+  assertExactOrderedPair(
+    record.owner_bindings,
+    assertScenarioOwnerBindingRefV1,
+    `${path}.owner_bindings`,
+  );
+  assertSha256(record.pair_relation_evidence_hash, `${path}.pair_relation_evidence_hash`);
+  assertSha256(record.current_owner_evidence_hash, `${path}.current_owner_evidence_hash`);
+};
+
+export const assertScenarioIdentityOperationStatusLookupRequestV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is ScenarioIdentityOperationStatusLookupRequestV1 = (
+  value,
+  path = "status_lookup_request",
+) => {
+  const record = assertRecord(value, path);
+  assertKeys(record, statusLookupRequestKeys, path);
+  assertVersion(record.status_lookup_request_version, 1, `${path}.status_lookup_request_version`);
+  assertOpaqueId(record.identity_operation_id, `${path}.identity_operation_id`);
+  assertExactOrderedPair(
+    record.owner_bindings,
+    assertScenarioOwnerBindingRefV1,
+    `${path}.owner_bindings`,
+  );
+  assertSha256(record.association_expectation_hash, `${path}.association_expectation_hash`);
+  assertOpaqueId(record.scenario_command_id, `${path}.scenario_command_id`);
+  for (const field of [
+    "scenario_command_hash",
+    "principal_provenance_hash",
+    "host_identity_evidence_hash",
+    "deadline_evidence_hash",
+    "attempt_ledger_hash",
+  ] as const) {
+    assertSha256(record[field], `${path}.${field}`);
+  }
+};
+
+export const assertScenarioIdentityOperationStatusLookupResultV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is ScenarioIdentityOperationStatusLookupResultV1 = (
+  value,
+  path = "status_lookup_result",
+) => {
+  const record = assertRecord(value, path);
+  if (record.status === "committed") {
+    assertKeys(record, committedStatusResultKeys, path);
+  } else if (record.status === "confirmed_no_effect") {
+    assertKeys(record, confirmedNoEffectStatusResultKeys, path);
+  } else if (record.status === "unknown") {
+    assertKeys(record, unknownStatusResultKeys, path);
+  } else {
+    fail("invalid_operation_status", `${path}.status`, `${path}.status is invalid`);
+  }
+
+  assertVersion(record.status_lookup_result_version, 1, `${path}.status_lookup_result_version`);
+  assertOpaqueId(record.identity_operation_id, `${path}.identity_operation_id`);
+  assertOpaqueId(record.scenario_command_id, `${path}.scenario_command_id`);
+  assertCanonicalInstant(record.checked_at, `${path}.checked_at`);
+  assertSha256(record.request_nonce_hash, `${path}.request_nonce_hash`);
+
+  if (record.status === "committed") {
+    assertCanonicalRef(record.scenario_execution_ref, `${path}.scenario_execution_ref`);
+    assertSha256(record.scenario_commit_evidence_hash, `${path}.scenario_commit_evidence_hash`);
+  } else if (record.status === "confirmed_no_effect") {
+    assertSha256(record.no_effect_fence_evidence_hash, `${path}.no_effect_fence_evidence_hash`);
+  } else if (
+    typeof record.reason_code !== "string" ||
+    !identityOperationUnknownReasons.has(record.reason_code)
+  ) {
+    fail("invalid_unknown_reason", `${path}.reason_code`, `${path}.reason_code is invalid`);
+  }
+};
+
+/** Structural request/result identity parity; writer-fence truth remains a runtime concern. */
+export const assertScenarioIdentityOperationStatusLookupExchangeV1 = (
+  request: unknown,
+  result: unknown,
+): void => {
+  assertScenarioIdentityOperationStatusLookupRequestV1(request);
+  assertScenarioIdentityOperationStatusLookupResultV1(result);
+  if (request.identity_operation_id !== result.identity_operation_id) {
+    fail(
+      "identity_operation_mismatch",
+      "status_lookup_result.identity_operation_id",
+      "status lookup request and result must have the same identity_operation_id",
+    );
+  }
+  if (request.scenario_command_id !== result.scenario_command_id) {
+    fail(
+      "scenario_command_mismatch",
+      "status_lookup_result.scenario_command_id",
+      "status lookup request and result must have the same scenario_command_id",
+    );
+  }
 };

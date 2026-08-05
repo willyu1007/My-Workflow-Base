@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-identity-operation-status-lookup-request-v1.schema.json",
+  "title": "ScenarioIdentityOperationStatusLookupRequestV1",
+  "description": "Scenario-private writer-fenced status lookup input carried inside I1-A without transport metadata.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status_lookup_request_version", "identity_operation_id", "owner_bindings", "association_expectation_hash", "scenario_command_id", "scenario_command_hash", "principal_provenance_hash", "host_identity_evidence_hash", "deadline_evidence_hash", "attempt_ledger_hash"],
+  "properties": {
+    "status_lookup_request_version": { "const": 1 },
+    "identity_operation_id": { "$ref": "#/$defs/opaqueId" },
+    "owner_bindings": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "$ref": "scenario-owner-binding-ref-v1.schema.json" }
+    },
+    "association_expectation_hash": { "$ref": "#/$defs/sha256" },
+    "scenario_command_id": { "$ref": "#/$defs/opaqueId" },
+    "scenario_command_hash": { "$ref": "#/$defs/sha256" },
+    "principal_provenance_hash": { "$ref": "#/$defs/sha256" },
+    "host_identity_evidence_hash": { "$ref": "#/$defs/sha256" },
+    "deadline_evidence_hash": { "$ref": "#/$defs/sha256" },
+    "attempt_ledger_hash": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

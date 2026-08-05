@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-identity-operation-status-lookup-result-v1.schema.json",
+  "title": "ScenarioIdentityOperationStatusLookupResultV1",
+  "description": "Closed body-only status result. Response authentication and writer-fence truth remain outside this structural contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status_lookup_result_version", "identity_operation_id", "scenario_command_id", "checked_at", "request_nonce_hash", "status"],
+  "properties": {
+    "status_lookup_result_version": { "const": 1 },
+    "identity_operation_id": { "$ref": "#/$defs/opaqueId" },
+    "scenario_command_id": { "$ref": "#/$defs/opaqueId" },
+    "checked_at": { "$ref": "#/$defs/canonicalInstant" },
+    "request_nonce_hash": { "$ref": "#/$defs/sha256" },
+    "status": { "enum": ["committed", "confirmed_no_effect", "unknown"] },
+    "scenario_execution_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "scenario_commit_evidence_hash": { "$ref": "#/$defs/sha256" },
+    "no_effect_fence_evidence_hash": { "$ref": "#/$defs/sha256" },
+    "reason_code": {
+      "enum": ["lock_timeout", "possible_inflight", "owner_unavailable", "compatible_evidence_ambiguous"]
+    }
+  },
+  "oneOf": [
+    {
+      "required": ["scenario_execution_ref", "scenario_commit_evidence_hash"],
+      "properties": {
+        "status": { "const": "committed" },
+        "scenario_execution_ref": true,
+        "scenario_commit_evidence_hash": true
+      },
+      "minProperties": 8,
+      "maxProperties": 8
+    },
+    {
+      "required": ["no_effect_fence_evidence_hash"],
+      "properties": {
+        "status": { "const": "confirmed_no_effect" },
+        "no_effect_fence_evidence_hash": true
+      },
+      "minProperties": 7,
+      "maxProperties": 7
+    },
+    {
+      "required": ["reason_code"],
+      "properties": {
+        "status": { "const": "unknown" },
+        "reason_code": true
+      },
+      "minProperties": 7,
+      "maxProperties": 7
+    }
+  ],
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "canonicalInstant": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    }
+  }
+}

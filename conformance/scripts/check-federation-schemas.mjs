@@ -15,8 +15,11 @@ const expected = [
   "scenario-command-envelope-v1.schema.json",
   "scenario-command-receipt-v1.schema.json",
   "scenario-contract-release-v1.schema.json",
+  "scenario-current-owner-binding-pair-evidence-v1.schema.json",
   "scenario-event-envelope-v1.schema.json",
   "scenario-human-principal-v1.schema.json",
+  "scenario-identity-operation-status-lookup-request-v1.schema.json",
+  "scenario-identity-operation-status-lookup-result-v1.schema.json",
   "scenario-ingress-surface-v1.schema.json",
   "scenario-manifest-v2.schema.json",
   "scenario-owner-binding-ref-v1.schema.json",
@@ -85,6 +88,21 @@ for (const [schemaName, value] of [
   const validate = ajv.getSchema(`https://morethan.local/contracts/${schemaName}.schema.json`);
   if (!validate || !validate(value)) {
     throw new Error(`binding pair fixture failed ${schemaName}: ${JSON.stringify(validate?.errors)}`);
+  }
+}
+
+const currentOwnerStatusFixture = JSON.parse(await readFile(
+  new URL("../fixtures/scenario-current-owner-status.valid.json", import.meta.url),
+  "utf8",
+));
+for (const [schemaName, values] of [
+  ["scenario-current-owner-binding-pair-evidence-v1", [currentOwnerStatusFixture.current_evidence]],
+  ["scenario-identity-operation-status-lookup-request-v1", [currentOwnerStatusFixture.status_request]],
+  ["scenario-identity-operation-status-lookup-result-v1", currentOwnerStatusFixture.status_results],
+]) {
+  const validate = ajv.getSchema(`https://morethan.local/contracts/${schemaName}.schema.json`);
+  if (!validate || values.some((value) => !validate(value))) {
+    throw new Error(`current owner/status fixture failed ${schemaName}: ${JSON.stringify(validate?.errors)}`);
   }
 }
 
