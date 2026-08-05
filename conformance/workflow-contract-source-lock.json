@@ -6,12 +6,12 @@
     "workflow-contracts",
     "workflow-validator"
   ],
-  "source_hash": "8621c6cc6e81e99450f42d7b0879da9e029f90a350c11bb4a0d64f341c370b0c",
+  "source_hash": "16be693cd877bfac3638a615b391614cddccbf219ef6a115a450ff5f47eb2512",
   "files": [
     {
       "path": "workflow-contracts/index.ts",
-      "bytes": 492,
-      "sha256": "7eab57385f875de654fdf59b50d37718464cf559b97dfe7ad8c86facd0ccf649"
+      "bytes": 593,
+      "sha256": "43c337935e410bdf9c2cecd9885aa37a838005557ada736790d77f3c1173324b"
     },
     {
       "path": "workflow-contracts/types/api.ts",
@@ -54,6 +54,16 @@
       "sha256": "9752f54c72105fe58c42c42df524c5c71094409ea1d7f01494cc1bb589e76213"
     },
     {
+      "path": "workflow-contracts/types/scenario-binding-validation.ts",
+      "bytes": 22057,
+      "sha256": "c90eaee0f7d89a0682028655ed55cb7df07cdc04b8ddb8b2489cdcac5e4c494c"
+    },
+    {
+      "path": "workflow-contracts/types/scenario-binding.ts",
+      "bytes": 5342,
+      "sha256": "e9715cfda97765b1b3e305aaa73c6baad7c702fab31705564177080e133b4782"
+    },
+    {
       "path": "workflow-contracts/types/scenario-invocation-validation.ts",
       "bytes": 8853,
       "sha256": "1a44879ff1700ca93f2acca85b9ecfbb2d074d47d16ad9e8fa6a90d56a75697d"
@@ -79,5 +89,5 @@
       "sha256": "8a9311e67bf97b15b9b0225fc1ce9174eaedd96c667df951e71a15a7385bc5c9"
     }
   ],
-  "contract_source_revision": "ce7118c85e10bd607f7c73ddc42f44ba6732e15e"
+  "contract_source_revision": "edbcd747eb50106b8f4967c3cb03b5480cbebc7f"
 }
