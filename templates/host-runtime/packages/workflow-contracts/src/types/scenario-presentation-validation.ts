@@ -1,5 +1,7 @@
 import {
   scenarioNarrationPolicies,
+  scenarioDefaultPageSizeV1,
+  scenarioMaximumPageSizeV1,
   scenarioOfferPriorities,
   scenarioPresentationViewModes,
   scenarioSafeReasonRetryClasses,
@@ -156,13 +158,19 @@ const canonicalLocalePattern =
   /^[a-z]{2,3}(?:-[A-Z][a-z]{3})?(?:-(?:[A-Z]{2}|[0-9]{3}))?(?:-[A-Za-z0-9]{5,8})*$/u;
 const controlCharacterPattern = /[\u0000-\u001f\u007f-\u009f]/u;
 const htmlPattern = /<\/?[A-Za-z][^>]*>|<!--|-->/u;
-const urlPattern = /\b(?:(?:https?|ftp):\/\/|mailto:|www\.)/iu;
+const uriSchemePattern = /(?:^|[\s(<{\[])[A-Za-z][A-Za-z0-9+.-]{0,31}:[^\s)\]}>]+/u;
+const networkPathPattern = /(?:^|[\s(<{\[])\/\/[^\s)\]}>]+/u;
+const emailAddressPattern =
+  /\b[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*\b/u;
+const bareDomainPattern =
+  /\b(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}(?::[0-9]{1,5})?(?:\/[^\s]*)?/u;
+const ipv4AddressPattern =
+  /\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}(?::[0-9]{1,5})?(?:\/[^\s]*)?/u;
 const markdownPattern =
   /(?:^|\n)\s{0,3}(?:#{1,6}\s|>\s|[-*+]\s|[0-9]+\.\s)|!?\[[^\]]*\]\([^)]+\)|\*\*|__|~~|`/u;
 const unresolvedParameterPattern = /\{\{[^}]*\}\}|\$\{[^}]*\}|\{[A-Za-z][A-Za-z0-9_.-]*\}/u;
 const internalDetailPattern =
   /\b(?:stack trace|sqlstate|postgresql?|prisma|database error|provider error|internal exception|internal reason)\b/iu;
-const maximumPageSize = 20;
 const maximumSubjectContextLifetimeMs = 30 * 60 * 1000;
 const maximumPresentationBytes = 64 * 1024;
 
@@ -186,6 +194,15 @@ const assertKeys = (record: Record<string, unknown>, allowed: Set<string>, path:
 };
 
 const codePointLength = (value: string) => Array.from(value).length;
+
+const isCanonicalLocale = (value: unknown): value is string => {
+  if (typeof value !== "string" || !canonicalLocalePattern.test(value)) return false;
+  try {
+    return Intl.getCanonicalLocales(value)[0] === value;
+  } catch {
+    return false;
+  }
+};
 
 const assertSafeText: (
   value: unknown,
@@ -216,18 +233,18 @@ const assertSafeText: (
   if (
     controlCharacterPattern.test(text) ||
     htmlPattern.test(text) ||
-    urlPattern.test(text) ||
+    uriSchemePattern.test(text) ||
+    networkPathPattern.test(text) ||
+    emailAddressPattern.test(text) ||
+    bareDomainPattern.test(text) ||
+    ipv4AddressPattern.test(text) ||
     markdownPattern.test(text) ||
     unresolvedParameterPattern.test(text) ||
     internalDetailPattern.test(text)
   ) {
     fail("unsafe_safe_text", `${path}.value`, `${path}.value contains unsafe copy`);
   }
-  if (
-    typeof record.locale !== "string" ||
-    !canonicalLocalePattern.test(record.locale) ||
-    Intl.getCanonicalLocales(record.locale)[0] !== record.locale
-  ) {
+  if (!isCanonicalLocale(record.locale)) {
     fail("invalid_locale", `${path}.locale`, `${path}.locale must be normalized BCP-47`);
   }
 };
@@ -259,10 +276,26 @@ const assertCanonicalInstant = (value: unknown, path: string): number => {
   return epoch;
 };
 
-const assertPageSize = (value: unknown, path: string) => {
-  if (!Number.isInteger(value) || Number(value) < 1 || Number(value) > maximumPageSize) {
+const assertPageSize: (
+  value: unknown,
+  path: string,
+) => asserts value is number = (value, path) => {
+  if (
+    !Number.isInteger(value) ||
+    Number(value) < 1 ||
+    Number(value) > scenarioMaximumPageSizeV1
+  ) {
     fail("invalid_page_size", path, `${path} must be an integer from 1 through 20`);
   }
+};
+
+export const resolveScenarioPageSizeV1 = (
+  value?: unknown,
+  path = "page_size",
+): number => {
+  const resolved = value === undefined ? scenarioDefaultPageSizeV1 : value;
+  assertPageSize(resolved, path);
+  return resolved;
 };
 
 const assertMachineKey = (value: unknown, path: string) => {
@@ -392,7 +425,7 @@ export const assertListScenarioSubjectContextsInputV1: (
   if (record.cursor !== undefined) {
     assertScenarioPresentationCursorV1(record.cursor, `${path}.cursor`);
   }
-  if (record.page_size !== undefined) assertPageSize(record.page_size, `${path}.page_size`);
+  resolveScenarioPageSizeV1(record.page_size, `${path}.page_size`);
 };
 
 export const assertResolveScenarioSubjectContextInputV1: (
@@ -464,6 +497,43 @@ export const assertScenarioSubjectContextOptionV1: (
   }
 };
 
+const assertActiveSubjectContextOption = (
+  value: ScenarioSubjectContextOptionV1,
+  currentEpoch: number,
+  path: string,
+): void => {
+  const issuedAt = Date.parse(value.issued_at);
+  const expiresAt = Date.parse(value.expires_at);
+  if (currentEpoch < issuedAt) {
+    fail(
+      "subject_context_not_yet_active",
+      `${path}.issued_at`,
+      `${path} is not active at the supplied current_time`,
+    );
+  }
+  if (currentEpoch >= expiresAt) {
+    fail(
+      "expired_subject_context",
+      `${path}.expires_at`,
+      `${path} is expired at the supplied current_time`,
+    );
+  }
+};
+
+export const assertScenarioSubjectContextOptionActiveV1: (
+  value: unknown,
+  currentTime: unknown,
+  path?: string,
+) => asserts value is ScenarioSubjectContextOptionV1 = (
+  value,
+  currentTime,
+  path = "subject_context",
+) => {
+  assertScenarioSubjectContextOptionV1(value, path);
+  const currentEpoch = assertCanonicalInstant(currentTime, "current_time");
+  assertActiveSubjectContextOption(value, currentEpoch, path);
+};
+
 export const assertListScenarioSubjectContextsResultV1: (
   value: unknown,
   path?: string,
@@ -510,6 +580,30 @@ export const assertListScenarioSubjectContextsResultV1: (
   fail("invalid_list_status", `${path}.status`, `${path}.status is invalid`);
 };
 
+export const assertListScenarioSubjectContextsResultActiveV1: (
+  value: unknown,
+  currentTime: unknown,
+  path?: string,
+) => asserts value is ListScenarioSubjectContextsResultV1 = (
+  value,
+  currentTime,
+  path = "list_subject_contexts_result",
+) => {
+  assertListScenarioSubjectContextsResultV1(value, path);
+  const currentEpoch = assertCanonicalInstant(currentTime, "current_time");
+  if (value.status === "resolved") {
+    assertActiveSubjectContextOption(value.context, currentEpoch, `${path}.context`);
+  } else if (value.status === "needs_selection") {
+    value.candidates.forEach((candidate, index) => {
+      assertActiveSubjectContextOption(
+        candidate,
+        currentEpoch,
+        `${path}.candidates[${index}]`,
+      );
+    });
+  }
+};
+
 export const assertResolveScenarioSubjectContextResultV1: (
   value: unknown,
   path?: string,
@@ -539,6 +633,28 @@ export const assertResolveScenarioSubjectContextResultV1: (
     return;
   }
   fail("invalid_resolve_status", `${path}.status`, `${path}.status is invalid`);
+};
+
+export const assertResolveScenarioSubjectContextResultActiveV1: (
+  value: unknown,
+  currentTime: unknown,
+  path?: string,
+) => asserts value is ResolveScenarioSubjectContextResultV1 = (
+  value,
+  currentTime,
+  path = "resolve_subject_context_result",
+) => {
+  assertResolveScenarioSubjectContextResultV1(value, path);
+  const currentEpoch = assertCanonicalInstant(currentTime, "current_time");
+  if (value.status !== "resolved") return;
+  assertActiveSubjectContextOption(value.context, currentEpoch, `${path}.context`);
+  if (Date.parse(value.resolved_at) > currentEpoch) {
+    fail(
+      "future_resolved_at",
+      `${path}.resolved_at`,
+      `${path}.resolved_at cannot be after the supplied current_time`,
+    );
+  }
 };
 
 export const assertPresentScenarioSubjectContextInputV1: (
@@ -577,9 +693,7 @@ export const assertPresentScenarioSubjectContextInputV1: (
     if (query.cursor !== undefined) {
       assertScenarioPresentationCursorV1(query.cursor, `${path}.view_query.cursor`);
     }
-    if (query.page_size !== undefined) {
-      assertPageSize(query.page_size, `${path}.view_query.page_size`);
-    }
+    resolveScenarioPageSizeV1(query.page_size, `${path}.view_query.page_size`);
   }
 };
 
@@ -771,10 +885,17 @@ export const assertScenarioSemanticPresentationV1: (
   if (!Array.isArray(record.blocks) || record.blocks.length > 20) {
     fail("invalid_blocks", `${path}.blocks`, "blocks must contain at most 20 entries");
   }
+  const responseLocalItemKeys: string[] = [];
   record.blocks.forEach((block, index) => {
     assertScenarioSemanticBlockV1(block, `${path}.blocks[${index}]`);
+    if (block.kind === "item_collection") {
+      block.items.forEach((item) => responseLocalItemKeys.push(item.item_key));
+    } else if (block.kind === "timeline") {
+      block.entries.forEach((entry) => responseLocalItemKeys.push(entry.entry_key));
+    }
   });
   assertUniqueKeys(record.blocks.map((block) => block.block_key), `${path}.blocks`);
+  assertUniqueKeys(responseLocalItemKeys, `${path}.response_local_items`);
   if (!Array.isArray(record.navigation) || record.navigation.length > 8) {
     fail("invalid_navigation", `${path}.navigation`, "navigation must contain at most 8 offers");
   }

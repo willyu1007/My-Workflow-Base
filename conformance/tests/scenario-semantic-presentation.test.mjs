@@ -13,6 +13,8 @@ import {
   assertScenarioSemanticBlockV1,
   assertScenarioSemanticPresentationV1,
   projectScenarioNarrationTextV1,
+  resolveScenarioPageSizeV1,
+  scenarioDefaultPageSizeV1,
 } from "@host/workflow-contracts";
 
 const schemaRoot = new URL(
@@ -126,6 +128,15 @@ test("presentation input rejects authority, target, surface and command smugglin
   }
 });
 
+test("presentation pagination uses the shared default contract", () => {
+  assert.equal(schemas[2].properties.view_query.properties.page_size.default, 10);
+  const input = clone(fixture.input);
+  delete input.view_query.page_size;
+  assertSchemaAccepts(validateInput, input);
+  assert.doesNotThrow(() => assertPresentScenarioSubjectContextInputV1(input));
+  assert.equal(resolveScenarioPageSizeV1(input.view_query.page_size), scenarioDefaultPageSizeV1);
+});
+
 test("block union rejects recursion, raw identities, renderer fields and mixed variants", async (context) => {
   const cases = [
     ["recursive", 0, (value) => { value.blocks = []; }],
@@ -181,6 +192,25 @@ test("block and presentation codecs enforce local-key and count bounds", () => {
   assert.throws(() => assertScenarioSemanticPresentationV1(tooManyBlocks));
 });
 
+test("presentation item and timeline keys share one response-local namespace", () => {
+  const duplicateAcrossBlocks = clone(fixture.presentation);
+  const secondCollection = clone(duplicateAcrossBlocks.blocks[4]);
+  secondCollection.block_key = "items.second";
+  duplicateAcrossBlocks.blocks.push(secondCollection);
+  assertSchemaAccepts(validatePresentation, duplicateAcrossBlocks);
+  assert.throws(() => assertScenarioSemanticPresentationV1(duplicateAcrossBlocks), {
+    code: "duplicate_local_key",
+  });
+
+  const duplicateAcrossKinds = clone(fixture.presentation);
+  duplicateAcrossKinds.blocks[5].entries[0].entry_key =
+    duplicateAcrossKinds.blocks[4].items[0].item_key;
+  assertSchemaAccepts(validatePresentation, duplicateAcrossKinds);
+  assert.throws(() => assertScenarioSemanticPresentationV1(duplicateAcrossKinds), {
+    code: "duplicate_local_key",
+  });
+});
+
 test("navigation remains read-only and action offers remain prepare-only", async (context) => {
   const navigationCases = [
     ["URL", (value) => { value.url = "https://example.invalid"; }],
@@ -231,7 +261,7 @@ test("result union rejects partial aliases and enforces 64 KiB UTF-8", () => {
     tone: "neutral",
     narration: "allowed",
     items: Array.from({ length: 20 }, (_, itemIndex) => ({
-      item_key: `item.${itemIndex}`,
+      item_key: `item.${blockIndex}.${itemIndex}`,
       title: text("x".repeat(120)),
       summary: text("x".repeat(500)),
       badges: Array.from({ length: 4 }, () => ({

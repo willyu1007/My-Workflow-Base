@@ -49,6 +49,9 @@ export type ScenarioSubjectScopeKindV1 = (typeof scenarioSubjectScopeKinds)[numb
 export const scenarioSubjectRouteClasses = ["subject_detail", "subject_collection"] as const;
 export type ScenarioSubjectRouteClassV1 = (typeof scenarioSubjectRouteClasses)[number];
 
+export const scenarioDefaultPageSizeV1 = 10;
+export const scenarioMaximumPageSizeV1 = 20;
+
 export type ListScenarioSubjectContextsInputV1 = {
   provider_version: 1;
   cursor?: string;

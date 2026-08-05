@@ -5,11 +5,17 @@ import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 import {
   assertListScenarioSubjectContextsInputV1,
+  assertListScenarioSubjectContextsResultActiveV1,
   assertListScenarioSubjectContextsResultV1,
   assertResolveScenarioSubjectContextInputV1,
+  assertResolveScenarioSubjectContextResultActiveV1,
   assertResolveScenarioSubjectContextResultV1,
   assertScenarioPrivateInvocationV1,
+  assertScenarioSubjectContextOptionActiveV1,
   assertScenarioSubjectContextOptionV1,
+  resolveScenarioPageSizeV1,
+  scenarioDefaultPageSizeV1,
+  scenarioMaximumPageSizeV1,
 } from "@host/workflow-contracts";
 
 const schemaRoot = new URL(
@@ -54,6 +60,7 @@ const assertSchemaAccepts = (validate, value) => {
 const assertSchemaRejects = (validate, value) => {
   assert.equal(validate(value), false, "JSON Schema unexpectedly accepted mutation");
 };
+const activeCurrentTime = "2026-08-05T10:10:00.000Z";
 
 test("accepts exact list/resolve inputs and every closed result branch", () => {
   assertSchemaAccepts(validateListInput, fixture.list_input);
@@ -63,15 +70,42 @@ test("accepts exact list/resolve inputs and every closed result branch", () => {
   for (const option of fixture.options) {
     assertSchemaAccepts(validateOption, option);
     assert.doesNotThrow(() => assertScenarioSubjectContextOptionV1(option));
+    assert.doesNotThrow(() => assertScenarioSubjectContextOptionActiveV1(
+      option,
+      activeCurrentTime,
+    ));
   }
   for (const result of fixture.list_results) {
     assertSchemaAccepts(validateListResult, result);
     assert.doesNotThrow(() => assertListScenarioSubjectContextsResultV1(result));
+    assert.doesNotThrow(() => assertListScenarioSubjectContextsResultActiveV1(
+      result,
+      activeCurrentTime,
+    ));
   }
   for (const result of fixture.resolve_results) {
     assertSchemaAccepts(validateResolveResult, result);
     assert.doesNotThrow(() => assertResolveScenarioSubjectContextResultV1(result));
+    assert.doesNotThrow(() => assertResolveScenarioSubjectContextResultActiveV1(
+      result,
+      activeCurrentTime,
+    ));
   }
+});
+
+test("page size exposes one executable default and maximum", () => {
+  assert.equal(scenarioDefaultPageSizeV1, 10);
+  assert.equal(scenarioMaximumPageSizeV1, 20);
+  assert.equal(schemas[2].properties.page_size.default, scenarioDefaultPageSizeV1);
+
+  const omitted = { provider_version: 1 };
+  assertSchemaAccepts(validateListInput, omitted);
+  assert.doesNotThrow(() => assertListScenarioSubjectContextsInputV1(omitted));
+  assert.equal(resolveScenarioPageSizeV1(omitted.page_size), 10);
+  assert.equal(resolveScenarioPageSizeV1(20), 20);
+  assert.throws(() => resolveScenarioPageSizeV1(21), {
+    code: "invalid_page_size",
+  });
 });
 
 test("list input rejects Host selection, identity and pagination smuggling", async (context) => {
@@ -187,6 +221,66 @@ test("resolved_at must remain inside the newly issued context lifetime", () => {
       code: "invalid_resolved_at",
     });
   }
+});
+
+test("explicitly clocked provider conformance rejects inactive context output", () => {
+  const expired = clone(fixture.options[0]);
+  expired.issued_at = "2020-01-01T00:00:00.000Z";
+  expired.expires_at = "2020-01-01T00:30:00.000Z";
+  assert.doesNotThrow(() => assertScenarioSubjectContextOptionV1(expired));
+  assert.throws(
+    () => assertScenarioSubjectContextOptionActiveV1(expired, activeCurrentTime),
+    { code: "expired_subject_context" },
+  );
+
+  const notYetActive = clone(fixture.options[0]);
+  notYetActive.issued_at = "2026-08-05T10:11:00.000Z";
+  notYetActive.expires_at = "2026-08-05T10:30:00.000Z";
+  assert.throws(
+    () => assertScenarioSubjectContextOptionActiveV1(notYetActive, activeCurrentTime),
+    { code: "subject_context_not_yet_active" },
+  );
+
+  const staleResolved = clone(fixture.resolve_results[0]);
+  staleResolved.context = expired;
+  staleResolved.resolved_at = "2020-01-01T00:00:01.000Z";
+  assert.doesNotThrow(() => assertResolveScenarioSubjectContextResultV1(staleResolved));
+  assert.throws(
+    () => assertResolveScenarioSubjectContextResultActiveV1(
+      staleResolved,
+      activeCurrentTime,
+    ),
+    { code: "expired_subject_context" },
+  );
+
+  const expiredCandidateList = clone(fixture.list_results[1]);
+  expiredCandidateList.candidates[1] = {
+    ...expired,
+    subject_context_ref: fixture.options[1].subject_context_ref,
+  };
+  assert.doesNotThrow(() => assertListScenarioSubjectContextsResultV1(expiredCandidateList));
+  assert.throws(
+    () => assertListScenarioSubjectContextsResultActiveV1(
+      expiredCandidateList,
+      activeCurrentTime,
+    ),
+    { code: "expired_subject_context" },
+  );
+
+  assert.doesNotThrow(() => assertResolveScenarioSubjectContextResultActiveV1(
+    fixture.resolve_results[2],
+    activeCurrentTime,
+  ));
+});
+
+test("active resolve result cannot claim a future resolution time", () => {
+  const result = clone(fixture.resolve_results[0]);
+  result.resolved_at = "2026-08-05T10:11:00.000Z";
+  assert.doesNotThrow(() => assertResolveScenarioSubjectContextResultV1(result));
+  assert.throws(
+    () => assertResolveScenarioSubjectContextResultActiveV1(result, activeCurrentTime),
+    { code: "future_resolved_at" },
+  );
 });
 
 test("provider inputs compose only inside the I1-A delegated operation input", () => {

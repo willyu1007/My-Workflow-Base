@@ -71,6 +71,13 @@ test("safe-copy Schema and codec reject structural and copy exposure mutations",
     ["HTML", (value) => { value.value = "<strong>unsafe</strong>"; }],
     ["URL", (value) => { value.value = "Open https://example.invalid"; }],
     ["uppercase URL", (value) => { value.value = "Open HTTPS://example.invalid"; }],
+    ["script URI", (value) => { value.value = "javascript:alert(1)"; }],
+    ["data URI", (value) => { value.value = "data:text/plain,hello"; }],
+    ["network path", (value) => { value.value = "Open //example.com/path"; }],
+    ["bare domain", (value) => { value.value = "Visit example.com"; }],
+    ["email address", (value) => { value.value = "Email user@example.com"; }],
+    ["single-label email address", (value) => { value.value = "Email user@internal"; }],
+    ["IPv4 address", (value) => { value.value = "Open 192.0.2.10/path"; }],
     ["Markdown", (value) => { value.value = "[open](target)"; }],
     ["Markdown heading", (value) => { value.value = "# Internal heading"; }],
     ["template", (value) => { value.value = "Hello {{name}}"; }],
@@ -87,6 +94,22 @@ test("safe-copy Schema and codec reject structural and copy exposure mutations",
       assert.throws(() => assertScenarioSafeTextV1(value));
     });
   }
+});
+
+test("safe-copy URI detection preserves ordinary colon prose", () => {
+  const value = cloneText();
+  value.value = "Note: this remains ordinary plain text.";
+  assertSchemaAccepts(validateText, value);
+  assert.doesNotThrow(() => assertScenarioSafeTextV1(value));
+});
+
+test("codec converts Intl locale failures into the stable validation error", () => {
+  const value = cloneText();
+  value.locale = "en-abcde-abcde";
+  assertSchemaAccepts(validateText, value);
+  assert.throws(() => assertScenarioSafeTextV1(value), {
+    code: "invalid_locale",
+  });
 });
 
 test("codec applies semantic Unicode normalization", () => {
