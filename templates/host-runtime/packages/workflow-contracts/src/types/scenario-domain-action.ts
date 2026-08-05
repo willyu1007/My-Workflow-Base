@@ -170,3 +170,42 @@ export type SubmitScenarioDomainActionResultV1 =
     }
   | { status: "context_changed"; safe_reason: ScenarioSafeReasonV1 }
   | { status: "unavailable"; safe_reason: ScenarioSafeReasonV1 };
+
+export type BindScenarioDomainActionStepInputV1 = {
+  step_binding_version: 1;
+  submit: SubmitScenarioDomainActionInputV1;
+  step_assertion: ScenarioDomainActionClaimedStepAssertionV1;
+};
+
+export type BindScenarioDomainActionStepResultV1 =
+  | {
+      status: "bound" | "exact_replay";
+      workflow_step_ref: ScenarioDomainActionWorkflowStepRefV1;
+      binding_evidence_hash: string;
+      context_expires_at: string;
+    }
+  | { status: "request_conflict"; safe_reason: ScenarioSafeReasonV1 }
+  | { status: "unavailable"; safe_reason: ScenarioSafeReasonV1 };
+
+export type LookupScenarioDomainActionStepBindingInputV1 = {
+  binding_lookup_version: 1;
+  workflow_step_ref: ScenarioDomainActionWorkflowStepRefV1;
+};
+
+export type LookupScenarioDomainActionStepBindingResultV1 =
+  | {
+      status: "bound";
+      workflow_step_ref: ScenarioDomainActionWorkflowStepRefV1;
+      binding_evidence_hash: string;
+      context_expires_at: string;
+    }
+  | { status: "not_bound" }
+  | { status: "unavailable"; safe_reason: ScenarioSafeReasonV1 };
+
+export type ScenarioDomainActionClaimedStepDriverV1 = {
+  claimed_driver_version: 1;
+  workflow_step_ref: ScenarioDomainActionWorkflowStepRefV1;
+  action_contract_hash: string;
+  claim_token: string;
+  expected_step_version: number;
+};

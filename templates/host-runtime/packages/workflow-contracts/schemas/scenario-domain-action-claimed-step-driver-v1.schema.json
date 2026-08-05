@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-domain-action-claimed-step-driver-v1.schema.json",
+  "title": "ScenarioDomainActionClaimedStepDriverV1",
+  "description": "Transient Host worker claim evidence for the exact bound original Step.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["claimed_driver_version", "workflow_step_ref", "action_contract_hash", "claim_token", "expected_step_version"],
+  "properties": {
+    "claimed_driver_version": { "const": 1 },
+    "workflow_step_ref": { "$ref": "scenario-domain-action-workflow-step-ref-v1.schema.json" },
+    "action_contract_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "claim_token": { "type": "string", "minLength": 32, "maxLength": 512, "pattern": "^[A-Za-z0-9_-]+$" },
+    "expected_step_version": { "type": "integer", "minimum": 0 }
+  }
+}

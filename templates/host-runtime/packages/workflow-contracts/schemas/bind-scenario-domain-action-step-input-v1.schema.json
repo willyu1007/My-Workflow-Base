@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/bind-scenario-domain-action-step-input-v1.schema.json",
+  "title": "BindScenarioDomainActionStepInputV1",
+  "description": "Host-private immutable binding request for one original non-claimable Workflow Step.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["step_binding_version", "submit", "step_assertion"],
+  "properties": {
+    "step_binding_version": { "const": 1 },
+    "submit": { "$ref": "submit-scenario-domain-action-input-v1.schema.json" },
+    "step_assertion": { "$ref": "scenario-domain-action-claimed-step-assertion-v1.schema.json" }
+  }
+}

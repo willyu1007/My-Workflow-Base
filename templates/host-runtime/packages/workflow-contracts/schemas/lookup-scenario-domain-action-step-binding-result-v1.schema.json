@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/lookup-scenario-domain-action-step-binding-result-v1.schema.json",
+  "title": "LookupScenarioDomainActionStepBindingResultV1",
+  "description": "Body-free recovery result for a lost bind response; not_bound grants no authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "status": { "enum": ["bound", "not_bound", "unavailable"] },
+    "workflow_step_ref": { "$ref": "scenario-domain-action-workflow-step-ref-v1.schema.json" },
+    "binding_evidence_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "context_expires_at": { "$ref": "#/$defs/canonicalInstant" },
+    "safe_reason": { "$ref": "scenario-safe-reason-v1.schema.json" }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "workflow_step_ref", "binding_evidence_hash", "context_expires_at"],
+      "properties": {
+        "status": { "const": "bound" },
+        "workflow_step_ref": { "$ref": "scenario-domain-action-workflow-step-ref-v1.schema.json" },
+        "binding_evidence_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "context_expires_at": { "$ref": "#/$defs/canonicalInstant" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": { "status": { "const": "not_bound" } }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "safe_reason"],
+      "properties": {
+        "status": { "const": "unavailable" },
+        "safe_reason": { "$ref": "scenario-safe-reason-v1.schema.json" }
+      }
+    }
+  ],
+  "$defs": {
+    "canonicalInstant": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    }
+  }
+}

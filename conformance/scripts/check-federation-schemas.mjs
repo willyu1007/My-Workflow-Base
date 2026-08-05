@@ -4,9 +4,13 @@ import addFormats from "ajv-formats";
 
 const schemaRoot = new URL("../../templates/host-runtime/packages/workflow-contracts/schemas/", import.meta.url);
 const expected = [
+  "bind-scenario-domain-action-step-input-v1.schema.json",
+  "bind-scenario-domain-action-step-result-v1.schema.json",
   "canonical-ref-v1.schema.json",
   "generation-ticket-v1.schema.json",
   "integration-lock-v3.schema.json",
+  "lookup-scenario-domain-action-step-binding-input-v1.schema.json",
+  "lookup-scenario-domain-action-step-binding-result-v1.schema.json",
   "prepare-scenario-domain-action-input-v1.schema.json",
   "prepare-scenario-domain-action-result-v1.schema.json",
   "scenario-action-offer-v1.schema.json",
@@ -21,6 +25,7 @@ const expected = [
   "scenario-contract-release-v1.schema.json",
   "scenario-current-owner-binding-pair-evidence-v1.schema.json",
   "scenario-domain-action-claimed-step-assertion-v1.schema.json",
+  "scenario-domain-action-claimed-step-driver-v1.schema.json",
   "scenario-domain-action-confirmation-prompt-v1.schema.json",
   "scenario-domain-action-contract-v1.schema.json",
   "scenario-domain-action-current-result-v1.schema.json",

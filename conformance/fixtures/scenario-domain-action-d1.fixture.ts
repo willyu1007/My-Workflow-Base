@@ -1,4 +1,8 @@
 import type {
+  BindScenarioDomainActionStepInputV1,
+  BindScenarioDomainActionStepResultV1,
+  LookupScenarioDomainActionStepBindingInputV1,
+  ScenarioDomainActionClaimedStepDriverV1,
   PrepareScenarioDomainActionInputV1,
   PrepareScenarioDomainActionResultV1,
   ScenarioDomainActionClaimedStepAssertionV1,
@@ -119,3 +123,29 @@ export const submitScenarioDomainActionResultFixture = {
   status: "completed",
   current_result: { state: "changed" },
 } satisfies SubmitScenarioDomainActionResultV1;
+
+export const bindScenarioDomainActionStepInputFixture = {
+  step_binding_version: 1,
+  submit: submitScenarioDomainActionInputFixture,
+  step_assertion: scenarioDomainActionClaimedStepAssertionFixture,
+} satisfies BindScenarioDomainActionStepInputV1;
+
+export const bindScenarioDomainActionStepResultFixture = {
+  status: "bound",
+  workflow_step_ref: scenarioDomainActionClaimedStepAssertionFixture.workflow_step_ref,
+  binding_evidence_hash: "8".repeat(64),
+  context_expires_at: "2026-08-05T00:05:00.000Z",
+} satisfies BindScenarioDomainActionStepResultV1;
+
+export const lookupScenarioDomainActionStepBindingInputFixture = {
+  binding_lookup_version: 1,
+  workflow_step_ref: scenarioDomainActionClaimedStepAssertionFixture.workflow_step_ref,
+} satisfies LookupScenarioDomainActionStepBindingInputV1;
+
+export const scenarioDomainActionClaimedStepDriverFixture = {
+  claimed_driver_version: 1,
+  workflow_step_ref: scenarioDomainActionClaimedStepAssertionFixture.workflow_step_ref,
+  action_contract_hash: "2".repeat(64),
+  claim_token: "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  expected_step_version: 2,
+} satisfies ScenarioDomainActionClaimedStepDriverV1;

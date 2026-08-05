@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/lookup-scenario-domain-action-step-binding-input-v1.schema.json",
+  "title": "LookupScenarioDomainActionStepBindingInputV1",
+  "description": "Body-free and token-free recovery lookup for one original Workflow Step.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["binding_lookup_version", "workflow_step_ref"],
+  "properties": {
+    "binding_lookup_version": { "const": 1 },
+    "workflow_step_ref": { "$ref": "scenario-domain-action-workflow-step-ref-v1.schema.json" }
+  }
+}

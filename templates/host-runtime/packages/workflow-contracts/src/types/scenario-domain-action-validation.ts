@@ -24,6 +24,11 @@ import {
   type ScenarioDomainActionExecutionBindingV1,
   type ScenarioDomainActionExecutionResultV1,
   type SubmitScenarioDomainActionResultV1,
+  type BindScenarioDomainActionStepInputV1,
+  type BindScenarioDomainActionStepResultV1,
+  type LookupScenarioDomainActionStepBindingInputV1,
+  type LookupScenarioDomainActionStepBindingResultV1,
+  type ScenarioDomainActionClaimedStepDriverV1,
 } from "./scenario-domain-action.js";
 
 export class ScenarioDomainActionValidationError extends Error {
@@ -148,6 +153,29 @@ const currentSimpleResultKeys = new Set(["state"]);
 const currentUnavailableResultKeys = new Set(["state", "safe_reason"]);
 const submitAcceptedResultKeys = new Set(["status"]);
 const submitCompletedResultKeys = new Set(["status", "current_result"]);
+const bindStepInputKeys = new Set([
+  "step_binding_version",
+  "submit",
+  "step_assertion",
+]);
+const boundStepResultKeys = new Set([
+  "status",
+  "workflow_step_ref",
+  "binding_evidence_hash",
+  "context_expires_at",
+]);
+const lookupStepInputKeys = new Set([
+  "binding_lookup_version",
+  "workflow_step_ref",
+]);
+const lookupNotBoundResultKeys = new Set(["status"]);
+const claimedStepDriverKeys = new Set([
+  "claimed_driver_version",
+  "workflow_step_ref",
+  "action_contract_hash",
+  "claim_token",
+  "expected_step_version",
+]);
 const drivers = new Set<string>(scenarioDomainActionDriversV1);
 const confirmationClasses = new Set<string>(scenarioDomainActionConfirmationClassesV1);
 const machineKeyPattern = /^[a-z][a-z0-9._:-]{0,127}$/u;
@@ -1077,5 +1105,369 @@ export const assertScenarioDomainActionExactReplayV1 = (
         "exact replay must preserve outcome, refs and snapshots",
       );
     }
+  }
+};
+
+export const assertBindScenarioDomainActionStepInputV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is BindScenarioDomainActionStepInputV1 = (
+  value,
+  path = "step_binding_input",
+) => {
+  const record = assertRecord(value, path);
+  assertKeys(record, bindStepInputKeys, path);
+  if (record.step_binding_version !== 1) {
+    fail(
+      "invalid_version",
+      `${path}.step_binding_version`,
+      "step_binding_version must be 1",
+    );
+  }
+  assertSubmitScenarioDomainActionInputV1(record.submit, `${path}.submit`);
+  assertScenarioDomainActionClaimedStepAssertionV1(
+    record.step_assertion,
+    `${path}.step_assertion`,
+  );
+};
+
+export const assertBindScenarioDomainActionStepResultV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is BindScenarioDomainActionStepResultV1 = (
+  value,
+  path = "step_binding_result",
+) => {
+  const record = assertRecord(value, path);
+  if (record.status === "bound" || record.status === "exact_replay") {
+    assertKeys(record, boundStepResultKeys, path);
+    assertScenarioDomainActionWorkflowStepRefV1(
+      record.workflow_step_ref,
+      `${path}.workflow_step_ref`,
+    );
+    assertSha256(record.binding_evidence_hash, `${path}.binding_evidence_hash`);
+    assertCanonicalInstant(record.context_expires_at, `${path}.context_expires_at`);
+    return;
+  }
+  if (record.status !== "request_conflict" && record.status !== "unavailable") {
+    fail("invalid_status", `${path}.status`, `${path}.status is invalid`);
+  }
+  assertKeys(record, safeResultKeys, path);
+  assertScenarioSafeReasonV1(record.safe_reason, `${path}.safe_reason`);
+};
+
+export const assertLookupScenarioDomainActionStepBindingInputV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is LookupScenarioDomainActionStepBindingInputV1 = (
+  value,
+  path = "binding_lookup_input",
+) => {
+  const record = assertRecord(value, path);
+  assertKeys(record, lookupStepInputKeys, path);
+  if (record.binding_lookup_version !== 1) {
+    fail(
+      "invalid_version",
+      `${path}.binding_lookup_version`,
+      "binding_lookup_version must be 1",
+    );
+  }
+  assertScenarioDomainActionWorkflowStepRefV1(
+    record.workflow_step_ref,
+    `${path}.workflow_step_ref`,
+  );
+};
+
+export const assertLookupScenarioDomainActionStepBindingResultV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is LookupScenarioDomainActionStepBindingResultV1 = (
+  value,
+  path = "binding_lookup_result",
+) => {
+  const record = assertRecord(value, path);
+  if (record.status === "bound") {
+    assertKeys(record, boundStepResultKeys, path);
+    assertScenarioDomainActionWorkflowStepRefV1(
+      record.workflow_step_ref,
+      `${path}.workflow_step_ref`,
+    );
+    assertSha256(record.binding_evidence_hash, `${path}.binding_evidence_hash`);
+    assertCanonicalInstant(record.context_expires_at, `${path}.context_expires_at`);
+    return;
+  }
+  if (record.status === "not_bound") {
+    assertKeys(record, lookupNotBoundResultKeys, path);
+    return;
+  }
+  if (record.status !== "unavailable") {
+    fail("invalid_status", `${path}.status`, `${path}.status is invalid`);
+  }
+  assertKeys(record, safeResultKeys, path);
+  assertScenarioSafeReasonV1(record.safe_reason, `${path}.safe_reason`);
+};
+
+export const assertScenarioDomainActionClaimedStepDriverV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is ScenarioDomainActionClaimedStepDriverV1 = (
+  value,
+  path = "claimed_driver",
+) => {
+  const record = assertRecord(value, path);
+  assertKeys(record, claimedStepDriverKeys, path);
+  if (record.claimed_driver_version !== 1) {
+    fail(
+      "invalid_version",
+      `${path}.claimed_driver_version`,
+      "claimed_driver_version must be 1",
+    );
+  }
+  assertScenarioDomainActionWorkflowStepRefV1(
+    record.workflow_step_ref,
+    `${path}.workflow_step_ref`,
+  );
+  assertSha256(record.action_contract_hash, `${path}.action_contract_hash`);
+  assertOpaqueLocator(record.claim_token, `${path}.claim_token`);
+  if (!Number.isInteger(record.expected_step_version) || Number(record.expected_step_version) < 0) {
+    fail(
+      "invalid_step_version",
+      `${path}.expected_step_version`,
+      "expected_step_version must be a non-negative integer",
+    );
+  }
+};
+
+const workflowStepRefEquals = (
+  left: ScenarioDomainActionWorkflowStepRefV1,
+  right: ScenarioDomainActionWorkflowStepRefV1,
+): boolean =>
+  left.schema_version === right.schema_version &&
+  left.namespace === right.namespace &&
+  left.object_type === right.object_type &&
+  left.object_id === right.object_id;
+
+const claimedStepAssertionKey = (
+  assertion: ScenarioDomainActionClaimedStepAssertionV1,
+): string => JSON.stringify({
+  step_assertion_version: assertion.step_assertion_version,
+  workflow_step_ref: [
+    assertion.workflow_step_ref.schema_version,
+    assertion.workflow_step_ref.namespace,
+    assertion.workflow_step_ref.object_type,
+    assertion.workflow_step_ref.object_id,
+  ],
+  workspace_ref: canonicalRefProjection(assertion.workspace_ref),
+  principal_provenance_hash: assertion.principal_provenance_hash,
+  scenario_key: assertion.scenario_key,
+  action_key: assertion.action_key,
+  handler_key: assertion.handler_key,
+  action_contract_hash: assertion.action_contract_hash,
+  driver: assertion.driver,
+  client_mutation_id: assertion.client_mutation_id,
+  request_correlation_hash: assertion.request_correlation_hash,
+});
+
+export const assertBindScenarioDomainActionStepContextV1 = (
+  contract: unknown,
+  input: unknown,
+  result: unknown,
+  context: {
+    step_state: "awaiting_scenario_binding" | "scenario_bound" | "claimable" | "missing";
+    workflow_step_ref: unknown;
+    action_contract_hash: string;
+    principal_binding_hash: string;
+    principal_provenance_hash: string;
+    request_correlation_hash: string;
+    workspace_ref: unknown;
+    binding_evidence_hash: string;
+    context_expires_at: string;
+    now: string;
+    existing_binding?: unknown;
+  },
+): void => {
+  assertScenarioDomainActionContractV1(contract);
+  assertBindScenarioDomainActionStepInputV1(input);
+  assertBindScenarioDomainActionStepResultV1(result);
+  if (contract.driver !== "workflow_claimed_step_v1") {
+    fail("driver_mismatch", "action_contract.driver", "Step binding requires claimed-Step driver");
+  }
+  const assertion = input.step_assertion;
+  assertScenarioDomainActionWorkflowStepRefV1(context.workflow_step_ref, "context.workflow_step_ref");
+  assertWorkspaceRef(context.workspace_ref, "context.workspace_ref");
+  assertSha256(context.action_contract_hash, "context.action_contract_hash");
+  assertSha256(context.principal_binding_hash, "context.principal_binding_hash");
+  assertSha256(context.principal_provenance_hash, "context.principal_provenance_hash");
+  assertSha256(context.request_correlation_hash, "context.request_correlation_hash");
+  assertSha256(context.binding_evidence_hash, "context.binding_evidence_hash");
+  const contextExpiresAt = assertCanonicalInstant(
+    context.context_expires_at,
+    "context.context_expires_at",
+  );
+  const now = assertCanonicalInstant(context.now, "context.now");
+  if (now >= contextExpiresAt) {
+    fail("submit_context_expired", "context.now", "Step binding requires a current submit context");
+  }
+  assertSubmitScenarioDomainActionContextV1(contract, input.submit, {
+    principal_binding_hash: context.principal_binding_hash,
+    submit_context_expires_at: context.context_expires_at,
+    now: context.now,
+  });
+  if (
+    contract.scenario_key !== assertion.scenario_key ||
+    contract.action_key !== assertion.action_key ||
+    contract.handler_key !== assertion.handler_key ||
+    assertion.action_contract_hash !== context.action_contract_hash
+  ) {
+    fail(
+      "step_contract_mismatch",
+      "step_binding_input.step_assertion",
+      "Step assertion must match the immutable action contract",
+    );
+  }
+  if (!workflowStepRefEquals(assertion.workflow_step_ref, context.workflow_step_ref)) {
+    fail("workflow_step_mismatch", "context.workflow_step_ref", "binding must use the original Step");
+  }
+  if (!canonicalRefEquals(assertion.workspace_ref, context.workspace_ref)) {
+    fail("workspace_mismatch", "context.workspace_ref", "binding Workspace must match the assertion");
+  }
+  if (assertion.principal_provenance_hash !== context.principal_provenance_hash) {
+    fail(
+      "principal_binding_mismatch",
+      "context.principal_provenance_hash",
+      "binding principal must match the assertion",
+    );
+  }
+  if (assertion.client_mutation_id !== input.submit.client_echo.client_mutation_id) {
+    fail(
+      "client_mutation_mismatch",
+      "step_binding_input.step_assertion.client_mutation_id",
+      "Step assertion must bind the exact submit client mutation",
+    );
+  }
+  if (assertion.request_correlation_hash !== context.request_correlation_hash) {
+    fail(
+      "request_correlation_mismatch",
+      "context.request_correlation_hash",
+      "Step assertion must bind the exact Host request correlation",
+    );
+  }
+  if (context.step_state === "claimable" || context.step_state === "missing") {
+    fail(
+      "step_not_bindable",
+      "context.step_state",
+      "only the original awaiting or already-bound Step is bindable",
+    );
+  }
+  if (context.existing_binding === undefined) {
+    if (context.step_state !== "awaiting_scenario_binding" || result.status !== "bound") {
+      fail("binding_state_mismatch", "step_binding_result.status", "new binding must return bound");
+    }
+  } else {
+    assertScenarioDomainActionClaimedStepAssertionV1(
+      context.existing_binding,
+      "context.existing_binding",
+    );
+    if (claimedStepAssertionKey(context.existing_binding) !== claimedStepAssertionKey(assertion)) {
+      fail(
+        "request_conflict",
+        "context.existing_binding",
+        "different immutable assertion cannot exact-rebind",
+      );
+    }
+    if (context.step_state !== "scenario_bound" || result.status !== "exact_replay") {
+      fail(
+        "binding_state_mismatch",
+        "step_binding_result.status",
+        "existing exact binding must return exact_replay",
+      );
+    }
+  }
+  if (result.status === "bound" || result.status === "exact_replay") {
+    if (!workflowStepRefEquals(result.workflow_step_ref, assertion.workflow_step_ref)) {
+      fail(
+        "workflow_step_mismatch",
+        "step_binding_result.workflow_step_ref",
+        "binding result must preserve the original Step",
+      );
+    }
+    if (result.binding_evidence_hash !== context.binding_evidence_hash) {
+      fail(
+        "binding_evidence_mismatch",
+        "step_binding_result.binding_evidence_hash",
+        "binding result evidence must match stored evidence",
+      );
+    }
+    if (result.context_expires_at !== context.context_expires_at) {
+      fail(
+        "context_expiry_changed",
+        "step_binding_result.context_expires_at",
+        "binding must not extend or replace the submit-context expiry",
+      );
+    }
+  }
+};
+
+export const assertLookupScenarioDomainActionStepBindingExchangeV1 = (
+  input: unknown,
+  result: unknown,
+  storedBinding?: {
+    workflow_step_ref: unknown;
+    binding_evidence_hash: string;
+    context_expires_at: string;
+  },
+): void => {
+  assertLookupScenarioDomainActionStepBindingInputV1(input);
+  assertLookupScenarioDomainActionStepBindingResultV1(result);
+  if (storedBinding === undefined) {
+    if (result.status === "bound") {
+      fail("unexpected_binding", "binding_lookup_result", "lookup cannot invent a binding");
+    }
+    return;
+  }
+  assertScenarioDomainActionWorkflowStepRefV1(
+    storedBinding.workflow_step_ref,
+    "stored_binding.workflow_step_ref",
+  );
+  assertSha256(storedBinding.binding_evidence_hash, "stored_binding.binding_evidence_hash");
+  assertCanonicalInstant(storedBinding.context_expires_at, "stored_binding.context_expires_at");
+  if (
+    !workflowStepRefEquals(input.workflow_step_ref, storedBinding.workflow_step_ref) ||
+    result.status !== "bound" ||
+    !workflowStepRefEquals(result.workflow_step_ref, input.workflow_step_ref) ||
+    result.binding_evidence_hash !== storedBinding.binding_evidence_hash ||
+    result.context_expires_at !== storedBinding.context_expires_at
+  ) {
+    fail(
+      "binding_recovery_mismatch",
+      "binding_lookup_result",
+      "lookup must recover only the exact stored original-Step binding",
+    );
+  }
+};
+
+export const assertScenarioDomainActionClaimedStepDriverContextV1 = (
+  driver: unknown,
+  context: {
+    binding_published: boolean;
+    workflow_step_ref: unknown;
+    action_contract_hash: string;
+  },
+): void => {
+  assertScenarioDomainActionClaimedStepDriverV1(driver);
+  assertScenarioDomainActionWorkflowStepRefV1(context.workflow_step_ref, "context.workflow_step_ref");
+  assertSha256(context.action_contract_hash, "context.action_contract_hash");
+  if (!context.binding_published) {
+    fail("claim_before_bind", "context.binding_published", "Step cannot be claimed before binding");
+  }
+  if (!workflowStepRefEquals(driver.workflow_step_ref, context.workflow_step_ref)) {
+    fail("workflow_step_mismatch", "claimed_driver.workflow_step_ref", "driver must use the bound Step");
+  }
+  if (driver.action_contract_hash !== context.action_contract_hash) {
+    fail(
+      "step_contract_mismatch",
+      "claimed_driver.action_contract_hash",
+      "driver contract hash must match the bound assertion",
+    );
   }
 };

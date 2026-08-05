@@ -279,5 +279,135 @@
         "retry_class": "retry_later"
       }
     }
-  ]
+  ],
+  "step_binding_input": {
+    "step_binding_version": 1,
+    "submit": {
+      "submit_request_version": 1,
+      "client_echo": {
+        "submit_version": 1,
+        "submit_token": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+        "confirmation": "confirmed",
+        "client_mutation_id": "mutation_example_01"
+      }
+    },
+    "step_assertion": {
+      "step_assertion_version": 1,
+      "workflow_step_ref": {
+        "schema_version": 1,
+        "namespace": "my_chat",
+        "object_type": "workflow_step",
+        "object_id": "step_example_01"
+      },
+      "workspace_ref": {
+        "schema_version": 1,
+        "namespace": "my_chat",
+        "object_type": "workspace",
+        "object_id": "workspace_example_01"
+      },
+      "principal_provenance_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "scenario_key": "example-care",
+      "action_key": "example.record",
+      "handler_key": "example.record.handler",
+      "action_contract_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+      "driver": "workflow_claimed_step_v1",
+      "client_mutation_id": "mutation_example_01",
+      "request_correlation_hash": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+  },
+  "step_binding_results": [
+    {
+      "status": "bound",
+      "workflow_step_ref": {
+        "schema_version": 1,
+        "namespace": "my_chat",
+        "object_type": "workflow_step",
+        "object_id": "step_example_01"
+      },
+      "binding_evidence_hash": "8888888888888888888888888888888888888888888888888888888888888888",
+      "context_expires_at": "2026-08-05T00:05:00.000Z"
+    },
+    {
+      "status": "exact_replay",
+      "workflow_step_ref": {
+        "schema_version": 1,
+        "namespace": "my_chat",
+        "object_type": "workflow_step",
+        "object_id": "step_example_01"
+      },
+      "binding_evidence_hash": "8888888888888888888888888888888888888888888888888888888888888888",
+      "context_expires_at": "2026-08-05T00:05:00.000Z"
+    },
+    {
+      "status": "request_conflict",
+      "safe_reason": {
+        "reason_code": "example_request_conflict",
+        "message": {
+          "kind": "plain_text",
+          "value": "The example request conflicts with the stored binding.",
+          "locale": "en-US"
+        },
+        "retry_class": "refresh"
+      }
+    },
+    {
+      "status": "unavailable",
+      "safe_reason": {
+        "reason_code": "example_unavailable",
+        "message": {
+          "kind": "plain_text",
+          "value": "The example binding is unavailable.",
+          "locale": "en-US"
+        },
+        "retry_class": "retry_later"
+      }
+    }
+  ],
+  "binding_lookup_input": {
+    "binding_lookup_version": 1,
+    "workflow_step_ref": {
+      "schema_version": 1,
+      "namespace": "my_chat",
+      "object_type": "workflow_step",
+      "object_id": "step_example_01"
+    }
+  },
+  "binding_lookup_results": [
+    {
+      "status": "bound",
+      "workflow_step_ref": {
+        "schema_version": 1,
+        "namespace": "my_chat",
+        "object_type": "workflow_step",
+        "object_id": "step_example_01"
+      },
+      "binding_evidence_hash": "8888888888888888888888888888888888888888888888888888888888888888",
+      "context_expires_at": "2026-08-05T00:05:00.000Z"
+    },
+    { "status": "not_bound" },
+    {
+      "status": "unavailable",
+      "safe_reason": {
+        "reason_code": "example_unavailable",
+        "message": {
+          "kind": "plain_text",
+          "value": "The example binding lookup is unavailable.",
+          "locale": "en-US"
+        },
+        "retry_class": "retry_later"
+      }
+    }
+  ],
+  "claimed_step_driver": {
+    "claimed_driver_version": 1,
+    "workflow_step_ref": {
+      "schema_version": 1,
+      "namespace": "my_chat",
+      "object_type": "workflow_step",
+      "object_id": "step_example_01"
+    },
+    "action_contract_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+    "claim_token": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+    "expected_step_version": 2
+  }
 }
