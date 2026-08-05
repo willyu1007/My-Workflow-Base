@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/submit-scenario-domain-action-result-v1.schema.json",
+  "title": "SubmitScenarioDomainActionResultV1",
+  "description": "Public progress shell with no execution, output, Step, driver, claim or snapshot reference.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "status": { "enum": ["accepted", "completed", "context_changed", "unavailable"] },
+    "current_result": { "$ref": "scenario-domain-action-current-result-v1.schema.json" },
+    "safe_reason": { "$ref": "scenario-safe-reason-v1.schema.json" }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": { "status": { "const": "accepted" } }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "current_result"],
+      "properties": {
+        "status": { "const": "completed" },
+        "current_result": { "$ref": "scenario-domain-action-current-result-v1.schema.json" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "safe_reason"],
+      "properties": {
+        "status": { "enum": ["context_changed", "unavailable"] },
+        "safe_reason": { "$ref": "scenario-safe-reason-v1.schema.json" }
+      }
+    }
+  ]
+}

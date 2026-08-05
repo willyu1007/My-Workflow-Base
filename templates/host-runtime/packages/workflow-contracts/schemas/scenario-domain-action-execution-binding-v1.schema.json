@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-domain-action-execution-binding-v1.schema.json",
+  "title": "ScenarioDomainActionExecutionBindingV1",
+  "description": "Server-only binding of effect identity inputs to the Scenario-owned canonical payload hash.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["execution_binding_version", "effect_identity", "canonical_payload_hash"],
+  "properties": {
+    "execution_binding_version": { "const": 1 },
+    "effect_identity": { "$ref": "scenario-domain-action-effect-identity-input-v1.schema.json" },
+    "canonical_payload_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

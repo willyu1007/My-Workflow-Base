@@ -23,6 +23,10 @@ const expected = [
   "scenario-domain-action-claimed-step-assertion-v1.schema.json",
   "scenario-domain-action-confirmation-prompt-v1.schema.json",
   "scenario-domain-action-contract-v1.schema.json",
+  "scenario-domain-action-current-result-v1.schema.json",
+  "scenario-domain-action-effect-identity-input-v1.schema.json",
+  "scenario-domain-action-execution-binding-v1.schema.json",
+  "scenario-domain-action-execution-result-v1.schema.json",
   "scenario-domain-action-submit-echo-v1.schema.json",
   "scenario-domain-action-workflow-step-ref-v1.schema.json",
   "scenario-event-envelope-v1.schema.json",
@@ -49,6 +53,7 @@ const expected = [
   "scenario-subject-context-option-v1.schema.json",
   "scenario-workspace-activation-v1.schema.json",
   "submit-scenario-domain-action-input-v1.schema.json",
+  "submit-scenario-domain-action-result-v1.schema.json",
 ];
 
 const actual = (await readdir(schemaRoot)).filter((name) => name.endsWith(".schema.json")).sort();

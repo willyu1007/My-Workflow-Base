@@ -1,5 +1,6 @@
 import { assertCanonicalRef } from "./federation-validation.js";
 import type { CanonicalRef } from "./identity.js";
+import type { ScenarioHandoffRequestSnapshot } from "./handoff.js";
 import {
   assertScenarioActionTargetRefV1,
   assertScenarioSafeReasonV1,
@@ -18,6 +19,11 @@ import {
   type ScenarioDomainActionConfirmationPromptV1,
   type ScenarioDomainActionSubmitEchoV1,
   type SubmitScenarioDomainActionInputV1,
+  type ScenarioDomainActionCurrentResultV1,
+  type ScenarioDomainActionEffectIdentityInputV1,
+  type ScenarioDomainActionExecutionBindingV1,
+  type ScenarioDomainActionExecutionResultV1,
+  type SubmitScenarioDomainActionResultV1,
 } from "./scenario-domain-action.js";
 
 export class ScenarioDomainActionValidationError extends Error {
@@ -95,6 +101,53 @@ const submitInputKeys = new Set([
   "client_echo",
   "authentication_assurance",
 ]);
+const directEffectIdentityKeys = new Set([
+  "effect_identity_version",
+  "driver",
+  "workspace_ref",
+  "scenario_key",
+  "action_key",
+  "submit_context_ref",
+]);
+const claimedEffectIdentityKeys = new Set([
+  "effect_identity_version",
+  "driver",
+  "workspace_ref",
+  "scenario_key",
+  "action_key",
+  "original_workflow_step_ref",
+]);
+const executionBindingKeys = new Set([
+  "execution_binding_version",
+  "effect_identity",
+  "canonical_payload_hash",
+]);
+const committedExecutionResultKeys = new Set([
+  "status",
+  "disposition",
+  "business_outcome",
+  "execution_ref",
+  "output_refs",
+  "handoff_request_snapshots",
+]);
+const notCommittedExecutionResultKeys = new Set([
+  "status",
+  "decision",
+  "safe_reason",
+]);
+const safeExecutionResultKeys = new Set(["status", "safe_reason"]);
+const handoffSnapshotKeys = new Set([
+  "requestId",
+  "handoffKey",
+  "requestedPurpose",
+  "sourceContextRefs",
+  "sourceArtifactRefs",
+  "expiresAt",
+]);
+const currentSimpleResultKeys = new Set(["state"]);
+const currentUnavailableResultKeys = new Set(["state", "safe_reason"]);
+const submitAcceptedResultKeys = new Set(["status"]);
+const submitCompletedResultKeys = new Set(["status", "current_result"]);
 const drivers = new Set<string>(scenarioDomainActionDriversV1);
 const confirmationClasses = new Set<string>(scenarioDomainActionConfirmationClassesV1);
 const machineKeyPattern = /^[a-z][a-z0-9._:-]{0,127}$/u;
@@ -105,6 +158,16 @@ const opaqueVersionPattern = /^[A-Za-z0-9][A-Za-z0-9._:~-]{0,199}$/u;
 const canonicalInstantPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u;
 const maximumSubmitContextLifetimeMs = 5 * 60 * 1000;
 const maximumActionInputBytes = 32 * 1024;
+const maximumExecutionResultBytes = 64 * 1024;
+const maximumSubmitResultBytes = 8 * 1024;
+const maximumResultRefs = 32;
+const executionDispositions = new Set(["executed", "replayed"]);
+const businessOutcomes = new Set(["applied", "already_satisfied"]);
+const notCommittedDecisions = new Set([
+  "invalid_request",
+  "request_conflict",
+  "rate_limited",
+]);
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === "object" && !Array.isArray(value);
@@ -674,5 +737,345 @@ export const assertSubmitScenarioDomainActionContextV1 = (
       "submit_input.authentication_assurance.expires_at",
       "assurance must be current and no later than the submit context",
     );
+  }
+};
+
+export const assertScenarioDomainActionEffectIdentityInputV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is ScenarioDomainActionEffectIdentityInputV1 = (
+  value,
+  path = "effect_identity",
+) => {
+  const record = assertRecord(value, path);
+  if (record.driver === "scenario_direct_empty_v1") {
+    assertKeys(record, directEffectIdentityKeys, path);
+  } else if (record.driver === "workflow_claimed_step_v1") {
+    assertKeys(record, claimedEffectIdentityKeys, path);
+  } else {
+    fail("invalid_driver", `${path}.driver`, `${path}.driver is invalid`);
+  }
+  if (record.effect_identity_version !== 1) {
+    fail(
+      "invalid_version",
+      `${path}.effect_identity_version`,
+      "effect_identity_version must be 1",
+    );
+  }
+  assertWorkspaceRef(record.workspace_ref, `${path}.workspace_ref`);
+  assertMachineKey(record.scenario_key, `${path}.scenario_key`);
+  assertMachineKey(record.action_key, `${path}.action_key`);
+  if (record.driver === "scenario_direct_empty_v1") {
+    assertCanonicalRef(record.submit_context_ref, `${path}.submit_context_ref`);
+    return;
+  }
+  assertScenarioDomainActionWorkflowStepRefV1(
+    record.original_workflow_step_ref,
+    `${path}.original_workflow_step_ref`,
+  );
+};
+
+export const assertScenarioDomainActionExecutionBindingV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is ScenarioDomainActionExecutionBindingV1 = (
+  value,
+  path = "execution_binding",
+) => {
+  const record = assertRecord(value, path);
+  assertKeys(record, executionBindingKeys, path);
+  if (record.execution_binding_version !== 1) {
+    fail(
+      "invalid_version",
+      `${path}.execution_binding_version`,
+      "execution_binding_version must be 1",
+    );
+  }
+  assertScenarioDomainActionEffectIdentityInputV1(
+    record.effect_identity,
+    `${path}.effect_identity`,
+  );
+  assertSha256(record.canonical_payload_hash, `${path}.canonical_payload_hash`);
+};
+
+const assertCanonicalRefArray: (
+  value: unknown,
+  path: string,
+) => asserts value is CanonicalRef[] = (value, path) => {
+  if (!Array.isArray(value) || value.length > maximumResultRefs) {
+    fail("invalid_ref_array", path, `${path} must contain at most 32 canonical refs`);
+  }
+  value.forEach((ref, index) => assertCanonicalRef(ref, `${path}.${index}`));
+};
+
+const assertHandoffRequestSnapshot: (
+  value: unknown,
+  path: string,
+) => asserts value is ScenarioHandoffRequestSnapshot = (value, path) => {
+  const record = assertRecord(value, path);
+  assertKeys(record, handoffSnapshotKeys, path);
+  if (
+    typeof record.requestId !== "string" ||
+    !opaqueIdPattern.test(record.requestId)
+  ) {
+    fail("invalid_snapshot", `${path}.requestId`, `${path}.requestId must be opaque`);
+  }
+  assertMachineKey(record.handoffKey, `${path}.handoffKey`);
+  assertMachineKey(record.requestedPurpose, `${path}.requestedPurpose`);
+  if (record.sourceContextRefs !== undefined) {
+    assertCanonicalRefArray(record.sourceContextRefs, `${path}.sourceContextRefs`);
+  }
+  if (record.sourceArtifactRefs !== undefined) {
+    assertCanonicalRefArray(record.sourceArtifactRefs, `${path}.sourceArtifactRefs`);
+  }
+  if (record.expiresAt !== undefined) {
+    assertCanonicalInstant(record.expiresAt, `${path}.expiresAt`);
+  }
+};
+
+export const assertScenarioDomainActionExecutionResultV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is ScenarioDomainActionExecutionResultV1 = (
+  value,
+  path = "execution_result",
+) => {
+  const record = assertRecord(value, path);
+  if (record.status === "committed") {
+    assertKeys(record, committedExecutionResultKeys, path);
+    if (
+      typeof record.disposition !== "string" ||
+      !executionDispositions.has(record.disposition)
+    ) {
+      fail("invalid_disposition", `${path}.disposition`, `${path}.disposition is invalid`);
+    }
+    if (
+      typeof record.business_outcome !== "string" ||
+      !businessOutcomes.has(record.business_outcome)
+    ) {
+      fail(
+        "invalid_business_outcome",
+        `${path}.business_outcome`,
+        `${path}.business_outcome is invalid`,
+      );
+    }
+    assertCanonicalRef(record.execution_ref, `${path}.execution_ref`);
+    assertCanonicalRefArray(record.output_refs, `${path}.output_refs`);
+    if (
+      !Array.isArray(record.handoff_request_snapshots) ||
+      record.handoff_request_snapshots.length > maximumResultRefs
+    ) {
+      fail(
+        "invalid_snapshot_array",
+        `${path}.handoff_request_snapshots`,
+        `${path}.handoff_request_snapshots must contain at most 32 snapshots`,
+      );
+    }
+    record.handoff_request_snapshots.forEach((snapshot, index) =>
+      assertHandoffRequestSnapshot(snapshot, `${path}.handoff_request_snapshots.${index}`),
+    );
+  } else if (record.status === "not_committed") {
+    assertKeys(record, notCommittedExecutionResultKeys, path);
+    if (typeof record.decision !== "string" || !notCommittedDecisions.has(record.decision)) {
+      fail("invalid_decision", `${path}.decision`, `${path}.decision is invalid`);
+    }
+    assertScenarioSafeReasonV1(record.safe_reason, `${path}.safe_reason`);
+  } else if (record.status === "outcome_unknown") {
+    assertKeys(record, safeExecutionResultKeys, path);
+    assertScenarioSafeReasonV1(record.safe_reason, `${path}.safe_reason`);
+  } else {
+    fail("invalid_status", `${path}.status`, `${path}.status is invalid`);
+  }
+  if (serializedUtf8Bytes(record, path) > maximumExecutionResultBytes) {
+    fail(
+      "execution_result_too_large",
+      path,
+      "private execution result must be at most 64 KiB UTF-8",
+    );
+  }
+};
+
+export const assertScenarioDomainActionCurrentResultV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is ScenarioDomainActionCurrentResultV1 = (
+  value,
+  path = "current_result",
+) => {
+  const record = assertRecord(value, path);
+  if (record.state === "changed" || record.state === "already_current") {
+    assertKeys(record, currentSimpleResultKeys, path);
+    return;
+  }
+  if (record.state !== "processed_but_unavailable") {
+    fail("invalid_state", `${path}.state`, `${path}.state is invalid`);
+  }
+  assertKeys(record, currentUnavailableResultKeys, path);
+  assertScenarioSafeReasonV1(record.safe_reason, `${path}.safe_reason`);
+};
+
+export const assertSubmitScenarioDomainActionResultV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is SubmitScenarioDomainActionResultV1 = (
+  value,
+  path = "submit_result",
+) => {
+  const record = assertRecord(value, path);
+  if (record.status === "accepted") {
+    assertKeys(record, submitAcceptedResultKeys, path);
+  } else if (record.status === "completed") {
+    assertKeys(record, submitCompletedResultKeys, path);
+    assertScenarioDomainActionCurrentResultV1(record.current_result, `${path}.current_result`);
+  } else if (record.status === "context_changed" || record.status === "unavailable") {
+    assertKeys(record, safeResultKeys, path);
+    assertScenarioSafeReasonV1(record.safe_reason, `${path}.safe_reason`);
+  } else {
+    fail("invalid_status", `${path}.status`, `${path}.status is invalid`);
+  }
+  if (serializedUtf8Bytes(record, path) > maximumSubmitResultBytes) {
+    fail(
+      "submit_result_too_large",
+      path,
+      "public submit result must be at most 8 KiB UTF-8",
+    );
+  }
+};
+
+export const assertScenarioDomainActionExecutionResultForBindingV1 = (
+  contract: unknown,
+  binding: unknown,
+  result: unknown,
+): void => {
+  assertScenarioDomainActionContractV1(contract);
+  assertScenarioDomainActionExecutionBindingV1(binding);
+  assertScenarioDomainActionExecutionResultV1(result);
+  const identity = binding.effect_identity;
+  if (
+    contract.driver !== identity.driver ||
+    contract.scenario_key !== identity.scenario_key ||
+    contract.action_key !== identity.action_key
+  ) {
+    fail(
+      "execution_contract_mismatch",
+      "execution_binding.effect_identity",
+      "effect identity must match the immutable action contract",
+    );
+  }
+  if (
+    identity.driver === "scenario_direct_empty_v1" &&
+    result.status === "committed" &&
+    result.handoff_request_snapshots.length !== 0
+  ) {
+    fail(
+      "direct_snapshot_forbidden",
+      "execution_result.handoff_request_snapshots",
+      "direct execution must persist an exact empty snapshot array",
+    );
+  }
+};
+
+export const assertSubmitScenarioDomainActionResultForContractV1 = (
+  contract: unknown,
+  result: unknown,
+): void => {
+  assertScenarioDomainActionContractV1(contract);
+  assertSubmitScenarioDomainActionResultV1(result);
+  if (result.status === "accepted" && contract.driver !== "workflow_claimed_step_v1") {
+    fail(
+      "public_mode_mismatch",
+      "submit_result.status",
+      "accepted is available only to the claimed-Step driver",
+    );
+  }
+  if (result.status === "completed" && contract.driver !== "scenario_direct_empty_v1") {
+    fail(
+      "public_mode_mismatch",
+      "submit_result.status",
+      "completed is available only to the direct driver",
+    );
+  }
+};
+
+const canonicalRefProjection = (ref: CanonicalRef) => [
+  ref.schema_version,
+  ref.namespace,
+  ref.object_type,
+  ref.object_id,
+  ref.version ?? null,
+];
+
+const effectIdentityKey = (identity: ScenarioDomainActionEffectIdentityInputV1): string =>
+  identity.driver === "scenario_direct_empty_v1"
+    ? JSON.stringify([
+        canonicalRefProjection(identity.workspace_ref),
+        identity.scenario_key,
+        identity.action_key,
+        canonicalRefProjection(identity.submit_context_ref),
+      ])
+    : JSON.stringify([
+        canonicalRefProjection(identity.workspace_ref),
+        identity.scenario_key,
+        identity.action_key,
+        [
+          identity.original_workflow_step_ref.schema_version,
+          identity.original_workflow_step_ref.namespace,
+          identity.original_workflow_step_ref.object_type,
+          identity.original_workflow_step_ref.object_id,
+        ],
+      ]);
+
+const committedReplayProjection = (
+  result: Extract<ScenarioDomainActionExecutionResultV1, { status: "committed" }>,
+): string => JSON.stringify({
+  business_outcome: result.business_outcome,
+  execution_ref: canonicalRefProjection(result.execution_ref),
+  output_refs: result.output_refs.map(canonicalRefProjection),
+  handoff_request_snapshots: result.handoff_request_snapshots.map((snapshot) => ({
+    requestId: snapshot.requestId,
+    handoffKey: snapshot.handoffKey,
+    requestedPurpose: snapshot.requestedPurpose,
+    sourceContextRefs: snapshot.sourceContextRefs?.map(canonicalRefProjection) ?? null,
+    sourceArtifactRefs: snapshot.sourceArtifactRefs?.map(canonicalRefProjection) ?? null,
+    expiresAt: snapshot.expiresAt ?? null,
+  })),
+});
+
+export const assertScenarioDomainActionExactReplayV1 = (
+  originalBinding: unknown,
+  replayBinding: unknown,
+  originalResult: unknown,
+  replayResult: unknown,
+): void => {
+  assertScenarioDomainActionExecutionBindingV1(originalBinding, "original_binding");
+  assertScenarioDomainActionExecutionBindingV1(replayBinding, "replay_binding");
+  assertScenarioDomainActionExecutionResultV1(originalResult, "original_result");
+  assertScenarioDomainActionExecutionResultV1(replayResult, "replay_result");
+  if (
+    effectIdentityKey(originalBinding.effect_identity) !==
+      effectIdentityKey(replayBinding.effect_identity) ||
+    originalBinding.canonical_payload_hash !== replayBinding.canonical_payload_hash
+  ) {
+    fail(
+      "request_conflict",
+      "replay_binding",
+      "changed immutable identity or payload cannot exact-replay",
+    );
+  }
+  if (originalResult.status === "committed" && replayResult.status === "committed") {
+    if (replayResult.disposition !== "replayed") {
+      fail(
+        "invalid_replay_disposition",
+        "replay_result.disposition",
+        "an exact replay invocation must report replayed",
+      );
+    }
+    if (committedReplayProjection(originalResult) !== committedReplayProjection(replayResult)) {
+      fail(
+        "replay_result_mismatch",
+        "replay_result",
+        "exact replay must preserve outcome, refs and snapshots",
+      );
+    }
   }
 };

@@ -1,4 +1,5 @@
 import type { CanonicalRef } from "./identity.js";
+import type { ScenarioHandoffRequestSnapshot } from "./handoff.js";
 import type {
   ScenarioActionTargetRefV1,
   ScenarioSafeReasonV1,
@@ -104,3 +105,68 @@ export type SubmitScenarioDomainActionInputV1 = {
   client_echo: ScenarioDomainActionSubmitEchoV1;
   authentication_assurance?: ScenarioAuthenticationAssuranceEvidenceV1;
 };
+
+export type ScenarioDomainActionEffectIdentityInputV1 =
+  | {
+      effect_identity_version: 1;
+      driver: "scenario_direct_empty_v1";
+      workspace_ref: CanonicalRef;
+      scenario_key: string;
+      action_key: string;
+      submit_context_ref: CanonicalRef;
+    }
+  | {
+      effect_identity_version: 1;
+      driver: "workflow_claimed_step_v1";
+      workspace_ref: CanonicalRef;
+      scenario_key: string;
+      action_key: string;
+      original_workflow_step_ref: ScenarioDomainActionWorkflowStepRefV1;
+    };
+
+export type ScenarioDomainActionExecutionBindingV1 = {
+  execution_binding_version: 1;
+  effect_identity: ScenarioDomainActionEffectIdentityInputV1;
+  canonical_payload_hash: string;
+};
+
+export type ScenarioDomainActionBusinessOutcomeV1 =
+  | "applied"
+  | "already_satisfied";
+
+export type ScenarioDomainActionExecutionDispositionV1 =
+  | "executed"
+  | "replayed";
+
+export type ScenarioDomainActionExecutionResultV1 =
+  | {
+      status: "committed";
+      disposition: ScenarioDomainActionExecutionDispositionV1;
+      business_outcome: ScenarioDomainActionBusinessOutcomeV1;
+      execution_ref: CanonicalRef;
+      output_refs: CanonicalRef[];
+      handoff_request_snapshots: ScenarioHandoffRequestSnapshot[];
+    }
+  | {
+      status: "not_committed";
+      decision: "invalid_request" | "request_conflict" | "rate_limited";
+      safe_reason: ScenarioSafeReasonV1;
+    }
+  | { status: "outcome_unknown"; safe_reason: ScenarioSafeReasonV1 };
+
+export type ScenarioDomainActionCurrentResultV1 =
+  | { state: "changed" }
+  | { state: "already_current" }
+  | {
+      state: "processed_but_unavailable";
+      safe_reason: ScenarioSafeReasonV1;
+    };
+
+export type SubmitScenarioDomainActionResultV1 =
+  | { status: "accepted" }
+  | {
+      status: "completed";
+      current_result: ScenarioDomainActionCurrentResultV1;
+    }
+  | { status: "context_changed"; safe_reason: ScenarioSafeReasonV1 }
+  | { status: "unavailable"; safe_reason: ScenarioSafeReasonV1 };

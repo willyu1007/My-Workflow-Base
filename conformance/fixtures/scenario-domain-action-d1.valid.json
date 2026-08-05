@@ -114,5 +114,170 @@
         "expires_at": "2026-08-05T00:03:00.000Z"
       }
     }
+  ],
+  "execution_bindings": [
+    {
+      "execution_binding_version": 1,
+      "effect_identity": {
+        "effect_identity_version": 1,
+        "driver": "scenario_direct_empty_v1",
+        "workspace_ref": {
+          "schema_version": 1,
+          "namespace": "my_chat",
+          "object_type": "workspace",
+          "object_id": "workspace_example_01"
+        },
+        "scenario_key": "example-care",
+        "action_key": "example.record",
+        "submit_context_ref": {
+          "schema_version": 1,
+          "namespace": "scenario.example",
+          "object_type": "submit_context",
+          "object_id": "submit_context_example_01"
+        }
+      },
+      "canonical_payload_hash": "6666666666666666666666666666666666666666666666666666666666666666"
+    },
+    {
+      "execution_binding_version": 1,
+      "effect_identity": {
+        "effect_identity_version": 1,
+        "driver": "workflow_claimed_step_v1",
+        "workspace_ref": {
+          "schema_version": 1,
+          "namespace": "my_chat",
+          "object_type": "workspace",
+          "object_id": "workspace_example_01"
+        },
+        "scenario_key": "example-care",
+        "action_key": "example.record",
+        "original_workflow_step_ref": {
+          "schema_version": 1,
+          "namespace": "my_chat",
+          "object_type": "workflow_step",
+          "object_id": "step_example_01"
+        }
+      },
+      "canonical_payload_hash": "7777777777777777777777777777777777777777777777777777777777777777"
+    }
+  ],
+  "execution_results": [
+    {
+      "status": "committed",
+      "disposition": "executed",
+      "business_outcome": "applied",
+      "execution_ref": {
+        "schema_version": 1,
+        "namespace": "scenario.example",
+        "object_type": "domain_action_execution",
+        "object_id": "execution_example_01"
+      },
+      "output_refs": [],
+      "handoff_request_snapshots": []
+    },
+    {
+      "status": "committed",
+      "disposition": "executed",
+      "business_outcome": "already_satisfied",
+      "execution_ref": {
+        "schema_version": 1,
+        "namespace": "scenario.example",
+        "object_type": "domain_action_execution",
+        "object_id": "execution_example_02"
+      },
+      "output_refs": [
+        {
+          "schema_version": 1,
+          "namespace": "scenario.example",
+          "object_type": "example_output",
+          "object_id": "output_example_01"
+        }
+      ],
+      "handoff_request_snapshots": [
+        {
+          "requestId": "request-example-01",
+          "handoffKey": "example_attention",
+          "requestedPurpose": "example_attention",
+          "sourceContextRefs": [
+            {
+              "schema_version": 1,
+              "namespace": "scenario.example",
+              "object_type": "example_context",
+              "object_id": "context_example_01"
+            }
+          ],
+          "expiresAt": "2026-08-05T01:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "status": "not_committed",
+      "decision": "request_conflict",
+      "safe_reason": {
+        "reason_code": "example_request_conflict",
+        "message": {
+          "kind": "plain_text",
+          "value": "The example request conflicts with earlier input.",
+          "locale": "en-US"
+        },
+        "retry_class": "refresh"
+      }
+    },
+    {
+      "status": "outcome_unknown",
+      "safe_reason": {
+        "reason_code": "example_outcome_unknown",
+        "message": {
+          "kind": "plain_text",
+          "value": "The current example outcome is unavailable.",
+          "locale": "en-US"
+        },
+        "retry_class": "retry_later"
+      }
+    }
+  ],
+  "submit_results": [
+    { "status": "accepted" },
+    { "status": "completed", "current_result": { "state": "changed" } },
+    { "status": "completed", "current_result": { "state": "already_current" } },
+    {
+      "status": "completed",
+      "current_result": {
+        "state": "processed_but_unavailable",
+        "safe_reason": {
+          "reason_code": "example_current_unavailable",
+          "message": {
+            "kind": "plain_text",
+            "value": "The current example view is unavailable.",
+            "locale": "en-US"
+          },
+          "retry_class": "refresh"
+        }
+      }
+    },
+    {
+      "status": "context_changed",
+      "safe_reason": {
+        "reason_code": "example_context_changed",
+        "message": {
+          "kind": "plain_text",
+          "value": "The example context changed.",
+          "locale": "en-US"
+        },
+        "retry_class": "refresh"
+      }
+    },
+    {
+      "status": "unavailable",
+      "safe_reason": {
+        "reason_code": "example_unavailable",
+        "message": {
+          "kind": "plain_text",
+          "value": "The example action is unavailable.",
+          "locale": "en-US"
+        },
+        "retry_class": "retry_later"
+      }
+    }
   ]
 }

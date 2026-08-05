@@ -3,7 +3,10 @@ import type {
   PrepareScenarioDomainActionResultV1,
   ScenarioDomainActionClaimedStepAssertionV1,
   ScenarioDomainActionContractV1,
+  ScenarioDomainActionExecutionBindingV1,
+  ScenarioDomainActionExecutionResultV1,
   SubmitScenarioDomainActionInputV1,
+  SubmitScenarioDomainActionResultV1,
 } from "@host/workflow-contracts";
 
 export const scenarioDomainActionContractFixture = {
@@ -79,3 +82,40 @@ export const submitScenarioDomainActionInputFixture = {
     client_mutation_id: "mutation_example_01",
   },
 } satisfies SubmitScenarioDomainActionInputV1;
+
+export const scenarioDomainActionExecutionBindingFixture = {
+  execution_binding_version: 1,
+  effect_identity: {
+    effect_identity_version: 1,
+    driver: "scenario_direct_empty_v1",
+    workspace_ref: scenarioDomainActionClaimedStepAssertionFixture.workspace_ref,
+    scenario_key: "example-care",
+    action_key: "example.record",
+    submit_context_ref: {
+      schema_version: 1,
+      namespace: "scenario.example",
+      object_type: "submit_context",
+      object_id: "submit_context_example_01",
+    },
+  },
+  canonical_payload_hash: "6".repeat(64),
+} satisfies ScenarioDomainActionExecutionBindingV1;
+
+export const scenarioDomainActionExecutionResultFixture = {
+  status: "committed",
+  disposition: "executed",
+  business_outcome: "applied",
+  execution_ref: {
+    schema_version: 1,
+    namespace: "scenario.example",
+    object_type: "domain_action_execution",
+    object_id: "execution_example_01",
+  },
+  output_refs: [],
+  handoff_request_snapshots: [],
+} satisfies ScenarioDomainActionExecutionResultV1;
+
+export const submitScenarioDomainActionResultFixture = {
+  status: "completed",
+  current_result: { state: "changed" },
+} satisfies SubmitScenarioDomainActionResultV1;

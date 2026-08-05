@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-domain-action-effect-identity-input-v1.schema.json",
+  "title": "ScenarioDomainActionEffectIdentityInputV1",
+  "description": "Closed server-only identity inputs for direct-empty and claimed-Step execution.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "effect_identity_version": { "const": 1 },
+    "driver": { "enum": ["scenario_direct_empty_v1", "workflow_claimed_step_v1"] },
+    "workspace_ref": { "$ref": "#/$defs/workspaceRef" },
+    "scenario_key": { "$ref": "#/$defs/machineKey" },
+    "action_key": { "$ref": "#/$defs/machineKey" },
+    "submit_context_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "original_workflow_step_ref": { "$ref": "scenario-domain-action-workflow-step-ref-v1.schema.json" }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["effect_identity_version", "driver", "workspace_ref", "scenario_key", "action_key", "submit_context_ref"],
+      "properties": {
+        "effect_identity_version": { "const": 1 },
+        "driver": { "const": "scenario_direct_empty_v1" },
+        "workspace_ref": { "$ref": "#/$defs/workspaceRef" },
+        "scenario_key": { "$ref": "#/$defs/machineKey" },
+        "action_key": { "$ref": "#/$defs/machineKey" },
+        "submit_context_ref": { "$ref": "canonical-ref-v1.schema.json" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["effect_identity_version", "driver", "workspace_ref", "scenario_key", "action_key", "original_workflow_step_ref"],
+      "properties": {
+        "effect_identity_version": { "const": 1 },
+        "driver": { "const": "workflow_claimed_step_v1" },
+        "workspace_ref": { "$ref": "#/$defs/workspaceRef" },
+        "scenario_key": { "$ref": "#/$defs/machineKey" },
+        "action_key": { "$ref": "#/$defs/machineKey" },
+        "original_workflow_step_ref": { "$ref": "scenario-domain-action-workflow-step-ref-v1.schema.json" }
+      }
+    }
+  ],
+  "$defs": {
+    "machineKey": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-z][a-z0-9._:-]*$" },
+    "workspaceRef": {
+      "allOf": [
+        { "$ref": "canonical-ref-v1.schema.json" },
+        {
+          "type": "object",
+          "properties": {
+            "namespace": { "const": "my_chat" },
+            "object_type": { "const": "workspace" },
+            "object_id": { "type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$" }
+          }
+        }
+      ]
+    }
+  }
+}
