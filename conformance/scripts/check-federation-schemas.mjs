@@ -7,6 +7,11 @@ const expected = [
   "canonical-ref-v1.schema.json",
   "generation-ticket-v1.schema.json",
   "integration-lock-v3.schema.json",
+  "scenario-canonical-binding-expected-head-v1.schema.json",
+  "scenario-canonical-binding-intent-v1.schema.json",
+  "scenario-canonical-binding-pair-request-v1.schema.json",
+  "scenario-canonical-binding-pair-result-v1.schema.json",
+  "scenario-canonical-binding-result-item-v1.schema.json",
   "scenario-command-envelope-v1.schema.json",
   "scenario-command-receipt-v1.schema.json",
   "scenario-contract-release-v1.schema.json",
@@ -66,6 +71,20 @@ for (const [schemaName, fixtureName] of [
   const validate = ajv.getSchema(`https://morethan.local/contracts/${schemaName}.schema.json`);
   if (!validate || !validate(fixture)) {
     throw new Error(`${fixtureName} failed schema execution: ${JSON.stringify(validate?.errors)}`);
+  }
+}
+
+const bindingPairFixture = JSON.parse(await readFile(
+  new URL("../fixtures/scenario-canonical-binding-pair.valid.json", import.meta.url),
+  "utf8",
+));
+for (const [schemaName, value] of [
+  ["scenario-canonical-binding-pair-request-v1", bindingPairFixture.request],
+  ["scenario-canonical-binding-pair-result-v1", bindingPairFixture.result],
+]) {
+  const validate = ajv.getSchema(`https://morethan.local/contracts/${schemaName}.schema.json`);
+  if (!validate || !validate(value)) {
+    throw new Error(`binding pair fixture failed ${schemaName}: ${JSON.stringify(validate?.errors)}`);
   }
 }
 

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-canonical-binding-pair-request-v1.schema.json",
+  "title": "ScenarioCanonicalBindingPairRequestV1",
+  "description": "Host-owner-internal request for one atomic two-slot canonical-object binding transaction.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["pair_request_version", "identity_operation_id", "workspace_ref", "scenario_key", "principal_provenance_hash", "continuation_context_hash", "pair_relation_evidence_hash", "canonical_input_hash", "bindings"],
+  "properties": {
+    "pair_request_version": { "const": 1 },
+    "identity_operation_id": { "$ref": "#/$defs/opaqueId" },
+    "workspace_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "scenario_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "principal_provenance_hash": { "$ref": "#/$defs/sha256" },
+    "continuation_context_hash": { "$ref": "#/$defs/sha256" },
+    "pair_relation_evidence_hash": { "$ref": "#/$defs/sha256" },
+    "canonical_input_hash": { "$ref": "#/$defs/sha256" },
+    "bindings": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "$ref": "scenario-canonical-binding-intent-v1.schema.json" }
+    }
+  },
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

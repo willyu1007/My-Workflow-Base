@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-canonical-binding-result-item-v1.schema.json",
+  "title": "ScenarioCanonicalBindingResultItemV1",
+  "description": "Host-owner-internal result for one member of an atomic canonical binding pair.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["binding_result_version", "binding_slot", "canonical_object_ref", "scenario_owner_ref", "binding_ref", "binding_version", "effect"],
+  "properties": {
+    "binding_result_version": { "const": 1 },
+    "binding_slot": { "$ref": "#/$defs/machineKey" },
+    "canonical_object_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "scenario_owner_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "binding_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "binding_version": { "type": "integer", "minimum": 0 },
+    "effect": { "enum": ["created", "reused"] }
+  },
+  "$defs": {
+    "machineKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._:-]*$"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-canonical-binding-expected-head-v1.schema.json",
+  "title": "ScenarioCanonicalBindingExpectedHeadV1",
+  "description": "Host-owner-internal optimistic head for one canonical-object scenario binding.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["state"],
+  "properties": {
+    "state": { "enum": ["absent", "bound"] },
+    "binding_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "binding_version": { "type": "integer", "minimum": 0 },
+    "owner_ref": { "$ref": "canonical-ref-v1.schema.json" }
+  },
+  "oneOf": [
+    {
+      "properties": { "state": { "const": "absent" } },
+      "maxProperties": 1
+    },
+    {
+      "required": ["state", "binding_ref", "binding_version", "owner_ref"],
+      "properties": {
+        "state": { "const": "bound" },
+        "binding_ref": true,
+        "binding_version": true,
+        "owner_ref": true
+      }
+    }
+  ]
+}

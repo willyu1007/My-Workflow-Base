@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-canonical-binding-pair-result-v1.schema.json",
+  "title": "ScenarioCanonicalBindingPairResultV1",
+  "description": "Host-owner-internal all-or-none result for one canonical binding pair request.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["pair_result_version", "identity_operation_id", "canonical_input_hash", "disposition", "bindings", "pair_commit_evidence_hash"],
+  "properties": {
+    "pair_result_version": { "const": 1 },
+    "identity_operation_id": { "$ref": "#/$defs/opaqueId" },
+    "canonical_input_hash": { "$ref": "#/$defs/sha256" },
+    "disposition": { "enum": ["committed", "exact_replay"] },
+    "bindings": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "$ref": "scenario-canonical-binding-result-item-v1.schema.json" }
+    },
+    "pair_commit_evidence_hash": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

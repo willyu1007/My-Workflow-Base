@@ -1,0 +1,125 @@
+{
+  "request": {
+    "pair_request_version": 1,
+    "identity_operation_id": "identity-operation-pair-01",
+    "workspace_ref": {
+      "schema_version": 1,
+      "namespace": "example_platform",
+      "object_type": "workspace",
+      "object_id": "workspace_01"
+    },
+    "scenario_key": "example-scenario",
+    "principal_provenance_hash": "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012",
+    "continuation_context_hash": "456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123",
+    "pair_relation_evidence_hash": "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234",
+    "canonical_input_hash": "6789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012345",
+    "bindings": [
+      {
+        "binding_intent_version": 1,
+        "binding_slot": "canonical.context.primary",
+        "canonical_object_ref": {
+          "schema_version": 1,
+          "namespace": "example_platform",
+          "object_type": "canonical_context",
+          "object_id": "context_01"
+        },
+        "scenario_owner_ref": {
+          "schema_version": 1,
+          "namespace": "example_scenario",
+          "object_type": "binding_anchor",
+          "object_id": "context_anchor_01"
+        },
+        "expected_head": {
+          "state": "bound",
+          "binding_ref": {
+            "schema_version": 1,
+            "namespace": "example_platform",
+            "object_type": "scenario_binding",
+            "object_id": "binding_context_01"
+          },
+          "binding_version": 3,
+          "owner_ref": {
+            "schema_version": 1,
+            "namespace": "example_scenario",
+            "object_type": "binding_anchor",
+            "object_id": "context_anchor_01"
+          }
+        }
+      },
+      {
+        "binding_intent_version": 1,
+        "binding_slot": "canonical.subject.primary",
+        "canonical_object_ref": {
+          "schema_version": 1,
+          "namespace": "example_platform",
+          "object_type": "canonical_subject",
+          "object_id": "subject_01"
+        },
+        "scenario_owner_ref": {
+          "schema_version": 1,
+          "namespace": "example_scenario",
+          "object_type": "binding_anchor",
+          "object_id": "subject_anchor_01"
+        },
+        "expected_head": { "state": "absent" }
+      }
+    ]
+  },
+  "result": {
+    "pair_result_version": 1,
+    "identity_operation_id": "identity-operation-pair-01",
+    "canonical_input_hash": "6789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012345",
+    "disposition": "committed",
+    "bindings": [
+      {
+        "binding_result_version": 1,
+        "binding_slot": "canonical.context.primary",
+        "canonical_object_ref": {
+          "schema_version": 1,
+          "namespace": "example_platform",
+          "object_type": "canonical_context",
+          "object_id": "context_01"
+        },
+        "scenario_owner_ref": {
+          "schema_version": 1,
+          "namespace": "example_scenario",
+          "object_type": "binding_anchor",
+          "object_id": "context_anchor_01"
+        },
+        "binding_ref": {
+          "schema_version": 1,
+          "namespace": "example_platform",
+          "object_type": "scenario_binding",
+          "object_id": "binding_context_01"
+        },
+        "binding_version": 3,
+        "effect": "reused"
+      },
+      {
+        "binding_result_version": 1,
+        "binding_slot": "canonical.subject.primary",
+        "canonical_object_ref": {
+          "schema_version": 1,
+          "namespace": "example_platform",
+          "object_type": "canonical_subject",
+          "object_id": "subject_01"
+        },
+        "scenario_owner_ref": {
+          "schema_version": 1,
+          "namespace": "example_scenario",
+          "object_type": "binding_anchor",
+          "object_id": "subject_anchor_01"
+        },
+        "binding_ref": {
+          "schema_version": 1,
+          "namespace": "example_platform",
+          "object_type": "scenario_binding",
+          "object_id": "binding_subject_01"
+        },
+        "binding_version": 0,
+        "effect": "created"
+      }
+    ],
+    "pair_commit_evidence_hash": "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
+  }
+}

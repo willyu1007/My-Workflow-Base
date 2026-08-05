@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-canonical-binding-intent-v1.schema.json",
+  "title": "ScenarioCanonicalBindingIntentV1",
+  "description": "Host-owner-internal intent to bind one canonical object to one Scenario-owned endpoint.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["binding_intent_version", "binding_slot", "canonical_object_ref", "scenario_owner_ref", "expected_head"],
+  "properties": {
+    "binding_intent_version": { "const": 1 },
+    "binding_slot": { "$ref": "#/$defs/machineKey" },
+    "canonical_object_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "scenario_owner_ref": { "$ref": "canonical-ref-v1.schema.json" },
+    "expected_head": { "$ref": "scenario-canonical-binding-expected-head-v1.schema.json" }
+  },
+  "$defs": {
+    "machineKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._:-]*$"
+    }
+  }
+}
