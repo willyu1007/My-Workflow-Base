@@ -26,7 +26,7 @@
       "properties": {
         "source": { "enum": ["git", "package"] },
         "repository": { "type": "string", "minLength": 1 },
-        "revision": { "type": "string", "minLength": 7 },
+        "revision": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
         "package": { "type": "string", "minLength": 1 },
         "version": { "type": "string", "minLength": 1 },
         "artifact_path": { "type": "string", "minLength": 1 },

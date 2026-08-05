@@ -2,6 +2,7 @@
 
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
+import { realpathSync } from "node:fs";
 import { lstat, readFile, readdir } from "node:fs/promises";
 import { isAbsolute, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -19,6 +20,7 @@ const assertLogicalPath = (value) => {
 };
 
 export const INTEGRATION_SOURCE_HASH_ALGORITHM = "sha256-path-content-source-hash-normalized-v1";
+const EXACT_GIT_REVISION = /^[a-f0-9]{40}$/u;
 const lockKeys = new Set(["lock_version", "generated_at", "scenario_key", "qualification_mode", "base_contract", "host_sdk", "scenario_artifact"]);
 const revisionKeys = new Set(["source", "repository", "revision", "package", "version", "artifact_path", "logical_paths", "hash_algorithm", "source_hash"]);
 
@@ -95,6 +97,7 @@ const validateLockShape = (lock) => {
     if (!validateExactKeys(pin, revisionKeys, name)) continue;
     if (pin.source === "git") {
       if (typeof pin.repository !== "string" || typeof pin.revision !== "string") fail(`${name}: git pins require repository and revision`);
+      if (typeof pin.revision === "string" && !EXACT_GIT_REVISION.test(pin.revision)) fail(`${name}: git revision must be an exact lowercase 40-character commit id`);
       if (pin.package !== undefined || pin.version !== undefined || pin.artifact_path !== undefined) fail(`${name}: git pins must not declare package fields`);
     } else if (pin.source === "package") {
       if (typeof pin.package !== "string" || typeof pin.version !== "string" || typeof pin.artifact_path !== "string") fail(`${name}: package pins require package, version, and artifact_path`);
@@ -142,8 +145,11 @@ async function verifyRevision(name, pin, jointCandidate, lockRoot) {
     let actualHash;
     if (pin.source === "git") {
       if (!pin.repository || !pin.revision) throw new Error("git pins require repository and revision");
+      if (!EXACT_GIT_REVISION.test(pin.revision)) throw new Error("git revision must be an exact lowercase 40-character commit id");
       const repository = resolve(lockRoot, pin.repository);
       gitText(repository, ["cat-file", "-e", `${pin.revision}^{commit}`]);
+      const resolvedRevision = gitText(repository, ["rev-parse", `${pin.revision}^{commit}`]);
+      if (resolvedRevision !== pin.revision) throw new Error(`git revision resolves to unexpected commit ${resolvedRevision}`);
       actualHash = hashGitObject(repository, pin.revision, pin.logical_paths);
       if (jointCandidate) {
         const head = gitText(repository, ["rev-parse", "HEAD"]);
@@ -151,6 +157,7 @@ async function verifyRevision(name, pin, jointCandidate, lockRoot) {
         if (head !== revision) fail(`${name}: joint qualification requires checkout HEAD ${head} to equal ${revision}`);
       }
     } else if (pin.source === "package") {
+      if (jointCandidate) throw new Error("joint qualification requires an exact git source; package paths are ordinary-mode inputs only");
       if (!pin.package || !pin.version || !pin.artifact_path) throw new Error("package pins require package, version, and artifact_path");
       const artifactRoot = resolve(lockRoot, pin.artifact_path);
       await verifyPackageManifest(name, pin, artifactRoot);
@@ -167,6 +174,8 @@ async function verifyRevision(name, pin, jointCandidate, lockRoot) {
 async function main() {
   const [lockPathArgument, ...flags] = process.argv.slice(2);
   if (!lockPathArgument) throw new Error("usage: verify-integration-lock.mjs <integration-lock.json> [--joint-candidate]");
+  const unknownFlags = flags.filter((flag) => flag !== "--joint-candidate");
+  if (unknownFlags.length > 0) throw new Error(`unsupported flag(s): ${unknownFlags.join(", ")}`);
   const lockPath = resolve(lockPathArgument);
   const lockRoot = resolve(lockPath, "..");
   const lock = JSON.parse(await readFile(lockPath, "utf8"));
@@ -183,4 +192,20 @@ async function main() {
   }
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();
+const isCliEntry = () => {
+  if (!process.argv[1]) return false;
+  try {
+    return realpathSync(resolve(process.argv[1])) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+};
+
+if (isCliEntry()) {
+  try {
+    await main();
+  } catch (error) {
+    process.stderr.write(`[error] ${error instanceof Error ? error.message : String(error)}\n`);
+    process.exitCode = 1;
+  }
+}

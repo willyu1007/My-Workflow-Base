@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { hashPackageArtifact } from "../scripts/verify-integration-lock.mjs";
+import { hashGitObject, hashPackageArtifact } from "../scripts/verify-integration-lock.mjs";
 
 const verifier = resolve(fileURLToPath(new URL("../scripts/verify-integration-lock.mjs", import.meta.url)));
 
@@ -45,7 +45,33 @@ async function fixture(overrides = {}) {
   return { root, lock, lockPath };
 }
 
-const run = (lockPath) => spawnSync(process.execPath, [verifier, lockPath], { encoding: "utf8" });
+const run = (lockPath, ...flags) => spawnSync(process.execPath, [verifier, lockPath, ...flags], { encoding: "utf8" });
+
+const git = (repository, ...args) => {
+  const result = spawnSync("git", ["-C", repository, ...args], { encoding: "utf8" });
+  assert.equal(result.status, 0, result.stderr);
+  return result.stdout.trim();
+};
+
+async function useGitPins(value) {
+  for (const name of ["base", "host", "scenario"]) {
+    const repository = join(value.root, name);
+    git(repository, "init", "--quiet");
+    git(repository, "add", "package.json", "index.js");
+    git(repository, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit", "--quiet", "-m", "fixture");
+    const revision = git(repository, "rev-parse", "HEAD");
+    value.lock[name === "base" ? "base_contract" : name === "host" ? "host_sdk" : "scenario_artifact"] = {
+      source: "git",
+      repository: `./${name}`,
+      revision,
+      logical_paths: ["package.json", "index.js"],
+      hash_algorithm: "sha256-path-content-source-hash-normalized-v1",
+      source_hash: hashGitObject(repository, revision, ["package.json", "index.js"]),
+    };
+  }
+  value.lock.qualification_mode = "joint_candidate";
+  await writeFile(value.lockPath, JSON.stringify(value.lock));
+}
 
 test("verifies exact public package names and versions", async () => {
   const value = await fixture();
@@ -67,6 +93,67 @@ test("fails closed on unknown lock fields", async () => {
     const result = run(value.lockPath);
     assert.equal(result.status, 1);
     assert.match(result.stderr, /unknown fields future_contract_mode/u);
+  } finally {
+    await rm(value.root, { recursive: true, force: true });
+  }
+});
+
+test("joint qualification rejects mutable package-path inputs", async () => {
+  const value = await fixture({ qualification_mode: "joint_candidate" });
+  try {
+    const result = run(value.lockPath);
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /joint qualification requires an exact git source/u);
+  } finally {
+    await rm(value.root, { recursive: true, force: true });
+  }
+});
+
+test("joint qualification requires exact commit ids and matching checkouts", async () => {
+  const value = await fixture();
+  try {
+    await useGitPins(value);
+    assert.equal(run(value.lockPath).status, 0);
+
+    const exactRevision = value.lock.base_contract.revision;
+    value.lock.base_contract.revision = "HEAD";
+    await writeFile(value.lockPath, JSON.stringify(value.lock));
+    const symbolic = run(value.lockPath);
+    assert.equal(symbolic.status, 1);
+    assert.match(symbolic.stderr, /exact lowercase 40-character commit id/u);
+
+    value.lock.base_contract.revision = exactRevision;
+    await writeFile(value.lockPath, JSON.stringify(value.lock));
+    await writeFile(join(value.root, "base", "drift.js"), "export const drift = true;\n");
+    git(join(value.root, "base"), "add", "drift.js");
+    git(join(value.root, "base"), "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit", "--quiet", "-m", "drift");
+    const driftedCheckout = run(value.lockPath);
+    assert.equal(driftedCheckout.status, 1);
+    assert.match(driftedCheckout.stderr, /joint qualification requires checkout HEAD/u);
+  } finally {
+    await rm(value.root, { recursive: true, force: true });
+  }
+});
+
+test("installed-bin symlink executes the verifier main entry", async () => {
+  const value = await fixture();
+  try {
+    const installedBin = join(value.root, "workflow-integration-lock");
+    await symlink(verifier, installedBin);
+    const result = spawnSync(process.execPath, [installedBin, value.lockPath], { encoding: "utf8" });
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /integration lock v3 verified/u);
+  } finally {
+    await rm(value.root, { recursive: true, force: true });
+  }
+});
+
+test("CLI rejects unknown flags", async () => {
+  const value = await fixture();
+  try {
+    const result = run(value.lockPath, "--future-mode");
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /unsupported flag/u);
   } finally {
     await rm(value.root, { recursive: true, force: true });
   }
