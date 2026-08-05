@@ -11,6 +11,7 @@ import {
   assertLookupScenarioDomainActionStepBindingInputV1,
   assertLookupScenarioDomainActionStepBindingResultV1,
   assertScenarioDomainActionClaimedStepDriverContextV1,
+  assertScenarioDomainActionClaimedStepExecutionContextV1,
   assertScenarioDomainActionClaimedStepDriverV1,
   assertScenarioDomainActionExecutionBindingV1,
   assertScenarioDomainActionExecutionResultV1,
@@ -107,6 +108,9 @@ const bindContext = () => ({
   principal_provenance_hash: fixture.step_assertion.principal_provenance_hash,
   request_correlation_hash: fixture.step_assertion.request_correlation_hash,
   workspace_ref: clone(fixture.step_assertion.workspace_ref),
+  submit_token: fixture.step_binding_input.submit.client_echo.submit_token,
+  scenario_key: fixture.contract.scenario_key,
+  action_key: fixture.contract.action_key,
   binding_evidence_hash: fixture.step_binding_results[0].binding_evidence_hash,
   context_expires_at: fixture.step_binding_results[0].context_expires_at,
   now: "2026-08-05T00:02:00.000Z",
@@ -128,12 +132,34 @@ test("D4 binds once and exact-rebinds only the immutable original assertion", ()
     {
       ...bindContext(),
       step_state: "scenario_bound",
-      existing_binding: clone(fixture.step_assertion),
+      existing_binding: {
+        assertion: clone(fixture.step_assertion),
+        binding_evidence_hash: fixture.step_binding_results[0].binding_evidence_hash,
+        context_expires_at: fixture.step_binding_results[0].context_expires_at,
+      },
     },
   ));
 
   const changedBinding = clone(fixture.step_binding_input);
   changedBinding.step_assertion.request_correlation_hash = "a".repeat(64);
+  assert.doesNotThrow(
+    () => assertBindScenarioDomainActionStepContextV1(
+      claimedContract,
+      changedBinding,
+      fixture.step_binding_results[2],
+      {
+        ...bindContext(),
+        step_state: "scenario_bound",
+        request_correlation_hash: changedBinding.step_assertion.request_correlation_hash,
+        existing_binding: {
+          assertion: clone(fixture.step_assertion),
+          binding_evidence_hash: fixture.step_binding_results[0].binding_evidence_hash,
+          context_expires_at: fixture.step_binding_results[0].context_expires_at,
+        },
+      },
+    ),
+  );
+
   assert.throws(
     () => assertBindScenarioDomainActionStepContextV1(
       claimedContract,
@@ -143,10 +169,95 @@ test("D4 binds once and exact-rebinds only the immutable original assertion", ()
         ...bindContext(),
         step_state: "scenario_bound",
         request_correlation_hash: changedBinding.step_assertion.request_correlation_hash,
-        existing_binding: clone(fixture.step_assertion),
+        existing_binding: {
+          assertion: clone(fixture.step_assertion),
+          binding_evidence_hash: fixture.step_binding_results[0].binding_evidence_hash,
+          context_expires_at: fixture.step_binding_results[0].context_expires_at,
+        },
       },
     ),
     { code: "request_conflict" },
+  );
+});
+
+test("D4 unavailable and request-conflict outcomes do not require success metadata", () => {
+  const claimedContract = clone(fixture.contract);
+  claimedContract.driver = "workflow_claimed_step_v1";
+  assert.doesNotThrow(() => assertBindScenarioDomainActionStepContextV1(
+    claimedContract,
+    fixture.step_binding_input,
+    fixture.step_binding_results[3],
+    {},
+  ));
+
+  const changedBinding = clone(fixture.step_binding_input);
+  changedBinding.step_assertion.request_correlation_hash = "a".repeat(64);
+  assert.doesNotThrow(() => assertBindScenarioDomainActionStepContextV1(
+    claimedContract,
+    changedBinding,
+    fixture.step_binding_results[2],
+    {
+      ...bindContext(),
+      step_state: "scenario_bound",
+      request_correlation_hash: changedBinding.step_assertion.request_correlation_hash,
+      existing_binding: {
+        assertion: clone(fixture.step_assertion),
+        binding_evidence_hash: fixture.step_binding_results[0].binding_evidence_hash,
+        context_expires_at: fixture.step_binding_results[0].context_expires_at,
+      },
+    },
+  ));
+  assert.throws(
+    () => assertBindScenarioDomainActionStepContextV1(
+      claimedContract,
+      fixture.step_binding_input,
+      fixture.step_binding_results[2],
+      bindContext(),
+    ),
+    { code: "unexpected_request_conflict" },
+  );
+});
+
+test("D4 exact rebind preserves the stored expiry and binding evidence", () => {
+  const claimedContract = clone(fixture.contract);
+  claimedContract.driver = "workflow_claimed_step_v1";
+  const existingBinding = {
+    assertion: clone(fixture.step_assertion),
+    binding_evidence_hash: fixture.step_binding_results[0].binding_evidence_hash,
+    context_expires_at: fixture.step_binding_results[0].context_expires_at,
+  };
+  const extended = clone(fixture.step_binding_results[1]);
+  extended.context_expires_at = "2026-08-05T00:09:00.000Z";
+  assert.throws(
+    () => assertBindScenarioDomainActionStepContextV1(
+      claimedContract,
+      fixture.step_binding_input,
+      extended,
+      {
+        ...bindContext(),
+        step_state: "scenario_bound",
+        context_expires_at: extended.context_expires_at,
+        existing_binding: existingBinding,
+      },
+    ),
+    { code: "context_expiry_changed" },
+  );
+
+  const replacedEvidence = clone(fixture.step_binding_results[1]);
+  replacedEvidence.binding_evidence_hash = "a".repeat(64);
+  assert.throws(
+    () => assertBindScenarioDomainActionStepContextV1(
+      claimedContract,
+      fixture.step_binding_input,
+      replacedEvidence,
+      {
+        ...bindContext(),
+        step_state: "scenario_bound",
+        binding_evidence_hash: replacedEvidence.binding_evidence_hash,
+        existing_binding: existingBinding,
+      },
+    ),
+    { code: "binding_evidence_mismatch" },
   );
 });
 
@@ -266,6 +377,106 @@ test("D4 forbids claim before bind but permits transient same-Step reclaim rotat
     () => assertScenarioDomainActionClaimedStepDriverContextV1(
       fixture.claimed_step_driver,
       { ...context, action_contract_hash: "a".repeat(64) },
+    ),
+    { code: "step_contract_mismatch" },
+  );
+});
+
+test("D4 composes claimed driver, original Step and execution identity", () => {
+  const claimedContract = clone(fixture.contract);
+  claimedContract.driver = "workflow_claimed_step_v1";
+  const context = {
+    binding_published: true,
+    action_contract_hash: fixture.step_assertion.action_contract_hash,
+  };
+  assert.doesNotThrow(() => assertScenarioDomainActionClaimedStepExecutionContextV1(
+    claimedContract,
+    fixture.step_assertion,
+    fixture.claimed_step_driver,
+    fixture.execution_bindings[1],
+    fixture.execution_results[1],
+    context,
+  ));
+
+  const wrongDriverStep = clone(fixture.claimed_step_driver);
+  wrongDriverStep.workflow_step_ref.object_id = "step_example_02";
+  assert.throws(
+    () => assertScenarioDomainActionClaimedStepExecutionContextV1(
+      claimedContract,
+      fixture.step_assertion,
+      wrongDriverStep,
+      fixture.execution_bindings[1],
+      fixture.execution_results[1],
+      context,
+    ),
+    { code: "workflow_step_mismatch" },
+  );
+
+  const wrongExecutionStep = clone(fixture.execution_bindings[1]);
+  wrongExecutionStep.effect_identity.original_workflow_step_ref.object_id = "step_example_02";
+  assert.throws(
+    () => assertScenarioDomainActionClaimedStepExecutionContextV1(
+      claimedContract,
+      fixture.step_assertion,
+      fixture.claimed_step_driver,
+      wrongExecutionStep,
+      fixture.execution_results[1],
+      context,
+    ),
+    { code: "workflow_step_mismatch" },
+  );
+
+  const wrongWorkspace = clone(fixture.execution_bindings[1]);
+  wrongWorkspace.effect_identity.workspace_ref.object_id = "workspace_example_02";
+  assert.throws(
+    () => assertScenarioDomainActionClaimedStepExecutionContextV1(
+      claimedContract,
+      fixture.step_assertion,
+      fixture.claimed_step_driver,
+      wrongWorkspace,
+      fixture.execution_results[1],
+      context,
+    ),
+    { code: "workspace_mismatch" },
+  );
+
+  const wrongContractHash = clone(fixture.claimed_step_driver);
+  wrongContractHash.action_contract_hash = "a".repeat(64);
+  assert.throws(
+    () => assertScenarioDomainActionClaimedStepExecutionContextV1(
+      claimedContract,
+      fixture.step_assertion,
+      wrongContractHash,
+      fixture.execution_bindings[1],
+      fixture.execution_results[1],
+      context,
+    ),
+    { code: "step_contract_mismatch" },
+  );
+  assert.throws(
+    () => assertScenarioDomainActionClaimedStepExecutionContextV1(
+      claimedContract,
+      fixture.step_assertion,
+      fixture.claimed_step_driver,
+      fixture.execution_bindings[1],
+      fixture.execution_results[1],
+      { ...context, binding_published: false },
+    ),
+    { code: "claim_before_bind" },
+  );
+
+  const changedAssertion = clone(fixture.step_assertion);
+  const changedDriver = clone(fixture.claimed_step_driver);
+  changedAssertion.action_contract_hash = "a".repeat(64);
+  changedDriver.action_contract_hash = changedAssertion.action_contract_hash;
+  assert.throws(
+    () => assertScenarioDomainActionClaimedStepExecutionContextV1(
+      claimedContract,
+      changedAssertion,
+      changedDriver,
+      fixture.execution_bindings[1],
+      fixture.execution_results[1],
+      context,
     ),
     { code: "step_contract_mismatch" },
   );

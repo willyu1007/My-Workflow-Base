@@ -15,6 +15,8 @@
   },
   "oneOf": [
     {
+      "type": "object",
+      "additionalProperties": false,
       "properties": {
         "status": { "const": "prepared" },
         "submit_token": { "$ref": "#/$defs/opaqueLocator" },
@@ -25,6 +27,8 @@
       "required": ["status", "submit_token", "confirmation", "issued_at", "expires_at"]
     },
     {
+      "type": "object",
+      "additionalProperties": false,
       "properties": {
         "status": { "enum": ["context_changed", "unavailable"] },
         "safe_reason": { "$ref": "scenario-safe-reason-v1.schema.json" }

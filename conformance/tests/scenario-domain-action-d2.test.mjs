@@ -74,6 +74,8 @@ test("D2 closes prepare, result, client echo and assurance envelopes", async (co
     ["prepare array input", validatePrepareInput, assertPrepareScenarioDomainActionInputV1, fixture.prepare_input, (value) => { value.action_input = []; }],
     ["result target echo", validatePrepareResult, assertPrepareScenarioDomainActionResultV1, fixture.prepare_results[0], (value) => { value.target_ref = fixture.prepare_input.target_ref; }],
     ["result action echo", validatePrepareResult, assertPrepareScenarioDomainActionResultV1, fixture.prepare_results[0], (value) => { value.action_input = {}; }],
+    ["prepared mixed with safe reason", validatePrepareResult, assertPrepareScenarioDomainActionResultV1, fixture.prepare_results[0], (value) => { value.safe_reason = clone(fixture.prepare_results[1].safe_reason); }],
+    ["failure mixed with submit token", validatePrepareResult, assertPrepareScenarioDomainActionResultV1, fixture.prepare_results[1], (value) => { value.submit_token = fixture.prepare_results[0].submit_token; }],
     ["echo action", validateSubmitEcho, assertScenarioDomainActionSubmitEchoV1, fixture.submit_inputs[0].client_echo, (value) => { value.action_key = "example.record"; }],
     ["echo assurance", validateSubmitEcho, assertScenarioDomainActionSubmitEchoV1, fixture.submit_inputs[0].client_echo, (value) => { value.authentication_assurance = {}; }],
     ["echo claim", validateSubmitEcho, assertScenarioDomainActionSubmitEchoV1, fixture.submit_inputs[0].client_echo, (value) => { value.claim_token = "A".repeat(32); }],
@@ -216,6 +218,9 @@ test("D2 contextual submit keeps explicit and strong assurance mutually exclusiv
   const strongContract = clone(fixture.contract);
   strongContract.confirmation_class = "strong_authorization";
   const context = {
+    submit_token: fixture.submit_inputs[0].client_echo.submit_token,
+    scenario_key: fixture.contract.scenario_key,
+    action_key: fixture.contract.action_key,
     principal_binding_hash: "4".repeat(64),
     submit_context_expires_at: "2026-08-05T00:04:00.000Z",
     now: "2026-08-05T00:02:00.000Z",
@@ -229,13 +234,13 @@ test("D2 contextual submit keeps explicit and strong assurance mutually exclusiv
   assert.doesNotThrow(() => assertSubmitScenarioDomainActionContextV1(
     strongContract,
     fixture.submit_inputs[1],
-    context,
+    { ...context, submit_token: fixture.submit_inputs[1].client_echo.submit_token },
   ));
   assert.throws(
     () => assertSubmitScenarioDomainActionContextV1(
       explicitContract,
       fixture.submit_inputs[1],
-      context,
+      { ...context, submit_token: fixture.submit_inputs[1].client_echo.submit_token },
     ),
     { code: "unexpected_assurance" },
   );
@@ -251,14 +256,45 @@ test("D2 contextual submit keeps explicit and strong assurance mutually exclusiv
   const wrongPrincipal = clone(fixture.submit_inputs[1]);
   wrongPrincipal.authentication_assurance.principal_binding_hash = "6".repeat(64);
   assert.throws(
-    () => assertSubmitScenarioDomainActionContextV1(strongContract, wrongPrincipal, context),
+    () => assertSubmitScenarioDomainActionContextV1(
+      strongContract,
+      wrongPrincipal,
+      { ...context, submit_token: wrongPrincipal.client_echo.submit_token },
+    ),
     { code: "principal_binding_mismatch" },
   );
 
   const lateAssurance = clone(fixture.submit_inputs[1]);
   lateAssurance.authentication_assurance.expires_at = "2026-08-05T00:04:00.001Z";
   assert.throws(
-    () => assertSubmitScenarioDomainActionContextV1(strongContract, lateAssurance, context),
+    () => assertSubmitScenarioDomainActionContextV1(
+      strongContract,
+      lateAssurance,
+      { ...context, submit_token: lateAssurance.client_echo.submit_token },
+    ),
     { code: "assurance_not_current" },
+  );
+
+  const alteredToken = clone(fixture.submit_inputs[0]);
+  alteredToken.client_echo.submit_token = "Z".repeat(43);
+  assert.throws(
+    () => assertSubmitScenarioDomainActionContextV1(explicitContract, alteredToken, context),
+    { code: "submit_token_mismatch" },
+  );
+  assert.throws(
+    () => assertSubmitScenarioDomainActionContextV1(
+      explicitContract,
+      fixture.submit_inputs[0],
+      { ...context, scenario_key: "other-scenario" },
+    ),
+    { code: "submit_context_mismatch" },
+  );
+  assert.throws(
+    () => assertSubmitScenarioDomainActionContextV1(
+      explicitContract,
+      fixture.submit_inputs[0],
+      { ...context, action_key: "other.action" },
+    ),
+    { code: "submit_context_mismatch" },
   );
 });
