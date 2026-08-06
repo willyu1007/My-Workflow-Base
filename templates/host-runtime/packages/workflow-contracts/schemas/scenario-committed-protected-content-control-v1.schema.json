@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-committed-protected-content-control-v1.schema.json",
+  "title": "ScenarioCommittedProtectedContentControlV1",
+  "description": "Body-free owner control proving the prepared protected object entered committed state.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protected_content_control_version",
+    "state",
+    "protected_content_ref",
+    "prepared_content_version",
+    "committed_content_version",
+    "content_kind",
+    "keyed_integrity_hash",
+    "committed_at"
+  ],
+  "properties": {
+    "protected_content_control_version": { "const": 1 },
+    "state": { "const": "committed" },
+    "protected_content_ref": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 512,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "prepared_content_version": { "$ref": "#/$defs/opaqueVersion" },
+    "committed_content_version": { "$ref": "#/$defs/opaqueVersion" },
+    "content_kind": { "$ref": "#/$defs/machineKey" },
+    "keyed_integrity_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "committed_at": { "$ref": "#/$defs/canonicalInstant" }
+  },
+  "$defs": {
+    "machineKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._:-]*$"
+    },
+    "opaqueVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$"
+    },
+    "canonicalInstant": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    }
+  }
+}

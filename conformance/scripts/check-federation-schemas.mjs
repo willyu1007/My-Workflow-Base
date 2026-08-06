@@ -24,6 +24,7 @@ const expected = [
   "scenario-canonical-binding-result-item-v1.schema.json",
   "scenario-command-envelope-v1.schema.json",
   "scenario-command-receipt-v1.schema.json",
+  "scenario-committed-protected-content-control-v1.schema.json",
   "scenario-contract-release-v1.schema.json",
   "scenario-current-owner-binding-pair-evidence-v1.schema.json",
   "scenario-domain-action-claimed-step-assertion-v1.schema.json",
@@ -227,6 +228,19 @@ for (const [schemaName, values] of [
   const validate = ajv.getSchema(`https://morethan.local/contracts/${schemaName}.schema.json`);
   if (!validate || values.some((value) => !validate(value))) {
     throw new Error(`protected-interaction E2 fixture failed ${schemaName}: ${JSON.stringify(validate?.errors)}`);
+  }
+}
+
+const protectedCommitFixture = JSON.parse(await readFile(
+  new URL("../fixtures/scenario-protected-interaction-e3.valid.json", import.meta.url),
+  "utf8",
+));
+{
+  const validate = ajv.getSchema(
+    "https://morethan.local/contracts/scenario-committed-protected-content-control-v1.schema.json",
+  );
+  if (!validate || !validate(protectedCommitFixture.committed_content)) {
+    throw new Error(`protected-interaction E3 fixture failed committed control: ${JSON.stringify(validate?.errors)}`);
   }
 }
 

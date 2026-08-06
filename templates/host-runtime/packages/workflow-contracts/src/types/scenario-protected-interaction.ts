@@ -111,6 +111,29 @@ export type ScenarioPreparedProtectedContentVerificationV1 = {
   issued_at: string;
   expires_at: string;
 };
+
+export type ScenarioCommittedProtectedContentControlV1 = {
+  protected_content_control_version: 1;
+  state: "committed";
+  protected_content_ref: ScenarioProtectedContentRefV1;
+  prepared_content_version: string;
+  committed_content_version: string;
+  content_kind: string;
+  keyed_integrity_hash: string;
+  committed_at: string;
+};
+
+export type ScenarioProtectedContentCommitVerificationV1 = {
+  scenario_key: string;
+  action_key: string;
+  canonical_payload_hash: string;
+  protected_content_ref: ScenarioProtectedContentRefV1;
+  prepared_content_version: string;
+  committed_content_version: string;
+  content_kind: string;
+  verified_keyed_integrity_hash: string;
+  committed_at: string;
+};
 import type {
   PrepareScenarioDomainActionInputV1,
   PrepareScenarioDomainActionResultV1,

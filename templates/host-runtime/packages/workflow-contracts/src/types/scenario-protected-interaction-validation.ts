@@ -3,6 +3,11 @@ import {
   assertPrepareScenarioDomainActionInputV1,
   assertPrepareScenarioDomainActionResultV1,
   assertScenarioDomainActionContractV1,
+  assertScenarioDomainActionExecutionBindingV1,
+  assertScenarioDomainActionExecutionResultForBindingV1,
+  assertScenarioDomainActionExecutionResultV1,
+  assertSubmitScenarioDomainActionContextV1,
+  assertSubmitScenarioDomainActionInputV1,
 } from "./scenario-domain-action-validation.js";
 import type { ScenarioDomainActionContractV1 } from "./scenario-domain-action.js";
 import {
@@ -22,6 +27,8 @@ import {
   type PrepareScenarioProtectedInteractionResultV1,
   type ScenarioPreparedProtectedContentControlV1,
   type ScenarioPreparedProtectedContentVerificationV1,
+  type ScenarioCommittedProtectedContentControlV1,
+  type ScenarioProtectedContentCommitVerificationV1,
 } from "./scenario-protected-interaction.js";
 
 export class ScenarioProtectedInteractionValidationError extends Error {
@@ -75,6 +82,16 @@ const preparedContentControlKeys = new Set([
   "keyed_integrity_hash",
   "issued_at",
   "expires_at",
+]);
+const committedContentControlKeys = new Set([
+  "protected_content_control_version",
+  "state",
+  "protected_content_ref",
+  "prepared_content_version",
+  "committed_content_version",
+  "content_kind",
+  "keyed_integrity_hash",
+  "committed_at",
 ]);
 const protectedPrepareSuccessKeys = new Set([
   "protected_prepare_result_version",
@@ -865,6 +882,268 @@ export const assertPrepareScenarioProtectedInteractionExchangeV1 = (
       "prepared_time_mismatch",
       "protected_prepare_result.prepared_content.issued_at",
       "action and protected prepared controls must share exact owner-verified times",
+    );
+  }
+};
+
+export const assertScenarioCommittedProtectedContentControlV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is ScenarioCommittedProtectedContentControlV1 = (
+  value,
+  path = "committed_content",
+) => {
+  const record = assertRecord(value, path);
+  assertKeys(record, committedContentControlKeys, path);
+  if (record.protected_content_control_version !== 1 || record.state !== "committed") {
+    fail("invalid_committed_control", path, `${path} must be a v1 committed control`);
+  }
+  assertScenarioProtectedContentRefV1(
+    record.protected_content_ref,
+    `${path}.protected_content_ref`,
+  );
+  assertOpaqueVersion(record.prepared_content_version, `${path}.prepared_content_version`);
+  assertOpaqueVersion(record.committed_content_version, `${path}.committed_content_version`);
+  if (record.prepared_content_version === record.committed_content_version) {
+    fail(
+      "content_version_not_advanced",
+      `${path}.committed_content_version`,
+      "committed content version must differ from the prepared version",
+    );
+  }
+  assertMachineKey(record.content_kind, `${path}.content_kind`);
+  assertSha256(record.keyed_integrity_hash, `${path}.keyed_integrity_hash`);
+  assertCanonicalInstant(record.committed_at, `${path}.committed_at`);
+  if (serializedUtf8Bytes(record, path) > maximumProtectedControlBytesV1) {
+    fail("control_too_large", path, `${path} must be at most 8 KiB UTF-8`);
+  }
+};
+
+const assertProtectedCommitVerification = (
+  verification: ScenarioProtectedContentCommitVerificationV1,
+): void => {
+  assertMachineKey(verification.scenario_key, "context.commit_verification.scenario_key");
+  assertMachineKey(verification.action_key, "context.commit_verification.action_key");
+  assertSha256(
+    verification.canonical_payload_hash,
+    "context.commit_verification.canonical_payload_hash",
+  );
+  assertScenarioProtectedContentRefV1(
+    verification.protected_content_ref,
+    "context.commit_verification.protected_content_ref",
+  );
+  assertOpaqueVersion(
+    verification.prepared_content_version,
+    "context.commit_verification.prepared_content_version",
+  );
+  assertOpaqueVersion(
+    verification.committed_content_version,
+    "context.commit_verification.committed_content_version",
+  );
+  assertMachineKey(verification.content_kind, "context.commit_verification.content_kind");
+  assertSha256(
+    verification.verified_keyed_integrity_hash,
+    "context.commit_verification.verified_keyed_integrity_hash",
+  );
+  assertCanonicalInstant(
+    verification.committed_at,
+    "context.commit_verification.committed_at",
+  );
+};
+
+export const assertScenarioProtectedContentCommitCompositionV1 = (
+  protectedContract: unknown,
+  actionContract: unknown,
+  submit: unknown,
+  preparedContent: unknown,
+  executionBinding: unknown,
+  executionResult: unknown,
+  committedContent: unknown | undefined,
+  context: {
+    submit_context: Parameters<typeof assertSubmitScenarioDomainActionContextV1>[2];
+    resolved_prepared_content: ScenarioPreparedProtectedContentVerificationV1;
+    commit_verification?: ScenarioProtectedContentCommitVerificationV1;
+  },
+): void => {
+  assertScenarioProtectedActionContractPairV1(protectedContract, actionContract);
+  assertScenarioProtectedInteractionContractV1(protectedContract);
+  assertSubmitScenarioDomainActionInputV1(submit);
+  assertScenarioPreparedProtectedContentControlV1(preparedContent);
+  assertScenarioDomainActionExecutionBindingV1(executionBinding);
+  assertScenarioDomainActionExecutionResultV1(executionResult);
+  assertSubmitScenarioDomainActionContextV1(
+    actionContract,
+    submit,
+    context.submit_context,
+  );
+  const resolvedPrepared = context.resolved_prepared_content;
+  assertScenarioProtectedContentRefV1(
+    resolvedPrepared.protected_content_ref,
+    "context.resolved_prepared_content.protected_content_ref",
+  );
+  assertOpaqueVersion(
+    resolvedPrepared.protected_content_version,
+    "context.resolved_prepared_content.protected_content_version",
+  );
+  assertMachineKey(
+    resolvedPrepared.protected_field_key,
+    "context.resolved_prepared_content.protected_field_key",
+  );
+  assertMachineKey(
+    resolvedPrepared.content_kind,
+    "context.resolved_prepared_content.content_kind",
+  );
+  assertSha256(
+    resolvedPrepared.verified_keyed_integrity_hash,
+    "context.resolved_prepared_content.verified_keyed_integrity_hash",
+  );
+  assertCanonicalInstant(
+    resolvedPrepared.issued_at,
+    "context.resolved_prepared_content.issued_at",
+  );
+  assertCanonicalInstant(
+    resolvedPrepared.expires_at,
+    "context.resolved_prepared_content.expires_at",
+  );
+  if (
+    resolvedPrepared.protected_content_ref !== preparedContent.protected_content_ref ||
+    resolvedPrepared.protected_content_version !== preparedContent.protected_content_version ||
+    resolvedPrepared.protected_field_key !== protectedContract.protected_field_key ||
+    resolvedPrepared.content_kind !== preparedContent.content_kind ||
+    resolvedPrepared.content_kind !== protectedContract.content_kind ||
+    resolvedPrepared.verified_keyed_integrity_hash !== preparedContent.keyed_integrity_hash ||
+    resolvedPrepared.issued_at !== preparedContent.issued_at ||
+    resolvedPrepared.expires_at !== preparedContent.expires_at ||
+    resolvedPrepared.expires_at !== context.submit_context.submit_context_expires_at
+  ) {
+    fail(
+      "resolved_prepared_content_mismatch",
+      "context.resolved_prepared_content",
+      "resolved submit context must name the exact prepared protected object",
+    );
+  }
+  assertScenarioDomainActionExecutionResultForBindingV1(
+    actionContract,
+    executionBinding,
+    executionResult,
+  );
+  if (executionResult.status !== "committed") {
+    if (committedContent !== undefined || context.commit_verification !== undefined) {
+      fail(
+        "commit_without_committed_effect",
+        "committed_content",
+        "not-committed or unknown execution cannot produce committed protected content",
+      );
+    }
+    return;
+  }
+  if (committedContent === undefined) {
+    fail(
+      "missing_committed_content",
+      "committed_content",
+      "committed execution requires a committed protected content control",
+    );
+  }
+  assertScenarioCommittedProtectedContentControlV1(committedContent);
+  const verification = context.commit_verification;
+  if (verification === undefined) {
+    fail(
+      "missing_commit_verification",
+      "context.commit_verification",
+      "committed protected content requires owner transaction verification",
+    );
+  }
+  assertProtectedCommitVerification(verification);
+  if (
+    verification.scenario_key !== protectedContract.scenario_key ||
+    verification.action_key !== protectedContract.action_key ||
+    verification.scenario_key !== executionBinding.effect_identity.scenario_key ||
+    verification.action_key !== executionBinding.effect_identity.action_key
+  ) {
+    fail(
+      "commit_effect_identity_mismatch",
+      "context.commit_verification",
+      "commit verification must bind the same scenario/action effect identity",
+    );
+  }
+  if (verification.canonical_payload_hash !== executionBinding.canonical_payload_hash) {
+    fail(
+      "commit_payload_mismatch",
+      "context.commit_verification.canonical_payload_hash",
+      "commit verification must bind the exact execution payload",
+    );
+  }
+  if (
+    committedContent.protected_content_ref !== preparedContent.protected_content_ref ||
+    committedContent.protected_content_ref !== verification.protected_content_ref
+  ) {
+    fail(
+      "committed_content_ref_mismatch",
+      "committed_content.protected_content_ref",
+      "commit must use the exact prepared protected content reference",
+    );
+  }
+  if (
+    committedContent.prepared_content_version !== preparedContent.protected_content_version ||
+    committedContent.prepared_content_version !== verification.prepared_content_version
+  ) {
+    fail(
+      "prepared_version_mismatch",
+      "committed_content.prepared_content_version",
+      "commit must name the exact prepared content version",
+    );
+  }
+  if (
+    committedContent.committed_content_version !== verification.committed_content_version ||
+    committedContent.committed_content_version === preparedContent.protected_content_version
+  ) {
+    fail(
+      "committed_version_mismatch",
+      "committed_content.committed_content_version",
+      "commit must produce the new owner-verified content version",
+    );
+  }
+  if (
+    committedContent.content_kind !== preparedContent.content_kind ||
+    committedContent.content_kind !== protectedContract.content_kind ||
+    committedContent.content_kind !== verification.content_kind
+  ) {
+    fail(
+      "content_kind_mismatch",
+      "committed_content.content_kind",
+      "committed content kind must match prepared, static and owner-verified context",
+    );
+  }
+  if (
+    committedContent.keyed_integrity_hash !== preparedContent.keyed_integrity_hash ||
+    committedContent.keyed_integrity_hash !== verification.verified_keyed_integrity_hash
+  ) {
+    fail(
+      "integrity_hash_mismatch",
+      "committed_content.keyed_integrity_hash",
+      "committed content must preserve the exact prepared owner integrity evidence",
+    );
+  }
+  if (committedContent.committed_at !== verification.committed_at) {
+    fail(
+      "committed_time_mismatch",
+      "committed_content.committed_at",
+      "committed time must match owner transaction verification",
+    );
+  }
+  const committedAt = assertCanonicalInstant(
+    committedContent.committed_at,
+    "committed_content.committed_at",
+  );
+  const preparedAt = assertCanonicalInstant(
+    preparedContent.issued_at,
+    "prepared_content.issued_at",
+  );
+  if (committedAt < preparedAt) {
+    fail(
+      "commit_before_prepare",
+      "committed_content.committed_at",
+      "protected content cannot commit before it was prepared",
     );
   }
 };
