@@ -1,12 +1,12 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "algorithm": "sha256",
   "normalization": "utf8_lf_workflow_contracts_import_alias_path_nul_length_nul_content_nul_v1",
   "logical_roots": [
     "workflow-contracts",
     "workflow-validator"
   ],
-  "source_hash": "be6fd80042a2998688dbeeaa6b4161ef80482d51eac413cfc0a53eaf2491fb7d",
+  "source_hash": "33df7df95e614104465c2fa93078b897e96538a765b050246a6b4f7ccd9139cd",
   "files": [
     {
       "path": "workflow-contracts/index.ts",
@@ -45,8 +45,8 @@
     },
     {
       "path": "workflow-contracts/types/manifest.ts",
-      "bytes": 5695,
-      "sha256": "4f19f2769555cbbc749a0a928b21dbb8241215cc13bad44391c2cf23d769d61f"
+      "bytes": 8978,
+      "sha256": "227ff2959d5e526190166108ed693566b8c62e61c00111082472a9787bbc39ee"
     },
     {
       "path": "workflow-contracts/types/module.ts",
@@ -105,19 +105,840 @@
     },
     {
       "path": "workflow-contracts/types/scenario-release.ts",
-      "bytes": 32337,
-      "sha256": "94b0abf3149b188ffb825c0ce03ac128a75e323adc992039b45f203065aef493"
+      "bytes": 64932,
+      "sha256": "0e612207ab455bc48292c9f5ea94b2ef48ff28f69cf089e14b377bee3624ea29"
     },
     {
       "path": "workflow-contracts/types/validation.ts",
-      "bytes": 1139,
-      "sha256": "4ca5e8cff40b0a16d8d7c3fa1b0c58585ad8c30b57fb44f4c9e7837898b41892"
+      "bytes": 1293,
+      "sha256": "e0b08d4a32075b06ceffda5071e7061356268b20341808eac5bc826a10633b83"
     },
     {
       "path": "workflow-validator/validate-module.ts",
-      "bytes": 27108,
-      "sha256": "8a9311e67bf97b15b9b0225fc1ce9174eaedd96c667df951e71a15a7385bc5c9"
+      "bytes": 33236,
+      "sha256": "fb7616f7e835efaa8741f7b20c7030c68074f39d2941e27ada7df7757eee3857"
     }
   ],
-  "contract_source_revision": "48fd3d65b34a1dd7a6b1e85713fca81f7c9da171"
+  "source_profiles": [
+    {
+      "source_identity": "platform_child_family_identity_source_v1",
+      "source_hash": "3a438edca6a4e6f8d1c116a386756b6f8ece4ac8e91127cf436ba5b7c8e9ec1a",
+      "files": [
+        {
+          "path": "workflow-contract-schemas/canonical-ref-v1.schema.json",
+          "bytes": 800,
+          "sha256": "cd67879cd4684738a8db4e6c7c610ff477626ac4b00a88282cfd0539b6a978fd"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-canonical-binding-expected-head-v1.schema.json",
+          "bytes": 1004,
+          "sha256": "9b85a73c429353bd0bdacb7392a4e949f9ea276b6186216feeb06804fdb0818a"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-canonical-binding-intent-v1.schema.json",
+          "bytes": 997,
+          "sha256": "0c6ff0175c2911c1c69c577d68225e6fe314fe132290b4f460e7480c6605cc28"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-canonical-binding-pair-request-v1.schema.json",
+          "bytes": 1589,
+          "sha256": "dbd335a1e14f27668e1b8883683cbf218d32a0375ef331eabbe9653561b49c43"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-canonical-binding-pair-result-v1.schema.json",
+          "bytes": 1235,
+          "sha256": "d957a5e72cfc46a411c201d37c1541bc931f8b630044bc6cd322b9e74e5f2a1f"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-canonical-binding-result-item-v1.schema.json",
+          "bytes": 1104,
+          "sha256": "de69337190993d746c8b2cf10ec788a995ab5d5dcad2b15f9f98069984688d16"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-current-owner-binding-pair-evidence-v1.schema.json",
+          "bytes": 1173,
+          "sha256": "4c05209c0ce840305de2f58663368cb815b63d3f90837d536f65e2446ce2bcf0"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-human-principal-v1.schema.json",
+          "bytes": 2133,
+          "sha256": "064f375927f689aaec8656ddb58aa81cd05e1e6ddc456473ee21f6506961d911"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-identity-operation-status-lookup-request-v1.schema.json",
+          "bytes": 1663,
+          "sha256": "7927c66f69d30ea4badff91d7604108b615e5ef14a63b413e1bc025052b92bbb"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-identity-operation-status-lookup-result-v1.schema.json",
+          "bytes": 2478,
+          "sha256": "33baf85c3f1dc8732098092b2c3265fb7abe51379285be59da1ced6563c0304e"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-ingress-surface-v1.schema.json",
+          "bytes": 667,
+          "sha256": "25f6aa6372cd9e18919a790084ba480f00abaac5c3eac0e7b3e2b81426f1bd25"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-manifest-v2.schema.json",
+          "bytes": 25401,
+          "sha256": "31ebf0cf64e7d05698221ecd654e8e740056a205900594e483f37595c9cbfe0a"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-owner-binding-ref-v1.schema.json",
+          "bytes": 806,
+          "sha256": "1fb6ffb424983f6298ada29e0d4b1f3af2bd168b7b8273bb890271c2d1b697e8"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-owner-binding-reservation-request-v1.schema.json",
+          "bytes": 1236,
+          "sha256": "582538babffa264b1a8139e097179f3d121d5fbc0f974a9ac59a815b99d1824a"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-owner-binding-reservation-result-v1.schema.json",
+          "bytes": 1209,
+          "sha256": "71aac6e309b95ab139511ca615e3bdeaaa94e9ec4fea5ad2e909dff174558e95"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-private-invocation-v1.schema.json",
+          "bytes": 2973,
+          "sha256": "8f6789f574fe28a4e43c909b8344a759f296159125c7fa517982796e090106b3"
+        },
+        {
+          "path": "workflow-contracts/types/federation-validation.ts",
+          "bytes": 11176,
+          "sha256": "56ea11bdbf035bc4ed30ffd5ad7ae396b3e21fd913f39909bec59c90c599f57a"
+        },
+        {
+          "path": "workflow-contracts/types/federation.ts",
+          "bytes": 5426,
+          "sha256": "faf38208ea55681eb0a51a6407d63f4fee8c24fe53f6e117bae7ef6729b8902a"
+        },
+        {
+          "path": "workflow-contracts/types/identity.ts",
+          "bytes": 2445,
+          "sha256": "82dcec9daf196246c923f56623365633c6b59490002a6b90bdb7ac0d9a898bd8"
+        },
+        {
+          "path": "workflow-contracts/types/manifest.ts",
+          "bytes": 8978,
+          "sha256": "227ff2959d5e526190166108ed693566b8c62e61c00111082472a9787bbc39ee"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-binding-validation.ts",
+          "bytes": 22057,
+          "sha256": "c90eaee0f7d89a0682028655ed55cb7df07cdc04b8ddb8b2489cdcac5e4c494c"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-binding.ts",
+          "bytes": 5342,
+          "sha256": "e9715cfda97765b1b3e305aaa73c6baad7c702fab31705564177080e133b4782"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-invocation-validation.ts",
+          "bytes": 8853,
+          "sha256": "1a44879ff1700ca93f2acca85b9ecfbb2d074d47d16ad9e8fa6a90d56a75697d"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-invocation.ts",
+          "bytes": 1909,
+          "sha256": "6d69b89de40c10b55ce24decdba59e431a3b5731131cd8f0966a369d12091001"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-release.ts",
+          "bytes": 64932,
+          "sha256": "0e612207ab455bc48292c9f5ea94b2ef48ff28f69cf089e14b377bee3624ea29"
+        },
+        {
+          "path": "workflow-contracts/types/validation.ts",
+          "bytes": 1293,
+          "sha256": "e0b08d4a32075b06ceffda5071e7061356268b20341808eac5bc826a10633b83"
+        },
+        {
+          "path": "workflow-validator/validate-module.ts",
+          "bytes": 33236,
+          "sha256": "fb7616f7e835efaa8741f7b20c7030c68074f39d2941e27ada7df7757eee3857"
+        }
+      ]
+    },
+    {
+      "source_identity": "scenario_interface_source_v1",
+      "source_hash": "52aeaa1a1677a0076c57d92464681813c00192c2998413cca87e9b9b1db40a17",
+      "files": [
+        {
+          "path": "workflow-contract-schemas/canonical-ref-v1.schema.json",
+          "bytes": 800,
+          "sha256": "cd67879cd4684738a8db4e6c7c610ff477626ac4b00a88282cfd0539b6a978fd"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-action-offer-v1.schema.json",
+          "bytes": 3138,
+          "sha256": "620c0150526e2b622edcadb0e72650300e8956782f8637397a0348da34018bb2"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-human-principal-v1.schema.json",
+          "bytes": 2133,
+          "sha256": "064f375927f689aaec8656ddb58aa81cd05e1e6ddc456473ee21f6506961d911"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-ingress-surface-v1.schema.json",
+          "bytes": 667,
+          "sha256": "25f6aa6372cd9e18919a790084ba480f00abaac5c3eac0e7b3e2b81426f1bd25"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-list-subject-contexts-input-v1.schema.json",
+          "bytes": 780,
+          "sha256": "d3785babc0f8de3fc220939f6bcec5f2fda1408fa5181d9209d95aa8993c4f2f"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-list-subject-contexts-result-v1.schema.json",
+          "bytes": 1920,
+          "sha256": "2c1ad32b1e0fb196c57d3f82d62388b7f1af842d84d413d489f821256ca2cc4b"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-manifest-v2.schema.json",
+          "bytes": 25401,
+          "sha256": "31ebf0cf64e7d05698221ecd654e8e740056a205900594e483f37595c9cbfe0a"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-navigation-offer-v1.schema.json",
+          "bytes": 1291,
+          "sha256": "342db1fcb774a701b5ed3b2e631c119d9df5f643dde3c91e88076c31841f2422"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-present-subject-context-input-v1.schema.json",
+          "bytes": 1359,
+          "sha256": "192781a821e3d661535bf3a146dde29255f34264b58f2d063c7d9a593efe4071"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-presentation-result-v1.schema.json",
+          "bytes": 1156,
+          "sha256": "c661a1902449fb80db00e3b31d2a3017be2d229ccc50451746174d655a217a92"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-private-invocation-v1.schema.json",
+          "bytes": 2973,
+          "sha256": "8f6789f574fe28a4e43c909b8344a759f296159125c7fa517982796e090106b3"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-resolve-subject-context-input-v1.schema.json",
+          "bytes": 924,
+          "sha256": "e9d7a2222afb181e63335380684c87a81818a88391db4321831ff6813259af9a"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-resolve-subject-context-result-v1.schema.json",
+          "bytes": 1616,
+          "sha256": "8a6be9bb82840aa4964e26827654848a4e3329c863a65f3c912e2720903882c9"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-safe-reason-v1.schema.json",
+          "bytes": 922,
+          "sha256": "af990efd8cac973a4404e766a88509d7af12b9873186db9f92e9eea207b2f807"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-safe-text-v1.schema.json",
+          "bytes": 2126,
+          "sha256": "fcc388e694584c8386363b7c44488e30c82624f7d13dca07ab561488bfab778e"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-semantic-block-v1.schema.json",
+          "bytes": 6517,
+          "sha256": "e75d38f63fba5f6a0233fbd5e96b33ddeabe8c85ae684ea79bb8890f0bea072d"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-semantic-presentation-v1.schema.json",
+          "bytes": 1893,
+          "sha256": "14aa888c4b1fc282d0d1d5dbd2e8999b5c7890406f8f4457bb464f08d3413342"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-subject-context-option-v1.schema.json",
+          "bytes": 2127,
+          "sha256": "0f270a39d2e82d0414c969c1d3a8cab55ae9ec667142c92a90eafabce8619a2c"
+        },
+        {
+          "path": "workflow-contracts/types/federation-validation.ts",
+          "bytes": 11176,
+          "sha256": "56ea11bdbf035bc4ed30ffd5ad7ae396b3e21fd913f39909bec59c90c599f57a"
+        },
+        {
+          "path": "workflow-contracts/types/federation.ts",
+          "bytes": 5426,
+          "sha256": "faf38208ea55681eb0a51a6407d63f4fee8c24fe53f6e117bae7ef6729b8902a"
+        },
+        {
+          "path": "workflow-contracts/types/identity.ts",
+          "bytes": 2445,
+          "sha256": "82dcec9daf196246c923f56623365633c6b59490002a6b90bdb7ac0d9a898bd8"
+        },
+        {
+          "path": "workflow-contracts/types/manifest.ts",
+          "bytes": 8978,
+          "sha256": "227ff2959d5e526190166108ed693566b8c62e61c00111082472a9787bbc39ee"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-invocation-validation.ts",
+          "bytes": 8853,
+          "sha256": "1a44879ff1700ca93f2acca85b9ecfbb2d074d47d16ad9e8fa6a90d56a75697d"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-invocation.ts",
+          "bytes": 1909,
+          "sha256": "6d69b89de40c10b55ce24decdba59e431a3b5731131cd8f0966a369d12091001"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-presentation-validation.ts",
+          "bytes": 37188,
+          "sha256": "8818b44237b600656d8c1d08f455e23b3dc311ac3ff77c2062b6f0401bc817d6"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-presentation.ts",
+          "bytes": 6949,
+          "sha256": "553004570fc558aa1ebd3428df2ed34700c6a4a27a3be05b3cb2cecb3ec6c747"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-release.ts",
+          "bytes": 64932,
+          "sha256": "0e612207ab455bc48292c9f5ea94b2ef48ff28f69cf089e14b377bee3624ea29"
+        },
+        {
+          "path": "workflow-contracts/types/validation.ts",
+          "bytes": 1293,
+          "sha256": "e0b08d4a32075b06ceffda5071e7061356268b20341808eac5bc826a10633b83"
+        },
+        {
+          "path": "workflow-validator/validate-module.ts",
+          "bytes": 33236,
+          "sha256": "fb7616f7e835efaa8741f7b20c7030c68074f39d2941e27ada7df7757eee3857"
+        }
+      ]
+    },
+    {
+      "source_identity": "scenario_domain_action_source_v1",
+      "source_hash": "0e4b185c0cb1f63583ca16f1efa935ca90ed540d73f678462aeceee0da6634e6",
+      "files": [
+        {
+          "path": "workflow-contract-schemas/bind-scenario-domain-action-step-input-v1.schema.json",
+          "bytes": 683,
+          "sha256": "e72e7ad5033e9fda22119323679c3ee111cb1387e4876e2f6d1327ea279af09e"
+        },
+        {
+          "path": "workflow-contract-schemas/bind-scenario-domain-action-step-result-v1.schema.json",
+          "bytes": 1804,
+          "sha256": "dc658249d60ab0ad35fd691470fb7eb9fea1e02547bd446aa03a843e9372fa20"
+        },
+        {
+          "path": "workflow-contract-schemas/lookup-scenario-domain-action-step-binding-input-v1.schema.json",
+          "bytes": 605,
+          "sha256": "1f2a26f20ba453ee35a4d06b9b09512c3588ffa041757ee78d41be344f4b9e41"
+        },
+        {
+          "path": "workflow-contract-schemas/lookup-scenario-domain-action-step-binding-result-v1.schema.json",
+          "bytes": 1922,
+          "sha256": "8525a5f204bfd17ab321e6459ca10be1171d382ab53e54ee0bb9e6734163f0ba"
+        },
+        {
+          "path": "workflow-contract-schemas/prepare-scenario-domain-action-input-v1.schema.json",
+          "bytes": 946,
+          "sha256": "0f40cf200bd3f4413aa372746a1fa0a65b7e569057276a0bc524698c7d3c8f8b"
+        },
+        {
+          "path": "workflow-contract-schemas/prepare-scenario-domain-action-result-v1.schema.json",
+          "bytes": 1907,
+          "sha256": "d74c982bf02c96f3606d53a60f0e80d63200a11b3ce00249beabbec86f7cbcf6"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-action-offer-v1.schema.json",
+          "bytes": 3138,
+          "sha256": "620c0150526e2b622edcadb0e72650300e8956782f8637397a0348da34018bb2"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-authentication-assurance-evidence-v1.schema.json",
+          "bytes": 1249,
+          "sha256": "50d588c380e29132aaf0c2152c575c51a95e2bca3d9ebacd87b2c2b3bf61bb1e"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-claimed-step-assertion-v1.schema.json",
+          "bytes": 1967,
+          "sha256": "a638ebb4cff047300abfa5bce8b168ab14476555d07baf96d184c218efe8a246"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-claimed-step-driver-v1.schema.json",
+          "bytes": 909,
+          "sha256": "aa6554f0230a1deb624a60b3aa31c117c8515059c0b3885968d73da3220e3b07"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-confirmation-prompt-v1.schema.json",
+          "bytes": 564,
+          "sha256": "5ab9bc9b58746581fe1deaab605a988565c7253ba90fe245c3ca1f15eb83d134"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-contract-v1.schema.json",
+          "bytes": 1763,
+          "sha256": "eed9db3b93fc6362aee6adb35dfcaa351e5bc813d1724def885a0666c1f1a0d1"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-current-result-v1.schema.json",
+          "bytes": 1009,
+          "sha256": "cd0b10e1a97352af71c6fc668734a3ad32e1e9cc196534fef42f650538cdf1b0"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-effect-identity-input-v1.schema.json",
+          "bytes": 2650,
+          "sha256": "73a9bc7f64e94f9d6f6e236625ced50957eb44d148b6d29e61a957bccfe87771"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-execution-binding-v1.schema.json",
+          "bytes": 723,
+          "sha256": "af4e7809a42259abc0be6430749c4bb9ff6e8e9eab393b7b8f93df98c827f348"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-execution-result-v1.schema.json",
+          "bytes": 3374,
+          "sha256": "a291e84cbe0d9ecc99480e19def339e4d3b1a7160f3eebb9148ebaa23c85e7ac"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-submit-echo-v1.schema.json",
+          "bytes": 758,
+          "sha256": "53e0b4b0e7282e5b688574562cd5efa3f551335b64f51acfb804ec1c52c436bd"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-workflow-step-ref-v1.schema.json",
+          "bytes": 713,
+          "sha256": "ca0042363e1cb1366990b236a8ec63362807f141411d48d6cc79325184697bc9"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-list-subject-contexts-input-v1.schema.json",
+          "bytes": 780,
+          "sha256": "d3785babc0f8de3fc220939f6bcec5f2fda1408fa5181d9209d95aa8993c4f2f"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-list-subject-contexts-result-v1.schema.json",
+          "bytes": 1920,
+          "sha256": "2c1ad32b1e0fb196c57d3f82d62388b7f1af842d84d413d489f821256ca2cc4b"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-manifest-v2.schema.json",
+          "bytes": 25401,
+          "sha256": "31ebf0cf64e7d05698221ecd654e8e740056a205900594e483f37595c9cbfe0a"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-navigation-offer-v1.schema.json",
+          "bytes": 1291,
+          "sha256": "342db1fcb774a701b5ed3b2e631c119d9df5f643dde3c91e88076c31841f2422"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-present-subject-context-input-v1.schema.json",
+          "bytes": 1359,
+          "sha256": "192781a821e3d661535bf3a146dde29255f34264b58f2d063c7d9a593efe4071"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-presentation-result-v1.schema.json",
+          "bytes": 1156,
+          "sha256": "c661a1902449fb80db00e3b31d2a3017be2d229ccc50451746174d655a217a92"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-resolve-subject-context-input-v1.schema.json",
+          "bytes": 924,
+          "sha256": "e9d7a2222afb181e63335380684c87a81818a88391db4321831ff6813259af9a"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-resolve-subject-context-result-v1.schema.json",
+          "bytes": 1616,
+          "sha256": "8a6be9bb82840aa4964e26827654848a4e3329c863a65f3c912e2720903882c9"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-safe-reason-v1.schema.json",
+          "bytes": 922,
+          "sha256": "af990efd8cac973a4404e766a88509d7af12b9873186db9f92e9eea207b2f807"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-safe-text-v1.schema.json",
+          "bytes": 2126,
+          "sha256": "fcc388e694584c8386363b7c44488e30c82624f7d13dca07ab561488bfab778e"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-semantic-block-v1.schema.json",
+          "bytes": 6517,
+          "sha256": "e75d38f63fba5f6a0233fbd5e96b33ddeabe8c85ae684ea79bb8890f0bea072d"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-semantic-presentation-v1.schema.json",
+          "bytes": 1893,
+          "sha256": "14aa888c4b1fc282d0d1d5dbd2e8999b5c7890406f8f4457bb464f08d3413342"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-subject-context-option-v1.schema.json",
+          "bytes": 2127,
+          "sha256": "0f270a39d2e82d0414c969c1d3a8cab55ae9ec667142c92a90eafabce8619a2c"
+        },
+        {
+          "path": "workflow-contract-schemas/submit-scenario-domain-action-input-v1.schema.json",
+          "bytes": 681,
+          "sha256": "3ae656a3492de9ab0ae86d938c3845d1e57a13c22dff22766d2318e640d48819"
+        },
+        {
+          "path": "workflow-contract-schemas/submit-scenario-domain-action-result-v1.schema.json",
+          "bytes": 1400,
+          "sha256": "268152bcac1c04af8cefc499fa9663ec166b335d173218e00aeba94035b4ace1"
+        },
+        {
+          "path": "workflow-contracts/types/federation-validation.ts",
+          "bytes": 11176,
+          "sha256": "56ea11bdbf035bc4ed30ffd5ad7ae396b3e21fd913f39909bec59c90c599f57a"
+        },
+        {
+          "path": "workflow-contracts/types/federation.ts",
+          "bytes": 5426,
+          "sha256": "faf38208ea55681eb0a51a6407d63f4fee8c24fe53f6e117bae7ef6729b8902a"
+        },
+        {
+          "path": "workflow-contracts/types/handoff.ts",
+          "bytes": 2153,
+          "sha256": "6791c3ee3a79b865a9c60db48289f5f8a28153a0326555b90cd90cb2e39383b9"
+        },
+        {
+          "path": "workflow-contracts/types/identity.ts",
+          "bytes": 2445,
+          "sha256": "82dcec9daf196246c923f56623365633c6b59490002a6b90bdb7ac0d9a898bd8"
+        },
+        {
+          "path": "workflow-contracts/types/manifest.ts",
+          "bytes": 8978,
+          "sha256": "227ff2959d5e526190166108ed693566b8c62e61c00111082472a9787bbc39ee"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-domain-action-validation.ts",
+          "bytes": 59211,
+          "sha256": "b4310ced20a283ce71d8476f1e619a9de291901b2ccf04b245694c2335fe7155"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-domain-action.ts",
+          "bytes": 6331,
+          "sha256": "fcdf8ece3ed0d48cd711e4872cce0d20830570ea289b16836df6ef1c72f0fb0a"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-presentation-validation.ts",
+          "bytes": 37188,
+          "sha256": "8818b44237b600656d8c1d08f455e23b3dc311ac3ff77c2062b6f0401bc817d6"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-presentation.ts",
+          "bytes": 6949,
+          "sha256": "553004570fc558aa1ebd3428df2ed34700c6a4a27a3be05b3cb2cecb3ec6c747"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-release.ts",
+          "bytes": 64932,
+          "sha256": "0e612207ab455bc48292c9f5ea94b2ef48ff28f69cf089e14b377bee3624ea29"
+        },
+        {
+          "path": "workflow-contracts/types/validation.ts",
+          "bytes": 1293,
+          "sha256": "e0b08d4a32075b06ceffda5071e7061356268b20341808eac5bc826a10633b83"
+        },
+        {
+          "path": "workflow-validator/validate-module.ts",
+          "bytes": 33236,
+          "sha256": "fb7616f7e835efaa8741f7b20c7030c68074f39d2941e27ada7df7757eee3857"
+        }
+      ]
+    },
+    {
+      "source_identity": "scenario_protected_interaction_source_v1",
+      "source_hash": "7f00570e5736757698b476e4b3103ecfca55956c347caa1f7678298dfc6f9800",
+      "files": [
+        {
+          "path": "workflow-contract-schemas/bind-scenario-domain-action-step-input-v1.schema.json",
+          "bytes": 683,
+          "sha256": "e72e7ad5033e9fda22119323679c3ee111cb1387e4876e2f6d1327ea279af09e"
+        },
+        {
+          "path": "workflow-contract-schemas/bind-scenario-domain-action-step-result-v1.schema.json",
+          "bytes": 1804,
+          "sha256": "dc658249d60ab0ad35fd691470fb7eb9fea1e02547bd446aa03a843e9372fa20"
+        },
+        {
+          "path": "workflow-contract-schemas/lookup-scenario-domain-action-step-binding-input-v1.schema.json",
+          "bytes": 605,
+          "sha256": "1f2a26f20ba453ee35a4d06b9b09512c3588ffa041757ee78d41be344f4b9e41"
+        },
+        {
+          "path": "workflow-contract-schemas/lookup-scenario-domain-action-step-binding-result-v1.schema.json",
+          "bytes": 1922,
+          "sha256": "8525a5f204bfd17ab321e6459ca10be1171d382ab53e54ee0bb9e6734163f0ba"
+        },
+        {
+          "path": "workflow-contract-schemas/prepare-scenario-domain-action-input-v1.schema.json",
+          "bytes": 946,
+          "sha256": "0f40cf200bd3f4413aa372746a1fa0a65b7e569057276a0bc524698c7d3c8f8b"
+        },
+        {
+          "path": "workflow-contract-schemas/prepare-scenario-domain-action-result-v1.schema.json",
+          "bytes": 1907,
+          "sha256": "d74c982bf02c96f3606d53a60f0e80d63200a11b3ce00249beabbec86f7cbcf6"
+        },
+        {
+          "path": "workflow-contract-schemas/prepare-scenario-protected-interaction-input-v1.schema.json",
+          "bytes": 4305,
+          "sha256": "4405faacffa0cc82259b506014c7e8c67f4b82ff40af644b41c9b8cf33646099"
+        },
+        {
+          "path": "workflow-contract-schemas/prepare-scenario-protected-interaction-result-v1.schema.json",
+          "bytes": 2743,
+          "sha256": "f39ca952ee60fe85ed4a9a709e0913a1471875985ab5415330c4aab4aa96d964"
+        },
+        {
+          "path": "workflow-contract-schemas/read-scenario-protected-detail-input-v1.schema.json",
+          "bytes": 807,
+          "sha256": "30db6ffacbaaeb95b6c93e423f9b3118185fbfa69da6a278fd5d8891a8cf3a23"
+        },
+        {
+          "path": "workflow-contract-schemas/read-scenario-protected-detail-result-v1.schema.json",
+          "bytes": 3239,
+          "sha256": "74821ba1ab01a2a7f8931d27ee69c7ab9f6aafa67292bfe92bc1bbe139d1e630"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-action-offer-v1.schema.json",
+          "bytes": 3138,
+          "sha256": "620c0150526e2b622edcadb0e72650300e8956782f8637397a0348da34018bb2"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-authentication-assurance-evidence-v1.schema.json",
+          "bytes": 1249,
+          "sha256": "50d588c380e29132aaf0c2152c575c51a95e2bca3d9ebacd87b2c2b3bf61bb1e"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-committed-protected-content-control-v1.schema.json",
+          "bytes": 1694,
+          "sha256": "aecc64503277c40bd529b72ba6bfc441968828f6add19369966a90f98ae386da"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-claimed-step-assertion-v1.schema.json",
+          "bytes": 1967,
+          "sha256": "a638ebb4cff047300abfa5bce8b168ab14476555d07baf96d184c218efe8a246"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-claimed-step-driver-v1.schema.json",
+          "bytes": 909,
+          "sha256": "aa6554f0230a1deb624a60b3aa31c117c8515059c0b3885968d73da3220e3b07"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-confirmation-prompt-v1.schema.json",
+          "bytes": 564,
+          "sha256": "5ab9bc9b58746581fe1deaab605a988565c7253ba90fe245c3ca1f15eb83d134"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-contract-v1.schema.json",
+          "bytes": 1763,
+          "sha256": "eed9db3b93fc6362aee6adb35dfcaa351e5bc813d1724def885a0666c1f1a0d1"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-current-result-v1.schema.json",
+          "bytes": 1009,
+          "sha256": "cd0b10e1a97352af71c6fc668734a3ad32e1e9cc196534fef42f650538cdf1b0"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-effect-identity-input-v1.schema.json",
+          "bytes": 2650,
+          "sha256": "73a9bc7f64e94f9d6f6e236625ced50957eb44d148b6d29e61a957bccfe87771"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-execution-binding-v1.schema.json",
+          "bytes": 723,
+          "sha256": "af4e7809a42259abc0be6430749c4bb9ff6e8e9eab393b7b8f93df98c827f348"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-execution-result-v1.schema.json",
+          "bytes": 3374,
+          "sha256": "a291e84cbe0d9ecc99480e19def339e4d3b1a7160f3eebb9148ebaa23c85e7ac"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-submit-echo-v1.schema.json",
+          "bytes": 758,
+          "sha256": "53e0b4b0e7282e5b688574562cd5efa3f551335b64f51acfb804ec1c52c436bd"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-domain-action-workflow-step-ref-v1.schema.json",
+          "bytes": 713,
+          "sha256": "ca0042363e1cb1366990b236a8ec63362807f141411d48d6cc79325184697bc9"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-list-subject-contexts-input-v1.schema.json",
+          "bytes": 780,
+          "sha256": "d3785babc0f8de3fc220939f6bcec5f2fda1408fa5181d9209d95aa8993c4f2f"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-list-subject-contexts-result-v1.schema.json",
+          "bytes": 1920,
+          "sha256": "2c1ad32b1e0fb196c57d3f82d62388b7f1af842d84d413d489f821256ca2cc4b"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-manifest-v2.schema.json",
+          "bytes": 25401,
+          "sha256": "31ebf0cf64e7d05698221ecd654e8e740056a205900594e483f37595c9cbfe0a"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-navigation-offer-v1.schema.json",
+          "bytes": 1291,
+          "sha256": "342db1fcb774a701b5ed3b2e631c119d9df5f643dde3c91e88076c31841f2422"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-prepared-protected-content-control-v1.schema.json",
+          "bytes": 1643,
+          "sha256": "a275a3c13745320154b17be9d0182b8331e679b2098edfed125ddf2435b255af"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-present-subject-context-input-v1.schema.json",
+          "bytes": 1359,
+          "sha256": "192781a821e3d661535bf3a146dde29255f34264b58f2d063c7d9a593efe4071"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-presentation-result-v1.schema.json",
+          "bytes": 1156,
+          "sha256": "c661a1902449fb80db00e3b31d2a3017be2d229ccc50451746174d655a217a92"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-protected-carrier-binding-v1.schema.json",
+          "bytes": 851,
+          "sha256": "db0eea580aaff1c40505e4ae2f1586c87a52098d6a558801c39205f0ed983e40"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-protected-content-read-locator-v1.schema.json",
+          "bytes": 1295,
+          "sha256": "f9892d660af46e1df65060ea5c2629ff0c77ef67a461b945589a6bf8a77a22ac"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-protected-display-lease-v1.schema.json",
+          "bytes": 868,
+          "sha256": "5b4d2d05825de9ae542c5b097058e7596d523b772ae8a1bf665ad7398457da35"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-protected-interaction-contract-v1.schema.json",
+          "bytes": 1738,
+          "sha256": "31b9d8b1d036514f246e81f4461ad03554383a982b98d995ce1cfb696ee8dd91"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-protected-plain-text-carrier-v1.schema.json",
+          "bytes": 1115,
+          "sha256": "7aa6e0022f28e38705b834b7884858fe5eff3b523317c1be1bf4e0968db370ba"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-resolve-subject-context-input-v1.schema.json",
+          "bytes": 924,
+          "sha256": "e9d7a2222afb181e63335380684c87a81818a88391db4321831ff6813259af9a"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-resolve-subject-context-result-v1.schema.json",
+          "bytes": 1616,
+          "sha256": "8a6be9bb82840aa4964e26827654848a4e3329c863a65f3c912e2720903882c9"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-safe-reason-v1.schema.json",
+          "bytes": 922,
+          "sha256": "af990efd8cac973a4404e766a88509d7af12b9873186db9f92e9eea207b2f807"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-safe-text-v1.schema.json",
+          "bytes": 2126,
+          "sha256": "fcc388e694584c8386363b7c44488e30c82624f7d13dca07ab561488bfab778e"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-semantic-block-v1.schema.json",
+          "bytes": 6517,
+          "sha256": "e75d38f63fba5f6a0233fbd5e96b33ddeabe8c85ae684ea79bb8890f0bea072d"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-semantic-presentation-v1.schema.json",
+          "bytes": 1893,
+          "sha256": "14aa888c4b1fc282d0d1d5dbd2e8999b5c7890406f8f4457bb464f08d3413342"
+        },
+        {
+          "path": "workflow-contract-schemas/scenario-subject-context-option-v1.schema.json",
+          "bytes": 2127,
+          "sha256": "0f270a39d2e82d0414c969c1d3a8cab55ae9ec667142c92a90eafabce8619a2c"
+        },
+        {
+          "path": "workflow-contract-schemas/submit-scenario-domain-action-input-v1.schema.json",
+          "bytes": 681,
+          "sha256": "3ae656a3492de9ab0ae86d938c3845d1e57a13c22dff22766d2318e640d48819"
+        },
+        {
+          "path": "workflow-contract-schemas/submit-scenario-domain-action-result-v1.schema.json",
+          "bytes": 1400,
+          "sha256": "268152bcac1c04af8cefc499fa9663ec166b335d173218e00aeba94035b4ace1"
+        },
+        {
+          "path": "workflow-contracts/types/federation-validation.ts",
+          "bytes": 11176,
+          "sha256": "56ea11bdbf035bc4ed30ffd5ad7ae396b3e21fd913f39909bec59c90c599f57a"
+        },
+        {
+          "path": "workflow-contracts/types/federation.ts",
+          "bytes": 5426,
+          "sha256": "faf38208ea55681eb0a51a6407d63f4fee8c24fe53f6e117bae7ef6729b8902a"
+        },
+        {
+          "path": "workflow-contracts/types/handoff.ts",
+          "bytes": 2153,
+          "sha256": "6791c3ee3a79b865a9c60db48289f5f8a28153a0326555b90cd90cb2e39383b9"
+        },
+        {
+          "path": "workflow-contracts/types/identity.ts",
+          "bytes": 2445,
+          "sha256": "82dcec9daf196246c923f56623365633c6b59490002a6b90bdb7ac0d9a898bd8"
+        },
+        {
+          "path": "workflow-contracts/types/manifest.ts",
+          "bytes": 8978,
+          "sha256": "227ff2959d5e526190166108ed693566b8c62e61c00111082472a9787bbc39ee"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-domain-action-validation.ts",
+          "bytes": 59211,
+          "sha256": "b4310ced20a283ce71d8476f1e619a9de291901b2ccf04b245694c2335fe7155"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-domain-action.ts",
+          "bytes": 6331,
+          "sha256": "fcdf8ece3ed0d48cd711e4872cce0d20830570ea289b16836df6ef1c72f0fb0a"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-presentation-validation.ts",
+          "bytes": 37188,
+          "sha256": "8818b44237b600656d8c1d08f455e23b3dc311ac3ff77c2062b6f0401bc817d6"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-presentation.ts",
+          "bytes": 6949,
+          "sha256": "553004570fc558aa1ebd3428df2ed34700c6a4a27a3be05b3cb2cecb3ec6c747"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-protected-interaction-validation.ts",
+          "bytes": 71608,
+          "sha256": "ee5ba141fdaafb3c461f51c5c765efabdec38d9c5821ea82e21f9a0f2d76a620"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-protected-interaction.ts",
+          "bytes": 4710,
+          "sha256": "fe0d247bdec08445735accd22fdd089689cc478fea4bb8ecdb38abf3209979c3"
+        },
+        {
+          "path": "workflow-contracts/types/scenario-release.ts",
+          "bytes": 64932,
+          "sha256": "0e612207ab455bc48292c9f5ea94b2ef48ff28f69cf089e14b377bee3624ea29"
+        },
+        {
+          "path": "workflow-contracts/types/validation.ts",
+          "bytes": 1293,
+          "sha256": "e0b08d4a32075b06ceffda5071e7061356268b20341808eac5bc826a10633b83"
+        },
+        {
+          "path": "workflow-validator/validate-module.ts",
+          "bytes": 33236,
+          "sha256": "fb7616f7e835efaa8741f7b20c7030c68074f39d2941e27ada7df7757eee3857"
+        }
+      ]
+    }
+  ],
+  "contract_source_revision": "3d91591eb506de2c2c6c6633536c5b43d07c2af9"
 }
