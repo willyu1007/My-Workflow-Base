@@ -6,7 +6,7 @@
     "workflow-contracts",
     "workflow-validator"
   ],
-  "source_hash": "7ba9458f0e1a91f6fda1a47e5682064020017c41731b1016f8bdad962664c126",
+  "source_hash": "be6fd80042a2998688dbeeaa6b4161ef80482d51eac413cfc0a53eaf2491fb7d",
   "files": [
     {
       "path": "workflow-contracts/index.ts",
@@ -95,8 +95,8 @@
     },
     {
       "path": "workflow-contracts/types/scenario-protected-interaction-validation.ts",
-      "bytes": 69240,
-      "sha256": "a56730fc48a31e134f0914a3243f1ac6d0eb9baa5ae1db91917ad8e4cc23ea21"
+      "bytes": 71608,
+      "sha256": "ee5ba141fdaafb3c461f51c5c765efabdec38d9c5821ea82e21f9a0f2d76a620"
     },
     {
       "path": "workflow-contracts/types/scenario-protected-interaction.ts",
@@ -119,5 +119,5 @@
       "sha256": "8a9311e67bf97b15b9b0225fc1ce9174eaedd96c667df951e71a15a7385bc5c9"
     }
   ],
-  "contract_source_revision": "5433124506ca8d48a536a283796765209b93d808"
+  "contract_source_revision": "48fd3d65b34a1dd7a6b1e85713fca81f7c9da171"
 }
