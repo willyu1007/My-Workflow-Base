@@ -56,12 +56,6 @@ export type ScenarioProtectedCarrierBindingV1 = {
   keyed_binding_hash: string;
 };
 
-export type ScenarioProtectedCarrierBindingVerificationV1 = {
-  carrier_scope: ScenarioProtectedCarrierScopeV1;
-  protected_field_key: string;
-  verified_keyed_binding_hash: string;
-};
-
 export type PrepareScenarioProtectedInteractionInputV1 = {
   protected_prepare_version: 1;
   action_prepare: PrepareScenarioDomainActionInputV1;
@@ -108,16 +102,6 @@ export type PrepareScenarioProtectedInteractionResultV1 =
       >;
     };
 
-export type ScenarioPreparedProtectedContentVerificationV1 = {
-  protected_content_ref: ScenarioProtectedContentRefV1;
-  protected_content_version: string;
-  protected_field_key: string;
-  content_kind: string;
-  verified_keyed_integrity_hash: string;
-  issued_at: string;
-  expires_at: string;
-};
-
 export type ScenarioCommittedProtectedContentControlV1 = {
   protected_content_control_version: 1;
   state: "committed";
@@ -126,18 +110,6 @@ export type ScenarioCommittedProtectedContentControlV1 = {
   committed_content_version: string;
   content_kind: string;
   keyed_integrity_hash: string;
-  committed_at: string;
-};
-
-export type ScenarioProtectedContentCommitVerificationV1 = {
-  scenario_key: string;
-  action_key: string;
-  canonical_payload_hash: string;
-  protected_content_ref: ScenarioProtectedContentRefV1;
-  prepared_content_version: string;
-  committed_content_version: string;
-  content_kind: string;
-  verified_keyed_integrity_hash: string;
   committed_at: string;
 };
 
@@ -175,22 +147,16 @@ export type ReadScenarioProtectedDetailResultV1 =
     }
   | {
       protected_read_result_version: 1;
-      status: "tombstone" | "context_changed" | "unavailable";
+      status: "tombstone";
+      safe_reason: ScenarioSafeReasonV1;
+    }
+  | {
+      protected_read_result_version: 1;
+      status: "context_changed";
+      safe_reason: ScenarioSafeReasonV1;
+    }
+  | {
+      protected_read_result_version: 1;
+      status: "unavailable";
       safe_reason: ScenarioSafeReasonV1;
     };
-
-export type ScenarioProtectedReadLocatorVerificationV1 = {
-  protected_content_ref: ScenarioProtectedContentRefV1;
-  content_kind: string;
-  issued_at: string;
-  expires_at: string;
-  verified_foreground_context_hash: string;
-};
-
-export type ScenarioProtectedDecryptedContentVerificationV1 = {
-  protected_content_ref: ScenarioProtectedContentRefV1;
-  protected_content_version: string;
-  protected_field_key: string;
-  content_kind: string;
-  verified_keyed_integrity_hash: string;
-};

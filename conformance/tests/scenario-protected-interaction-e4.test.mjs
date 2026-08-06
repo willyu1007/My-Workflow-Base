@@ -28,6 +28,10 @@ const fixture = JSON.parse(await readFile(
   new URL("../fixtures/scenario-protected-interaction-e4.valid.json", import.meta.url),
   "utf8",
 ));
+const domainFixture = JSON.parse(await readFile(
+  new URL("../fixtures/scenario-domain-action-d1.valid.json", import.meta.url),
+  "utf8",
+));
 const schemaNames = [
   "scenario-safe-text-v1.schema.json",
   "scenario-safe-reason-v1.schema.json",
@@ -62,6 +66,13 @@ const assertParityRejects = (validate, codec, value) => {
 const readyContext = () => ({
   now: "2026-08-05T00:02:30.000Z",
   locator_verification: {
+    access_mode: "foreground_current",
+    request_identity_hash: "9".repeat(64),
+    workspace_ref: clone(domainFixture.step_assertion.workspace_ref),
+    principal_binding_hash: "7".repeat(64),
+    scenario_key: e1Fixture.contract.scenario_key,
+    action_key: e1Fixture.contract.action_key,
+    surface_key: "example.web",
     protected_content_ref: fixture.locator.protected_content_ref,
     content_kind: fixture.locator.content_kind,
     issued_at: fixture.locator.issued_at,
@@ -71,6 +82,12 @@ const readyContext = () => ({
   carrier_binding_verification: {
     carrier_scope: "read_output",
     protected_field_key: e1Fixture.contract.protected_field_key,
+    request_identity_hash: "9".repeat(64),
+    workspace_ref: clone(domainFixture.step_assertion.workspace_ref),
+    principal_binding_hash: "7".repeat(64),
+    scenario_key: e1Fixture.contract.scenario_key,
+    action_key: e1Fixture.contract.action_key,
+    surface_key: "example.web",
     verified_keyed_binding_hash: fixture.results[0].carrier_binding.keyed_binding_hash,
   },
   decrypted_content_verification: {
@@ -78,6 +95,8 @@ const readyContext = () => ({
     protected_content_version: e3Fixture.committed_content.committed_content_version,
     protected_field_key: e1Fixture.contract.protected_field_key,
     content_kind: e3Fixture.committed_content.content_kind,
+    read_carrier_binding_hash: fixture.results[0].carrier_binding.keyed_binding_hash,
+    request_identity_hash: "9".repeat(64),
     verified_keyed_integrity_hash: e3Fixture.committed_content.keyed_integrity_hash,
   },
 });
@@ -127,6 +146,19 @@ test("E4 schemas and codecs close locator, input, lease and result unions", asyn
   }
 });
 
+test("E4 schemas and codecs reject missing and null read fields", () => {
+  for (const [validate, codec, source, mutate] of [
+    [validateLocator, assertScenarioProtectedContentReadLocatorV1, fixture.locator, (value) => { delete value.expires_at; }],
+    [validateInput, assertReadScenarioProtectedDetailInputV1, fixture.input, (value) => { value.protected_content_ref = null; }],
+    [validateResult, assertReadScenarioProtectedDetailResultV1, fixture.results[0], (value) => { value.carrier_binding = null; }],
+    [validateResult, assertReadScenarioProtectedDetailResultV1, fixture.results[1], (value) => { value.safe_reason = null; }],
+  ]) {
+    const value = clone(source);
+    mutate(value);
+    assertParityRejects(validate, codec, value);
+  }
+});
+
 test("E4 runtime enforces five-minute locator and 60-second display bounds", () => {
   const locator = clone(fixture.locator);
   locator.expires_at = "2026-08-05T00:05:00.001Z";
@@ -156,12 +188,18 @@ test("E4 ready requires current foreground context and verified separate carrier
   const cases = [
     ["read_locator_mismatch", (locator) => { locator.protected_content_ref = "S".repeat(43); }],
     ["read_locator_not_current", (locator, result, context) => { context.now = locator.expires_at; }],
+    ["invalid_read_access_mode", (locator, result, context) => { context.locator_verification.access_mode = "offline_cached"; }],
     ["read_content_context_mismatch", (locator, result) => { result.protected_content_version = "committed-version-02"; }],
     ["decrypted_integrity_mismatch", (locator, result, context) => { context.decrypted_content_verification.verified_keyed_integrity_hash = "d".repeat(64); }],
     ["display_lease_not_current", (locator, result, context) => { context.now = result.display_lease.expires_at; }],
     ["hash_domain_reuse", (locator, result, context) => {
       result.carrier_binding.keyed_binding_hash = e3Fixture.committed_content.keyed_integrity_hash;
       context.carrier_binding_verification.verified_keyed_binding_hash = result.carrier_binding.keyed_binding_hash;
+      context.decrypted_content_verification.read_carrier_binding_hash =
+        result.carrier_binding.keyed_binding_hash;
+    }],
+    ["carrier_request_context_mismatch", (locator, result, context) => {
+      context.carrier_binding_verification.request_identity_hash = "8".repeat(64);
     }],
   ];
   for (const [code, mutate] of cases) {
@@ -189,6 +227,63 @@ test("E4 ready requires current foreground context and verified separate carrier
   ), { code: "missing_read_carrier" });
 });
 
+test("E4 rejects locator-as-bearer and cross-context read carrier swaps", () => {
+  const mutations = [
+    (context) => { context.carrier_binding_verification.request_identity_hash = "8".repeat(64); },
+    (context) => { context.carrier_binding_verification.workspace_ref.object_id = "workspace_other_01"; },
+    (context) => { context.carrier_binding_verification.principal_binding_hash = "8".repeat(64); },
+    (context) => { context.carrier_binding_verification.scenario_key = "example-other"; },
+    (context) => { context.carrier_binding_verification.action_key = "example.other"; },
+    (context) => { context.carrier_binding_verification.surface_key = "example.chat"; },
+  ];
+  for (const mutate of mutations) {
+    const context = readyContext();
+    mutate(context);
+    assert.throws(() => assertReadyExchange(
+      fixture.locator,
+      fixture.input,
+      e3Fixture.committed_content,
+      fixture.results[0],
+      e1Fixture.carrier,
+      context,
+    ), { code: "carrier_request_context_mismatch" });
+  }
+
+  const missingForegroundVerification = readyContext();
+  delete missingForegroundVerification.locator_verification;
+  assert.throws(() => assertReadyExchange(
+    fixture.locator,
+    fixture.input,
+    e3Fixture.committed_content,
+    fixture.results[0],
+    e1Fixture.carrier,
+    missingForegroundVerification,
+  ), { code: "invalid_object" });
+
+  const swappedDecryptedCarrier = readyContext();
+  swappedDecryptedCarrier.decrypted_content_verification.read_carrier_binding_hash =
+    "8".repeat(64);
+  assert.throws(() => assertReadyExchange(
+    fixture.locator,
+    fixture.input,
+    e3Fixture.committed_content,
+    fixture.results[0],
+    e1Fixture.carrier,
+    swappedDecryptedCarrier,
+  ), { code: "read_content_context_mismatch" });
+
+  const broadContext = readyContext();
+  broadContext.metadata = { offline: true };
+  assert.throws(() => assertReadyExchange(
+    fixture.locator,
+    fixture.input,
+    e3Fixture.committed_content,
+    fixture.results[0],
+    e1Fixture.carrier,
+    broadContext,
+  ), { code: "unknown_field" });
+});
+
 test("E4 non-ready branches never emit a carrier or decrypted evidence", () => {
   for (const result of fixture.results.slice(1)) {
     const context = readyContext();
@@ -214,33 +309,43 @@ test("E4 non-ready branches never emit a carrier or decrypted evidence", () => {
 });
 
 test("E4 no-copy sentinels stay absent from generic Base fixtures", async () => {
-  const genericFixtureUrls = [
-    new URL("../fixtures/scenario-private-invocation.valid.json", import.meta.url),
-    new URL("../fixtures/scenario-semantic-presentation.valid.json", import.meta.url),
-    new URL("../fixtures/scenario-domain-action-d1.valid.json", import.meta.url),
-  ];
-  const genericFixtures = await Promise.all(genericFixtureUrls.map(async (url) => ({
-    source: await readFile(url, "utf8"),
-    value: JSON.parse(await readFile(url, "utf8")),
-  })));
+  const fixtureRoot = new URL("../fixtures/", import.meta.url);
+  const genericFixtureNames = (await readdir(fixtureRoot))
+    .filter((name) => !name.startsWith("scenario-protected-interaction-"));
+  const genericFixtures = await Promise.all(genericFixtureNames.map(async (name) => {
+    const source = await readFile(new URL(name, fixtureRoot), "utf8");
+    return {
+      name,
+      source,
+      value: name.endsWith(".valid.json") ? JSON.parse(source) : undefined,
+    };
+  }));
   const plainText = e1Fixture.carrier.plain_text;
   const sentinels = [
     plainText,
     JSON.stringify(plainText).slice(1, -1),
     Buffer.from(plainText, "utf8").toString("base64"),
     Array.from(plainText).slice(9, 33).join(""),
+    e3Fixture.committed_content.protected_content_ref,
+    e3Fixture.committed_content.prepared_content_version,
+    e3Fixture.committed_content.committed_content_version,
+    e3Fixture.committed_content.keyed_integrity_hash,
+    fixture.results[0].carrier_binding.keyed_binding_hash,
   ];
   for (const generic of genericFixtures) {
-    assert.doesNotThrow(() =>
-      assertScenarioProtectedBodyFreeControlV1(generic.value, e1Fixture.carrier));
+    if (generic.value !== undefined) {
+      assert.doesNotThrow(() =>
+        assertScenarioProtectedBodyFreeControlV1(generic.value, e1Fixture.carrier),
+      generic.name);
+    }
     for (const sentinel of sentinels) assert.equal(generic.source.includes(sentinel), false);
   }
 });
 
-test("E4 publishes no generic erase or tombstone write input", async () => {
+test("E4 publishes no generic commit, erase or tombstone write input", async () => {
   const publishedSchemas = await readdir(schemaRoot);
   assert.equal(
-    publishedSchemas.some((name) => /(?:erase|tombstone).*(?:input|request)/u.test(name)),
+    publishedSchemas.some((name) => /(?:commit|erase|tombstone).*(?:input|request)/u.test(name)),
     false,
   );
 });

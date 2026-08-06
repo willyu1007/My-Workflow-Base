@@ -77,13 +77,26 @@ const contextForBinding = (binding) => ({
     protected_content_version: e2Fixture.results[0].prepared_content.protected_content_version,
     protected_field_key: e1Fixture.contract.protected_field_key,
     content_kind: e2Fixture.results[0].prepared_content.content_kind,
+    accepted_carrier_binding_hash: e2Fixture.input.carrier_binding.keyed_binding_hash,
+    request_identity_hash: "e".repeat(64),
     verified_keyed_integrity_hash: e2Fixture.results[0].prepared_content.keyed_integrity_hash,
     issued_at: e2Fixture.results[0].prepared_content.issued_at,
     expires_at: e2Fixture.results[0].prepared_content.expires_at,
   },
+  execution_path_verification: binding.effect_identity.driver === "scenario_direct_empty_v1"
+    ? {
+        driver: "scenario_direct_empty_v1",
+        submit_context_ref: clone(binding.effect_identity.submit_context_ref),
+      }
+    : {
+        driver: "workflow_claimed_step_v1",
+        original_workflow_step_ref: clone(binding.effect_identity.original_workflow_step_ref),
+      },
   commit_verification: {
     scenario_key: binding.effect_identity.scenario_key,
     action_key: binding.effect_identity.action_key,
+    request_identity_hash: "e".repeat(64),
+    accepted_carrier_binding_hash: e2Fixture.input.carrier_binding.keyed_binding_hash,
     canonical_payload_hash: binding.canonical_payload_hash,
     protected_content_ref: fixture.committed_content.protected_content_ref,
     prepared_content_version: fixture.committed_content.prepared_content_version,
@@ -136,6 +149,17 @@ test("E3 schema and codec close the committed control", async (context) => {
   }
 });
 
+test("E3 schema and codec reject missing and null committed fields", () => {
+  for (const mutate of [
+    (value) => { delete value.committed_content_version; },
+    (value) => { value.prepared_content_version = null; },
+  ]) {
+    const value = clone(fixture.committed_content);
+    mutate(value);
+    assertParityRejects(validateCommitted, assertScenarioCommittedProtectedContentControlV1, value);
+  }
+});
+
 test("E3 composes the same prepared object through both existing I1-D drivers", () => {
   for (const [index, result] of [
     [0, domainFixture.execution_results[0]],
@@ -157,6 +181,7 @@ test("E3 rejects prepared-object, payload, effect and transaction drift", () => 
     ["integrity_hash_mismatch", (committed) => { committed.keyed_integrity_hash = "d".repeat(64); }],
     ["committed_time_mismatch", (committed) => { committed.committed_at = "2026-08-05T00:02:31.000Z"; }],
     ["commit_payload_mismatch", (committed, context) => { context.commit_verification.canonical_payload_hash = "d".repeat(64); }],
+    ["commit_request_identity_mismatch", (committed, context) => { context.commit_verification.request_identity_hash = "d".repeat(64); }],
     ["commit_effect_identity_mismatch", (committed, context) => { context.commit_verification.action_key = "example.other_action"; }],
     ["resolved_prepared_content_mismatch", (committed, context) => { context.resolved_prepared_content.expires_at = "2026-08-05T00:04:59.000Z"; }],
   ];
@@ -176,6 +201,26 @@ test("E3 rejects prepared-object, payload, effect and transaction drift", () => 
   assert.throws(() =>
     assertComposition(0, domainFixture.execution_results[0], beforePrepare, beforePrepareContext),
   { code: "commit_before_prepare" });
+
+  const wrongStepContext = contextForBinding(domainFixture.execution_bindings[1]);
+  wrongStepContext.execution_path_verification.original_workflow_step_ref.object_id =
+    "step_example_02";
+  assert.throws(() => assertComposition(
+    1,
+    domainFixture.execution_results[1],
+    fixture.committed_content,
+    wrongStepContext,
+  ), { code: "original_step_mismatch" });
+
+  const wrongSubmitContext = contextForBinding(domainFixture.execution_bindings[0]);
+  wrongSubmitContext.execution_path_verification.submit_context_ref.object_id =
+    "submit_context_example_02";
+  assert.throws(() => assertComposition(
+    0,
+    domainFixture.execution_results[0],
+    fixture.committed_content,
+    wrongSubmitContext,
+  ), { code: "execution_path_mismatch" });
 });
 
 test("E3 never commits failed, unknown or rolled-back execution", () => {
@@ -193,6 +238,15 @@ test("E3 never commits failed, unknown or rolled-back execution", () => {
   assert.throws(() =>
     assertComposition(0, domainFixture.execution_results[0], undefined, rolledBackContext),
   { code: "missing_committed_content" });
+
+  const expiredContext = contextForBinding(domainFixture.execution_bindings[0]);
+  expiredContext.submit_context.now = expiredContext.submit_context.submit_context_expires_at;
+  assert.throws(() => assertComposition(
+    0,
+    domainFixture.execution_results[0],
+    fixture.committed_content,
+    expiredContext,
+  ), { code: "submit_context_expired" });
 });
 
 test("E3 recovery composes an exact replay without carrier resend", () => {
@@ -206,6 +260,17 @@ test("E3 recovery composes an exact replay without carrier resend", () => {
   ));
 });
 
+test("E3 contextual evidence rejects broad metadata extensions", () => {
+  const context = contextForBinding(domainFixture.execution_bindings[0]);
+  context.metadata = { durable: true };
+  assert.throws(() => assertComposition(
+    0,
+    domainFixture.execution_results[0],
+    fixture.committed_content,
+    context,
+  ), { code: "unknown_field" });
+});
+
 test("E3 adds no commit input and keeps I1-D envelopes protected-ref free", () => {
   for (const [validate, codec, source] of [
     [validateBinding, assertScenarioDomainActionExecutionBindingV1, domainFixture.execution_bindings[0]],
@@ -215,4 +280,23 @@ test("E3 adds no commit input and keeps I1-D envelopes protected-ref free", () =
     value.protected_content_ref = fixture.committed_content.protected_content_ref;
     assertParityRejects(validate, codec, value);
   }
+
+  const hiddenRef = clone(domainFixture.execution_results[0]);
+  hiddenRef.output_refs = [{
+    schema_version: 1,
+    namespace: "scenario.example",
+    object_type: "example_output",
+    object_id: fixture.committed_content.protected_content_ref,
+  }];
+  assert.equal(
+    validateExecutionResult(hiddenRef),
+    true,
+    JSON.stringify(validateExecutionResult.errors),
+  );
+  assert.throws(() => assertComposition(
+    0,
+    hiddenRef,
+    fixture.committed_content,
+    contextForBinding(domainFixture.execution_bindings[0]),
+  ), { code: "protected_control_copy" });
 });

@@ -15,12 +15,7 @@
           "type": "object",
           "properties": {
             "action_input": {
-              "type": "object",
-              "propertyNames": {
-                "not": {
-                  "pattern": "^(plain_text(_dev)?|plaintext|body|carrier|ciphertext|wrapped_key|kms_key(_id)?|attachment_refs|protected_content_ref|client_content_kind|content_bytes|encryption_key|key_id|nonce)$"
-                }
-              }
+              "$ref": "#/$defs/bodyFreeObject"
             }
           },
           "required": ["action_input"]
@@ -35,6 +30,32 @@
           "properties": { "carrier_scope": { "const": "prepare_input" } },
           "required": ["carrier_scope"]
         }
+      ]
+    }
+  },
+  "$defs": {
+    "forbiddenBodyField": {
+      "not": {
+        "type": "string",
+        "pattern": "^(plain_text(_dev)?|plaintext|body|carrier|ciphertext|wrapped_key|kms_key(_id)?|attachment_refs|protected_content_ref|client_content_kind|content_bytes|detail|summary|narration|encryption_key|key_id|nonce)$"
+      }
+    },
+    "bodyFreeObject": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/forbiddenBodyField" },
+      "additionalProperties": { "$ref": "#/$defs/bodyFreeValue" }
+    },
+    "bodyFreeValue": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "boolean" },
+        { "type": "number" },
+        { "type": "string" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/$defs/bodyFreeValue" }
+        },
+        { "$ref": "#/$defs/bodyFreeObject" }
       ]
     }
   }

@@ -6,10 +6,17 @@ import {
   assertScenarioDomainActionExecutionBindingV1,
   assertScenarioDomainActionExecutionResultForBindingV1,
   assertScenarioDomainActionExecutionResultV1,
+  assertScenarioDomainActionWorkflowStepRefV1,
   assertSubmitScenarioDomainActionContextV1,
   assertSubmitScenarioDomainActionInputV1,
 } from "./scenario-domain-action-validation.js";
-import type { ScenarioDomainActionContractV1 } from "./scenario-domain-action.js";
+import type {
+  ScenarioDomainActionContractV1,
+  ScenarioDomainActionExecutionBindingV1,
+  ScenarioDomainActionWorkflowStepRefV1,
+} from "./scenario-domain-action.js";
+import { assertCanonicalRef } from "./federation-validation.js";
+import type { CanonicalRef } from "./identity.js";
 import { assertScenarioSafeReasonV1 } from "./scenario-presentation-validation.js";
 import {
   scenarioProtectedCarrierScopesV1,
@@ -19,24 +26,92 @@ import {
   scenarioProtectedMediaTypeV1,
   scenarioProtectedMinimumCharactersV1,
   scenarioProtectedNormalizationV1,
+  type ScenarioProtectedCarrierScopeV1,
   type ScenarioProtectedCarrierBindingV1,
-  type ScenarioProtectedCarrierBindingVerificationV1,
   type ScenarioProtectedContentRefV1,
   type ScenarioProtectedInteractionContractV1,
   type ScenarioProtectedPlainTextCarrierV1,
   type PrepareScenarioProtectedInteractionInputV1,
   type PrepareScenarioProtectedInteractionResultV1,
   type ScenarioPreparedProtectedContentControlV1,
-  type ScenarioPreparedProtectedContentVerificationV1,
   type ScenarioCommittedProtectedContentControlV1,
-  type ScenarioProtectedContentCommitVerificationV1,
   type ScenarioProtectedContentReadLocatorV1,
   type ReadScenarioProtectedDetailInputV1,
   type ScenarioProtectedDisplayLeaseV1,
   type ReadScenarioProtectedDetailResultV1,
-  type ScenarioProtectedReadLocatorVerificationV1,
-  type ScenarioProtectedDecryptedContentVerificationV1,
 } from "./scenario-protected-interaction.js";
+
+type ScenarioProtectedVerifiedRequestContextV1 = {
+  request_identity_hash: string;
+  workspace_ref: CanonicalRef;
+  principal_binding_hash: string;
+  scenario_key: string;
+  action_key: string;
+  surface_key: string;
+};
+
+type ScenarioProtectedCarrierBindingVerificationV1 =
+  ScenarioProtectedVerifiedRequestContextV1 & {
+    carrier_scope: ScenarioProtectedCarrierScopeV1;
+    protected_field_key: string;
+    verified_keyed_binding_hash: string;
+  };
+
+type ScenarioPreparedProtectedContentVerificationV1 = {
+  protected_content_ref: ScenarioProtectedContentRefV1;
+  protected_content_version: string;
+  protected_field_key: string;
+  content_kind: string;
+  accepted_carrier_binding_hash: string;
+  request_identity_hash: string;
+  verified_keyed_integrity_hash: string;
+  issued_at: string;
+  expires_at: string;
+};
+
+type ScenarioProtectedContentCommitVerificationV1 = {
+  scenario_key: string;
+  action_key: string;
+  request_identity_hash: string;
+  accepted_carrier_binding_hash: string;
+  canonical_payload_hash: string;
+  protected_content_ref: ScenarioProtectedContentRefV1;
+  prepared_content_version: string;
+  committed_content_version: string;
+  content_kind: string;
+  verified_keyed_integrity_hash: string;
+  committed_at: string;
+};
+
+type ScenarioProtectedExecutionPathVerificationV1 =
+  | {
+      driver: "scenario_direct_empty_v1";
+      submit_context_ref: CanonicalRef;
+    }
+  | {
+      driver: "workflow_claimed_step_v1";
+      original_workflow_step_ref: ScenarioDomainActionWorkflowStepRefV1;
+    };
+
+type ScenarioProtectedReadLocatorVerificationV1 =
+  ScenarioProtectedVerifiedRequestContextV1 & {
+    access_mode: "foreground_current";
+    protected_content_ref: ScenarioProtectedContentRefV1;
+    content_kind: string;
+    issued_at: string;
+    expires_at: string;
+    verified_foreground_context_hash: string;
+  };
+
+type ScenarioProtectedDecryptedContentVerificationV1 = {
+  protected_content_ref: ScenarioProtectedContentRefV1;
+  protected_content_version: string;
+  protected_field_key: string;
+  content_kind: string;
+  read_carrier_binding_hash: string;
+  request_identity_hash: string;
+  verified_keyed_integrity_hash: string;
+};
 
 export class ScenarioProtectedInteractionValidationError extends Error {
   constructor(readonly code: string, readonly path: string, message: string) {
@@ -130,6 +205,82 @@ const protectedReadSafeResultKeys = new Set([
   "protected_read_result_version",
   "status",
   "safe_reason",
+]);
+const carrierBindingVerificationKeys = new Set([
+  "carrier_scope",
+  "protected_field_key",
+  "request_identity_hash",
+  "workspace_ref",
+  "principal_binding_hash",
+  "scenario_key",
+  "action_key",
+  "surface_key",
+  "verified_keyed_binding_hash",
+]);
+const preparedContentVerificationKeys = new Set([
+  "protected_content_ref",
+  "protected_content_version",
+  "protected_field_key",
+  "content_kind",
+  "accepted_carrier_binding_hash",
+  "request_identity_hash",
+  "verified_keyed_integrity_hash",
+  "issued_at",
+  "expires_at",
+]);
+const protectedPrepareExchangeContextKeys = new Set([
+  "request_identity_hash",
+  "carrier_binding_verification",
+  "action_prepare_context",
+  "prepared_content_verification",
+]);
+const commitVerificationKeys = new Set([
+  "scenario_key",
+  "action_key",
+  "request_identity_hash",
+  "accepted_carrier_binding_hash",
+  "canonical_payload_hash",
+  "protected_content_ref",
+  "prepared_content_version",
+  "committed_content_version",
+  "content_kind",
+  "verified_keyed_integrity_hash",
+  "committed_at",
+]);
+const protectedCommitExchangeContextKeys = new Set([
+  "submit_context",
+  "resolved_prepared_content",
+  "execution_path_verification",
+  "commit_verification",
+]);
+const readLocatorVerificationKeys = new Set([
+  "access_mode",
+  "request_identity_hash",
+  "workspace_ref",
+  "principal_binding_hash",
+  "scenario_key",
+  "action_key",
+  "surface_key",
+  "protected_content_ref",
+  "content_kind",
+  "issued_at",
+  "expires_at",
+  "verified_foreground_context_hash",
+]);
+const decryptedContentVerificationKeys = new Set([
+  "protected_content_ref",
+  "protected_content_version",
+  "protected_field_key",
+  "content_kind",
+  "read_carrier_binding_hash",
+  "request_identity_hash",
+  "verified_keyed_integrity_hash",
+]);
+const protectedReadExchangeContextKeys = new Set([
+  "now",
+  "locator_verification",
+  "carrier_binding_verification",
+  "decrypted_content_verification",
 ]);
 const protectedPrepareSuccessKeys = new Set([
   "protected_prepare_result_version",
@@ -269,22 +420,6 @@ const assertNormalizedPlainText = (value: unknown, path: string): void => {
   if (htmlMarkupPattern.test(value)) {
     fail("rich_text_not_supported", path, `${path} must not contain HTML markup`);
   }
-};
-
-export const normalizeScenarioProtectedPlainTextV1 = (
-  value: unknown,
-  path = "plain_text",
-): string => {
-  if (typeof value !== "string") {
-    fail("invalid_plain_text", path, `${path} must be a string`);
-  }
-  const normalizedLineEndings = value.replaceAll("\r\n", "\n");
-  if (normalizedLineEndings.includes("\r")) {
-    fail("invalid_normalization", path, `${path} contains a lone CR character`);
-  }
-  const normalized = normalizedLineEndings.trim();
-  assertNormalizedPlainText(normalized, path);
-  return normalized;
 };
 
 export const assertScenarioProtectedInteractionContractV1: (
@@ -462,12 +597,20 @@ export const assertScenarioProtectedPlainTextCarrierForContractV1 = (
 
 export const assertScenarioProtectedCarrierBindingVerificationV1 = (
   binding: unknown,
-  verification: ScenarioProtectedCarrierBindingVerificationV1,
+  verification: unknown,
 ): void => {
   assertScenarioProtectedCarrierBindingV1(binding);
+  const verificationRecord = assertRecord(verification, "binding_verification");
+  assertKeys(
+    verificationRecord,
+    carrierBindingVerificationKeys,
+    "binding_verification",
+  );
+  const typedVerification =
+    verificationRecord as ScenarioProtectedCarrierBindingVerificationV1;
   if (
-    verification.carrier_scope !== "prepare_input" &&
-    verification.carrier_scope !== "read_output"
+    typedVerification.carrier_scope !== "prepare_input" &&
+    typedVerification.carrier_scope !== "read_output"
   ) {
     fail(
       "invalid_verified_scope",
@@ -476,28 +619,50 @@ export const assertScenarioProtectedCarrierBindingVerificationV1 = (
     );
   }
   assertMachineKey(
-    verification.protected_field_key,
+    typedVerification.protected_field_key,
     "binding_verification.protected_field_key",
   );
   assertSha256(
-    verification.verified_keyed_binding_hash,
+    typedVerification.request_identity_hash,
+    "binding_verification.request_identity_hash",
+  );
+  assertCanonicalRef(typedVerification.workspace_ref, "binding_verification.workspace_ref");
+  if (
+    typedVerification.workspace_ref.namespace !== "my_chat" ||
+    typedVerification.workspace_ref.object_type !== "workspace"
+  ) {
+    fail(
+      "invalid_workspace_ref",
+      "binding_verification.workspace_ref",
+      "binding verification must name a my_chat/workspace ref",
+    );
+  }
+  assertSha256(
+    typedVerification.principal_binding_hash,
+    "binding_verification.principal_binding_hash",
+  );
+  assertMachineKey(typedVerification.scenario_key, "binding_verification.scenario_key");
+  assertMachineKey(typedVerification.action_key, "binding_verification.action_key");
+  assertMachineKey(typedVerification.surface_key, "binding_verification.surface_key");
+  assertSha256(
+    typedVerification.verified_keyed_binding_hash,
     "binding_verification.verified_keyed_binding_hash",
   );
-  if (binding.carrier_scope !== verification.carrier_scope) {
+  if (binding.carrier_scope !== typedVerification.carrier_scope) {
     fail(
       "carrier_scope_mismatch",
       "carrier_binding.carrier_scope",
       "carrier scope must match independently verified context",
     );
   }
-  if (binding.protected_field_key !== verification.protected_field_key) {
+  if (binding.protected_field_key !== typedVerification.protected_field_key) {
     fail(
       "protected_field_mismatch",
       "carrier_binding.protected_field_key",
       "protected field must match independently verified context",
     );
   }
-  if (binding.keyed_binding_hash !== verification.verified_keyed_binding_hash) {
+  if (binding.keyed_binding_hash !== typedVerification.verified_keyed_binding_hash) {
     fail(
       "binding_hash_mismatch",
       "carrier_binding.keyed_binding_hash",
@@ -505,6 +670,13 @@ export const assertScenarioProtectedCarrierBindingVerificationV1 = (
     );
   }
 };
+
+const canonicalRefEquals = (left: CanonicalRef, right: CanonicalRef): boolean =>
+  left.schema_version === right.schema_version &&
+  left.namespace === right.namespace &&
+  left.object_type === right.object_type &&
+  left.object_id === right.object_id &&
+  left.version === right.version;
 
 const normalizedControlKey = (key: string): string =>
   key.toLowerCase().replaceAll(/[^a-z0-9]/gu, "");
@@ -603,6 +775,56 @@ export const assertScenarioProtectedBodyFreeControlV1 = (
   serializedUtf8Bytes(value, path);
 };
 
+const assertNoProtectedControlCopies = (
+  value: unknown,
+  protectedValues: readonly string[],
+  path: string,
+  ancestors = new Set<object>(),
+): void => {
+  if (
+    value === null ||
+    typeof value === "boolean" ||
+    typeof value === "number"
+  ) {
+    return;
+  }
+  if (typeof value === "string") {
+    if (protectedValues.some((protectedValue) => value.includes(protectedValue))) {
+      fail(
+        "protected_control_copy",
+        path,
+        `${path} contains a protected ref, version or integrity value`,
+      );
+    }
+    return;
+  }
+  if (typeof value !== "object") return;
+  if (ancestors.has(value)) {
+    fail("cyclic_control_value", path, `${path} must not contain cycles`);
+  }
+  ancestors.add(value);
+  if (Array.isArray(value)) {
+    value.forEach((item, index) =>
+      assertNoProtectedControlCopies(
+        item,
+        protectedValues,
+        `${path}.${index}`,
+        ancestors,
+      ),
+    );
+  } else {
+    for (const [key, item] of Object.entries(value)) {
+      assertNoProtectedControlCopies(
+        item,
+        protectedValues,
+        `${path}.${key}`,
+        ancestors,
+      );
+    }
+  }
+  ancestors.delete(value);
+};
+
 const protectedActionInputForbiddenKeyForms = [
   "attachmentrefs",
   "body",
@@ -610,6 +832,7 @@ const protectedActionInputForbiddenKeyForms = [
   "ciphertext",
   "clientcontentkind",
   "contentbytes",
+  "detail",
   "encryptionkey",
   "keyid",
   "kmskey",
@@ -618,6 +841,8 @@ const protectedActionInputForbiddenKeyForms = [
   "protectedbody",
   "protectedcarrier",
   "protectedcontentref",
+  "summary",
+  "narration",
   "wrappedkey",
 ];
 
@@ -792,6 +1017,7 @@ export const assertPrepareScenarioProtectedInteractionExchangeV1 = (
   result: unknown,
   carrier: unknown,
   context: {
+    request_identity_hash: string;
     carrier_binding_verification: ScenarioProtectedCarrierBindingVerificationV1;
     action_prepare_context: Parameters<
       typeof assertPrepareScenarioDomainActionExchangeV1
@@ -799,6 +1025,11 @@ export const assertPrepareScenarioProtectedInteractionExchangeV1 = (
     prepared_content_verification?: ScenarioPreparedProtectedContentVerificationV1;
   },
 ): void => {
+  assertKeys(
+    assertRecord(context, "context"),
+    protectedPrepareExchangeContextKeys,
+    "context",
+  );
   assertScenarioProtectedActionContractPairV1(protectedContract, actionContract);
   assertScenarioProtectedInteractionContractV1(protectedContract);
   assertPrepareScenarioProtectedInteractionInputV1(input);
@@ -823,6 +1054,32 @@ export const assertPrepareScenarioProtectedInteractionExchangeV1 = (
     result.action_result,
     context.action_prepare_context,
   );
+  assertSha256(context.request_identity_hash, "context.request_identity_hash");
+  assertCanonicalRef(
+    context.action_prepare_context.workspace_ref,
+    "context.action_prepare_context.workspace_ref",
+  );
+  const bindingVerification = context.carrier_binding_verification;
+  if (
+    bindingVerification.request_identity_hash !== context.request_identity_hash ||
+    !canonicalRefEquals(
+      bindingVerification.workspace_ref,
+      context.action_prepare_context.workspace_ref,
+    ) ||
+    bindingVerification.principal_binding_hash !==
+      context.action_prepare_context.principal_binding_hash ||
+    bindingVerification.scenario_key !== protectedContract.scenario_key ||
+    bindingVerification.scenario_key !== context.action_prepare_context.scenario_key ||
+    bindingVerification.action_key !== protectedContract.action_key ||
+    bindingVerification.action_key !== input.action_prepare.action_key ||
+    bindingVerification.surface_key !== context.action_prepare_context.ingress_key
+  ) {
+    fail(
+      "carrier_request_context_mismatch",
+      "context.carrier_binding_verification",
+      "verified carrier must bind the exact request, Workspace, principal, scenario, action and surface",
+    );
+  }
   if (result.status !== "prepared") {
     if (context.prepared_content_verification !== undefined) {
       fail(
@@ -841,6 +1098,11 @@ export const assertPrepareScenarioProtectedInteractionExchangeV1 = (
       "prepared result requires owner-verified protected content context",
     );
   }
+  assertKeys(
+    assertRecord(verification, "context.prepared_content_verification"),
+    preparedContentVerificationKeys,
+    "context.prepared_content_verification",
+  );
   assertScenarioProtectedContentRefV1(
     verification.protected_content_ref,
     "context.prepared_content_verification.protected_content_ref",
@@ -858,6 +1120,14 @@ export const assertPrepareScenarioProtectedInteractionExchangeV1 = (
     "context.prepared_content_verification.content_kind",
   );
   assertSha256(
+    verification.accepted_carrier_binding_hash,
+    "context.prepared_content_verification.accepted_carrier_binding_hash",
+  );
+  assertSha256(
+    verification.request_identity_hash,
+    "context.prepared_content_verification.request_identity_hash",
+  );
+  assertSha256(
     verification.verified_keyed_integrity_hash,
     "context.prepared_content_verification.verified_keyed_integrity_hash",
   );
@@ -870,6 +1140,20 @@ export const assertPrepareScenarioProtectedInteractionExchangeV1 = (
     "context.prepared_content_verification.expires_at",
   );
   const prepared = result.prepared_content;
+  for (const [value, path] of [
+    [input.action_prepare, "protected_prepare_input.action_prepare"],
+    [result.action_result, "protected_prepare_result.action_result"],
+  ] as const) {
+    assertNoProtectedControlCopies(
+      value,
+      [
+        prepared.protected_content_ref,
+        prepared.protected_content_version,
+        prepared.keyed_integrity_hash,
+      ],
+      path,
+    );
+  }
   if (
     prepared.protected_content_ref !== verification.protected_content_ref ||
     prepared.protected_content_version !== verification.protected_content_version
@@ -895,6 +1179,16 @@ export const assertPrepareScenarioProtectedInteractionExchangeV1 = (
       "protected_field_mismatch",
       "context.prepared_content_verification.protected_field_key",
       "owner integrity evidence must bind the static protected field",
+    );
+  }
+  if (
+    verification.accepted_carrier_binding_hash !== input.carrier_binding.keyed_binding_hash ||
+    verification.request_identity_hash !== context.request_identity_hash
+  ) {
+    fail(
+      "owner_carrier_context_mismatch",
+      "context.prepared_content_verification.accepted_carrier_binding_hash",
+      "owner integrity evidence must bind the exact accepted carrier request",
     );
   }
   if (prepared.keyed_integrity_hash !== verification.verified_keyed_integrity_hash) {
@@ -961,8 +1255,21 @@ export const assertScenarioCommittedProtectedContentControlV1: (
 const assertProtectedCommitVerification = (
   verification: ScenarioProtectedContentCommitVerificationV1,
 ): void => {
+  assertKeys(
+    assertRecord(verification, "context.commit_verification"),
+    commitVerificationKeys,
+    "context.commit_verification",
+  );
   assertMachineKey(verification.scenario_key, "context.commit_verification.scenario_key");
   assertMachineKey(verification.action_key, "context.commit_verification.action_key");
+  assertSha256(
+    verification.request_identity_hash,
+    "context.commit_verification.request_identity_hash",
+  );
+  assertSha256(
+    verification.accepted_carrier_binding_hash,
+    "context.commit_verification.accepted_carrier_binding_hash",
+  );
   assertSha256(
     verification.canonical_payload_hash,
     "context.commit_verification.canonical_payload_hash",
@@ -990,6 +1297,103 @@ const assertProtectedCommitVerification = (
   );
 };
 
+const workflowStepRefEquals = (
+  left: ScenarioDomainActionWorkflowStepRefV1,
+  right: ScenarioDomainActionWorkflowStepRefV1,
+): boolean =>
+  left.schema_version === right.schema_version &&
+  left.namespace === right.namespace &&
+  left.object_type === right.object_type &&
+  left.object_id === right.object_id;
+
+const assertExecutionPathVerification = (
+  verification: ScenarioProtectedExecutionPathVerificationV1,
+  executionBinding: ScenarioDomainActionExecutionBindingV1,
+): void => {
+  assertRecord(verification, "context.execution_path_verification");
+  if (verification.driver === "scenario_direct_empty_v1") {
+    if (
+      Object.keys(verification).some(
+        (key) => key !== "driver" && key !== "submit_context_ref",
+      )
+    ) {
+      fail(
+        "invalid_execution_path_verification",
+        "context.execution_path_verification",
+        "direct execution-path verification contains unknown fields",
+      );
+    }
+    assertCanonicalRef(
+      verification.submit_context_ref,
+      "context.execution_path_verification.submit_context_ref",
+    );
+    if (
+      executionBinding.effect_identity.driver !== verification.driver ||
+      !canonicalRefEquals(
+        verification.submit_context_ref,
+        executionBinding.effect_identity.submit_context_ref,
+      )
+    ) {
+      fail(
+        "execution_path_mismatch",
+        "context.execution_path_verification",
+        "direct execution path must retain the exact I1-D submit context identity",
+      );
+    }
+    return;
+  }
+  if (verification.driver !== "workflow_claimed_step_v1") {
+    fail(
+      "invalid_execution_path_verification",
+      "context.execution_path_verification.driver",
+      "execution path must use an accepted I1-D driver",
+    );
+  }
+  if (
+    Object.keys(verification).some(
+      (key) => key !== "driver" && key !== "original_workflow_step_ref",
+    )
+  ) {
+    fail(
+      "invalid_execution_path_verification",
+      "context.execution_path_verification",
+      "claimed execution-path verification contains unknown fields",
+    );
+  }
+  assertScenarioDomainActionExecutionBindingV1(executionBinding);
+  if (executionBinding.effect_identity.driver !== "workflow_claimed_step_v1") {
+    fail(
+      "execution_path_mismatch",
+      "context.execution_path_verification.driver",
+      "claimed execution path must match the I1-D effect identity",
+    );
+  }
+  const originalStep = verification.original_workflow_step_ref;
+  if (originalStep === undefined) {
+    fail(
+      "missing_original_step",
+      "context.execution_path_verification.original_workflow_step_ref",
+      "claimed execution path requires the independently resolved original Step",
+    );
+  }
+  assertScenarioDomainActionWorkflowStepRefV1(
+    originalStep,
+    "context.execution_path_verification.original_workflow_step_ref",
+  );
+  if (
+    !workflowStepRefEquals(
+      originalStep,
+      executionBinding.effect_identity.original_workflow_step_ref,
+    )
+  ) {
+    fail(
+      "original_step_mismatch",
+      "context.execution_path_verification.original_workflow_step_ref",
+      "protected commit must retain the exact original claimed Step",
+    );
+  }
+};
+
 export const assertScenarioProtectedContentCommitCompositionV1 = (
   protectedContract: unknown,
   actionContract: unknown,
@@ -1001,9 +1405,15 @@ export const assertScenarioProtectedContentCommitCompositionV1 = (
   context: {
     submit_context: Parameters<typeof assertSubmitScenarioDomainActionContextV1>[2];
     resolved_prepared_content: ScenarioPreparedProtectedContentVerificationV1;
+    execution_path_verification: ScenarioProtectedExecutionPathVerificationV1;
     commit_verification?: ScenarioProtectedContentCommitVerificationV1;
   },
 ): void => {
+  assertKeys(
+    assertRecord(context, "context"),
+    protectedCommitExchangeContextKeys,
+    "context",
+  );
   assertScenarioProtectedActionContractPairV1(protectedContract, actionContract);
   assertScenarioProtectedInteractionContractV1(protectedContract);
   assertSubmitScenarioDomainActionInputV1(submit);
@@ -1016,6 +1426,11 @@ export const assertScenarioProtectedContentCommitCompositionV1 = (
     context.submit_context,
   );
   const resolvedPrepared = context.resolved_prepared_content;
+  assertKeys(
+    assertRecord(resolvedPrepared, "context.resolved_prepared_content"),
+    preparedContentVerificationKeys,
+    "context.resolved_prepared_content",
+  );
   assertScenarioProtectedContentRefV1(
     resolvedPrepared.protected_content_ref,
     "context.resolved_prepared_content.protected_content_ref",
@@ -1031,6 +1446,14 @@ export const assertScenarioProtectedContentCommitCompositionV1 = (
   assertMachineKey(
     resolvedPrepared.content_kind,
     "context.resolved_prepared_content.content_kind",
+  );
+  assertSha256(
+    resolvedPrepared.accepted_carrier_binding_hash,
+    "context.resolved_prepared_content.accepted_carrier_binding_hash",
+  );
+  assertSha256(
+    resolvedPrepared.request_identity_hash,
+    "context.resolved_prepared_content.request_identity_hash",
   );
   assertSha256(
     resolvedPrepared.verified_keyed_integrity_hash,
@@ -1061,11 +1484,30 @@ export const assertScenarioProtectedContentCommitCompositionV1 = (
       "resolved submit context must name the exact prepared protected object",
     );
   }
+  assertExecutionPathVerification(
+    context.execution_path_verification,
+    executionBinding,
+  );
   assertScenarioDomainActionExecutionResultForBindingV1(
     actionContract,
     executionBinding,
     executionResult,
   );
+  for (const [value, path] of [
+    [submit, "submit_input"],
+    [executionBinding, "execution_binding"],
+    [executionResult, "execution_result"],
+  ] as const) {
+    assertNoProtectedControlCopies(
+      value,
+      [
+        preparedContent.protected_content_ref,
+        preparedContent.protected_content_version,
+        preparedContent.keyed_integrity_hash,
+      ],
+      path,
+    );
+  }
   if (executionResult.status !== "committed") {
     if (committedContent !== undefined || context.commit_verification !== undefined) {
       fail(
@@ -1084,6 +1526,17 @@ export const assertScenarioProtectedContentCommitCompositionV1 = (
     );
   }
   assertScenarioCommittedProtectedContentControlV1(committedContent);
+  for (const [value, path] of [
+    [submit, "submit_input"],
+    [executionBinding, "execution_binding"],
+    [executionResult, "execution_result"],
+  ] as const) {
+    assertNoProtectedControlCopies(
+      value,
+      [committedContent.committed_content_version],
+      path,
+    );
+  }
   const verification = context.commit_verification;
   if (verification === undefined) {
     fail(
@@ -1110,6 +1563,17 @@ export const assertScenarioProtectedContentCommitCompositionV1 = (
       "commit_payload_mismatch",
       "context.commit_verification.canonical_payload_hash",
       "commit verification must bind the exact execution payload",
+    );
+  }
+  if (
+    verification.request_identity_hash !== resolvedPrepared.request_identity_hash ||
+    verification.accepted_carrier_binding_hash !==
+      resolvedPrepared.accepted_carrier_binding_hash
+  ) {
+    fail(
+      "commit_request_identity_mismatch",
+      "context.commit_verification.request_identity_hash",
+      "commit verification must retain the exact prepared request and carrier binding",
     );
   }
   if (
@@ -1328,6 +1792,43 @@ export const assertReadScenarioProtectedDetailResultV1: (
 const assertReadLocatorVerification = (
   verification: ScenarioProtectedReadLocatorVerificationV1,
 ): void => {
+  assertKeys(
+    assertRecord(verification, "context.locator_verification"),
+    readLocatorVerificationKeys,
+    "context.locator_verification",
+  );
+  if (verification.access_mode !== "foreground_current") {
+    fail(
+      "invalid_read_access_mode",
+      "context.locator_verification.access_mode",
+      "protected reads require freshly verified foreground access",
+    );
+  }
+  assertSha256(
+    verification.request_identity_hash,
+    "context.locator_verification.request_identity_hash",
+  );
+  assertCanonicalRef(
+    verification.workspace_ref,
+    "context.locator_verification.workspace_ref",
+  );
+  if (
+    verification.workspace_ref.namespace !== "my_chat" ||
+    verification.workspace_ref.object_type !== "workspace"
+  ) {
+    fail(
+      "invalid_workspace_ref",
+      "context.locator_verification.workspace_ref",
+      "read verification must name a my_chat/workspace ref",
+    );
+  }
+  assertSha256(
+    verification.principal_binding_hash,
+    "context.locator_verification.principal_binding_hash",
+  );
+  assertMachineKey(verification.scenario_key, "context.locator_verification.scenario_key");
+  assertMachineKey(verification.action_key, "context.locator_verification.action_key");
+  assertMachineKey(verification.surface_key, "context.locator_verification.surface_key");
   assertScenarioProtectedContentRefV1(
     verification.protected_content_ref,
     "context.locator_verification.protected_content_ref",
@@ -1344,6 +1845,11 @@ const assertReadLocatorVerification = (
 const assertDecryptedContentVerification = (
   verification: ScenarioProtectedDecryptedContentVerificationV1,
 ): void => {
+  assertKeys(
+    assertRecord(verification, "context.decrypted_content_verification"),
+    decryptedContentVerificationKeys,
+    "context.decrypted_content_verification",
+  );
   assertScenarioProtectedContentRefV1(
     verification.protected_content_ref,
     "context.decrypted_content_verification.protected_content_ref",
@@ -1359,6 +1865,14 @@ const assertDecryptedContentVerification = (
   assertMachineKey(
     verification.content_kind,
     "context.decrypted_content_verification.content_kind",
+  );
+  assertSha256(
+    verification.read_carrier_binding_hash,
+    "context.decrypted_content_verification.read_carrier_binding_hash",
+  );
+  assertSha256(
+    verification.request_identity_hash,
+    "context.decrypted_content_verification.request_identity_hash",
   );
   assertSha256(
     verification.verified_keyed_integrity_hash,
@@ -1380,6 +1894,11 @@ export const assertReadScenarioProtectedDetailExchangeV1 = (
     decrypted_content_verification?: ScenarioProtectedDecryptedContentVerificationV1;
   },
 ): void => {
+  assertKeys(
+    assertRecord(context, "context"),
+    protectedReadExchangeContextKeys,
+    "context",
+  );
   assertScenarioProtectedInteractionContractV1(protectedContract);
   assertScenarioProtectedContentReadLocatorV1(locator);
   assertReadScenarioProtectedDetailInputV1(input);
@@ -1391,6 +1910,8 @@ export const assertReadScenarioProtectedDetailExchangeV1 = (
     locator.protected_content_ref !== locatorVerification.protected_content_ref ||
     locator.content_kind !== protectedContract.content_kind ||
     locator.content_kind !== locatorVerification.content_kind ||
+    locatorVerification.scenario_key !== protectedContract.scenario_key ||
+    locatorVerification.action_key !== protectedContract.action_key ||
     locator.issued_at !== locatorVerification.issued_at ||
     locator.expires_at !== locatorVerification.expires_at
   ) {
@@ -1455,6 +1976,25 @@ export const assertReadScenarioProtectedDetailExchangeV1 = (
     result.carrier_binding,
     bindingVerification,
   );
+  if (
+    bindingVerification.request_identity_hash !==
+      locatorVerification.request_identity_hash ||
+    !canonicalRefEquals(
+      bindingVerification.workspace_ref,
+      locatorVerification.workspace_ref,
+    ) ||
+    bindingVerification.principal_binding_hash !==
+      locatorVerification.principal_binding_hash ||
+    bindingVerification.scenario_key !== locatorVerification.scenario_key ||
+    bindingVerification.action_key !== locatorVerification.action_key ||
+    bindingVerification.surface_key !== locatorVerification.surface_key
+  ) {
+    fail(
+      "carrier_request_context_mismatch",
+      "context.carrier_binding_verification",
+      "read carrier must bind the exact current foreground request context",
+    );
+  }
   if (result.carrier_binding.protected_field_key !== protectedContract.protected_field_key) {
     fail(
       "protected_field_mismatch",
@@ -1479,7 +2019,11 @@ export const assertReadScenarioProtectedDetailExchangeV1 = (
     committedContent.content_kind !== result.content_kind ||
     committedContent.content_kind !== protectedContract.content_kind ||
     committedContent.content_kind !== decryptedVerification.content_kind ||
-    decryptedVerification.protected_field_key !== protectedContract.protected_field_key
+    decryptedVerification.protected_field_key !== protectedContract.protected_field_key ||
+    decryptedVerification.read_carrier_binding_hash !==
+      result.carrier_binding.keyed_binding_hash ||
+    decryptedVerification.request_identity_hash !==
+      locatorVerification.request_identity_hash
   ) {
     fail(
       "read_content_context_mismatch",

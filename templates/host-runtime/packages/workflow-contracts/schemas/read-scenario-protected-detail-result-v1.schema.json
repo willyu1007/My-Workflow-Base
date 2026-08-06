@@ -50,7 +50,27 @@
       "required": ["protected_read_result_version", "status", "safe_reason"],
       "properties": {
         "protected_read_result_version": { "const": 1 },
-        "status": { "enum": ["tombstone", "context_changed", "unavailable"] },
+        "status": { "const": "tombstone" },
+        "safe_reason": { "$ref": "scenario-safe-reason-v1.schema.json" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protected_read_result_version", "status", "safe_reason"],
+      "properties": {
+        "protected_read_result_version": { "const": 1 },
+        "status": { "const": "context_changed" },
+        "safe_reason": { "$ref": "scenario-safe-reason-v1.schema.json" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protected_read_result_version", "status", "safe_reason"],
+      "properties": {
+        "protected_read_result_version": { "const": 1 },
+        "status": { "const": "unavailable" },
         "safe_reason": { "$ref": "scenario-safe-reason-v1.schema.json" }
       }
     }

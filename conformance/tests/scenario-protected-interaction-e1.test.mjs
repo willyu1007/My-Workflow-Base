@@ -11,7 +11,6 @@ import {
   assertScenarioProtectedInteractionContractV1,
   assertScenarioProtectedPlainTextCarrierForContractV1,
   assertScenarioProtectedPlainTextCarrierV1,
-  normalizeScenarioProtectedPlainTextV1,
 } from "@host/workflow-contracts";
 
 const schemaRoot = new URL(
@@ -71,15 +70,32 @@ test("E1 accepts the Base-neutral static contract, carrier and keyed bindings", 
   );
 });
 
-test("E1 normalizes exactly CRLF, lone CR and outer ECMAScript whitespace", () => {
-  assert.equal(
-    normalizeScenarioProtectedPlainTextV1(" \talpha\r\nbeta\n "),
-    "alpha\nbeta",
-  );
-  assert.equal(normalizeScenarioProtectedPlainTextV1("e\u0301"), "e\u0301");
-  assert.throws(() => normalizeScenarioProtectedPlainTextV1("alpha\rbeta"), {
-    code: "invalid_normalization",
-  });
+test("E1 static join rejects scenario and action drift", () => {
+  for (const [field, value, code] of [
+    ["scenario_key", "example-other", "scenario_mismatch"],
+    ["action_key", "example.other", "action_mismatch"],
+  ]) {
+    const actionContract = clone(domainFixture.contract);
+    actionContract[field] = value;
+    assert.throws(() =>
+      assertScenarioProtectedActionContractPairV1(fixture.contract, actionContract),
+    { code });
+  }
+});
+
+test("E1 validates the exact normalization boundary without rewriting input", () => {
+  const authored = " \talpha\r\nbeta\n ";
+  const normalized = authored.replaceAll("\r\n", "\n").trim();
+  assert.equal(normalized, "alpha\nbeta");
+  const normalizedCarrier = clone(fixture.carrier);
+  normalizedCarrier.plain_text = normalized;
+  assert.doesNotThrow(() => assertScenarioProtectedPlainTextCarrierV1(normalizedCarrier));
+
+  const decomposedCarrier = clone(fixture.carrier);
+  decomposedCarrier.plain_text = "e\u0301";
+  assert.doesNotThrow(() => assertScenarioProtectedPlainTextCarrierV1(decomposedCarrier));
+  assert.equal(decomposedCarrier.plain_text, "e\u0301");
+
   const unnormalized = clone(fixture.carrier);
   unnormalized.plain_text = ` ${fixture.carrier.plain_text}`;
   assertParityRejects(validateCarrier, assertScenarioProtectedPlainTextCarrierV1, unnormalized);
@@ -107,34 +123,45 @@ test("E1 schemas and codecs close contract, carrier and binding shapes", async (
   }
 });
 
+test("E1 schemas and codecs reject missing and null required values", () => {
+  for (const [validate, codec, source, field] of [
+    [validateContract, assertScenarioProtectedInteractionContractV1, fixture.contract, "content_profile"],
+    [validateCarrier, assertScenarioProtectedPlainTextCarrierV1, fixture.carrier, "plain_text"],
+    [validateBinding, assertScenarioProtectedCarrierBindingV1, fixture.prepare_binding, "keyed_binding_hash"],
+  ]) {
+    for (const mode of ["missing", "null"]) {
+      const value = clone(source);
+      if (mode === "missing") delete value[field];
+      else value[field] = null;
+      assertParityRejects(validate, codec, value);
+    }
+  }
+});
+
 test("E1 uses independently verified binding context", () => {
+  const bindingVerification = (binding, overrides = {}) => ({
+    carrier_scope: binding.carrier_scope,
+    protected_field_key: fixture.contract.protected_field_key,
+    request_identity_hash: "e".repeat(64),
+    workspace_ref: clone(domainFixture.step_assertion.workspace_ref),
+    principal_binding_hash: "7".repeat(64),
+    scenario_key: fixture.contract.scenario_key,
+    action_key: fixture.contract.action_key,
+    surface_key: "example.web",
+    verified_keyed_binding_hash: binding.keyed_binding_hash,
+    ...overrides,
+  });
   assert.doesNotThrow(() => assertScenarioProtectedCarrierBindingVerificationV1(
     fixture.prepare_binding,
-    {
-      carrier_scope: "prepare_input",
-      protected_field_key: fixture.contract.protected_field_key,
-      verified_keyed_binding_hash: fixture.prepare_binding.keyed_binding_hash,
-    },
+    bindingVerification(fixture.prepare_binding),
   ));
-  for (const verification of [
-    {
-      carrier_scope: "read_output",
-      protected_field_key: fixture.contract.protected_field_key,
-      verified_keyed_binding_hash: fixture.prepare_binding.keyed_binding_hash,
-    },
-    {
-      carrier_scope: "prepare_input",
-      protected_field_key: "example_other_text",
-      verified_keyed_binding_hash: fixture.prepare_binding.keyed_binding_hash,
-    },
-    {
-      carrier_scope: "prepare_input",
-      protected_field_key: fixture.contract.protected_field_key,
-      verified_keyed_binding_hash: "c".repeat(64),
-    },
+  for (const candidate of [
+    bindingVerification(fixture.prepare_binding, { carrier_scope: "read_output" }),
+    bindingVerification(fixture.prepare_binding, { protected_field_key: "example_other_text" }),
+    bindingVerification(fixture.prepare_binding, { verified_keyed_binding_hash: "c".repeat(64) }),
   ]) {
     assert.throws(() =>
-      assertScenarioProtectedCarrierBindingVerificationV1(fixture.prepare_binding, verification));
+      assertScenarioProtectedCarrierBindingVerificationV1(fixture.prepare_binding, candidate));
   }
 });
 
