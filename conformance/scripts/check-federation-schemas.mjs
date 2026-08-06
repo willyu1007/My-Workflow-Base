@@ -13,6 +13,8 @@ const expected = [
   "lookup-scenario-domain-action-step-binding-result-v1.schema.json",
   "prepare-scenario-domain-action-input-v1.schema.json",
   "prepare-scenario-domain-action-result-v1.schema.json",
+  "prepare-scenario-protected-interaction-input-v1.schema.json",
+  "prepare-scenario-protected-interaction-result-v1.schema.json",
   "scenario-action-offer-v1.schema.json",
   "scenario-authentication-assurance-evidence-v1.schema.json",
   "scenario-canonical-binding-expected-head-v1.schema.json",
@@ -46,6 +48,7 @@ const expected = [
   "scenario-owner-binding-ref-v1.schema.json",
   "scenario-owner-binding-reservation-request-v1.schema.json",
   "scenario-owner-binding-reservation-result-v1.schema.json",
+  "scenario-prepared-protected-content-control-v1.schema.json",
   "scenario-present-subject-context-input-v1.schema.json",
   "scenario-presentation-result-v1.schema.json",
   "scenario-private-invocation-v1.schema.json",
@@ -207,6 +210,23 @@ for (const [schemaName, values] of [
   const validate = ajv.getSchema(`https://morethan.local/contracts/${schemaName}.schema.json`);
   if (!validate || values.some((value) => !validate(value))) {
     throw new Error(`protected-interaction E1 fixture failed ${schemaName}: ${JSON.stringify(validate?.errors)}`);
+  }
+}
+
+const protectedPrepareFixture = JSON.parse(await readFile(
+  new URL("../fixtures/scenario-protected-interaction-e2.valid.json", import.meta.url),
+  "utf8",
+));
+for (const [schemaName, values] of [
+  ["prepare-scenario-protected-interaction-input-v1", [protectedPrepareFixture.input]],
+  ["scenario-prepared-protected-content-control-v1", [
+    protectedPrepareFixture.results[0].prepared_content,
+  ]],
+  ["prepare-scenario-protected-interaction-result-v1", protectedPrepareFixture.results],
+]) {
+  const validate = ajv.getSchema(`https://morethan.local/contracts/${schemaName}.schema.json`);
+  if (!validate || values.some((value) => !validate(value))) {
+    throw new Error(`protected-interaction E2 fixture failed ${schemaName}: ${JSON.stringify(validate?.errors)}`);
   }
 }
 

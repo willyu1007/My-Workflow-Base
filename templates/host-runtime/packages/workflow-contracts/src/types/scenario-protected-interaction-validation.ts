@@ -1,4 +1,9 @@
-import { assertScenarioDomainActionContractV1 } from "./scenario-domain-action-validation.js";
+import {
+  assertPrepareScenarioDomainActionExchangeV1,
+  assertPrepareScenarioDomainActionInputV1,
+  assertPrepareScenarioDomainActionResultV1,
+  assertScenarioDomainActionContractV1,
+} from "./scenario-domain-action-validation.js";
 import type { ScenarioDomainActionContractV1 } from "./scenario-domain-action.js";
 import {
   scenarioProtectedCarrierScopesV1,
@@ -13,6 +18,10 @@ import {
   type ScenarioProtectedContentRefV1,
   type ScenarioProtectedInteractionContractV1,
   type ScenarioProtectedPlainTextCarrierV1,
+  type PrepareScenarioProtectedInteractionInputV1,
+  type PrepareScenarioProtectedInteractionResultV1,
+  type ScenarioPreparedProtectedContentControlV1,
+  type ScenarioPreparedProtectedContentVerificationV1,
 } from "./scenario-protected-interaction.js";
 
 export class ScenarioProtectedInteractionValidationError extends Error {
@@ -52,10 +61,38 @@ const carrierBindingKeys = new Set([
   "protected_field_key",
   "keyed_binding_hash",
 ]);
+const protectedPrepareInputKeys = new Set([
+  "protected_prepare_version",
+  "action_prepare",
+  "carrier_binding",
+]);
+const preparedContentControlKeys = new Set([
+  "protected_content_control_version",
+  "state",
+  "protected_content_ref",
+  "protected_content_version",
+  "content_kind",
+  "keyed_integrity_hash",
+  "issued_at",
+  "expires_at",
+]);
+const protectedPrepareSuccessKeys = new Set([
+  "protected_prepare_result_version",
+  "status",
+  "action_result",
+  "prepared_content",
+]);
+const protectedPrepareFailureKeys = new Set([
+  "protected_prepare_result_version",
+  "status",
+  "action_result",
+]);
 const carrierScopes = new Set<string>(scenarioProtectedCarrierScopesV1);
 const machineKeyPattern = /^[a-z][a-z0-9._:-]{0,127}$/u;
 const opaqueLocatorPattern = /^[A-Za-z0-9_-]{32,512}$/u;
+const opaqueVersionPattern = /^[A-Za-z0-9][A-Za-z0-9._:~-]{0,199}$/u;
 const sha256Pattern = /^[a-f0-9]{64}$/u;
+const canonicalInstantPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u;
 const htmlMarkupPattern = /<\/?[A-Za-z][^>]*>|<!--|-->/u;
 const forbiddenControlKeyForms = new Set([
   "attachmentrefs",
@@ -70,6 +107,8 @@ const forbiddenControlKeyForms = new Set([
   "protectedcarrier",
   "wrappedkey",
 ]);
+const maximumProtectedPrepareLifetimeMs = 5 * 60 * 1000;
+const maximumProtectedControlBytesV1 = 8 * 1024;
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === "object" && !Array.isArray(value);
@@ -108,6 +147,27 @@ const assertSha256 = (value: unknown, path: string): void => {
   if (typeof value !== "string" || !sha256Pattern.test(value)) {
     fail("invalid_hash", path, `${path} must be a lowercase SHA-256 hex digest`);
   }
+};
+
+const assertOpaqueVersion = (value: unknown, path: string): void => {
+  if (typeof value !== "string" || !opaqueVersionPattern.test(value)) {
+    fail(
+      "invalid_opaque_version",
+      path,
+      `${path} must be a 1-200 character opaque version`,
+    );
+  }
+};
+
+const assertCanonicalInstant = (value: unknown, path: string): number => {
+  if (typeof value !== "string" || !canonicalInstantPattern.test(value)) {
+    fail("invalid_instant", path, `${path} must be a canonical UTC instant`);
+  }
+  const parsed = Date.parse(value);
+  if (!Number.isFinite(parsed) || new Date(parsed).toISOString() !== value) {
+    fail("invalid_instant", path, `${path} must be a real canonical UTC instant`);
+  }
+  return parsed;
 };
 
 const serializedUtf8Bytes = (value: unknown, path: string): number => {
@@ -485,4 +545,326 @@ export const assertScenarioProtectedBodyFreeControlV1 = (
   assertScenarioProtectedPlainTextCarrierV1(carrier);
   assertBodyFreeValue(value, carrier.plain_text, path, new Set());
   serializedUtf8Bytes(value, path);
+};
+
+const protectedActionInputForbiddenKeyForms = [
+  "attachmentrefs",
+  "body",
+  "carrier",
+  "ciphertext",
+  "clientcontentkind",
+  "contentbytes",
+  "encryptionkey",
+  "keyid",
+  "kmskey",
+  "nonce",
+  "plaintext",
+  "protectedbody",
+  "protectedcarrier",
+  "protectedcontentref",
+  "wrappedkey",
+];
+
+const assertProtectedActionInputShape = (
+  value: unknown,
+  path: string,
+  ancestors: Set<object>,
+): void => {
+  if (value === null || typeof value !== "object") return;
+  if (ancestors.has(value)) {
+    fail("cyclic_action_input", path, `${path} must not contain cycles`);
+  }
+  ancestors.add(value);
+  if (Array.isArray(value)) {
+    value.forEach((item, index) =>
+      assertProtectedActionInputShape(item, `${path}.${index}`, ancestors),
+    );
+  } else {
+    for (const [key, item] of Object.entries(value)) {
+      const normalized = normalizedControlKey(key);
+      if (
+        protectedActionInputForbiddenKeyForms.some(
+          (forbidden) => normalized === forbidden || normalized.startsWith(forbidden),
+        )
+      ) {
+        fail(
+          "protected_action_input_field",
+          `${path}.${key}`,
+          `${path}.${key} is not allowed in the body-free protected action input`,
+        );
+      }
+      assertProtectedActionInputShape(item, `${path}.${key}`, ancestors);
+    }
+  }
+  ancestors.delete(value);
+};
+
+export const assertPrepareScenarioProtectedInteractionInputV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is PrepareScenarioProtectedInteractionInputV1 = (
+  value,
+  path = "protected_prepare_input",
+) => {
+  const record = assertRecord(value, path);
+  assertKeys(record, protectedPrepareInputKeys, path);
+  if (record.protected_prepare_version !== 1) {
+    fail(
+      "invalid_version",
+      `${path}.protected_prepare_version`,
+      "protected_prepare_version must be 1",
+    );
+  }
+  assertPrepareScenarioDomainActionInputV1(
+    record.action_prepare,
+    `${path}.action_prepare`,
+  );
+  assertProtectedActionInputShape(
+    record.action_prepare.action_input,
+    `${path}.action_prepare.action_input`,
+    new Set(),
+  );
+  assertScenarioProtectedCarrierBindingV1(
+    record.carrier_binding,
+    `${path}.carrier_binding`,
+  );
+  if (record.carrier_binding.carrier_scope !== "prepare_input") {
+    fail(
+      "invalid_carrier_scope",
+      `${path}.carrier_binding.carrier_scope`,
+      "protected prepare requires prepare_input carrier scope",
+    );
+  }
+  if (serializedUtf8Bytes(record, path) > maximumProtectedControlBytesV1) {
+    fail("control_too_large", path, `${path} must be at most 8 KiB UTF-8`);
+  }
+};
+
+export const assertScenarioPreparedProtectedContentControlV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is ScenarioPreparedProtectedContentControlV1 = (
+  value,
+  path = "prepared_content",
+) => {
+  const record = assertRecord(value, path);
+  assertKeys(record, preparedContentControlKeys, path);
+  if (record.protected_content_control_version !== 1 || record.state !== "prepared") {
+    fail("invalid_prepared_control", path, `${path} must be a v1 prepared control`);
+  }
+  assertScenarioProtectedContentRefV1(
+    record.protected_content_ref,
+    `${path}.protected_content_ref`,
+  );
+  assertOpaqueVersion(record.protected_content_version, `${path}.protected_content_version`);
+  assertMachineKey(record.content_kind, `${path}.content_kind`);
+  assertSha256(record.keyed_integrity_hash, `${path}.keyed_integrity_hash`);
+  const issuedAt = assertCanonicalInstant(record.issued_at, `${path}.issued_at`);
+  const expiresAt = assertCanonicalInstant(record.expires_at, `${path}.expires_at`);
+  if (
+    expiresAt <= issuedAt ||
+    expiresAt - issuedAt > maximumProtectedPrepareLifetimeMs
+  ) {
+    fail(
+      "invalid_lifetime",
+      `${path}.expires_at`,
+      "prepared protected content lifetime must be greater than zero and at most five minutes",
+    );
+  }
+  if (serializedUtf8Bytes(record, path) > maximumProtectedControlBytesV1) {
+    fail("control_too_large", path, `${path} must be at most 8 KiB UTF-8`);
+  }
+};
+
+export const assertPrepareScenarioProtectedInteractionResultV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is PrepareScenarioProtectedInteractionResultV1 = (
+  value,
+  path = "protected_prepare_result",
+) => {
+  const record = assertRecord(value, path);
+  if (record.protected_prepare_result_version !== 1) {
+    fail(
+      "invalid_version",
+      `${path}.protected_prepare_result_version`,
+      "protected_prepare_result_version must be 1",
+    );
+  }
+  if (record.status === "prepared") {
+    assertKeys(record, protectedPrepareSuccessKeys, path);
+    assertPrepareScenarioDomainActionResultV1(
+      record.action_result,
+      `${path}.action_result`,
+    );
+    if (record.action_result.status !== "prepared") {
+      fail(
+        "mixed_result_branch",
+        `${path}.action_result.status`,
+        "prepared protected result requires prepared action result",
+      );
+    }
+    assertScenarioPreparedProtectedContentControlV1(
+      record.prepared_content,
+      `${path}.prepared_content`,
+    );
+  } else if (record.status === "context_changed" || record.status === "unavailable") {
+    assertKeys(record, protectedPrepareFailureKeys, path);
+    assertPrepareScenarioDomainActionResultV1(
+      record.action_result,
+      `${path}.action_result`,
+    );
+    if (record.action_result.status !== record.status) {
+      fail(
+        "mixed_result_branch",
+        `${path}.action_result.status`,
+        "protected and action result statuses must match",
+      );
+    }
+  } else {
+    fail("invalid_status", `${path}.status`, `${path}.status is invalid`);
+  }
+  if (serializedUtf8Bytes(record, path) > maximumProtectedControlBytesV1) {
+    fail("control_too_large", path, `${path} must be at most 8 KiB UTF-8`);
+  }
+};
+
+export const assertPrepareScenarioProtectedInteractionExchangeV1 = (
+  protectedContract: unknown,
+  actionContract: unknown,
+  input: unknown,
+  result: unknown,
+  carrier: unknown,
+  context: {
+    carrier_binding_verification: ScenarioProtectedCarrierBindingVerificationV1;
+    action_prepare_context: Parameters<
+      typeof assertPrepareScenarioDomainActionExchangeV1
+    >[3];
+    prepared_content_verification?: ScenarioPreparedProtectedContentVerificationV1;
+  },
+): void => {
+  assertScenarioProtectedActionContractPairV1(protectedContract, actionContract);
+  assertScenarioProtectedInteractionContractV1(protectedContract);
+  assertPrepareScenarioProtectedInteractionInputV1(input);
+  assertPrepareScenarioProtectedInteractionResultV1(result);
+  assertScenarioProtectedPlainTextCarrierForContractV1(protectedContract, carrier);
+  assertScenarioProtectedCarrierBindingVerificationV1(
+    input.carrier_binding,
+    context.carrier_binding_verification,
+  );
+  if (input.carrier_binding.protected_field_key !== protectedContract.protected_field_key) {
+    fail(
+      "protected_field_mismatch",
+      "protected_prepare_input.carrier_binding.protected_field_key",
+      "carrier binding field must match the static contract",
+    );
+  }
+  assertScenarioProtectedBodyFreeControlV1(input, carrier, "protected_prepare_input");
+  assertScenarioProtectedBodyFreeControlV1(result, carrier, "protected_prepare_result");
+  assertPrepareScenarioDomainActionExchangeV1(
+    actionContract,
+    input.action_prepare,
+    result.action_result,
+    context.action_prepare_context,
+  );
+  if (result.status !== "prepared") {
+    if (context.prepared_content_verification !== undefined) {
+      fail(
+        "unexpected_prepared_verification",
+        "context.prepared_content_verification",
+        "failed prepare must not have prepared content verification",
+      );
+    }
+    return;
+  }
+  const verification = context.prepared_content_verification;
+  if (verification === undefined) {
+    fail(
+      "missing_prepared_verification",
+      "context.prepared_content_verification",
+      "prepared result requires owner-verified protected content context",
+    );
+  }
+  assertScenarioProtectedContentRefV1(
+    verification.protected_content_ref,
+    "context.prepared_content_verification.protected_content_ref",
+  );
+  assertOpaqueVersion(
+    verification.protected_content_version,
+    "context.prepared_content_verification.protected_content_version",
+  );
+  assertMachineKey(
+    verification.protected_field_key,
+    "context.prepared_content_verification.protected_field_key",
+  );
+  assertMachineKey(
+    verification.content_kind,
+    "context.prepared_content_verification.content_kind",
+  );
+  assertSha256(
+    verification.verified_keyed_integrity_hash,
+    "context.prepared_content_verification.verified_keyed_integrity_hash",
+  );
+  assertCanonicalInstant(
+    verification.issued_at,
+    "context.prepared_content_verification.issued_at",
+  );
+  assertCanonicalInstant(
+    verification.expires_at,
+    "context.prepared_content_verification.expires_at",
+  );
+  const prepared = result.prepared_content;
+  if (
+    prepared.protected_content_ref !== verification.protected_content_ref ||
+    prepared.protected_content_version !== verification.protected_content_version
+  ) {
+    fail(
+      "prepared_content_mismatch",
+      "protected_prepare_result.prepared_content",
+      "prepared content identity must match owner verification",
+    );
+  }
+  if (
+    prepared.content_kind !== protectedContract.content_kind ||
+    prepared.content_kind !== verification.content_kind
+  ) {
+    fail(
+      "content_kind_mismatch",
+      "protected_prepare_result.prepared_content.content_kind",
+      "prepared content kind must match static and server-derived context",
+    );
+  }
+  if (verification.protected_field_key !== protectedContract.protected_field_key) {
+    fail(
+      "protected_field_mismatch",
+      "context.prepared_content_verification.protected_field_key",
+      "owner integrity evidence must bind the static protected field",
+    );
+  }
+  if (prepared.keyed_integrity_hash !== verification.verified_keyed_integrity_hash) {
+    fail(
+      "integrity_hash_mismatch",
+      "protected_prepare_result.prepared_content.keyed_integrity_hash",
+      "prepared integrity must match independently verified owner evidence",
+    );
+  }
+  if (prepared.keyed_integrity_hash === input.carrier_binding.keyed_binding_hash) {
+    fail(
+      "hash_domain_reuse",
+      "protected_prepare_result.prepared_content.keyed_integrity_hash",
+      "transport binding and owner integrity hashes must use distinct domains",
+    );
+  }
+  if (
+    prepared.issued_at !== result.action_result.issued_at ||
+    prepared.expires_at !== result.action_result.expires_at ||
+    prepared.issued_at !== verification.issued_at ||
+    prepared.expires_at !== verification.expires_at
+  ) {
+    fail(
+      "prepared_time_mismatch",
+      "protected_prepare_result.prepared_content.issued_at",
+      "action and protected prepared controls must share exact owner-verified times",
+    );
+  }
 };

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/prepare-scenario-protected-interaction-input-v1.schema.json",
+  "title": "PrepareScenarioProtectedInteractionInputV1",
+  "description": "Body-free protected prepare control whose plaintext carrier is transported separately.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protected_prepare_version", "action_prepare", "carrier_binding"],
+  "properties": {
+    "protected_prepare_version": { "const": 1 },
+    "action_prepare": {
+      "allOf": [
+        { "$ref": "prepare-scenario-domain-action-input-v1.schema.json" },
+        {
+          "type": "object",
+          "properties": {
+            "action_input": {
+              "type": "object",
+              "propertyNames": {
+                "not": {
+                  "pattern": "^(plain_text(_dev)?|plaintext|body|carrier|ciphertext|wrapped_key|kms_key(_id)?|attachment_refs|protected_content_ref|client_content_kind|content_bytes|encryption_key|key_id|nonce)$"
+                }
+              }
+            }
+          },
+          "required": ["action_input"]
+        }
+      ]
+    },
+    "carrier_binding": {
+      "allOf": [
+        { "$ref": "scenario-protected-carrier-binding-v1.schema.json" },
+        {
+          "type": "object",
+          "properties": { "carrier_scope": { "const": "prepare_input" } },
+          "required": ["carrier_scope"]
+        }
+      ]
+    }
+  }
+}

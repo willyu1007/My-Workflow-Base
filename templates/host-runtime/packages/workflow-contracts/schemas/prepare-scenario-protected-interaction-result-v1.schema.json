@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/prepare-scenario-protected-interaction-result-v1.schema.json",
+  "title": "PrepareScenarioProtectedInteractionResultV1",
+  "description": "Closed protected prepare result; only success carries a body-free prepared content control.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "protected_prepare_result_version": { "const": 1 },
+    "status": { "enum": ["prepared", "context_changed", "unavailable"] },
+    "action_result": { "$ref": "prepare-scenario-domain-action-result-v1.schema.json" },
+    "prepared_content": { "$ref": "scenario-prepared-protected-content-control-v1.schema.json" }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protected_prepare_result_version",
+        "status",
+        "action_result",
+        "prepared_content"
+      ],
+      "properties": {
+        "protected_prepare_result_version": { "const": 1 },
+        "status": { "const": "prepared" },
+        "action_result": {
+          "allOf": [
+            { "$ref": "prepare-scenario-domain-action-result-v1.schema.json" },
+            {
+              "type": "object",
+              "properties": { "status": { "const": "prepared" } },
+              "required": ["status"]
+            }
+          ]
+        },
+        "prepared_content": { "$ref": "scenario-prepared-protected-content-control-v1.schema.json" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protected_prepare_result_version", "status", "action_result"],
+      "properties": {
+        "protected_prepare_result_version": { "const": 1 },
+        "status": { "const": "context_changed" },
+        "action_result": {
+          "allOf": [
+            { "$ref": "prepare-scenario-domain-action-result-v1.schema.json" },
+            {
+              "type": "object",
+              "properties": { "status": { "const": "context_changed" } },
+              "required": ["status"]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protected_prepare_result_version", "status", "action_result"],
+      "properties": {
+        "protected_prepare_result_version": { "const": 1 },
+        "status": { "const": "unavailable" },
+        "action_result": {
+          "allOf": [
+            { "$ref": "prepare-scenario-domain-action-result-v1.schema.json" },
+            {
+              "type": "object",
+              "properties": { "status": { "const": "unavailable" } },
+              "required": ["status"]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

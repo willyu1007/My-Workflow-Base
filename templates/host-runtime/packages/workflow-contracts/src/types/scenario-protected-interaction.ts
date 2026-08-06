@@ -55,3 +55,63 @@ export type ScenarioProtectedCarrierBindingVerificationV1 = {
   protected_field_key: string;
   verified_keyed_binding_hash: string;
 };
+
+export type PrepareScenarioProtectedInteractionInputV1 = {
+  protected_prepare_version: 1;
+  action_prepare: PrepareScenarioDomainActionInputV1;
+  carrier_binding: ScenarioProtectedCarrierBindingV1 & {
+    carrier_scope: "prepare_input";
+  };
+};
+
+export type ScenarioPreparedProtectedContentControlV1 = {
+  protected_content_control_version: 1;
+  state: "prepared";
+  protected_content_ref: ScenarioProtectedContentRefV1;
+  protected_content_version: string;
+  content_kind: string;
+  keyed_integrity_hash: string;
+  issued_at: string;
+  expires_at: string;
+};
+
+export type PrepareScenarioProtectedInteractionResultV1 =
+  | {
+      protected_prepare_result_version: 1;
+      status: "prepared";
+      action_result: Extract<
+        PrepareScenarioDomainActionResultV1,
+        { status: "prepared" }
+      >;
+      prepared_content: ScenarioPreparedProtectedContentControlV1;
+    }
+  | {
+      protected_prepare_result_version: 1;
+      status: "context_changed";
+      action_result: Extract<
+        PrepareScenarioDomainActionResultV1,
+        { status: "context_changed" }
+      >;
+    }
+  | {
+      protected_prepare_result_version: 1;
+      status: "unavailable";
+      action_result: Extract<
+        PrepareScenarioDomainActionResultV1,
+        { status: "unavailable" }
+      >;
+    };
+
+export type ScenarioPreparedProtectedContentVerificationV1 = {
+  protected_content_ref: ScenarioProtectedContentRefV1;
+  protected_content_version: string;
+  protected_field_key: string;
+  content_kind: string;
+  verified_keyed_integrity_hash: string;
+  issued_at: string;
+  expires_at: string;
+};
+import type {
+  PrepareScenarioDomainActionInputV1,
+  PrepareScenarioDomainActionResultV1,
+} from "./scenario-domain-action.js";
