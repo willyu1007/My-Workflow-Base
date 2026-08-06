@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-protected-interaction-contract-v1.schema.json",
+  "title": "ScenarioProtectedInteractionContractV1",
+  "description": "Static Base-neutral registration for a separately transported plaintext carrier.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protected_interaction_contract_version",
+    "scenario_key",
+    "action_key",
+    "protected_field_key",
+    "content_kind",
+    "prepare_operation_key",
+    "read_operation_key",
+    "content_profile"
+  ],
+  "properties": {
+    "protected_interaction_contract_version": { "const": 1 },
+    "scenario_key": { "$ref": "#/$defs/machineKey" },
+    "action_key": { "$ref": "#/$defs/machineKey" },
+    "protected_field_key": { "$ref": "#/$defs/machineKey" },
+    "content_kind": { "$ref": "#/$defs/machineKey" },
+    "prepare_operation_key": { "const": "prepare_domain_action" },
+    "read_operation_key": { "const": "read_protected_detail" },
+    "content_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "media_type",
+        "normalization",
+        "min_characters",
+        "max_characters",
+        "attachments"
+      ],
+      "properties": {
+        "media_type": { "const": "text/plain; charset=utf-8" },
+        "normalization": { "const": "trim_outer_whitespace_and_crlf_to_lf_v1" },
+        "min_characters": { "const": 1 },
+        "max_characters": { "const": 2000 },
+        "attachments": { "const": "none" }
+      }
+    }
+  },
+  "$defs": {
+    "machineKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._:-]*$"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-protected-carrier-binding-v1.schema.json",
+  "title": "ScenarioProtectedCarrierBindingV1",
+  "description": "Body-free keyed binding to a separately transported protected carrier.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "carrier_binding_version",
+    "carrier_scope",
+    "protected_field_key",
+    "keyed_binding_hash"
+  ],
+  "properties": {
+    "carrier_binding_version": { "const": 1 },
+    "carrier_scope": { "enum": ["prepare_input", "read_output"] },
+    "protected_field_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._:-]*$"
+    },
+    "keyed_binding_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

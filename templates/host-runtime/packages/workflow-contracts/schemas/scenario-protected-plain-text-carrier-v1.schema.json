@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/scenario-protected-plain-text-carrier-v1.schema.json",
+  "title": "ScenarioProtectedPlainTextCarrierV1",
+  "description": "Dedicated, already-normalized plaintext carrier kept outside generic Host envelopes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protected_carrier_version",
+    "protected_field_key",
+    "media_type",
+    "plain_text",
+    "attachment_refs"
+  ],
+  "properties": {
+    "protected_carrier_version": { "const": 1 },
+    "protected_field_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._:-]*$"
+    },
+    "media_type": { "const": "text/plain; charset=utf-8" },
+    "plain_text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000,
+      "pattern": "^(?!\\s)(?![\\s\\S]*\\s$)(?![\\s\\S]*\\r)(?![\\s\\S]*\\u0000)(?![\\s\\S]*<\\/?[A-Za-z][^>]*>)(?![\\s\\S]*<!--)(?![\\s\\S]*-->)[\\s\\S]+$"
+    },
+    "attachment_refs": {
+      "type": "array",
+      "maxItems": 0
+    }
+  }
+}

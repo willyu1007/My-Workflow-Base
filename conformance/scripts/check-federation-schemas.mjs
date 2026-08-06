@@ -49,6 +49,9 @@ const expected = [
   "scenario-present-subject-context-input-v1.schema.json",
   "scenario-presentation-result-v1.schema.json",
   "scenario-private-invocation-v1.schema.json",
+  "scenario-protected-carrier-binding-v1.schema.json",
+  "scenario-protected-interaction-contract-v1.schema.json",
+  "scenario-protected-plain-text-carrier-v1.schema.json",
   "scenario-resolve-subject-context-input-v1.schema.json",
   "scenario-resolve-subject-context-result-v1.schema.json",
   "scenario-safe-reason-v1.schema.json",
@@ -186,6 +189,24 @@ for (const [schemaName, values] of [
   const validate = ajv.getSchema(`https://morethan.local/contracts/${schemaName}.schema.json`);
   if (!validate || values.some((value) => !validate(value))) {
     throw new Error(`current owner/status fixture failed ${schemaName}: ${JSON.stringify(validate?.errors)}`);
+  }
+}
+
+const protectedInteractionFixture = JSON.parse(await readFile(
+  new URL("../fixtures/scenario-protected-interaction-e1.valid.json", import.meta.url),
+  "utf8",
+));
+for (const [schemaName, values] of [
+  ["scenario-protected-interaction-contract-v1", [protectedInteractionFixture.contract]],
+  ["scenario-protected-plain-text-carrier-v1", [protectedInteractionFixture.carrier]],
+  ["scenario-protected-carrier-binding-v1", [
+    protectedInteractionFixture.prepare_binding,
+    protectedInteractionFixture.read_binding,
+  ]],
+]) {
+  const validate = ajv.getSchema(`https://morethan.local/contracts/${schemaName}.schema.json`);
+  if (!validate || values.some((value) => !validate(value))) {
+    throw new Error(`protected-interaction E1 fixture failed ${schemaName}: ${JSON.stringify(validate?.errors)}`);
   }
 }
 
