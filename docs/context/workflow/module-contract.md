@@ -1261,6 +1261,11 @@ Implemented validation rules:
 | `WF-MAN-115` | Fatal | The release launch phase is from the closed Base registry. |
 | `WF-MAN-116` | Fatal | The required Scenario lifecycle status is from the closed Host registry. |
 | `WF-MAN-117` | Fatal | Capability enablement policy is `requires_workspace_activation` or `disabled`. |
+| `WF-MAN-118` | Fatal | The closed Scenario contract dependency and declaration envelope is valid. |
+| `WF-MAN-119` | Fatal | The Host supports every exact Scenario contract capability dependency. |
+| `WF-MAN-120` | Fatal | Scenario declaration handlers do not alias legacy implementation registries. |
+| `WF-MAN-121` | Fatal | Scenario operation keys and endpoints do not alias legacy entrypoints or routes. |
+| `WF-MAN-122` | Fatal | Scenario product-surface keys do not alias legacy surface mappings. |
 <!-- VALIDATOR-RULE-INVENTORY:END -->
 
 `WF-MAN-043` is warning-only and therefore does not make `report.passed` false.

@@ -251,7 +251,11 @@
       "required": [
         "scenario_contracts_version",
         "source_dependencies",
-        "capability_dependencies"
+        "capability_dependencies",
+        "trusted_invocation",
+        "subject_context_providers",
+        "semantic_presentations",
+        "product_surfaces"
       ],
       "properties": {
         "scenario_contracts_version": { "const": 1 },
@@ -268,8 +272,210 @@
           "maxItems": 4,
           "uniqueItems": true,
           "items": { "$ref": "#/$defs/scenarioCapabilityDependencyV1" }
+        },
+        "trusted_invocation": { "$ref": "#/$defs/scenarioTrustedInvocationManifestV1" },
+        "subject_context_providers": {
+          "type": "array",
+          "maxItems": 64,
+          "items": { "$ref": "#/$defs/scenarioSubjectContextProviderManifestV1" }
+        },
+        "semantic_presentations": {
+          "type": "array",
+          "maxItems": 64,
+          "items": { "$ref": "#/$defs/scenarioSemanticPresentationManifestV1" }
+        },
+        "product_surfaces": {
+          "type": "array",
+          "maxItems": 64,
+          "items": { "$ref": "#/$defs/scenarioProductSurfaceManifestV1" }
         }
       }
+    },
+    "scenarioDeclarationKeyV1": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9._-]{0,127}$"
+    },
+    "scenarioReasonCodeV1": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,63}$"
+    },
+    "scenarioTrustedInvocationIngressManifestV1": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ingress_category", "ingress_key", "principal_origins"],
+          "properties": {
+            "ingress_category": { "const": "product_surface" },
+            "ingress_key": { "$ref": "#/$defs/scenarioDeclarationKeyV1" },
+            "principal_origins": {
+              "type": "array",
+              "prefixItems": [{ "const": "interactive_session" }],
+              "minItems": 1,
+              "maxItems": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ingress_category", "ingress_key", "principal_origins"],
+          "properties": {
+            "ingress_category": { "const": "host_transition" },
+            "ingress_key": { "$ref": "#/$defs/scenarioDeclarationKeyV1" },
+            "principal_origins": {
+              "type": "array",
+              "prefixItems": [{ "const": "interactive_session" }],
+              "minItems": 1,
+              "maxItems": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ingress_category", "ingress_key", "principal_origins"],
+          "properties": {
+            "ingress_category": { "const": "workflow_runtime" },
+            "ingress_key": { "$ref": "#/$defs/scenarioDeclarationKeyV1" },
+            "principal_origins": {
+              "type": "array",
+              "prefixItems": [{ "const": "durable_run_actor" }],
+              "minItems": 1,
+              "maxItems": 1
+            }
+          }
+        }
+      ]
+    },
+    "scenarioTrustedInvocationOperationManifestV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoint_key", "method", "operation_key", "input_schema_key",
+        "input_schema_version", "handler_key", "ingress"
+      ],
+      "properties": {
+        "endpoint_key": { "$ref": "#/$defs/scenarioDeclarationKeyV1" },
+        "method": { "const": "POST" },
+        "operation_key": { "$ref": "#/$defs/scenarioDeclarationKeyV1" },
+        "input_schema_key": { "$ref": "#/$defs/scenarioDeclarationKeyV1" },
+        "input_schema_version": { "type": "integer", "minimum": 1 },
+        "handler_key": { "$ref": "#/$defs/scenarioDeclarationKeyV1" },
+        "ingress": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/scenarioTrustedInvocationIngressManifestV1" }
+        }
+      }
+    },
+    "scenarioTrustedInvocationManifestV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trusted_invocation_version", "invocation_contract", "operations"],
+      "properties": {
+        "trusted_invocation_version": { "const": 1 },
+        "invocation_contract": { "const": "scenario-private-invocation-v1" },
+        "operations": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/scenarioTrustedInvocationOperationManifestV1" }
+        }
+      }
+    },
+    "scenarioSubjectContextProviderManifestV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_key", "provider_version", "list_operation_key",
+        "resolve_operation_key", "handler_key"
+      ],
+      "properties": {
+        "provider_key": { "$ref": "#/$defs/scenarioDeclarationKeyV1" },
+        "provider_version": { "const": 1 },
+        "list_operation_key": { "const": "list_subject_contexts" },
+        "resolve_operation_key": { "const": "resolve_subject_context" },
+        "handler_key": { "$ref": "#/$defs/scenarioDeclarationKeyV1" }
+      }
+    },
+    "scenarioSemanticPresentationManifestV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "presentation_key", "presentation_version", "provider_key", "operation_key",
+        "handler_key", "safe_reason_codes"
+      ],
+      "properties": {
+        "presentation_key": { "$ref": "#/$defs/scenarioDeclarationKeyV1" },
+        "presentation_version": { "const": 1 },
+        "provider_key": { "$ref": "#/$defs/scenarioDeclarationKeyV1" },
+        "operation_key": { "const": "present_subject_context" },
+        "handler_key": { "$ref": "#/$defs/scenarioDeclarationKeyV1" },
+        "safe_reason_codes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/scenarioReasonCodeV1" }
+        }
+      }
+    },
+    "scenarioProductSurfaceManifestV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "product_surface_key", "presentation_key", "view_modes", "route_classes",
+        "action_offer_policy", "action_keys"
+      ],
+      "properties": {
+        "product_surface_key": { "$ref": "#/$defs/scenarioDeclarationKeyV1" },
+        "presentation_key": { "$ref": "#/$defs/scenarioDeclarationKeyV1" },
+        "view_modes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["current", "recent", "history"] }
+        },
+        "route_classes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/scenarioDeclarationKeyV1" }
+        },
+        "action_offer_policy": { "enum": ["none", "declared_actions"] },
+        "action_keys": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/scenarioDeclarationKeyV1" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "properties": { "action_offer_policy": { "const": "none" } },
+            "required": ["action_offer_policy"]
+          },
+          "then": {
+            "type": "object",
+            "properties": { "action_keys": { "type": "array", "maxItems": 0 } }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "action_offer_policy": { "const": "declared_actions" } },
+            "required": ["action_offer_policy"]
+          },
+          "then": {
+            "type": "object",
+            "properties": { "action_keys": { "type": "array", "minItems": 1 } }
+          }
+        }
+      ]
     },
     "uniqueStrings": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
     "runtimeKind": { "enum": ["scenario_action", "model_call", "tool_call", "transform", "human_gate", "wait_for_input", "artifact_write", "event_emit"] },

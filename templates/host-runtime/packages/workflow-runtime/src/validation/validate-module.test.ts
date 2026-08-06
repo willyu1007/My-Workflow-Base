@@ -3,6 +3,7 @@ import type {
   ChatWorkflowAdapter,
   HandoffManifest,
   ScenarioManifest,
+  ScenarioManifestV2,
   WorkflowHostValidationSnapshot,
   WorkflowRuntimePort,
   WorkflowScenarioModule,
@@ -410,6 +411,99 @@ function createFederatedScenarioModule(): WorkflowScenarioModule {
   return module;
 }
 
+function createScenarioContractModule(): WorkflowScenarioModule {
+  const module = createFederatedScenarioModule();
+  const manifest = module.manifest as ScenarioManifestV2;
+  manifest.allowed_user_classes = ["admin"];
+  manifest.scenario_contracts = {
+    scenario_contracts_version: 1,
+    source_dependencies: [
+      {
+        source_identity: "platform_child_family_identity_source_v1",
+        source_hash: "0123456789abcdef".repeat(4),
+      },
+      {
+        source_identity: "scenario_interface_source_v1",
+        source_hash: "fedcba9876543210".repeat(4),
+      },
+    ],
+    capability_dependencies: [
+      {
+        capability_key: "trusted_scenario_invocation_v1",
+        requires_capabilities: [],
+        requires_sources: ["scenario_interface_source_v1"],
+      },
+      {
+        capability_key: "scenario_subject_presentation_v1",
+        requires_capabilities: ["trusted_scenario_invocation_v1"],
+        requires_sources: [
+          "platform_child_family_identity_source_v1",
+          "scenario_interface_source_v1",
+        ],
+      },
+    ],
+    trusted_invocation: {
+      trusted_invocation_version: 1,
+      invocation_contract: "scenario-private-invocation-v1",
+      operations: [
+        ["list_subject_contexts", "example.list_subject_contexts.input"],
+        ["resolve_subject_context", "example.resolve_subject_context.input"],
+        ["present_subject_context", "example.present_subject_context.input"],
+      ].map(([operationKey, inputSchemaKey]) => ({
+        endpoint_key: `scenario.${operationKey}`,
+        method: "POST" as const,
+        operation_key: operationKey,
+        input_schema_key: inputSchemaKey,
+        input_schema_version: 1,
+        handler_key: `scenario.${operationKey}.handler`,
+        ingress: [{
+          ingress_category: "product_surface" as const,
+          ingress_key: "scenario.dashboard",
+          principal_origins: ["interactive_session" as const],
+        }],
+      })),
+    },
+    subject_context_providers: [{
+      provider_key: "scenario.subject_contexts",
+      provider_version: 1,
+      list_operation_key: "list_subject_contexts",
+      resolve_operation_key: "resolve_subject_context",
+      handler_key: "scenario.subject_contexts.handler",
+    }],
+    semantic_presentations: [{
+      presentation_key: "scenario.subject_summary",
+      presentation_version: 1,
+      provider_key: "scenario.subject_contexts",
+      operation_key: "present_subject_context",
+      handler_key: "scenario.subject_summary.handler",
+      safe_reason_codes: ["context_changed", "unavailable"],
+    }],
+    product_surfaces: [{
+      product_surface_key: "scenario.dashboard",
+      presentation_key: "scenario.subject_summary",
+      view_modes: ["current", "recent", "history"],
+      route_classes: ["subject_collection", "subject_detail"],
+      action_offer_policy: "none",
+      action_keys: [],
+    }],
+  };
+  return module;
+}
+
+function createScenarioContractHostSnapshot(
+  overrides: Partial<WorkflowHostValidationSnapshot> = {},
+): WorkflowHostValidationSnapshot {
+  return {
+    ...hostSnapshot,
+    host_capabilities: [
+      "scenario_federation_v1",
+      "trusted_scenario_invocation_v1",
+      "scenario_subject_presentation_v1",
+    ],
+    ...overrides,
+  };
+}
+
 function createLegacyHandoff(overrides: Partial<HandoffManifest> = {}): HandoffManifest {
   return {
     handoff_type: "notification",
@@ -460,6 +554,94 @@ function createHandoffHostSnapshot(
 }
 
 describe("workflow module validation and loading", () => {
+  it("passes a presentation-complete scenario contract with exact Host support", () => {
+    const report = validateWorkflowModule({
+      module: createScenarioContractModule(),
+      host_snapshot: createScenarioContractHostSnapshot(),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(true);
+    expect(report.findings.filter((finding) =>
+      ["WF-MAN-118", "WF-MAN-119", "WF-MAN-120", "WF-MAN-121", "WF-MAN-122"]
+        .includes(finding.rule_id)
+    )).toEqual([]);
+  });
+
+  it("fails when exact scenario contract Host support is absent", () => {
+    const report = validateWorkflowModule({
+      module: createScenarioContractModule(),
+      host_snapshot: createScenarioContractHostSnapshot({
+        host_capabilities: ["scenario_federation_v1", "trusted_scenario_invocation_v1"],
+      }),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toContainEqual(expect.objectContaining({
+      rule_id: "WF-MAN-119",
+      severity: "fatal",
+      path: "scenario_contracts.capability_dependencies.1.capability_key",
+    }));
+  });
+
+  it("rejects scenario declaration handlers that alias legacy implementations", () => {
+    const module = createScenarioContractModule();
+    const manifest = module.manifest as ScenarioManifestV2;
+    if (!manifest.scenario_contracts) throw new Error("scenario contract fixture is missing");
+    manifest.scenario_contracts.trusted_invocation.operations[0].handler_key =
+      "example.collect_context";
+    const report = validateWorkflowModule({
+      module,
+      host_snapshot: createScenarioContractHostSnapshot(),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toContainEqual(expect.objectContaining({
+      rule_id: "WF-MAN-120",
+      severity: "fatal",
+    }));
+  });
+
+  it("rejects scenario operations and surfaces that alias legacy paths", () => {
+    const module = createScenarioContractModule();
+    const manifest = module.manifest as ScenarioManifestV2;
+    if (!manifest.scenario_contracts) throw new Error("scenario contract fixture is missing");
+    manifest.scenario_contracts.trusted_invocation.operations.push({
+      endpoint_key: "scenario.authoring",
+      method: "POST",
+      operation_key: "authoring",
+      input_schema_key: "scenario.authoring.input",
+      input_schema_version: 1,
+      handler_key: "scenario.authoring.handler",
+      ingress: [{
+        ingress_category: "host_transition",
+        ingress_key: "scenario.authoring",
+        principal_origins: ["interactive_session"],
+      }],
+    });
+    for (const operation of manifest.scenario_contracts.trusted_invocation.operations) {
+      for (const ingress of operation.ingress) {
+        if (ingress.ingress_category === "product_surface") {
+          ingress.ingress_key = "mobile_dashboard";
+        }
+      }
+    }
+    manifest.scenario_contracts.product_surfaces[0].product_surface_key = "mobile_dashboard";
+    const report = validateWorkflowModule({
+      module,
+      host_snapshot: createScenarioContractHostSnapshot(),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ rule_id: "WF-MAN-121", severity: "fatal" }),
+      expect.objectContaining({ rule_id: "WF-MAN-122", severity: "fatal" }),
+    ]));
+  });
+
   it("passes a federated v2 module with exact Host capabilities", () => {
     const report = validateWorkflowModule({
       module: createFederatedScenarioModule(),

@@ -86,10 +86,34 @@ const governanceKeys = new Set([
 const verificationKeys = new Set(["deterministic_tests", "journey_harness"]);
 const scenarioContractKeys = new Set([
   "scenario_contracts_version", "source_dependencies", "capability_dependencies",
+  "trusted_invocation", "subject_context_providers", "semantic_presentations",
+  "product_surfaces",
 ]);
 const scenarioContractSourceDependencyKeys = new Set(["source_identity", "source_hash"]);
 const scenarioCapabilityDependencyKeys = new Set([
   "capability_key", "requires_capabilities", "requires_sources",
+]);
+const scenarioTrustedInvocationKeys = new Set([
+  "trusted_invocation_version", "invocation_contract", "operations",
+]);
+const scenarioTrustedOperationKeys = new Set([
+  "endpoint_key", "method", "operation_key", "input_schema_key",
+  "input_schema_version", "handler_key", "ingress",
+]);
+const scenarioTrustedIngressKeys = new Set([
+  "ingress_category", "ingress_key", "principal_origins",
+]);
+const scenarioSubjectProviderKeys = new Set([
+  "provider_key", "provider_version", "list_operation_key", "resolve_operation_key",
+  "handler_key",
+]);
+const scenarioSemanticPresentationKeys = new Set([
+  "presentation_key", "presentation_version", "provider_key", "operation_key",
+  "handler_key", "safe_reason_codes",
+]);
+const scenarioProductSurfaceKeys = new Set([
+  "product_surface_key", "presentation_key", "view_modes", "route_classes",
+  "action_offer_policy", "action_keys",
 ]);
 const workflowSurfaces = new Set([
   "chat_workflow_control", "chat_dashboard_summary", "chat_citation", "web_domain_workbench",
@@ -98,6 +122,14 @@ const workflowSurfaces = new Set([
 ]);
 const scenarioKeyPattern = /^[a-z][a-z0-9-]*$/u;
 const sourceHashPattern = /^[a-f0-9]{64}$/u;
+const scenarioDeclarationKeyPattern = /^[a-z][a-z0-9._-]{0,127}$/u;
+const scenarioReasonCodePattern = /^[a-z][a-z0-9_]{0,63}$/u;
+const scenarioPresentationViewModes = ["current", "recent", "history"] as const;
+const scenarioPresentationViewModeSet = new Set<string>(scenarioPresentationViewModes);
+const scenarioIngressCategorySet = new Set([
+  "product_surface", "host_transition", "workflow_runtime",
+]);
+const scenarioPrincipalOriginSet = new Set(["interactive_session", "durable_run_actor"]);
 const scenarioContractCapabilityKeySet = new Set<string>(scenarioContractCapabilityKeysV1);
 const scenarioContractSourceIdentitySet = new Set<string>(scenarioContractSourceIdentitiesV1);
 const scenarioContractDependencySets = new Map<string, {
@@ -201,6 +233,23 @@ const assertStringArray = (
 
 const arraysEqual = (left: readonly string[], right: readonly string[]): boolean =>
   left.length === right.length && left.every((value, index) => value === right[index]);
+
+const requireScenarioDeclarationKey = (value: unknown, path: string): string => {
+  if (typeof value !== "string" || !scenarioDeclarationKeyPattern.test(value)) {
+    fail(
+      "invalid_scenario_declaration_key",
+      path,
+      `${path} must be a bounded lowercase scenario declaration key`,
+    );
+  }
+  return value as string;
+};
+
+const assertMaximumItems = (values: readonly unknown[], maximum: number, path: string): void => {
+  if (values.length > maximum) {
+    fail("too_many_items", path, `${path} may contain at most ${maximum} items`);
+  }
+};
 
 const validateScenarioContractDependencies = (value: unknown, path: string): void => {
   const contract = requireRecord(value, path);
@@ -399,6 +448,352 @@ const validateScenarioContractDependencies = (value: unknown, path: string): voi
       `${path}.source_dependencies`,
       "source_dependencies must use canonical source-identity order",
     );
+  }
+
+  const trustedInvocation = requireRecord(
+    contract.trusted_invocation,
+    `${path}.trusted_invocation`,
+  );
+  assertExactKeys(
+    trustedInvocation,
+    scenarioTrustedInvocationKeys,
+    scenarioTrustedInvocationKeys,
+    `${path}.trusted_invocation`,
+  );
+  if (
+    trustedInvocation.trusted_invocation_version !== 1 ||
+    trustedInvocation.invocation_contract !== "scenario-private-invocation-v1"
+  ) {
+    fail(
+      "invalid_trusted_invocation_contract",
+      `${path}.trusted_invocation`,
+      "trusted_invocation must use the accepted scenario-private invocation v1 contract",
+    );
+  }
+
+  const operations = requireArray(
+    trustedInvocation.operations,
+    `${path}.trusted_invocation.operations`,
+  );
+  if (operations.length === 0) {
+    fail(
+      "empty_trusted_operations",
+      `${path}.trusted_invocation.operations`,
+      "trusted_invocation.operations must be non-empty",
+    );
+  }
+  assertMaximumItems(operations, 128, `${path}.trusted_invocation.operations`);
+
+  const operationTuples = new Set<string>();
+  const operationKeys = new Set<string>();
+  const declarationHandlerKeys = new Set<string>();
+  const productIngressKeys = new Set<string>();
+  for (const [operationIndex, rawOperation] of operations.entries()) {
+    const operationPath = `${path}.trusted_invocation.operations.${operationIndex}`;
+    const operation = requireRecord(rawOperation, operationPath);
+    assertExactKeys(
+      operation,
+      scenarioTrustedOperationKeys,
+      scenarioTrustedOperationKeys,
+      operationPath,
+    );
+    const endpointKey = requireScenarioDeclarationKey(
+      operation.endpoint_key,
+      `${operationPath}.endpoint_key`,
+    );
+    if (operation.method !== "POST") {
+      fail("invalid_http_method", `${operationPath}.method`, "trusted operations must use POST");
+    }
+    const operationKey = requireScenarioDeclarationKey(
+      operation.operation_key,
+      `${operationPath}.operation_key`,
+    );
+    requireScenarioDeclarationKey(operation.input_schema_key, `${operationPath}.input_schema_key`);
+    assertPositiveInteger(operation.input_schema_version, `${operationPath}.input_schema_version`);
+    const handlerKey = requireScenarioDeclarationKey(
+      operation.handler_key,
+      `${operationPath}.handler_key`,
+    );
+    const operationTuple = `${endpointKey}\0POST\0${operationKey}`;
+    if (operationTuples.has(operationTuple)) {
+      fail("duplicate_trusted_operation", operationPath, "trusted operation tuples must be unique");
+    }
+    if (operationKeys.has(operationKey)) {
+      fail(
+        "duplicate_trusted_operation_key",
+        `${operationPath}.operation_key`,
+        "trusted operation keys must be unique",
+      );
+    }
+    if (declarationHandlerKeys.has(handlerKey)) {
+      fail(
+        "duplicate_scenario_handler",
+        `${operationPath}.handler_key`,
+        "scenario declaration handler keys must be unique",
+      );
+    }
+    operationTuples.add(operationTuple);
+    operationKeys.add(operationKey);
+    declarationHandlerKeys.add(handlerKey);
+
+    const ingressEntries = requireArray(operation.ingress, `${operationPath}.ingress`);
+    if (ingressEntries.length === 0) {
+      fail("empty_operation_ingress", `${operationPath}.ingress`, "operation ingress must be non-empty");
+    }
+    assertMaximumItems(ingressEntries, 16, `${operationPath}.ingress`);
+    const ingressTuples = new Set<string>();
+    for (const [ingressIndex, rawIngress] of ingressEntries.entries()) {
+      const ingressPath = `${operationPath}.ingress.${ingressIndex}`;
+      const ingress = requireRecord(rawIngress, ingressPath);
+      assertExactKeys(
+        ingress,
+        scenarioTrustedIngressKeys,
+        scenarioTrustedIngressKeys,
+        ingressPath,
+      );
+      if (
+        typeof ingress.ingress_category !== "string" ||
+        !scenarioIngressCategorySet.has(ingress.ingress_category)
+      ) {
+        fail(
+          "invalid_ingress_category",
+          `${ingressPath}.ingress_category`,
+          "ingress_category must use the accepted I1-A vocabulary",
+        );
+      }
+      const ingressCategory = ingress.ingress_category as string;
+      const ingressKey = requireScenarioDeclarationKey(
+        ingress.ingress_key,
+        `${ingressPath}.ingress_key`,
+      );
+      const principalOrigins = assertStringArray(
+        ingress.principal_origins,
+        `${ingressPath}.principal_origins`,
+        { nonEmpty: true, unique: true, allowed: scenarioPrincipalOriginSet },
+      );
+      const expectedOrigins = ingressCategory === "workflow_runtime"
+        ? ["durable_run_actor"]
+        : ["interactive_session"];
+      if (!arraysEqual(principalOrigins, expectedOrigins)) {
+        fail(
+          "invalid_ingress_principal_origins",
+          `${ingressPath}.principal_origins`,
+          "product/transition ingress is interactive and workflow runtime ingress is durable",
+        );
+      }
+      const ingressTuple = `${ingressCategory}\0${ingressKey}\0${principalOrigins.join(",")}`;
+      if (ingressTuples.has(ingressTuple)) {
+        fail("duplicate_operation_ingress", ingressPath, "operation ingress tuples must be unique");
+      }
+      ingressTuples.add(ingressTuple);
+      if (ingressCategory === "product_surface") productIngressKeys.add(ingressKey);
+    }
+  }
+
+  const hasPresentation = declaredCapabilities.has("scenario_subject_presentation_v1");
+  const providerValues = requireArray(
+    contract.subject_context_providers,
+    `${path}.subject_context_providers`,
+  );
+  const presentationValues = requireArray(
+    contract.semantic_presentations,
+    `${path}.semantic_presentations`,
+  );
+  const surfaceValues = requireArray(contract.product_surfaces, `${path}.product_surfaces`);
+  for (const [values, field] of [
+    [providerValues, "subject_context_providers"],
+    [presentationValues, "semantic_presentations"],
+    [surfaceValues, "product_surfaces"],
+  ] as const) {
+    assertMaximumItems(values, 64, `${path}.${field}`);
+    if (hasPresentation && values.length === 0) {
+      fail(
+        "missing_presentation_declaration",
+        `${path}.${field}`,
+        `${field} must be non-empty when presentation capability is declared`,
+      );
+    }
+    if (!hasPresentation && values.length > 0) {
+      fail(
+        "undeclared_presentation_capability",
+        `${path}.${field}`,
+        `${field} requires scenario_subject_presentation_v1`,
+      );
+    }
+  }
+
+  const providerKeys = new Set<string>();
+  for (const [index, rawProvider] of providerValues.entries()) {
+    const providerPath = `${path}.subject_context_providers.${index}`;
+    const provider = requireRecord(rawProvider, providerPath);
+    assertExactKeys(provider, scenarioSubjectProviderKeys, scenarioSubjectProviderKeys, providerPath);
+    const providerKey = requireScenarioDeclarationKey(provider.provider_key, `${providerPath}.provider_key`);
+    if (provider.provider_version !== 1) {
+      fail("invalid_provider_version", `${providerPath}.provider_version`, "provider_version must be 1");
+    }
+    if (
+      provider.list_operation_key !== "list_subject_contexts" ||
+      provider.resolve_operation_key !== "resolve_subject_context"
+    ) {
+      fail(
+        "invalid_provider_operations",
+        providerPath,
+        "provider must use the accepted list/resolve operation pair",
+      );
+    }
+    const handlerKey = requireScenarioDeclarationKey(provider.handler_key, `${providerPath}.handler_key`);
+    if (providerKeys.has(providerKey)) {
+      fail("duplicate_provider", `${providerPath}.provider_key`, "provider keys must be unique");
+    }
+    if (declarationHandlerKeys.has(handlerKey)) {
+      fail("duplicate_scenario_handler", `${providerPath}.handler_key`, "scenario handler keys must be unique");
+    }
+    for (const operationKey of ["list_subject_contexts", "resolve_subject_context"]) {
+      if (!operationKeys.has(operationKey)) {
+        fail(
+          "missing_provider_operation",
+          providerPath,
+          `provider requires trusted operation ${operationKey}`,
+        );
+      }
+    }
+    providerKeys.add(providerKey);
+    declarationHandlerKeys.add(handlerKey);
+  }
+
+  const presentationKeys = new Set<string>();
+  for (const [index, rawPresentation] of presentationValues.entries()) {
+    const presentationPath = `${path}.semantic_presentations.${index}`;
+    const presentation = requireRecord(rawPresentation, presentationPath);
+    assertExactKeys(
+      presentation,
+      scenarioSemanticPresentationKeys,
+      scenarioSemanticPresentationKeys,
+      presentationPath,
+    );
+    const presentationKey = requireScenarioDeclarationKey(
+      presentation.presentation_key,
+      `${presentationPath}.presentation_key`,
+    );
+    if (presentation.presentation_version !== 1 || presentation.operation_key !== "present_subject_context") {
+      fail(
+        "invalid_presentation_contract",
+        presentationPath,
+        "presentation must use version 1 and present_subject_context",
+      );
+    }
+    const providerKey = requireScenarioDeclarationKey(
+      presentation.provider_key,
+      `${presentationPath}.provider_key`,
+    );
+    const handlerKey = requireScenarioDeclarationKey(
+      presentation.handler_key,
+      `${presentationPath}.handler_key`,
+    );
+    const reasonCodes = assertStringArray(
+      presentation.safe_reason_codes,
+      `${presentationPath}.safe_reason_codes`,
+      { nonEmpty: true, unique: true },
+    );
+    for (const [reasonIndex, reasonCode] of reasonCodes.entries()) {
+      if (!scenarioReasonCodePattern.test(reasonCode)) {
+        fail(
+          "invalid_safe_reason_code",
+          `${presentationPath}.safe_reason_codes.${reasonIndex}`,
+          "safe reason codes must use bounded snake_case",
+        );
+      }
+    }
+    if (presentationKeys.has(presentationKey)) {
+      fail("duplicate_presentation", `${presentationPath}.presentation_key`, "presentation keys must be unique");
+    }
+    if (!providerKeys.has(providerKey)) {
+      fail("missing_presentation_provider", `${presentationPath}.provider_key`, "presentation provider is undeclared");
+    }
+    if (!operationKeys.has("present_subject_context")) {
+      fail(
+        "missing_presentation_operation",
+        presentationPath,
+        "presentation requires trusted operation present_subject_context",
+      );
+    }
+    if (declarationHandlerKeys.has(handlerKey)) {
+      fail("duplicate_scenario_handler", `${presentationPath}.handler_key`, "scenario handler keys must be unique");
+    }
+    presentationKeys.add(presentationKey);
+    declarationHandlerKeys.add(handlerKey);
+  }
+
+  const productSurfaceKeys = new Set<string>();
+  for (const [index, rawSurface] of surfaceValues.entries()) {
+    const surfacePath = `${path}.product_surfaces.${index}`;
+    const surface = requireRecord(rawSurface, surfacePath);
+    assertExactKeys(surface, scenarioProductSurfaceKeys, scenarioProductSurfaceKeys, surfacePath);
+    const productSurfaceKey = requireScenarioDeclarationKey(
+      surface.product_surface_key,
+      `${surfacePath}.product_surface_key`,
+    );
+    const presentationKey = requireScenarioDeclarationKey(
+      surface.presentation_key,
+      `${surfacePath}.presentation_key`,
+    );
+    const viewModes = assertStringArray(surface.view_modes, `${surfacePath}.view_modes`, {
+      nonEmpty: true,
+      unique: true,
+      allowed: scenarioPresentationViewModeSet,
+    });
+    const expectedViewModes = scenarioPresentationViewModes.filter((viewMode) => viewModes.includes(viewMode));
+    if (!arraysEqual(viewModes, expectedViewModes)) {
+      fail("invalid_view_mode_order", `${surfacePath}.view_modes`, "view_modes must use canonical order");
+    }
+    const routeClasses = assertStringArray(surface.route_classes, `${surfacePath}.route_classes`, {
+      nonEmpty: true,
+      unique: true,
+    });
+    for (const [routeIndex, routeClass] of routeClasses.entries()) {
+      requireScenarioDeclarationKey(routeClass, `${surfacePath}.route_classes.${routeIndex}`);
+    }
+    const actionKeys = assertStringArray(surface.action_keys, `${surfacePath}.action_keys`, {
+      unique: true,
+    });
+    if (surface.action_offer_policy === "none") {
+      if (actionKeys.length !== 0) {
+        fail("invalid_action_offer_policy", surfacePath, "none requires an empty action_keys array");
+      }
+    } else if (surface.action_offer_policy === "declared_actions") {
+      if (actionKeys.length === 0) {
+        fail("invalid_action_offer_policy", surfacePath, "declared_actions requires action keys");
+      }
+      for (const [actionIndex, actionKey] of actionKeys.entries()) {
+        requireScenarioDeclarationKey(actionKey, `${surfacePath}.action_keys.${actionIndex}`);
+      }
+    } else {
+      fail("invalid_action_offer_policy", `${surfacePath}.action_offer_policy`, "Unknown action offer policy");
+    }
+    if (productSurfaceKeys.has(productSurfaceKey)) {
+      fail("duplicate_product_surface", `${surfacePath}.product_surface_key`, "product surface keys must be unique");
+    }
+    if (!presentationKeys.has(presentationKey)) {
+      fail("missing_surface_presentation", `${surfacePath}.presentation_key`, "surface presentation is undeclared");
+    }
+    if (!productIngressKeys.has(productSurfaceKey)) {
+      fail(
+        "missing_product_surface_ingress",
+        `${surfacePath}.product_surface_key`,
+        "product_surface_key must equal a declared product_surface ingress_key",
+      );
+    }
+    productSurfaceKeys.add(productSurfaceKey);
+  }
+
+  for (const productIngressKey of productIngressKeys) {
+    if (!productSurfaceKeys.has(productIngressKey)) {
+      fail(
+        "missing_product_surface_declaration",
+        `${path}.trusted_invocation.operations`,
+        `product surface ingress ${productIngressKey} has no product surface declaration`,
+      );
+    }
   }
 };
 

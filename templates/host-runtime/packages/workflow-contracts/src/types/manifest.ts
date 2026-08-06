@@ -92,10 +92,62 @@ export type ScenarioCapabilityDependencyV1 = {
   requires_sources: ScenarioContractSourceIdentityV1[];
 };
 
+export type ScenarioTrustedInvocationIngressManifestV1 = {
+  ingress_category: "product_surface" | "host_transition" | "workflow_runtime";
+  ingress_key: string;
+  principal_origins: Array<"interactive_session" | "durable_run_actor">;
+};
+
+export type ScenarioTrustedInvocationOperationManifestV1 = {
+  endpoint_key: string;
+  method: "POST";
+  operation_key: string;
+  input_schema_key: string;
+  input_schema_version: number;
+  handler_key: string;
+  ingress: ScenarioTrustedInvocationIngressManifestV1[];
+};
+
+export type ScenarioTrustedInvocationManifestV1 = {
+  trusted_invocation_version: 1;
+  invocation_contract: "scenario-private-invocation-v1";
+  operations: ScenarioTrustedInvocationOperationManifestV1[];
+};
+
+export type ScenarioSubjectContextProviderManifestV1 = {
+  provider_key: string;
+  provider_version: 1;
+  list_operation_key: "list_subject_contexts";
+  resolve_operation_key: "resolve_subject_context";
+  handler_key: string;
+};
+
+export type ScenarioSemanticPresentationManifestV1 = {
+  presentation_key: string;
+  presentation_version: 1;
+  provider_key: string;
+  operation_key: "present_subject_context";
+  handler_key: string;
+  safe_reason_codes: string[];
+};
+
+export type ScenarioProductSurfaceManifestV1 = {
+  product_surface_key: string;
+  presentation_key: string;
+  view_modes: Array<"current" | "recent" | "history">;
+  route_classes: string[];
+  action_offer_policy: "none" | "declared_actions";
+  action_keys: string[];
+};
+
 export type ScenarioContractManifestV1 = {
   scenario_contracts_version: 1;
   source_dependencies: ScenarioContractSourceDependencyV1[];
   capability_dependencies: ScenarioCapabilityDependencyV1[];
+  trusted_invocation: ScenarioTrustedInvocationManifestV1;
+  subject_context_providers: ScenarioSubjectContextProviderManifestV1[];
+  semantic_presentations: ScenarioSemanticPresentationManifestV1[];
+  product_surfaces: ScenarioProductSurfaceManifestV1[];
 };
 
 export type HandoffContextRefTypeManifest = {

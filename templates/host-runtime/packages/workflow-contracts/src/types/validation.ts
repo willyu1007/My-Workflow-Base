@@ -4,6 +4,10 @@ export const workflowHostCapabilities = [
   "workflow_handoff_materialization_v1",
   "scenario_federation_v1",
   "generation_ticket_v1",
+  "trusted_scenario_invocation_v1",
+  "scenario_subject_presentation_v1",
+  "scenario_domain_action_execution_v1",
+  "scenario_protected_interaction_v1",
 ] as const;
 
 export type WorkflowHostCapability = (typeof workflowHostCapabilities)[number];

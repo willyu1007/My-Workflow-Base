@@ -294,7 +294,11 @@ if (
 if (
   manifest.$defs.scenarioContractsV1.additionalProperties !== false ||
   manifest.$defs.scenarioContractSourceDependencyV1.additionalProperties !== false ||
-  manifest.$defs.scenarioCapabilityDependencyV1.additionalProperties !== false
+  manifest.$defs.scenarioCapabilityDependencyV1.additionalProperties !== false ||
+  manifest.$defs.scenarioTrustedInvocationOperationManifestV1.additionalProperties !== false ||
+  manifest.$defs.scenarioSubjectContextProviderManifestV1.additionalProperties !== false ||
+  manifest.$defs.scenarioSemanticPresentationManifestV1.additionalProperties !== false ||
+  manifest.$defs.scenarioProductSurfaceManifestV1.additionalProperties !== false
 ) {
   throw new Error("scenario-contract dependency structures must reject unknown fields");
 }

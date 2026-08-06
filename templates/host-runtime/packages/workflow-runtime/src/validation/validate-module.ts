@@ -1,4 +1,5 @@
 import type {
+  ScenarioManifestV2,
   WorkflowActivationTarget,
   WorkflowHostValidationSnapshot,
   WorkflowModuleValidationFinding,
@@ -6,6 +7,8 @@ import type {
   WorkflowScenarioModule,
 } from "@host/workflow-contracts";
 import {
+  ScenarioManifestValidationError,
+  assertScenarioManifestV2,
   scenarioCapabilityEnablementPolicies,
   scenarioLaunchPhases,
   standardWorkflowHandoffTypes,
@@ -77,6 +80,116 @@ function hasDeclaredHandoffSource(input: {
   );
 }
 
+function collectStringValues(value: unknown, target: Set<string>): void {
+  if (typeof value === "string") {
+    target.add(value);
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) collectStringValues(item, target);
+    return;
+  }
+  if (value && typeof value === "object") {
+    for (const item of Object.values(value as Record<string, unknown>)) {
+      collectStringValues(item, target);
+    }
+  }
+}
+
+function validateScenarioContractModule(input: {
+  manifest: ScenarioManifestV2;
+  host_snapshot: WorkflowHostValidationSnapshot;
+  findings: WorkflowModuleValidationFinding[];
+}): void {
+  const scenarioContracts = input.manifest.scenario_contracts;
+  if (!scenarioContracts) return;
+
+  for (const [index, dependency] of scenarioContracts.capability_dependencies.entries()) {
+    if (!input.host_snapshot.host_capabilities?.includes(dependency.capability_key)) {
+      addFatal(input.findings, {
+        rule_id: "WF-MAN-119",
+        message: `Host does not support scenario contract capability: ${dependency.capability_key}`,
+        path: `scenario_contracts.capability_dependencies.${index}.capability_key`,
+        remediation: "Keep the scenario contract inactive until the Host declares exact contract support.",
+      });
+    }
+  }
+
+  const legacyHandlerKeys = new Set<string>();
+  const legacyEntrypointKeys = new Set<string>();
+  for (const capability of input.manifest.capabilities) {
+    for (const entrypoint of capability.entrypoints) {
+      legacyEntrypointKeys.add(entrypoint.entrypoint_key);
+      for (const step of entrypoint.steps) legacyHandlerKeys.add(step.handler_key);
+    }
+  }
+  const legacyRouteAliases = new Set<string>();
+  for (const route of input.manifest.internal_api.routes) {
+    legacyHandlerKeys.add(route.handler_key);
+    legacyRouteAliases.add(route.path);
+  }
+  const legacySurfaceValues = new Set<string>();
+  collectStringValues(input.manifest.surface_mapping, legacySurfaceValues);
+
+  const declarationHandlers: Array<{ key: string; path: string }> = [];
+  for (const [index, operation] of scenarioContracts.trusted_invocation.operations.entries()) {
+    declarationHandlers.push({
+      key: operation.handler_key,
+      path: `scenario_contracts.trusted_invocation.operations.${index}.handler_key`,
+    });
+    if (
+      legacyEntrypointKeys.has(operation.operation_key) ||
+      legacyRouteAliases.has(operation.operation_key) ||
+      legacyRouteAliases.has(operation.endpoint_key)
+    ) {
+      addFatal(input.findings, {
+        rule_id: "WF-MAN-121",
+        message: `Scenario operation aliases a legacy entrypoint or route: ${operation.operation_key}`,
+        path: `scenario_contracts.trusted_invocation.operations.${index}`,
+        remediation: "Use one canonical vNext operation key and remove the legacy alias before adoption.",
+      });
+    }
+  }
+  for (const [index, provider] of scenarioContracts.subject_context_providers.entries()) {
+    declarationHandlers.push({
+      key: provider.handler_key,
+      path: `scenario_contracts.subject_context_providers.${index}.handler_key`,
+    });
+  }
+  for (const [index, presentation] of scenarioContracts.semantic_presentations.entries()) {
+    declarationHandlers.push({
+      key: presentation.handler_key,
+      path: `scenario_contracts.semantic_presentations.${index}.handler_key`,
+    });
+  }
+
+  for (const declaration of declarationHandlers) {
+    if (
+      legacyHandlerKeys.has(declaration.key) ||
+      legacySurfaceValues.has(declaration.key)
+    ) {
+      addFatal(input.findings, {
+        rule_id: "WF-MAN-120",
+        message: `Scenario declaration handler aliases a legacy implementation: ${declaration.key}`,
+        path: declaration.path,
+        remediation: "Use a dedicated vNext handler key and keep legacy registries separate.",
+      });
+    }
+  }
+
+  const legacySurfaceKeys = new Set(Object.keys(input.manifest.surface_mapping));
+  for (const [index, surface] of scenarioContracts.product_surfaces.entries()) {
+    if (legacySurfaceKeys.has(surface.product_surface_key)) {
+      addFatal(input.findings, {
+        rule_id: "WF-MAN-122",
+        message: `Scenario product surface aliases legacy surface_mapping: ${surface.product_surface_key}`,
+        path: `scenario_contracts.product_surfaces.${index}.product_surface_key`,
+        remediation: "Use a dedicated product-surface key; do not reinterpret legacy Host surfaces.",
+      });
+    }
+  }
+}
+
 export function validateWorkflowModule(input: {
   module: WorkflowScenarioModule;
   host_snapshot: WorkflowHostValidationSnapshot;
@@ -102,6 +215,7 @@ export function validateWorkflowModule(input: {
       "step_type_registry", "owner_integration", "launch_phase", "allowed_user_classes",
       "capabilities", "scenario_data", "artifact_policy", "action_availability", "handoffs",
       "surface_mapping", "internal_api", "event_registry", "governance", "verification",
+      "scenario_contracts",
     ]);
     const unknownManifestKeys = Object.keys(manifest).filter((key) => !allowedManifestKeys.has(key));
     if (unknownManifestKeys.length > 0) {
@@ -305,6 +419,32 @@ export function validateWorkflowModule(input: {
         path: "host_capabilities",
         remediation: "Keep generation capabilities disabled until the Host Gateway issues auditable tickets.",
       });
+    }
+
+    const federatedManifest = manifest as ScenarioManifestV2;
+    if (federatedManifest.scenario_contracts !== undefined) {
+      let scenarioContractStructureValid = true;
+      try {
+        assertScenarioManifestV2(federatedManifest);
+      } catch (error) {
+        scenarioContractStructureValid = false;
+        const detail = error instanceof ScenarioManifestValidationError
+          ? `${error.code} at ${error.path}`
+          : "unknown scenario-contract validation failure";
+        addFatal(findings, {
+          rule_id: "WF-MAN-118",
+          message: `Scenario contract manifest is invalid: ${detail}`,
+          path: "scenario_contracts",
+          remediation: "Fix the closed dependency and declaration envelope before module registration.",
+        });
+      }
+      if (scenarioContractStructureValid) {
+        validateScenarioContractModule({
+          manifest: federatedManifest,
+          host_snapshot: input.host_snapshot,
+          findings,
+        });
+      }
     }
   }
 

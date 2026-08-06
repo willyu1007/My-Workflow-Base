@@ -61,6 +61,68 @@ const sourceOrder = [
   "scenario_protected_interaction_source_v1",
 ];
 
+const presentationOperations = [
+  ["list_subject_contexts", "example.list_contexts.input", "example.list_contexts.handler"],
+  ["resolve_subject_context", "example.resolve_context.input", "example.resolve_context.handler"],
+  ["present_subject_context", "example.present_context.input", "example.present_context.handler"],
+].map(([operationKey, inputSchemaKey, handlerKey]) => ({
+  endpoint_key: `example.${operationKey}`,
+  method: "POST",
+  operation_key: operationKey,
+  input_schema_key: inputSchemaKey,
+  input_schema_version: 1,
+  handler_key: handlerKey,
+  ingress: [
+    {
+      ingress_category: "product_surface",
+      ingress_key: "example.dashboard",
+      principal_origins: ["interactive_session"],
+    },
+  ],
+}));
+
+const setPresentationDeclarations = (manifest, present) => {
+  if (!present) {
+    manifest.scenario_contracts.trusted_invocation.operations = [
+      structuredClone(fixture.scenario_contracts.trusted_invocation.operations[0]),
+    ];
+    manifest.scenario_contracts.subject_context_providers = [];
+    manifest.scenario_contracts.semantic_presentations = [];
+    manifest.scenario_contracts.product_surfaces = [];
+    return;
+  }
+  manifest.scenario_contracts.trusted_invocation.operations = structuredClone(presentationOperations);
+  manifest.scenario_contracts.subject_context_providers = [
+    {
+      provider_key: "example.subject_contexts",
+      provider_version: 1,
+      list_operation_key: "list_subject_contexts",
+      resolve_operation_key: "resolve_subject_context",
+      handler_key: "example.subject_contexts.handler",
+    },
+  ];
+  manifest.scenario_contracts.semantic_presentations = [
+    {
+      presentation_key: "example.subject_summary",
+      presentation_version: 1,
+      provider_key: "example.subject_contexts",
+      operation_key: "present_subject_context",
+      handler_key: "example.subject_summary.handler",
+      safe_reason_codes: ["context_changed", "unavailable"],
+    },
+  ];
+  manifest.scenario_contracts.product_surfaces = [
+    {
+      product_surface_key: "example.dashboard",
+      presentation_key: "example.subject_summary",
+      view_modes: ["current", "recent", "history"],
+      route_classes: ["subject_collection", "subject_detail"],
+      action_offer_policy: "none",
+      action_keys: [],
+    },
+  ];
+};
+
 const setPrefix = (manifest, length) => {
   const rows = capabilityRows.slice(0, length);
   const requiredSources = new Set(rows.flatMap((row) => row.requires_sources));
@@ -71,6 +133,7 @@ const setPrefix = (manifest, length) => {
       source_identity: sourceIdentity,
       source_hash: String(index + 1).repeat(64),
     }));
+  setPresentationDeclarations(manifest, length >= 2);
 };
 
 const assertBothAccept = (value) => {
