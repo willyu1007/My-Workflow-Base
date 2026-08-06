@@ -39,4 +39,6 @@ export const scenarioContractManifestF1Fixture = {
   subject_context_providers: [],
   semantic_presentations: [],
   product_surfaces: [],
+  domain_action_contracts: [],
+  protected_interaction_contracts: [],
 } satisfies ScenarioContractManifestV1;

@@ -12,6 +12,10 @@ import {
   workflowStepPolicyFlags,
 } from "./federation.js";
 import { scenarioLaunchPhases, workflowScenarioStatuses } from "./identity.js";
+import { assertScenarioDomainActionContractV1 } from "./scenario-domain-action-validation.js";
+import type { ScenarioDomainActionContractV1 } from "./scenario-domain-action.js";
+import { assertScenarioProtectedInteractionContractV1 } from "./scenario-protected-interaction-validation.js";
+import type { ScenarioProtectedInteractionContractV1 } from "./scenario-protected-interaction.js";
 
 export class ScenarioManifestValidationError extends Error {
   constructor(readonly code: string, readonly path: string, message: string) {
@@ -87,7 +91,7 @@ const verificationKeys = new Set(["deterministic_tests", "journey_harness"]);
 const scenarioContractKeys = new Set([
   "scenario_contracts_version", "source_dependencies", "capability_dependencies",
   "trusted_invocation", "subject_context_providers", "semantic_presentations",
-  "product_surfaces",
+  "product_surfaces", "domain_action_contracts", "protected_interaction_contracts",
 ]);
 const scenarioContractSourceDependencyKeys = new Set(["source_identity", "source_hash"]);
 const scenarioCapabilityDependencyKeys = new Set([
@@ -251,7 +255,11 @@ const assertMaximumItems = (values: readonly unknown[], maximum: number, path: s
   }
 };
 
-const validateScenarioContractDependencies = (value: unknown, path: string): void => {
+const validateScenarioContractDependencies = (
+  value: unknown,
+  scenarioKey: string,
+  path: string,
+): void => {
   const contract = requireRecord(value, path);
   assertExactKeys(contract, scenarioContractKeys, scenarioContractKeys, path);
   if (contract.scenario_contracts_version !== 1) {
@@ -486,6 +494,10 @@ const validateScenarioContractDependencies = (value: unknown, path: string): voi
 
   const operationTuples = new Set<string>();
   const operationKeys = new Set<string>();
+  const operationDeclarations = new Map<string, {
+    handlerKey: string;
+    ingressKeys: Set<string>;
+  }>();
   const declarationHandlerKeys = new Set<string>();
   const productIngressKeys = new Set<string>();
   for (const [operationIndex, rawOperation] of operations.entries()) {
@@ -542,6 +554,7 @@ const validateScenarioContractDependencies = (value: unknown, path: string): voi
     }
     assertMaximumItems(ingressEntries, 16, `${operationPath}.ingress`);
     const ingressTuples = new Set<string>();
+    const operationIngressKeys = new Set<string>();
     for (const [ingressIndex, rawIngress] of ingressEntries.entries()) {
       const ingressPath = `${operationPath}.ingress.${ingressIndex}`;
       const ingress = requireRecord(rawIngress, ingressPath);
@@ -586,8 +599,13 @@ const validateScenarioContractDependencies = (value: unknown, path: string): voi
         fail("duplicate_operation_ingress", ingressPath, "operation ingress tuples must be unique");
       }
       ingressTuples.add(ingressTuple);
+      operationIngressKeys.add(ingressKey);
       if (ingressCategory === "product_surface") productIngressKeys.add(ingressKey);
     }
+    operationDeclarations.set(operationKey, {
+      handlerKey,
+      ingressKeys: operationIngressKeys,
+    });
   }
 
   const hasPresentation = declaredCapabilities.has("scenario_subject_presentation_v1");
@@ -725,6 +743,8 @@ const validateScenarioContractDependencies = (value: unknown, path: string): voi
   }
 
   const productSurfaceKeys = new Set<string>();
+  const offeredActionKeys = new Set<string>();
+  const actionSurfaceKeys = new Map<string, Set<string>>();
   for (const [index, rawSurface] of surfaceValues.entries()) {
     const surfacePath = `${path}.product_surfaces.${index}`;
     const surface = requireRecord(rawSurface, surfacePath);
@@ -766,6 +786,10 @@ const validateScenarioContractDependencies = (value: unknown, path: string): voi
       }
       for (const [actionIndex, actionKey] of actionKeys.entries()) {
         requireScenarioDeclarationKey(actionKey, `${surfacePath}.action_keys.${actionIndex}`);
+        offeredActionKeys.add(actionKey);
+        const offeringSurfaces = actionSurfaceKeys.get(actionKey) ?? new Set<string>();
+        offeringSurfaces.add(productSurfaceKey);
+        actionSurfaceKeys.set(actionKey, offeringSurfaces);
       }
     } else {
       fail("invalid_action_offer_policy", `${surfacePath}.action_offer_policy`, "Unknown action offer policy");
@@ -794,6 +818,167 @@ const validateScenarioContractDependencies = (value: unknown, path: string): voi
         `product surface ingress ${productIngressKey} has no product surface declaration`,
       );
     }
+  }
+
+  const hasActionCapability = declaredCapabilities.has("scenario_domain_action_execution_v1");
+  const actionValues = requireArray(
+    contract.domain_action_contracts,
+    `${path}.domain_action_contracts`,
+  );
+  assertMaximumItems(actionValues, 128, `${path}.domain_action_contracts`);
+  if (hasActionCapability && actionValues.length === 0) {
+    fail(
+      "missing_domain_action_declaration",
+      `${path}.domain_action_contracts`,
+      "domain_action_contracts must be non-empty when action capability is declared",
+    );
+  }
+  if (!hasActionCapability && actionValues.length > 0) {
+    fail(
+      "undeclared_domain_action_capability",
+      `${path}.domain_action_contracts`,
+      "domain_action_contracts requires scenario_domain_action_execution_v1",
+    );
+  }
+
+  const prepareOperation = operationDeclarations.get("prepare_domain_action");
+  const actionKeys = new Set<string>();
+  const actionHandlerKeys = new Set<string>();
+  for (const [index, rawAction] of actionValues.entries()) {
+    const actionPath = `${path}.domain_action_contracts.${index}`;
+    try {
+      assertScenarioDomainActionContractV1(rawAction, actionPath);
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : "unknown action contract failure";
+      fail("invalid_domain_action_contract", actionPath, detail);
+    }
+    const action = rawAction as ScenarioDomainActionContractV1;
+    if (action.scenario_key !== scenarioKey) {
+      fail(
+        "domain_action_scenario_mismatch",
+        `${actionPath}.scenario_key`,
+        "domain action scenario_key must equal the manifest scenario_key",
+      );
+    }
+    if (actionKeys.has(action.action_key)) {
+      fail("duplicate_domain_action", `${actionPath}.action_key`, "domain action keys must be unique");
+    }
+    if (actionHandlerKeys.has(action.handler_key)) {
+      fail("duplicate_scenario_handler", `${actionPath}.handler_key`, "domain action handlers must be unique");
+    }
+    const checkedPrepareOperation = prepareOperation ?? fail(
+      "missing_domain_action_handler",
+      `${actionPath}.handler_key`,
+      "domain action requires a trusted prepare_domain_action operation",
+    );
+    if (checkedPrepareOperation.handlerKey !== action.handler_key) {
+      fail(
+        "missing_domain_action_handler",
+        `${actionPath}.handler_key`,
+        "domain action handler must resolve the trusted prepare_domain_action operation",
+      );
+    }
+    for (const [ingressIndex, ingressKey] of action.entitled_ingress_keys.entries()) {
+      if (!checkedPrepareOperation.ingressKeys.has(ingressKey)) {
+        fail(
+          "missing_domain_action_ingress",
+          `${actionPath}.entitled_ingress_keys.${ingressIndex}`,
+          "domain action ingress must be declared by prepare_domain_action",
+        );
+      }
+    }
+    for (const surfaceKey of actionSurfaceKeys.get(action.action_key) ?? []) {
+      if (!action.entitled_ingress_keys.includes(surfaceKey)) {
+        fail(
+          "missing_domain_action_surface_ingress",
+          `${actionPath}.entitled_ingress_keys`,
+          `domain action must entitle its offering product surface ${surfaceKey}`,
+        );
+      }
+    }
+    if (!offeredActionKeys.has(action.action_key)) {
+      fail(
+        "missing_domain_action_surface",
+        `${actionPath}.action_key`,
+        "every domain action must be offered by a declared product surface",
+      );
+    }
+    actionKeys.add(action.action_key);
+    actionHandlerKeys.add(action.handler_key);
+  }
+  for (const offeredActionKey of offeredActionKeys) {
+    if (!actionKeys.has(offeredActionKey)) {
+      fail(
+        "missing_domain_action_declaration",
+        `${path}.product_surfaces`,
+        `product surface action ${offeredActionKey} has no exact domain action contract`,
+      );
+    }
+  }
+
+  const hasProtectedCapability = declaredCapabilities.has("scenario_protected_interaction_v1");
+  const protectedValues = requireArray(
+    contract.protected_interaction_contracts,
+    `${path}.protected_interaction_contracts`,
+  );
+  assertMaximumItems(protectedValues, 128, `${path}.protected_interaction_contracts`);
+  if (hasProtectedCapability && protectedValues.length === 0) {
+    fail(
+      "missing_protected_interaction_declaration",
+      `${path}.protected_interaction_contracts`,
+      "protected_interaction_contracts must be non-empty when protected capability is declared",
+    );
+  }
+  if (!hasProtectedCapability && protectedValues.length > 0) {
+    fail(
+      "undeclared_protected_interaction_capability",
+      `${path}.protected_interaction_contracts`,
+      "protected_interaction_contracts requires scenario_protected_interaction_v1",
+    );
+  }
+  const protectedKeys = new Set<string>();
+  for (const [index, rawProtected] of protectedValues.entries()) {
+    const protectedPath = `${path}.protected_interaction_contracts.${index}`;
+    try {
+      assertScenarioProtectedInteractionContractV1(rawProtected, protectedPath);
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : "unknown protected contract failure";
+      fail("invalid_protected_interaction_contract", protectedPath, detail);
+    }
+    const protectedContract = rawProtected as ScenarioProtectedInteractionContractV1;
+    if (protectedContract.scenario_key !== scenarioKey) {
+      fail(
+        "protected_interaction_scenario_mismatch",
+        `${protectedPath}.scenario_key`,
+        "protected interaction scenario_key must equal the manifest scenario_key",
+      );
+    }
+    if (!actionKeys.has(protectedContract.action_key)) {
+      fail(
+        "missing_protected_domain_action",
+        `${protectedPath}.action_key`,
+        "protected interaction must resolve one exact domain action",
+      );
+    }
+    if (
+      !operationKeys.has(protectedContract.prepare_operation_key) ||
+      !operationKeys.has(protectedContract.read_operation_key)
+    ) {
+      fail(
+        "missing_protected_operation",
+        protectedPath,
+        "protected interaction operations must resolve trusted invocation declarations",
+      );
+    }
+    const protectedKey = `${protectedContract.action_key}\0${protectedContract.protected_field_key}`;
+    if (protectedKeys.has(protectedKey)) {
+      fail(
+        "duplicate_protected_interaction",
+        protectedPath,
+        "protected action and field pairs must be unique",
+      );
+    }
+    protectedKeys.add(protectedKey);
   }
 };
 
@@ -1159,7 +1344,11 @@ export const assertScenarioManifestV2: (
   validateEventRegistry(manifest.event_registry, `${path}.event_registry`);
   validateGovernanceAndVerification(manifest, path);
   if (manifest.scenario_contracts !== undefined) {
-    validateScenarioContractDependencies(manifest.scenario_contracts, `${path}.scenario_contracts`);
+    validateScenarioContractDependencies(
+      manifest.scenario_contracts,
+      manifest.scenario_key as string,
+      `${path}.scenario_contracts`,
+    );
   }
 };
 

@@ -1,6 +1,8 @@
 import type { EventRegistryManifest } from "./events.js";
 import type { WorkflowRuntimeKind, WorkflowStepPolicyFlag, WorkflowStepTypeDefinition } from "./federation.js";
 import type { ScenarioLaunchPhase, WorkflowExposureLevel, WorkflowScenarioStatus, WorkflowSurface } from "./identity.js";
+import type { ScenarioDomainActionContractV1 } from "./scenario-domain-action.js";
+import type { ScenarioProtectedInteractionContractV1 } from "./scenario-protected-interaction.js";
 
 export const scenarioCapabilityEnablementPolicies = [
   "requires_workspace_activation",
@@ -148,6 +150,8 @@ export type ScenarioContractManifestV1 = {
   subject_context_providers: ScenarioSubjectContextProviderManifestV1[];
   semantic_presentations: ScenarioSemanticPresentationManifestV1[];
   product_surfaces: ScenarioProductSurfaceManifestV1[];
+  domain_action_contracts: ScenarioDomainActionContractV1[];
+  protected_interaction_contracts: ScenarioProtectedInteractionContractV1[];
 };
 
 export type HandoffContextRefTypeManifest = {

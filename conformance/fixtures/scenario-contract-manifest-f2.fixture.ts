@@ -95,4 +95,6 @@ export const scenarioContractManifestF2Fixture = {
     action_offer_policy: "none",
     action_keys: [],
   }],
+  domain_action_contracts: [],
+  protected_interaction_contracts: [],
 } satisfies ScenarioContractManifestV1;

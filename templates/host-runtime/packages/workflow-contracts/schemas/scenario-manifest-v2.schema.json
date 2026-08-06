@@ -255,7 +255,9 @@
         "trusted_invocation",
         "subject_context_providers",
         "semantic_presentations",
-        "product_surfaces"
+        "product_surfaces",
+        "domain_action_contracts",
+        "protected_interaction_contracts"
       ],
       "properties": {
         "scenario_contracts_version": { "const": 1 },
@@ -288,6 +290,20 @@
           "type": "array",
           "maxItems": 64,
           "items": { "$ref": "#/$defs/scenarioProductSurfaceManifestV1" }
+        },
+        "domain_action_contracts": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "$ref": "https://morethan.local/contracts/scenario-domain-action-contract-v1.schema.json"
+          }
+        },
+        "protected_interaction_contracts": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "$ref": "https://morethan.local/contracts/scenario-protected-interaction-contract-v1.schema.json"
+          }
         }
       }
     },

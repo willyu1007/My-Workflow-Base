@@ -188,6 +188,18 @@ function validateScenarioContractModule(input: {
       });
     }
   }
+
+  const legacyActionKeys = new Set(input.manifest.action_availability.scenario_actions);
+  for (const [index, action] of scenarioContracts.domain_action_contracts.entries()) {
+    if (legacyActionKeys.has(action.action_key)) {
+      addFatal(input.findings, {
+        rule_id: "WF-MAN-123",
+        message: `Scenario domain action aliases legacy action_availability: ${action.action_key}`,
+        path: `scenario_contracts.domain_action_contracts.${index}.action_key`,
+        remediation: "Use one vNext action declaration and remove the legacy scenario-action alias.",
+      });
+    }
+  }
 }
 
 export function validateWorkflowModule(input: {

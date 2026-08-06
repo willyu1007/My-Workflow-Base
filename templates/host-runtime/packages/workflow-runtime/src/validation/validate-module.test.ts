@@ -486,6 +486,8 @@ function createScenarioContractModule(): WorkflowScenarioModule {
       action_offer_policy: "none",
       action_keys: [],
     }],
+    domain_action_contracts: [],
+    protected_interaction_contracts: [],
   };
   return module;
 }
@@ -502,6 +504,120 @@ function createScenarioContractHostSnapshot(
     ],
     ...overrides,
   };
+}
+
+function createCompleteScenarioContractModule(): WorkflowScenarioModule {
+  const module = createScenarioContractModule();
+  const manifest = module.manifest as ScenarioManifestV2;
+  const contracts = manifest.scenario_contracts;
+  if (!contracts) throw new Error("scenario contract fixture is missing");
+  contracts.source_dependencies.push(
+    {
+      source_identity: "scenario_domain_action_source_v1",
+      source_hash: "89abcdef01234567".repeat(4),
+    },
+    {
+      source_identity: "scenario_protected_interaction_source_v1",
+      source_hash: "76543210fedcba98".repeat(4),
+    },
+  );
+  contracts.capability_dependencies.push(
+    {
+      capability_key: "scenario_domain_action_execution_v1",
+      requires_capabilities: [
+        "trusted_scenario_invocation_v1",
+        "scenario_subject_presentation_v1",
+      ],
+      requires_sources: ["scenario_domain_action_source_v1"],
+    },
+    {
+      capability_key: "scenario_protected_interaction_v1",
+      requires_capabilities: [
+        "trusted_scenario_invocation_v1",
+        "scenario_subject_presentation_v1",
+        "scenario_domain_action_execution_v1",
+      ],
+      requires_sources: ["scenario_protected_interaction_source_v1"],
+    },
+  );
+  contracts.trusted_invocation.operations.push(
+    {
+      endpoint_key: "scenario.prepare_domain_action",
+      method: "POST",
+      operation_key: "prepare_domain_action",
+      input_schema_key: "scenario.prepare_domain_action.input",
+      input_schema_version: 1,
+      handler_key: "scenario.record.handler",
+      ingress: [{
+        ingress_category: "product_surface",
+        ingress_key: "scenario.dashboard",
+        principal_origins: ["interactive_session"],
+      }],
+    },
+    {
+      endpoint_key: "scenario.read_protected_detail",
+      method: "POST",
+      operation_key: "read_protected_detail",
+      input_schema_key: "scenario.read_protected_detail.input",
+      input_schema_version: 1,
+      handler_key: "scenario.read_protected_detail.handler",
+      ingress: [{
+        ingress_category: "product_surface",
+        ingress_key: "scenario.dashboard",
+        principal_origins: ["interactive_session"],
+      }],
+    },
+  );
+  contracts.product_surfaces[0] = {
+    ...contracts.product_surfaces[0],
+    action_offer_policy: "declared_actions",
+    action_keys: ["scenario.record"],
+  };
+  contracts.domain_action_contracts = [{
+    action_contract_version: 1,
+    scenario_key: "example",
+    action_key: "scenario.record",
+    input_schema_key: "scenario.record.input",
+    input_schema_version: 1,
+    target_ref_class: "scenario.record.target",
+    confirmation_class: "explicit",
+    entitled_ingress_keys: ["scenario.dashboard"],
+    handler_key: "scenario.record.handler",
+    command_contract: {
+      command_key: "scenario.record.command",
+      command_contract_version: 1,
+    },
+    driver: "workflow_claimed_step_v1",
+  }];
+  contracts.protected_interaction_contracts = [{
+    protected_interaction_contract_version: 1,
+    scenario_key: "example",
+    action_key: "scenario.record",
+    protected_field_key: "example_plain_text",
+    content_kind: "scenario.protected_record",
+    prepare_operation_key: "prepare_domain_action",
+    read_operation_key: "read_protected_detail",
+    content_profile: {
+      media_type: "text/plain; charset=utf-8",
+      normalization: "trim_outer_whitespace_and_crlf_to_lf_v1",
+      min_characters: 1,
+      max_characters: 2000,
+      attachments: "none",
+    },
+  }];
+  return module;
+}
+
+function createCompleteScenarioContractHostSnapshot(): WorkflowHostValidationSnapshot {
+  return createScenarioContractHostSnapshot({
+    host_capabilities: [
+      "scenario_federation_v1",
+      "trusted_scenario_invocation_v1",
+      "scenario_subject_presentation_v1",
+      "scenario_domain_action_execution_v1",
+      "scenario_protected_interaction_v1",
+    ],
+  });
 }
 
 function createLegacyHandoff(overrides: Partial<HandoffManifest> = {}): HandoffManifest {
@@ -640,6 +756,38 @@ describe("workflow module validation and loading", () => {
       expect.objectContaining({ rule_id: "WF-MAN-121", severity: "fatal" }),
       expect.objectContaining({ rule_id: "WF-MAN-122", severity: "fatal" }),
     ]));
+  });
+
+  it("passes the complete action and protected contract graph with exact Host support", () => {
+    const report = validateWorkflowModule({
+      module: createCompleteScenarioContractModule(),
+      host_snapshot: createCompleteScenarioContractHostSnapshot(),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(true);
+    expect(report.findings.filter((finding) => finding.rule_id === "WF-MAN-123"))
+      .toEqual([]);
+  });
+
+  it("rejects vNext actions that alias legacy action availability", () => {
+    const module = createCompleteScenarioContractModule();
+    module.manifest.action_availability = {
+      ...module.manifest.action_availability,
+      scenario_actions: ["scenario.record"],
+    };
+    const report = validateWorkflowModule({
+      module,
+      host_snapshot: createCompleteScenarioContractHostSnapshot(),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toContainEqual(expect.objectContaining({
+      rule_id: "WF-MAN-123",
+      severity: "fatal",
+      path: "scenario_contracts.domain_action_contracts.0.action_key",
+    }));
   });
 
   it("passes a federated v2 module with exact Host capabilities", () => {

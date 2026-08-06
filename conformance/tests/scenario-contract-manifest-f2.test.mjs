@@ -7,19 +7,25 @@ import {
   assertScenarioManifestV2,
 } from "@host/workflow-contracts";
 
-const schema = JSON.parse(await readFile(
-  new URL(
-    "../../templates/host-runtime/packages/workflow-contracts/schemas/scenario-manifest-v2.schema.json",
-    import.meta.url,
-  ),
-  "utf8",
-));
+const schemaRoot = new URL(
+  "../../templates/host-runtime/packages/workflow-contracts/schemas/",
+  import.meta.url,
+);
+const schemas = await Promise.all([
+  "scenario-domain-action-contract-v1.schema.json",
+  "scenario-protected-interaction-contract-v1.schema.json",
+  "scenario-manifest-v2.schema.json",
+].map(async (name) => JSON.parse(await readFile(new URL(name, schemaRoot), "utf8"))));
 const fixture = JSON.parse(await readFile(
   new URL("../fixtures/scenario-contract-manifest-f1.valid.json", import.meta.url),
   "utf8",
 ));
 const ajv = new Ajv2020({ allErrors: true, strict: true });
-const validateManifest = ajv.compile(schema);
+for (const schema of schemas) ajv.addSchema(schema);
+const validateManifest = ajv.getSchema(
+  "https://morethan.local/contracts/scenario-manifest-v2.schema.json",
+);
+if (!validateManifest) throw new Error("scenario manifest schema was not registered");
 const clone = () => structuredClone(fixture);
 
 const setPresentationComplete = (manifest) => {

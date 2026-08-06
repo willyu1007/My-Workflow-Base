@@ -120,6 +120,8 @@
     },
     "subject_context_providers": [],
     "semantic_presentations": [],
-    "product_surfaces": []
+    "product_surfaces": [],
+    "domain_action_contracts": [],
+    "protected_interaction_contracts": []
   }
 }

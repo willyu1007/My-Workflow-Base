@@ -7,19 +7,29 @@ import {
   assertScenarioManifestV2,
 } from "@host/workflow-contracts";
 
-const schema = JSON.parse(await readFile(
-  new URL(
-    "../../templates/host-runtime/packages/workflow-contracts/schemas/scenario-manifest-v2.schema.json",
-    import.meta.url,
-  ),
-  "utf8",
-));
+const schemaRoot = new URL(
+  "../../templates/host-runtime/packages/workflow-contracts/schemas/",
+  import.meta.url,
+);
+const schemas = await Promise.all([
+  "scenario-domain-action-contract-v1.schema.json",
+  "scenario-protected-interaction-contract-v1.schema.json",
+  "scenario-manifest-v2.schema.json",
+].map(async (name) => JSON.parse(await readFile(new URL(name, schemaRoot), "utf8"))));
 const fixture = JSON.parse(await readFile(
   new URL("../fixtures/scenario-contract-manifest-f1.valid.json", import.meta.url),
   "utf8",
 ));
+const completeContracts = JSON.parse(await readFile(
+  new URL("../fixtures/scenario-contract-manifest-f3.valid.json", import.meta.url),
+  "utf8",
+));
 const ajv = new Ajv2020({ allErrors: true, strict: true });
-const validateManifest = ajv.compile(schema);
+for (const schema of schemas) ajv.addSchema(schema);
+const validateManifest = ajv.getSchema(
+  "https://morethan.local/contracts/scenario-manifest-v2.schema.json",
+);
+if (!validateManifest) throw new Error("scenario manifest schema was not registered");
 const clone = (value = fixture) => structuredClone(value);
 
 const capabilityRows = [
@@ -134,6 +144,28 @@ const setPrefix = (manifest, length) => {
       source_hash: String(index + 1).repeat(64),
     }));
   setPresentationDeclarations(manifest, length >= 2);
+  if (length >= 3) {
+    manifest.scenario_contracts.trusted_invocation.operations = structuredClone(
+      completeContracts.trusted_invocation.operations.filter(
+        (operation) => length >= 4 || operation.operation_key !== "read_protected_detail",
+      ),
+    );
+    manifest.scenario_contracts.subject_context_providers = structuredClone(
+      completeContracts.subject_context_providers,
+    );
+    manifest.scenario_contracts.semantic_presentations = structuredClone(
+      completeContracts.semantic_presentations,
+    );
+    manifest.scenario_contracts.product_surfaces = structuredClone(
+      completeContracts.product_surfaces,
+    );
+    manifest.scenario_contracts.domain_action_contracts = structuredClone(
+      completeContracts.domain_action_contracts,
+    );
+    manifest.scenario_contracts.protected_interaction_contracts = length >= 4
+      ? structuredClone(completeContracts.protected_interaction_contracts)
+      : [];
+  }
 };
 
 const assertBothAccept = (value) => {

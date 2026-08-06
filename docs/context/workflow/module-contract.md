@@ -1266,6 +1266,7 @@ Implemented validation rules:
 | `WF-MAN-120` | Fatal | Scenario declaration handlers do not alias legacy implementation registries. |
 | `WF-MAN-121` | Fatal | Scenario operation keys and endpoints do not alias legacy entrypoints or routes. |
 | `WF-MAN-122` | Fatal | Scenario product-surface keys do not alias legacy surface mappings. |
+| `WF-MAN-123` | Fatal | Scenario domain-action keys do not alias legacy action availability. |
 <!-- VALIDATOR-RULE-INVENTORY:END -->
 
 `WF-MAN-043` is warning-only and therefore does not make `report.passed` false.
