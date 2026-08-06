@@ -5,19 +5,19 @@ export const scenarioContractManifestF3Fixture = {
   source_dependencies: [
     {
       source_identity: "platform_child_family_identity_source_v1",
-      source_hash: "0123456789abcdef".repeat(4),
+      source_hash: "3a438edca6a4e6f8d1c116a386756b6f8ece4ac8e91127cf436ba5b7c8e9ec1a",
     },
     {
       source_identity: "scenario_interface_source_v1",
-      source_hash: "fedcba9876543210".repeat(4),
+      source_hash: "52aeaa1a1677a0076c57d92464681813c00192c2998413cca87e9b9b1db40a17",
     },
     {
       source_identity: "scenario_domain_action_source_v1",
-      source_hash: "89abcdef01234567".repeat(4),
+      source_hash: "0e4b185c0cb1f63583ca16f1efa935ca90ed540d73f678462aeceee0da6634e6",
     },
     {
       source_identity: "scenario_protected_interaction_source_v1",
-      source_hash: "76543210fedcba98".repeat(4),
+      source_hash: "7f00570e5736757698b476e4b3103ecfca55956c347caa1f7678298dfc6f9800",
     },
   ],
   capability_dependencies: [
