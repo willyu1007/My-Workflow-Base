@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/read-scenario-protected-detail-result-v1.schema.json",
+  "title": "ReadScenarioProtectedDetailResultV1",
+  "description": "Body-free protected read result; ready binds one separately transported carrier.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "protected_read_result_version": { "const": 1 },
+    "status": { "enum": ["ready", "tombstone", "context_changed", "unavailable"] },
+    "protected_content_version": { "$ref": "#/$defs/opaqueVersion" },
+    "content_kind": { "$ref": "#/$defs/machineKey" },
+    "carrier_binding": { "$ref": "scenario-protected-carrier-binding-v1.schema.json" },
+    "display_lease": { "$ref": "scenario-protected-display-lease-v1.schema.json" },
+    "safe_reason": { "$ref": "scenario-safe-reason-v1.schema.json" }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protected_read_result_version",
+        "status",
+        "protected_content_version",
+        "content_kind",
+        "carrier_binding",
+        "display_lease"
+      ],
+      "properties": {
+        "protected_read_result_version": { "const": 1 },
+        "status": { "const": "ready" },
+        "protected_content_version": { "$ref": "#/$defs/opaqueVersion" },
+        "content_kind": { "$ref": "#/$defs/machineKey" },
+        "carrier_binding": {
+          "allOf": [
+            { "$ref": "scenario-protected-carrier-binding-v1.schema.json" },
+            {
+              "type": "object",
+              "properties": { "carrier_scope": { "const": "read_output" } },
+              "required": ["carrier_scope"]
+            }
+          ]
+        },
+        "display_lease": { "$ref": "scenario-protected-display-lease-v1.schema.json" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protected_read_result_version", "status", "safe_reason"],
+      "properties": {
+        "protected_read_result_version": { "const": 1 },
+        "status": { "enum": ["tombstone", "context_changed", "unavailable"] },
+        "safe_reason": { "$ref": "scenario-safe-reason-v1.schema.json" }
+      }
+    }
+  ],
+  "$defs": {
+    "machineKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._:-]*$"
+    },
+    "opaqueVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$"
+    }
+  }
+}

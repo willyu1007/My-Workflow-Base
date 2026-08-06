@@ -1,3 +1,9 @@
+import type {
+  PrepareScenarioDomainActionInputV1,
+  PrepareScenarioDomainActionResultV1,
+} from "./scenario-domain-action.js";
+import type { ScenarioSafeReasonV1 } from "./scenario-presentation.js";
+
 export const scenarioProtectedMediaTypeV1 =
   "text/plain; charset=utf-8" as const;
 export const scenarioProtectedNormalizationV1 =
@@ -134,7 +140,57 @@ export type ScenarioProtectedContentCommitVerificationV1 = {
   verified_keyed_integrity_hash: string;
   committed_at: string;
 };
-import type {
-  PrepareScenarioDomainActionInputV1,
-  PrepareScenarioDomainActionResultV1,
-} from "./scenario-domain-action.js";
+
+export type ScenarioProtectedContentReadLocatorV1 = {
+  protected_read_locator_version: 1;
+  protected_content_ref: ScenarioProtectedContentRefV1;
+  content_kind: string;
+  issued_at: string;
+  expires_at: string;
+};
+
+export type ReadScenarioProtectedDetailInputV1 = {
+  protected_read_version: 1;
+  protected_content_ref: ScenarioProtectedContentRefV1;
+  known_content_version?: string;
+};
+
+export type ScenarioProtectedDisplayLeaseV1 = {
+  display_lease_version: 1;
+  cache_policy: "no_store";
+  issued_at: string;
+  expires_at: string;
+};
+
+export type ReadScenarioProtectedDetailResultV1 =
+  | {
+      protected_read_result_version: 1;
+      status: "ready";
+      protected_content_version: string;
+      content_kind: string;
+      carrier_binding: ScenarioProtectedCarrierBindingV1 & {
+        carrier_scope: "read_output";
+      };
+      display_lease: ScenarioProtectedDisplayLeaseV1;
+    }
+  | {
+      protected_read_result_version: 1;
+      status: "tombstone" | "context_changed" | "unavailable";
+      safe_reason: ScenarioSafeReasonV1;
+    };
+
+export type ScenarioProtectedReadLocatorVerificationV1 = {
+  protected_content_ref: ScenarioProtectedContentRefV1;
+  content_kind: string;
+  issued_at: string;
+  expires_at: string;
+  verified_foreground_context_hash: string;
+};
+
+export type ScenarioProtectedDecryptedContentVerificationV1 = {
+  protected_content_ref: ScenarioProtectedContentRefV1;
+  protected_content_version: string;
+  protected_field_key: string;
+  content_kind: string;
+  verified_keyed_integrity_hash: string;
+};

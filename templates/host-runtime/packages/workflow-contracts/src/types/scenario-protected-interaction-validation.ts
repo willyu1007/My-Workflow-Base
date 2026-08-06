@@ -10,6 +10,7 @@ import {
   assertSubmitScenarioDomainActionInputV1,
 } from "./scenario-domain-action-validation.js";
 import type { ScenarioDomainActionContractV1 } from "./scenario-domain-action.js";
+import { assertScenarioSafeReasonV1 } from "./scenario-presentation-validation.js";
 import {
   scenarioProtectedCarrierScopesV1,
   scenarioProtectedMaximumCarrierBytesV1,
@@ -29,6 +30,12 @@ import {
   type ScenarioPreparedProtectedContentVerificationV1,
   type ScenarioCommittedProtectedContentControlV1,
   type ScenarioProtectedContentCommitVerificationV1,
+  type ScenarioProtectedContentReadLocatorV1,
+  type ReadScenarioProtectedDetailInputV1,
+  type ScenarioProtectedDisplayLeaseV1,
+  type ReadScenarioProtectedDetailResultV1,
+  type ScenarioProtectedReadLocatorVerificationV1,
+  type ScenarioProtectedDecryptedContentVerificationV1,
 } from "./scenario-protected-interaction.js";
 
 export class ScenarioProtectedInteractionValidationError extends Error {
@@ -93,6 +100,37 @@ const committedContentControlKeys = new Set([
   "keyed_integrity_hash",
   "committed_at",
 ]);
+const protectedReadLocatorKeys = new Set([
+  "protected_read_locator_version",
+  "protected_content_ref",
+  "content_kind",
+  "issued_at",
+  "expires_at",
+]);
+const protectedReadInputKeys = new Set([
+  "protected_read_version",
+  "protected_content_ref",
+  "known_content_version",
+]);
+const protectedDisplayLeaseKeys = new Set([
+  "display_lease_version",
+  "cache_policy",
+  "issued_at",
+  "expires_at",
+]);
+const protectedReadReadyResultKeys = new Set([
+  "protected_read_result_version",
+  "status",
+  "protected_content_version",
+  "content_kind",
+  "carrier_binding",
+  "display_lease",
+]);
+const protectedReadSafeResultKeys = new Set([
+  "protected_read_result_version",
+  "status",
+  "safe_reason",
+]);
 const protectedPrepareSuccessKeys = new Set([
   "protected_prepare_result_version",
   "status",
@@ -113,7 +151,6 @@ const canonicalInstantPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u
 const htmlMarkupPattern = /<\/?[A-Za-z][^>]*>|<!--|-->/u;
 const forbiddenControlKeyForms = new Set([
   "attachmentrefs",
-  "body",
   "carrier",
   "ciphertext",
   "contentbytes",
@@ -125,6 +162,8 @@ const forbiddenControlKeyForms = new Set([
   "wrappedkey",
 ]);
 const maximumProtectedPrepareLifetimeMs = 5 * 60 * 1000;
+const maximumProtectedReadLocatorLifetimeMs = 5 * 60 * 1000;
+const maximumProtectedDisplayLeaseLifetimeMs = 60 * 1000;
 const maximumProtectedControlBytesV1 = 8 * 1024;
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -1146,4 +1185,339 @@ export const assertScenarioProtectedContentCommitCompositionV1 = (
       "protected content cannot commit before it was prepared",
     );
   }
+};
+
+export const assertScenarioProtectedContentReadLocatorV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is ScenarioProtectedContentReadLocatorV1 = (
+  value,
+  path = "protected_read_locator",
+) => {
+  const record = assertRecord(value, path);
+  assertKeys(record, protectedReadLocatorKeys, path);
+  if (record.protected_read_locator_version !== 1) {
+    fail(
+      "invalid_version",
+      `${path}.protected_read_locator_version`,
+      "protected_read_locator_version must be 1",
+    );
+  }
+  assertScenarioProtectedContentRefV1(
+    record.protected_content_ref,
+    `${path}.protected_content_ref`,
+  );
+  assertMachineKey(record.content_kind, `${path}.content_kind`);
+  const issuedAt = assertCanonicalInstant(record.issued_at, `${path}.issued_at`);
+  const expiresAt = assertCanonicalInstant(record.expires_at, `${path}.expires_at`);
+  if (
+    expiresAt <= issuedAt ||
+    expiresAt - issuedAt > maximumProtectedReadLocatorLifetimeMs
+  ) {
+    fail(
+      "invalid_lifetime",
+      `${path}.expires_at`,
+      "protected read locator lifetime must be greater than zero and at most five minutes",
+    );
+  }
+  if (serializedUtf8Bytes(record, path) > maximumProtectedControlBytesV1) {
+    fail("control_too_large", path, `${path} must be at most 8 KiB UTF-8`);
+  }
+};
+
+export const assertReadScenarioProtectedDetailInputV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is ReadScenarioProtectedDetailInputV1 = (
+  value,
+  path = "protected_read_input",
+) => {
+  const record = assertRecord(value, path);
+  assertKeys(record, protectedReadInputKeys, path);
+  if (record.protected_read_version !== 1) {
+    fail(
+      "invalid_version",
+      `${path}.protected_read_version`,
+      "protected_read_version must be 1",
+    );
+  }
+  assertScenarioProtectedContentRefV1(
+    record.protected_content_ref,
+    `${path}.protected_content_ref`,
+  );
+  if (record.known_content_version !== undefined) {
+    assertOpaqueVersion(record.known_content_version, `${path}.known_content_version`);
+  }
+  if (serializedUtf8Bytes(record, path) > maximumProtectedControlBytesV1) {
+    fail("control_too_large", path, `${path} must be at most 8 KiB UTF-8`);
+  }
+};
+
+export const assertScenarioProtectedDisplayLeaseV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is ScenarioProtectedDisplayLeaseV1 = (
+  value,
+  path = "display_lease",
+) => {
+  const record = assertRecord(value, path);
+  assertKeys(record, protectedDisplayLeaseKeys, path);
+  if (record.display_lease_version !== 1 || record.cache_policy !== "no_store") {
+    fail("invalid_display_lease", path, `${path} must be a v1 no-store display lease`);
+  }
+  const issuedAt = assertCanonicalInstant(record.issued_at, `${path}.issued_at`);
+  const expiresAt = assertCanonicalInstant(record.expires_at, `${path}.expires_at`);
+  if (
+    expiresAt <= issuedAt ||
+    expiresAt - issuedAt > maximumProtectedDisplayLeaseLifetimeMs
+  ) {
+    fail(
+      "invalid_lifetime",
+      `${path}.expires_at`,
+      "display lease lifetime must be greater than zero and at most 60 seconds",
+    );
+  }
+};
+
+export const assertReadScenarioProtectedDetailResultV1: (
+  value: unknown,
+  path?: string,
+) => asserts value is ReadScenarioProtectedDetailResultV1 = (
+  value,
+  path = "protected_read_result",
+) => {
+  const record = assertRecord(value, path);
+  if (record.protected_read_result_version !== 1) {
+    fail(
+      "invalid_version",
+      `${path}.protected_read_result_version`,
+      "protected_read_result_version must be 1",
+    );
+  }
+  if (record.status === "ready") {
+    assertKeys(record, protectedReadReadyResultKeys, path);
+    assertOpaqueVersion(record.protected_content_version, `${path}.protected_content_version`);
+    assertMachineKey(record.content_kind, `${path}.content_kind`);
+    assertScenarioProtectedCarrierBindingV1(
+      record.carrier_binding,
+      `${path}.carrier_binding`,
+    );
+    if (record.carrier_binding.carrier_scope !== "read_output") {
+      fail(
+        "invalid_carrier_scope",
+        `${path}.carrier_binding.carrier_scope`,
+        "ready protected read requires read_output carrier scope",
+      );
+    }
+    assertScenarioProtectedDisplayLeaseV1(record.display_lease, `${path}.display_lease`);
+  } else if (
+    record.status === "tombstone" ||
+    record.status === "context_changed" ||
+    record.status === "unavailable"
+  ) {
+    assertKeys(record, protectedReadSafeResultKeys, path);
+    assertScenarioSafeReasonV1(record.safe_reason, `${path}.safe_reason`);
+  } else {
+    fail("invalid_status", `${path}.status`, `${path}.status is invalid`);
+  }
+  if (serializedUtf8Bytes(record, path) > maximumProtectedControlBytesV1) {
+    fail("control_too_large", path, `${path} must be at most 8 KiB UTF-8`);
+  }
+};
+
+const assertReadLocatorVerification = (
+  verification: ScenarioProtectedReadLocatorVerificationV1,
+): void => {
+  assertScenarioProtectedContentRefV1(
+    verification.protected_content_ref,
+    "context.locator_verification.protected_content_ref",
+  );
+  assertMachineKey(verification.content_kind, "context.locator_verification.content_kind");
+  assertCanonicalInstant(verification.issued_at, "context.locator_verification.issued_at");
+  assertCanonicalInstant(verification.expires_at, "context.locator_verification.expires_at");
+  assertSha256(
+    verification.verified_foreground_context_hash,
+    "context.locator_verification.verified_foreground_context_hash",
+  );
+};
+
+const assertDecryptedContentVerification = (
+  verification: ScenarioProtectedDecryptedContentVerificationV1,
+): void => {
+  assertScenarioProtectedContentRefV1(
+    verification.protected_content_ref,
+    "context.decrypted_content_verification.protected_content_ref",
+  );
+  assertOpaqueVersion(
+    verification.protected_content_version,
+    "context.decrypted_content_verification.protected_content_version",
+  );
+  assertMachineKey(
+    verification.protected_field_key,
+    "context.decrypted_content_verification.protected_field_key",
+  );
+  assertMachineKey(
+    verification.content_kind,
+    "context.decrypted_content_verification.content_kind",
+  );
+  assertSha256(
+    verification.verified_keyed_integrity_hash,
+    "context.decrypted_content_verification.verified_keyed_integrity_hash",
+  );
+};
+
+export const assertReadScenarioProtectedDetailExchangeV1 = (
+  protectedContract: unknown,
+  locator: unknown,
+  input: unknown,
+  committedContent: unknown | undefined,
+  result: unknown,
+  carrier: unknown | undefined,
+  context: {
+    now: string;
+    locator_verification: ScenarioProtectedReadLocatorVerificationV1;
+    carrier_binding_verification?: ScenarioProtectedCarrierBindingVerificationV1;
+    decrypted_content_verification?: ScenarioProtectedDecryptedContentVerificationV1;
+  },
+): void => {
+  assertScenarioProtectedInteractionContractV1(protectedContract);
+  assertScenarioProtectedContentReadLocatorV1(locator);
+  assertReadScenarioProtectedDetailInputV1(input);
+  assertReadScenarioProtectedDetailResultV1(result);
+  assertReadLocatorVerification(context.locator_verification);
+  const locatorVerification = context.locator_verification;
+  if (
+    locator.protected_content_ref !== input.protected_content_ref ||
+    locator.protected_content_ref !== locatorVerification.protected_content_ref ||
+    locator.content_kind !== protectedContract.content_kind ||
+    locator.content_kind !== locatorVerification.content_kind ||
+    locator.issued_at !== locatorVerification.issued_at ||
+    locator.expires_at !== locatorVerification.expires_at
+  ) {
+    fail(
+      "read_locator_mismatch",
+      "protected_read_locator",
+      "read input and independently verified foreground context must match the locator",
+    );
+  }
+  const now = assertCanonicalInstant(context.now, "context.now");
+  const locatorIssuedAt = assertCanonicalInstant(locator.issued_at, "protected_read_locator.issued_at");
+  const locatorExpiresAt = assertCanonicalInstant(
+    locator.expires_at,
+    "protected_read_locator.expires_at",
+  );
+  if (now < locatorIssuedAt || now >= locatorExpiresAt) {
+    fail(
+      "read_locator_not_current",
+      "context.now",
+      "protected read requires a current independently verified foreground locator",
+    );
+  }
+  if (result.status !== "ready") {
+    if (
+      carrier !== undefined ||
+      context.carrier_binding_verification !== undefined ||
+      context.decrypted_content_verification !== undefined
+    ) {
+      fail(
+        "carrier_on_non_ready_result",
+        "protected_read_result",
+        "non-ready protected reads must not produce a carrier or decrypted-content evidence",
+      );
+    }
+    return;
+  }
+  if (committedContent === undefined) {
+    fail(
+      "missing_committed_content",
+      "committed_content",
+      "ready protected read requires current committed content control",
+    );
+  }
+  assertScenarioCommittedProtectedContentControlV1(committedContent);
+  if (carrier === undefined) {
+    fail(
+      "missing_read_carrier",
+      "protected_carrier",
+      "ready protected read requires exactly one separately transported carrier",
+    );
+  }
+  assertScenarioProtectedPlainTextCarrierForContractV1(protectedContract, carrier);
+  const bindingVerification = context.carrier_binding_verification;
+  if (bindingVerification === undefined) {
+    fail(
+      "missing_binding_verification",
+      "context.carrier_binding_verification",
+      "ready protected read requires independently verified carrier binding",
+    );
+  }
+  assertScenarioProtectedCarrierBindingVerificationV1(
+    result.carrier_binding,
+    bindingVerification,
+  );
+  if (result.carrier_binding.protected_field_key !== protectedContract.protected_field_key) {
+    fail(
+      "protected_field_mismatch",
+      "protected_read_result.carrier_binding.protected_field_key",
+      "read carrier binding field must match the static contract",
+    );
+  }
+  const decryptedVerification = context.decrypted_content_verification;
+  if (decryptedVerification === undefined) {
+    fail(
+      "missing_decrypted_verification",
+      "context.decrypted_content_verification",
+      "ready protected read requires owner verification of decrypted bytes",
+    );
+  }
+  assertDecryptedContentVerification(decryptedVerification);
+  if (
+    committedContent.protected_content_ref !== locator.protected_content_ref ||
+    committedContent.protected_content_ref !== decryptedVerification.protected_content_ref ||
+    committedContent.committed_content_version !== result.protected_content_version ||
+    committedContent.committed_content_version !== decryptedVerification.protected_content_version ||
+    committedContent.content_kind !== result.content_kind ||
+    committedContent.content_kind !== protectedContract.content_kind ||
+    committedContent.content_kind !== decryptedVerification.content_kind ||
+    decryptedVerification.protected_field_key !== protectedContract.protected_field_key
+  ) {
+    fail(
+      "read_content_context_mismatch",
+      "protected_read_result",
+      "ready read must bind the exact committed object, version, kind and protected field",
+    );
+  }
+  if (
+    committedContent.keyed_integrity_hash !==
+      decryptedVerification.verified_keyed_integrity_hash
+  ) {
+    fail(
+      "decrypted_integrity_mismatch",
+      "context.decrypted_content_verification.verified_keyed_integrity_hash",
+      "decrypted bytes must match stored owner integrity before ready is returned",
+    );
+  }
+  if (result.carrier_binding.keyed_binding_hash === committedContent.keyed_integrity_hash) {
+    fail(
+      "hash_domain_reuse",
+      "protected_read_result.carrier_binding.keyed_binding_hash",
+      "read transport binding and stored owner integrity hashes must use distinct domains",
+    );
+  }
+  const leaseIssuedAt = assertCanonicalInstant(
+    result.display_lease.issued_at,
+    "protected_read_result.display_lease.issued_at",
+  );
+  const leaseExpiresAt = assertCanonicalInstant(
+    result.display_lease.expires_at,
+    "protected_read_result.display_lease.expires_at",
+  );
+  if (now < leaseIssuedAt || now >= leaseExpiresAt) {
+    fail(
+      "display_lease_not_current",
+      "context.now",
+      "ready protected content requires a current no-store display lease",
+    );
+  }
+  assertScenarioProtectedBodyFreeControlV1(result, carrier, "protected_read_result");
 };

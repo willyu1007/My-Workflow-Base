@@ -15,6 +15,8 @@ const expected = [
   "prepare-scenario-domain-action-result-v1.schema.json",
   "prepare-scenario-protected-interaction-input-v1.schema.json",
   "prepare-scenario-protected-interaction-result-v1.schema.json",
+  "read-scenario-protected-detail-input-v1.schema.json",
+  "read-scenario-protected-detail-result-v1.schema.json",
   "scenario-action-offer-v1.schema.json",
   "scenario-authentication-assurance-evidence-v1.schema.json",
   "scenario-canonical-binding-expected-head-v1.schema.json",
@@ -54,6 +56,8 @@ const expected = [
   "scenario-presentation-result-v1.schema.json",
   "scenario-private-invocation-v1.schema.json",
   "scenario-protected-carrier-binding-v1.schema.json",
+  "scenario-protected-content-read-locator-v1.schema.json",
+  "scenario-protected-display-lease-v1.schema.json",
   "scenario-protected-interaction-contract-v1.schema.json",
   "scenario-protected-plain-text-carrier-v1.schema.json",
   "scenario-resolve-subject-context-input-v1.schema.json",
@@ -241,6 +245,22 @@ const protectedCommitFixture = JSON.parse(await readFile(
   );
   if (!validate || !validate(protectedCommitFixture.committed_content)) {
     throw new Error(`protected-interaction E3 fixture failed committed control: ${JSON.stringify(validate?.errors)}`);
+  }
+}
+
+const protectedReadFixture = JSON.parse(await readFile(
+  new URL("../fixtures/scenario-protected-interaction-e4.valid.json", import.meta.url),
+  "utf8",
+));
+for (const [schemaName, values] of [
+  ["scenario-protected-content-read-locator-v1", [protectedReadFixture.locator]],
+  ["read-scenario-protected-detail-input-v1", [protectedReadFixture.input]],
+  ["scenario-protected-display-lease-v1", [protectedReadFixture.results[0].display_lease]],
+  ["read-scenario-protected-detail-result-v1", protectedReadFixture.results],
+]) {
+  const validate = ajv.getSchema(`https://morethan.local/contracts/${schemaName}.schema.json`);
+  if (!validate || values.some((value) => !validate(value))) {
+    throw new Error(`protected-interaction E4 fixture failed ${schemaName}: ${JSON.stringify(validate?.errors)}`);
   }
 }
 

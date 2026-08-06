@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://morethan.local/contracts/read-scenario-protected-detail-input-v1.schema.json",
+  "title": "ReadScenarioProtectedDetailInputV1",
+  "description": "Body-free protected-detail read input using an opaque owner-issued content reference.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protected_read_version", "protected_content_ref"],
+  "properties": {
+    "protected_read_version": { "const": 1 },
+    "protected_content_ref": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 512,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "known_content_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:~-]*$"
+    }
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "locator": {
+    "protected_read_locator_version": 1,
+    "protected_content_ref": "RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
+    "content_kind": "example.protected_record",
+    "issued_at": "2026-08-05T00:00:00.000Z",
+    "expires_at": "2026-08-05T00:05:00.000Z"
+  },
+  "input": {
+    "protected_read_version": 1,
+    "protected_content_ref": "RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
+    "known_content_version": "committed-version-00"
+  },
+  "results": [
+    {
+      "protected_read_result_version": 1,
+      "status": "ready",
+      "protected_content_version": "committed-version-01",
+      "content_kind": "example.protected_record",
+      "carrier_binding": {
+        "carrier_binding_version": 1,
+        "carrier_scope": "read_output",
+        "protected_field_key": "example_plain_text",
+        "keyed_binding_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "display_lease": {
+        "display_lease_version": 1,
+        "cache_policy": "no_store",
+        "issued_at": "2026-08-05T00:02:00.000Z",
+        "expires_at": "2026-08-05T00:03:00.000Z"
+      }
+    },
+    {
+      "protected_read_result_version": 1,
+      "status": "tombstone",
+      "safe_reason": {
+        "reason_code": "example_tombstone",
+        "message": {
+          "kind": "plain_text",
+          "value": "The example detail is no longer available.",
+          "locale": "en-US"
+        },
+        "retry_class": "none"
+      }
+    },
+    {
+      "protected_read_result_version": 1,
+      "status": "context_changed",
+      "safe_reason": {
+        "reason_code": "example_context_changed",
+        "message": {
+          "kind": "plain_text",
+          "value": "The example context changed.",
+          "locale": "en-US"
+        },
+        "retry_class": "refresh"
+      }
+    },
+    {
+      "protected_read_result_version": 1,
+      "status": "unavailable",
+      "safe_reason": {
+        "reason_code": "example_unavailable",
+        "message": {
+          "kind": "plain_text",
+          "value": "The example detail is unavailable.",
+          "locale": "en-US"
+        },
+        "retry_class": "retry_later"
+      }
+    }
+  ]
+}
