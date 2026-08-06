@@ -1,12 +1,23 @@
 import { execFileSync } from "node:child_process";
-import { cpSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import {
+  cpSync,
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  readdirSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "../..");
-const temporaryRoot = mkdtempSync(join(tmpdir(), "workflow-contract-source-hash-"));
+const temporaryRoot = realpathSync(
+  mkdtempSync(join(tmpdir(), "workflow-contract-source-hash-")),
+);
 
 function computeManifest(contractsRoot, validatorRoot, schemasRoot) {
   const output = execFileSync(
@@ -20,7 +31,11 @@ function computeManifest(contractsRoot, validatorRoot, schemasRoot) {
       "--schemas-root",
       schemasRoot,
     ],
-    { cwd: repositoryRoot, encoding: "utf8" },
+    {
+      cwd: repositoryRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    },
   );
   return JSON.parse(output);
 }
@@ -40,6 +55,20 @@ function portableSourceFiles(directory) {
 function rewriteWithBomAndCrlf(file) {
   const source = readFileSync(file, "utf8").replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
   writeFileSync(file, `\uFEFF${source.replace(/\n/g, "\r\n")}`, "utf8");
+}
+
+function assertSymlinkRootRejected(contractsRoot, validatorRoot, schemasRoot) {
+  try {
+    computeManifest(contractsRoot, validatorRoot, schemasRoot);
+  } catch (error) {
+    const stderr = error && typeof error === "object" && "stderr" in error
+      ? String(error.stderr)
+      : "";
+    const detail = `${error instanceof Error ? error.message : String(error)}\n${stderr}`;
+    if (!detail.includes("contract source hash does not accept symbolic links")) throw error;
+    return;
+  }
+  throw new Error("workflow contract source hash accepted a symbolic-link root");
 }
 
 try {
@@ -93,6 +122,10 @@ try {
   ) {
     throw new Error("workflow contract source hash is not portable across host paths/import aliases");
   }
+
+  const symlinkedContractsRoot = join(temporaryRoot, "symlinked-contracts");
+  symlinkSync(contractsRoot, symlinkedContractsRoot, process.platform === "win32" ? "junction" : "dir");
+  assertSymlinkRootRejected(symlinkedContractsRoot, validatorRoot, schemasRoot);
 
   const unexpectedAliasSource = myChatSource.replace(
     '"@my-chat/workflow-contracts"',

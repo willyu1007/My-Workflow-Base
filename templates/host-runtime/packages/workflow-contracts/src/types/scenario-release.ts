@@ -129,6 +129,9 @@ const sourceHashPattern = /^[a-f0-9]{64}$/u;
 const scenarioDeclarationKeyPattern = /^[a-z][a-z0-9._-]{0,127}$/u;
 const scenarioReasonCodePattern = /^[a-z][a-z0-9_]{0,63}$/u;
 const scenarioPresentationViewModes = ["current", "recent", "history"] as const;
+const maximumScenarioSafeReasonCodes = 64;
+const maximumScenarioRouteClasses = 64;
+const maximumScenarioSurfaceActionKeys = 128;
 const scenarioPresentationViewModeSet = new Set<string>(scenarioPresentationViewModes);
 const scenarioIngressCategorySet = new Set([
   "product_surface", "host_transition", "workflow_runtime",
@@ -495,8 +498,8 @@ const validateScenarioContractDependencies = (
   const operationTuples = new Set<string>();
   const operationKeys = new Set<string>();
   const operationDeclarations = new Map<string, {
-    handlerKey: string;
     ingressKeys: Set<string>;
+    productIngressKeys: Set<string>;
   }>();
   const declarationHandlerKeys = new Set<string>();
   const productIngressKeys = new Set<string>();
@@ -555,6 +558,7 @@ const validateScenarioContractDependencies = (
     assertMaximumItems(ingressEntries, 16, `${operationPath}.ingress`);
     const ingressTuples = new Set<string>();
     const operationIngressKeys = new Set<string>();
+    const operationProductIngressKeys = new Set<string>();
     for (const [ingressIndex, rawIngress] of ingressEntries.entries()) {
       const ingressPath = `${operationPath}.ingress.${ingressIndex}`;
       const ingress = requireRecord(rawIngress, ingressPath);
@@ -600,11 +604,14 @@ const validateScenarioContractDependencies = (
       }
       ingressTuples.add(ingressTuple);
       operationIngressKeys.add(ingressKey);
-      if (ingressCategory === "product_surface") productIngressKeys.add(ingressKey);
+      if (ingressCategory === "product_surface") {
+        productIngressKeys.add(ingressKey);
+        operationProductIngressKeys.add(ingressKey);
+      }
     }
     operationDeclarations.set(operationKey, {
-      handlerKey,
       ingressKeys: operationIngressKeys,
+      productIngressKeys: operationProductIngressKeys,
     });
   }
 
@@ -680,6 +687,7 @@ const validateScenarioContractDependencies = (
   }
 
   const presentationKeys = new Set<string>();
+  const presentationOperationKeys = new Map<string, string>();
   for (const [index, rawPresentation] of presentationValues.entries()) {
     const presentationPath = `${path}.semantic_presentations.${index}`;
     const presentation = requireRecord(rawPresentation, presentationPath);
@@ -713,6 +721,11 @@ const validateScenarioContractDependencies = (
       `${presentationPath}.safe_reason_codes`,
       { nonEmpty: true, unique: true },
     );
+    assertMaximumItems(
+      reasonCodes,
+      maximumScenarioSafeReasonCodes,
+      `${presentationPath}.safe_reason_codes`,
+    );
     for (const [reasonIndex, reasonCode] of reasonCodes.entries()) {
       if (!scenarioReasonCodePattern.test(reasonCode)) {
         fail(
@@ -739,6 +752,7 @@ const validateScenarioContractDependencies = (
       fail("duplicate_scenario_handler", `${presentationPath}.handler_key`, "scenario handler keys must be unique");
     }
     presentationKeys.add(presentationKey);
+    presentationOperationKeys.set(presentationKey, presentation.operation_key as string);
     declarationHandlerKeys.add(handlerKey);
   }
 
@@ -770,12 +784,22 @@ const validateScenarioContractDependencies = (
       nonEmpty: true,
       unique: true,
     });
+    assertMaximumItems(
+      routeClasses,
+      maximumScenarioRouteClasses,
+      `${surfacePath}.route_classes`,
+    );
     for (const [routeIndex, routeClass] of routeClasses.entries()) {
       requireScenarioDeclarationKey(routeClass, `${surfacePath}.route_classes.${routeIndex}`);
     }
     const actionKeys = assertStringArray(surface.action_keys, `${surfacePath}.action_keys`, {
       unique: true,
     });
+    assertMaximumItems(
+      actionKeys,
+      maximumScenarioSurfaceActionKeys,
+      `${surfacePath}.action_keys`,
+    );
     if (surface.action_offer_policy === "none") {
       if (actionKeys.length !== 0) {
         fail("invalid_action_offer_policy", surfacePath, "none requires an empty action_keys array");
@@ -805,6 +829,17 @@ const validateScenarioContractDependencies = (
         "missing_product_surface_ingress",
         `${surfacePath}.product_surface_key`,
         "product_surface_key must equal a declared product_surface ingress_key",
+      );
+    }
+    const presentationOperationKey = presentationOperationKeys.get(presentationKey);
+    const presentationOperation = presentationOperationKey === undefined
+      ? undefined
+      : operationDeclarations.get(presentationOperationKey);
+    if (!presentationOperation?.productIngressKeys.has(productSurfaceKey)) {
+      fail(
+        "missing_surface_presentation_ingress",
+        `${surfacePath}.product_surface_key`,
+        "product surface must be a product_surface ingress of its presentation operation",
       );
     }
     productSurfaceKeys.add(productSurfaceKey);
@@ -843,7 +878,6 @@ const validateScenarioContractDependencies = (
 
   const prepareOperation = operationDeclarations.get("prepare_domain_action");
   const actionKeys = new Set<string>();
-  const actionHandlerKeys = new Set<string>();
   for (const [index, rawAction] of actionValues.entries()) {
     const actionPath = `${path}.domain_action_contracts.${index}`;
     try {
@@ -863,19 +897,16 @@ const validateScenarioContractDependencies = (
     if (actionKeys.has(action.action_key)) {
       fail("duplicate_domain_action", `${actionPath}.action_key`, "domain action keys must be unique");
     }
-    if (actionHandlerKeys.has(action.handler_key)) {
-      fail("duplicate_scenario_handler", `${actionPath}.handler_key`, "domain action handlers must be unique");
-    }
     const checkedPrepareOperation = prepareOperation ?? fail(
       "missing_domain_action_handler",
       `${actionPath}.handler_key`,
       "domain action requires a trusted prepare_domain_action operation",
     );
-    if (checkedPrepareOperation.handlerKey !== action.handler_key) {
+    if (declarationHandlerKeys.has(action.handler_key)) {
       fail(
-        "missing_domain_action_handler",
+        "duplicate_scenario_handler",
         `${actionPath}.handler_key`,
-        "domain action handler must resolve the trusted prepare_domain_action operation",
+        "domain action handlers must be unique across Scenario declarations",
       );
     }
     for (const [ingressIndex, ingressKey] of action.entitled_ingress_keys.entries()) {
@@ -904,7 +935,7 @@ const validateScenarioContractDependencies = (
       );
     }
     actionKeys.add(action.action_key);
-    actionHandlerKeys.add(action.handler_key);
+    declarationHandlerKeys.add(action.handler_key);
   }
   for (const offeredActionKey of offeredActionKeys) {
     if (!actionKeys.has(offeredActionKey)) {

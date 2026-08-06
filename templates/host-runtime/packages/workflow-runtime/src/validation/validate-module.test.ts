@@ -547,7 +547,7 @@ function createCompleteScenarioContractModule(): WorkflowScenarioModule {
       operation_key: "prepare_domain_action",
       input_schema_key: "scenario.prepare_domain_action.input",
       input_schema_version: 1,
-      handler_key: "scenario.record.handler",
+      handler_key: "scenario.prepare_domain_action.handler",
       ingress: [{
         ingress_category: "product_surface",
         ingress_key: "scenario.dashboard",
@@ -787,6 +787,26 @@ describe("workflow module validation and loading", () => {
       rule_id: "WF-MAN-123",
       severity: "fatal",
       path: "scenario_contracts.domain_action_contracts.0.action_key",
+    }));
+  });
+
+  it("rejects vNext action handlers that alias legacy implementations", () => {
+    const module = createCompleteScenarioContractModule();
+    const manifest = module.manifest as ScenarioManifestV2;
+    if (!manifest.scenario_contracts) throw new Error("scenario contract fixture is missing");
+    manifest.scenario_contracts.domain_action_contracts[0].handler_key =
+      "example.collect_context";
+    const report = validateWorkflowModule({
+      module,
+      host_snapshot: createCompleteScenarioContractHostSnapshot(),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toContainEqual(expect.objectContaining({
+      rule_id: "WF-MAN-120",
+      severity: "fatal",
+      path: "scenario_contracts.domain_action_contracts.0.handler_key",
     }));
   });
 

@@ -162,6 +162,12 @@ function validateScenarioContractModule(input: {
       path: `scenario_contracts.semantic_presentations.${index}.handler_key`,
     });
   }
+  for (const [index, action] of scenarioContracts.domain_action_contracts.entries()) {
+    declarationHandlers.push({
+      key: action.handler_key,
+      path: `scenario_contracts.domain_action_contracts.${index}.handler_key`,
+    });
+  }
 
   for (const declaration of declarationHandlers) {
     if (

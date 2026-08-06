@@ -49,6 +49,16 @@ const actionOnly = () => {
     );
   return manifest;
 };
+const addSecondAction = (manifest, handlerKey = "example.record_two.handler") => {
+  const action = clone(manifest.scenario_contracts.domain_action_contracts[0]);
+  action.action_key = "example.record_two";
+  action.input_schema_key = "example.record_two.input";
+  action.target_ref_class = "example.record_two.target";
+  action.handler_key = handlerKey;
+  action.command_contract.command_key = "example.record_two.command";
+  manifest.scenario_contracts.domain_action_contracts.push(action);
+  manifest.scenario_contracts.product_surfaces[0].action_keys.push(action.action_key);
+};
 
 const assertBothAccept = (value) => {
   assert.equal(validateManifest(value), true, JSON.stringify(validateManifest.errors));
@@ -74,6 +84,9 @@ const assertRuntimeOnlyRejects = (value, code) => {
 test("F3 accepts action-complete and protected-complete declaration graphs", () => {
   assertBothAccept(actionOnly());
   assertBothAccept(complete());
+  const twoActions = actionOnly();
+  addSecondAction(twoActions);
+  assertBothAccept(twoActions);
 });
 
 test("F3 reuses exact I1-D and I1-E static declaration shapes", async (context) => {
@@ -83,6 +96,10 @@ test("F3 reuses exact I1-D and I1-E static declaration shapes", async (context) 
     }],
     ["action authority field", "invalid_domain_action_contract", (value) => {
       value.scenario_contracts.domain_action_contracts[0].role = "operator";
+    }],
+    ["too many surface action keys", "too_many_items", (value) => {
+      value.scenario_contracts.product_surfaces[0].action_keys =
+        Array.from({ length: 129 }, (_, index) => `example.action_${index}`);
     }],
     ["protected body", "invalid_protected_interaction_contract", (value) => {
       value.scenario_contracts.protected_interaction_contracts[0].body = "not-allowed";
@@ -144,8 +161,21 @@ test("F3 runtime closes action capability and bidirectional references", async (
         "example.workflow",
       ];
     }],
-    ["unbound action handler", "missing_domain_action_handler", (value) => {
-      value.scenario_contracts.domain_action_contracts[0].handler_key = "example.other.handler";
+    ["missing prepare operation", "missing_domain_action_handler", (value) => {
+      value.scenario_contracts.trusted_invocation.operations =
+        value.scenario_contracts.trusted_invocation.operations.filter(
+          (operation) => operation.operation_key !== "prepare_domain_action",
+        );
+    }],
+    ["action handler collides with transport handler", "duplicate_scenario_handler", (value) => {
+      value.scenario_contracts.domain_action_contracts[0].handler_key =
+        "example.prepare_domain_action.handler";
+    }],
+    ["two actions share one handler", "duplicate_scenario_handler", (value) => {
+      addSecondAction(
+        value,
+        value.scenario_contracts.domain_action_contracts[0].handler_key,
+      );
     }],
   ];
   for (const [name, code, mutate] of cases) {

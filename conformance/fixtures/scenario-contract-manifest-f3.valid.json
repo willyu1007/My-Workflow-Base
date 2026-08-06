@@ -1,10 +1,10 @@
 {
   "scenario_contracts_version": 1,
   "source_dependencies": [
-    { "source_identity": "platform_child_family_identity_source_v1", "source_hash": "3a438edca6a4e6f8d1c116a386756b6f8ece4ac8e91127cf436ba5b7c8e9ec1a" },
-    { "source_identity": "scenario_interface_source_v1", "source_hash": "52aeaa1a1677a0076c57d92464681813c00192c2998413cca87e9b9b1db40a17" },
-    { "source_identity": "scenario_domain_action_source_v1", "source_hash": "0e4b185c0cb1f63583ca16f1efa935ca90ed540d73f678462aeceee0da6634e6" },
-    { "source_identity": "scenario_protected_interaction_source_v1", "source_hash": "7f00570e5736757698b476e4b3103ecfca55956c347caa1f7678298dfc6f9800" }
+    { "source_identity": "platform_child_family_identity_source_v1", "source_hash": "81d9fb9db244b8e56bc85e8770eb13915ca87b6053bb3411420b569d59d8fed4" },
+    { "source_identity": "scenario_interface_source_v1", "source_hash": "37f0cdae3ad8807073dd250a51f4de990dcccf40952c127b2340161db2e28eaf" },
+    { "source_identity": "scenario_domain_action_source_v1", "source_hash": "b7c35259d03a84778cc909075a08d6b147a43a38a12cddeb875c94f01591e48d" },
+    { "source_identity": "scenario_protected_interaction_source_v1", "source_hash": "78eadaf4448b61ab3629026fefe4befbb2522eccbc7e459366d1032885d90efb" }
   ],
   "capability_dependencies": [
     { "capability_key": "trusted_scenario_invocation_v1", "requires_capabilities": [], "requires_sources": ["scenario_interface_source_v1"] },
@@ -19,7 +19,7 @@
       { "endpoint_key": "example.list_subject_contexts", "method": "POST", "operation_key": "list_subject_contexts", "input_schema_key": "example.list_subject_contexts.input", "input_schema_version": 1, "handler_key": "example.list_subject_contexts.handler", "ingress": [{ "ingress_category": "product_surface", "ingress_key": "example.dashboard", "principal_origins": ["interactive_session"] }] },
       { "endpoint_key": "example.resolve_subject_context", "method": "POST", "operation_key": "resolve_subject_context", "input_schema_key": "example.resolve_subject_context.input", "input_schema_version": 1, "handler_key": "example.resolve_subject_context.handler", "ingress": [{ "ingress_category": "product_surface", "ingress_key": "example.dashboard", "principal_origins": ["interactive_session"] }] },
       { "endpoint_key": "example.present_subject_context", "method": "POST", "operation_key": "present_subject_context", "input_schema_key": "example.present_subject_context.input", "input_schema_version": 1, "handler_key": "example.present_subject_context.handler", "ingress": [{ "ingress_category": "product_surface", "ingress_key": "example.dashboard", "principal_origins": ["interactive_session"] }] },
-      { "endpoint_key": "example.prepare_domain_action", "method": "POST", "operation_key": "prepare_domain_action", "input_schema_key": "example.prepare_domain_action.input", "input_schema_version": 1, "handler_key": "example.record.handler", "ingress": [{ "ingress_category": "product_surface", "ingress_key": "example.dashboard", "principal_origins": ["interactive_session"] }] },
+      { "endpoint_key": "example.prepare_domain_action", "method": "POST", "operation_key": "prepare_domain_action", "input_schema_key": "example.prepare_domain_action.input", "input_schema_version": 1, "handler_key": "example.prepare_domain_action.handler", "ingress": [{ "ingress_category": "product_surface", "ingress_key": "example.dashboard", "principal_origins": ["interactive_session"] }] },
       { "endpoint_key": "example.read_protected_detail", "method": "POST", "operation_key": "read_protected_detail", "input_schema_key": "example.read_protected_detail.input", "input_schema_version": 1, "handler_key": "example.read_protected_detail.handler", "ingress": [{ "ingress_category": "product_surface", "ingress_key": "example.dashboard", "principal_origins": ["interactive_session"] }] }
     ]
   },

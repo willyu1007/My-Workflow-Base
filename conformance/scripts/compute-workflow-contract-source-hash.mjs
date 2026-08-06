@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { lstatSync, readFileSync, readdirSync } from "node:fs";
-import { dirname, join, relative, resolve, sep } from "node:path";
+import { dirname, join, parse, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
@@ -196,6 +196,22 @@ function aggregateSourceFiles(directory) {
     });
 }
 
+function assertNoSymbolicLinkSegments(path) {
+  const absolutePath = resolve(path);
+  const pathRoot = parse(absolutePath).root;
+  const segments = relative(pathRoot, absolutePath).split(sep).filter(Boolean);
+  let currentPath = pathRoot;
+  let currentStat = lstatSync(currentPath);
+  for (const segment of segments) {
+    currentPath = join(currentPath, segment);
+    currentStat = lstatSync(currentPath);
+    if (currentStat.isSymbolicLink()) {
+      throw new Error(`contract source hash does not accept symbolic links: ${currentPath}`);
+    }
+  }
+  return currentStat;
+}
+
 function normalizedSource(file, logicalRoot) {
   let source = readFileSync(file, "utf8").replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
   if (logicalRoot === "workflow-validator") {
@@ -227,7 +243,7 @@ function resolveLogicalPath(path) {
   if (relativeFile.startsWith("..") || relativeFile.split(sep).includes("..")) {
     throw new Error(`contract source path escapes its logical root: ${path}`);
   }
-  const stat = lstatSync(file);
+  const stat = assertNoSymbolicLinkSegments(file);
   if (stat.isSymbolicLink() || !stat.isFile()) {
     throw new Error(`contract source profile requires a regular file: ${path}`);
   }
@@ -262,6 +278,12 @@ function publicFileRecords(files) {
 }
 
 function computeManifest() {
+  for (const root of allRoots) {
+    const stat = assertNoSymbolicLinkSegments(root.physicalRoot);
+    if (!stat.isDirectory()) {
+      throw new Error(`contract source physical root must be a directory: ${root.physicalRoot}`);
+    }
+  }
   const files = aggregateRoots
     .flatMap((root) => aggregateSourceFiles(root.physicalRoot).map((file) =>
       fileRecord(logicalPath(root, file), root, file)))

@@ -122,6 +122,14 @@ test("F2 accepts trusted-only and presentation-complete declarations", () => {
   const presentationComplete = clone();
   setPresentationComplete(presentationComplete);
   assertBothAccept(presentationComplete);
+
+  const boundedDeclarations = clone();
+  setPresentationComplete(boundedDeclarations);
+  boundedDeclarations.scenario_contracts.semantic_presentations[0].safe_reason_codes =
+    Array.from({ length: 64 }, (_, index) => `reason_${index}`);
+  boundedDeclarations.scenario_contracts.product_surfaces[0].route_classes =
+    Array.from({ length: 64 }, (_, index) => `route_${index}`);
+  assertBothAccept(boundedDeclarations);
 });
 
 test("F2 schema and runtime close declaration shapes", async (context) => {
@@ -143,6 +151,16 @@ test("F2 schema and runtime close declaration shapes", async (context) => {
     ["invalid safe reason", "invalid_safe_reason_code", (value) => {
       setPresentationComplete(value);
       value.scenario_contracts.semantic_presentations[0].safe_reason_codes = ["Context Changed"];
+    }],
+    ["too many safe reasons", "too_many_items", (value) => {
+      setPresentationComplete(value);
+      value.scenario_contracts.semantic_presentations[0].safe_reason_codes =
+        Array.from({ length: 65 }, (_, index) => `reason_${index}`);
+    }],
+    ["too many route classes", "too_many_items", (value) => {
+      setPresentationComplete(value);
+      value.scenario_contracts.product_surfaces[0].route_classes =
+        Array.from({ length: 65 }, (_, index) => `route_${index}`);
     }],
     ["none with action keys", "invalid_action_offer_policy", (value) => {
       setPresentationComplete(value);
@@ -186,6 +204,17 @@ test("F2 runtime closes cross-declaration and capability drift", async (context)
       setPresentationComplete(value);
       value.scenario_contracts.trusted_invocation.operations[0].ingress[0].ingress_key =
         "example.other_surface";
+    }],
+    ["surface outside its presentation operation", "missing_surface_presentation_ingress", (value) => {
+      setPresentationComplete(value);
+      const presentationOperation = value.scenario_contracts.trusted_invocation.operations.find(
+        (operation) => operation.operation_key === "present_subject_context",
+      );
+      presentationOperation.ingress[0].ingress_key = "example.presentation_only";
+      value.scenario_contracts.product_surfaces.push({
+        ...structuredClone(value.scenario_contracts.product_surfaces[0]),
+        product_surface_key: "example.presentation_only",
+      });
     }],
     ["duplicate declaration handler", "duplicate_scenario_handler", (value) => {
       setPresentationComplete(value);

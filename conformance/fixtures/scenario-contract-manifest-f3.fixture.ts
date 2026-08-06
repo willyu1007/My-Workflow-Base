@@ -5,19 +5,19 @@ export const scenarioContractManifestF3Fixture = {
   source_dependencies: [
     {
       source_identity: "platform_child_family_identity_source_v1",
-      source_hash: "3a438edca6a4e6f8d1c116a386756b6f8ece4ac8e91127cf436ba5b7c8e9ec1a",
+      source_hash: "81d9fb9db244b8e56bc85e8770eb13915ca87b6053bb3411420b569d59d8fed4",
     },
     {
       source_identity: "scenario_interface_source_v1",
-      source_hash: "52aeaa1a1677a0076c57d92464681813c00192c2998413cca87e9b9b1db40a17",
+      source_hash: "37f0cdae3ad8807073dd250a51f4de990dcccf40952c127b2340161db2e28eaf",
     },
     {
       source_identity: "scenario_domain_action_source_v1",
-      source_hash: "0e4b185c0cb1f63583ca16f1efa935ca90ed540d73f678462aeceee0da6634e6",
+      source_hash: "b7c35259d03a84778cc909075a08d6b147a43a38a12cddeb875c94f01591e48d",
     },
     {
       source_identity: "scenario_protected_interaction_source_v1",
-      source_hash: "7f00570e5736757698b476e4b3103ecfca55956c347caa1f7678298dfc6f9800",
+      source_hash: "78eadaf4448b61ab3629026fefe4befbb2522eccbc7e459366d1032885d90efb",
     },
   ],
   capability_dependencies: [
@@ -59,7 +59,7 @@ export const scenarioContractManifestF3Fixture = {
       ["list_subject_contexts", "example.list_subject_contexts.input", "example.list_subject_contexts.handler"],
       ["resolve_subject_context", "example.resolve_subject_context.input", "example.resolve_subject_context.handler"],
       ["present_subject_context", "example.present_subject_context.input", "example.present_subject_context.handler"],
-      ["prepare_domain_action", "example.prepare_domain_action.input", "example.record.handler"],
+      ["prepare_domain_action", "example.prepare_domain_action.input", "example.prepare_domain_action.handler"],
       ["read_protected_detail", "example.read_protected_detail.input", "example.read_protected_detail.handler"],
     ].map(([operationKey, inputSchemaKey, handlerKey]) => ({
       endpoint_key: `example.${operationKey}`,
