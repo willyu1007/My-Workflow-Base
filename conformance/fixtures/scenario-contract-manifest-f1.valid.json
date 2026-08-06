@@ -1,0 +1,101 @@
+{
+  "manifest_version": 2,
+  "scenario_key": "example",
+  "scenario_record": {
+    "display_name": "Example",
+    "required_status": "draft",
+    "owner_team": "example-owner",
+    "policy_version": 1
+  },
+  "owner": "example-owner",
+  "contract": {
+    "base_contract_version": "1.0.0",
+    "host_sdk_version": "1.0.0",
+    "host_abi_range": "^1.0.0",
+    "source_hash": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+  },
+  "step_type_registry": [
+    {
+      "step_type": "example.action",
+      "runtime_kind": "scenario_action",
+      "owner": "scenario"
+    }
+  ],
+  "owner_integration": {
+    "command_contract": "scenario-command-envelope-v1",
+    "event_contract": "scenario-event-envelope-v1",
+    "receipt_contract": "scenario-command-receipt-v1",
+    "status_lookup_required": true,
+    "auth_mode": "service_authenticated"
+  },
+  "launch_phase": "dev",
+  "allowed_user_classes": ["teacher", "admin"],
+  "capabilities": [
+    {
+      "capability_key": "example",
+      "label": "Example",
+      "description": "Example capability.",
+      "enablement_policy": "requires_workspace_activation",
+      "entrypoints": []
+    }
+  ],
+  "scenario_data": {
+    "context_ref_types": [],
+    "run_start_requirements": [],
+    "step_interventions": []
+  },
+  "artifact_policy": {
+    "artifact_types": [],
+    "exposure_levels": { "L0": [], "L1": [], "L2": [], "L3": [], "L4": [] },
+    "handoff_eligible": {}
+  },
+  "action_availability": {
+    "shared_actions": [],
+    "scenario_actions": [],
+    "expected_version_required": true
+  },
+  "handoffs": [],
+  "surface_mapping": {},
+  "internal_api": { "routes": [] },
+  "event_registry": {
+    "standard_workflow_events": [],
+    "scenario_internal_events": [],
+    "event_payload_policy": {
+      "signal_version": 1,
+      "body": "no_body",
+      "pii": "no_pii",
+      "status_in_payload": false,
+      "presenter_output_in_payload": false,
+      "idempotency_key": "{event_type}:{aggregate_id}:{aggregate_version}"
+    },
+    "producers": {},
+    "consumers": {}
+  },
+  "governance": {
+    "admin_actions": [],
+    "rollback": "Disable activation and preserve owner facts.",
+    "projection_review_required": false,
+    "evidence_records": [],
+    "outbox_events": []
+  },
+  "verification": {
+    "deterministic_tests": [],
+    "journey_harness": "example-release-contract-v1"
+  },
+  "scenario_contracts": {
+    "scenario_contracts_version": 1,
+    "source_dependencies": [
+      {
+        "source_identity": "scenario_interface_source_v1",
+        "source_hash": "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210"
+      }
+    ],
+    "capability_dependencies": [
+      {
+        "capability_key": "trusted_scenario_invocation_v1",
+        "requires_capabilities": [],
+        "requires_sources": ["scenario_interface_source_v1"]
+      }
+    ]
+  }
+}

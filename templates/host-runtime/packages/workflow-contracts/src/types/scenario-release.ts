@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 import {
   scenarioAdmittedUserClasses,
   scenarioCapabilityEnablementPolicies,
+  scenarioContractCapabilityKeysV1,
+  scenarioContractSourceIdentitiesV1,
   type ScenarioManifestV2,
 } from "./manifest.js";
 import {
@@ -18,12 +20,13 @@ export class ScenarioManifestValidationError extends Error {
   }
 }
 
-const manifestKeys = new Set([
+const requiredManifestKeys = new Set([
   "manifest_version", "scenario_key", "scenario_record", "owner", "contract",
   "step_type_registry", "owner_integration", "launch_phase", "allowed_user_classes",
   "capabilities", "scenario_data", "artifact_policy", "action_availability", "handoffs",
   "surface_mapping", "internal_api", "event_registry", "governance", "verification",
 ]);
+const manifestKeys = new Set([...requiredManifestKeys, "scenario_contracts"]);
 const contractKeys = new Set([
   "base_contract_version", "host_sdk_version", "host_abi_range", "source_hash",
 ]);
@@ -81,6 +84,13 @@ const governanceKeys = new Set([
   "admin_actions", "rollback", "projection_review_required", "evidence_records", "outbox_events",
 ]);
 const verificationKeys = new Set(["deterministic_tests", "journey_harness"]);
+const scenarioContractKeys = new Set([
+  "scenario_contracts_version", "source_dependencies", "capability_dependencies",
+]);
+const scenarioContractSourceDependencyKeys = new Set(["source_identity", "source_hash"]);
+const scenarioCapabilityDependencyKeys = new Set([
+  "capability_key", "requires_capabilities", "requires_sources",
+]);
 const workflowSurfaces = new Set([
   "chat_workflow_control", "chat_dashboard_summary", "chat_citation", "web_domain_workbench",
   "web_run_workbench", "mobile_dashboard", "forum_publication", "rag_knowledge",
@@ -88,6 +98,39 @@ const workflowSurfaces = new Set([
 ]);
 const scenarioKeyPattern = /^[a-z][a-z0-9-]*$/u;
 const sourceHashPattern = /^[a-f0-9]{64}$/u;
+const scenarioContractCapabilityKeySet = new Set<string>(scenarioContractCapabilityKeysV1);
+const scenarioContractSourceIdentitySet = new Set<string>(scenarioContractSourceIdentitiesV1);
+const scenarioContractDependencySets = new Map<string, {
+  capabilities: readonly string[];
+  sources: readonly string[];
+}>([
+  ["trusted_scenario_invocation_v1", {
+    capabilities: [],
+    sources: ["scenario_interface_source_v1"],
+  }],
+  ["scenario_subject_presentation_v1", {
+    capabilities: ["trusted_scenario_invocation_v1"],
+    sources: [
+      "platform_child_family_identity_source_v1",
+      "scenario_interface_source_v1",
+    ],
+  }],
+  ["scenario_domain_action_execution_v1", {
+    capabilities: [
+      "trusted_scenario_invocation_v1",
+      "scenario_subject_presentation_v1",
+    ],
+    sources: ["scenario_domain_action_source_v1"],
+  }],
+  ["scenario_protected_interaction_v1", {
+    capabilities: [
+      "trusted_scenario_invocation_v1",
+      "scenario_subject_presentation_v1",
+      "scenario_domain_action_execution_v1",
+    ],
+    sources: ["scenario_protected_interaction_source_v1"],
+  }],
+]);
 
 const isRecord = (value: unknown): value is Record<string, unknown> => {
   if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
@@ -154,6 +197,209 @@ const assertStringArray = (
     fail("duplicate_value", path, `${path} must not contain duplicates`);
   }
   return values as string[];
+};
+
+const arraysEqual = (left: readonly string[], right: readonly string[]): boolean =>
+  left.length === right.length && left.every((value, index) => value === right[index]);
+
+const validateScenarioContractDependencies = (value: unknown, path: string): void => {
+  const contract = requireRecord(value, path);
+  assertExactKeys(contract, scenarioContractKeys, scenarioContractKeys, path);
+  if (contract.scenario_contracts_version !== 1) {
+    fail(
+      "unsupported_scenario_contracts_version",
+      `${path}.scenario_contracts_version`,
+      "scenario_contracts_version must be 1",
+    );
+  }
+
+  const sourceDependencies = requireArray(
+    contract.source_dependencies,
+    `${path}.source_dependencies`,
+  );
+  if (sourceDependencies.length === 0) {
+    fail("empty_source_dependencies", `${path}.source_dependencies`, "source_dependencies must be non-empty");
+  }
+  const sourceIdentities: string[] = [];
+  for (const [index, rawDependency] of sourceDependencies.entries()) {
+    const dependencyPath = `${path}.source_dependencies.${index}`;
+    const dependency = requireRecord(rawDependency, dependencyPath);
+    assertExactKeys(
+      dependency,
+      scenarioContractSourceDependencyKeys,
+      scenarioContractSourceDependencyKeys,
+      dependencyPath,
+    );
+    const sourceIdentity = dependency.source_identity;
+    if (
+      typeof sourceIdentity !== "string" ||
+      !scenarioContractSourceIdentitySet.has(sourceIdentity)
+    ) {
+      fail(
+        "invalid_source_identity",
+        `${dependencyPath}.source_identity`,
+        "source_identity must use the closed scenario-contract source vocabulary",
+      );
+    }
+    const checkedSourceIdentity = sourceIdentity as string;
+    const sourceHash = dependency.source_hash;
+    if (typeof sourceHash !== "string" || !sourceHashPattern.test(sourceHash)) {
+      fail(
+        "invalid_source_hash",
+        `${dependencyPath}.source_hash`,
+        "source_hash must be lowercase SHA-256",
+      );
+    }
+    if (sourceIdentities.includes(checkedSourceIdentity)) {
+      fail(
+        "duplicate_source_dependency",
+        `${dependencyPath}.source_identity`,
+        "source_dependencies must not contain duplicate identities",
+      );
+    }
+    sourceIdentities.push(checkedSourceIdentity);
+  }
+
+  const capabilityDependencies = requireArray(
+    contract.capability_dependencies,
+    `${path}.capability_dependencies`,
+  );
+  if (capabilityDependencies.length === 0) {
+    fail(
+      "empty_capability_dependencies",
+      `${path}.capability_dependencies`,
+      "capability_dependencies must be non-empty",
+    );
+  }
+
+  const dependencies = new Map<string, string[]>();
+  const requiredSourcesByCapability = new Map<string, string[]>();
+  for (const [index, rawDependency] of capabilityDependencies.entries()) {
+    const dependencyPath = `${path}.capability_dependencies.${index}`;
+    const dependency = requireRecord(rawDependency, dependencyPath);
+    assertExactKeys(
+      dependency,
+      scenarioCapabilityDependencyKeys,
+      scenarioCapabilityDependencyKeys,
+      dependencyPath,
+    );
+    const capabilityKey = dependency.capability_key;
+    if (
+      typeof capabilityKey !== "string" ||
+      !scenarioContractCapabilityKeySet.has(capabilityKey)
+    ) {
+      fail(
+        "invalid_scenario_capability",
+        `${dependencyPath}.capability_key`,
+        "capability_key must use the closed scenario-contract capability vocabulary",
+      );
+    }
+    const checkedCapabilityKey = capabilityKey as string;
+    const expectedCapability = scenarioContractCapabilityKeysV1[index];
+    if (checkedCapabilityKey !== expectedCapability) {
+      fail(
+        "invalid_capability_prefix",
+        `${dependencyPath}.capability_key`,
+        "capability_dependencies must be one canonical dependency-complete prefix",
+      );
+    }
+    const requiredCapabilities = assertStringArray(
+      dependency.requires_capabilities,
+      `${dependencyPath}.requires_capabilities`,
+      { unique: true, allowed: scenarioContractCapabilityKeySet },
+    );
+    const requiredSources = assertStringArray(
+      dependency.requires_sources,
+      `${dependencyPath}.requires_sources`,
+      { nonEmpty: true, unique: true, allowed: scenarioContractSourceIdentitySet },
+    );
+    dependencies.set(checkedCapabilityKey, requiredCapabilities);
+    requiredSourcesByCapability.set(checkedCapabilityKey, requiredSources);
+  }
+
+  const declaredCapabilities = new Set(dependencies.keys());
+  for (const [capability, requiredCapabilities] of dependencies) {
+    for (const requiredCapability of requiredCapabilities) {
+      if (!declaredCapabilities.has(requiredCapability)) {
+        fail(
+          "missing_capability_dependency",
+          `${path}.capability_dependencies`,
+          `${capability} requires undeclared capability ${requiredCapability}`,
+        );
+      }
+    }
+  }
+
+  const visiting = new Set<string>();
+  const visited = new Set<string>();
+  const visit = (capability: string): void => {
+    if (visiting.has(capability)) {
+      fail(
+        "cyclic_capability_dependency",
+        `${path}.capability_dependencies`,
+        "scenario-contract capability dependencies must be acyclic",
+      );
+    }
+    if (visited.has(capability)) return;
+    visiting.add(capability);
+    for (const requiredCapability of dependencies.get(capability) ?? []) visit(requiredCapability);
+    visiting.delete(capability);
+    visited.add(capability);
+  };
+  for (const capability of dependencies.keys()) visit(capability);
+
+  for (const [capability, requiredCapabilities] of dependencies) {
+    const expected = scenarioContractDependencySets.get(capability) ?? fail(
+      "invalid_scenario_capability",
+      `${path}.capability_dependencies`,
+      "Unknown capability",
+    );
+    if (!arraysEqual(requiredCapabilities, expected.capabilities)) {
+      fail(
+        "invalid_capability_dependency_set",
+        `${path}.capability_dependencies`,
+        `${capability} must use its exact required capability set`,
+      );
+    }
+    const requiredSources = requiredSourcesByCapability.get(capability) ?? [];
+    if (!arraysEqual(requiredSources, expected.sources)) {
+      fail(
+        "invalid_source_dependency_set",
+        `${path}.capability_dependencies`,
+        `${capability} must use its exact required source set`,
+      );
+    }
+  }
+
+  const referencedSources = new Set([...requiredSourcesByCapability.values()].flat());
+  for (const sourceIdentity of referencedSources) {
+    if (!sourceIdentities.includes(sourceIdentity)) {
+      fail(
+        "missing_source_dependency",
+        `${path}.source_dependencies`,
+        `source_dependencies is missing ${sourceIdentity}`,
+      );
+    }
+  }
+  for (const sourceIdentity of sourceIdentities) {
+    if (!referencedSources.has(sourceIdentity)) {
+      fail(
+        "stale_source_dependency",
+        `${path}.source_dependencies`,
+        `source_dependencies contains unreferenced ${sourceIdentity}`,
+      );
+    }
+  }
+  const expectedSourceOrder = scenarioContractSourceIdentitiesV1.filter((sourceIdentity) =>
+    referencedSources.has(sourceIdentity)
+  );
+  if (!arraysEqual(sourceIdentities, expectedSourceOrder)) {
+    fail(
+      "invalid_source_dependency_order",
+      `${path}.source_dependencies`,
+      "source_dependencies must use canonical source-identity order",
+    );
+  }
 };
 
 const assertJsonValue = (value: unknown, path: string): void => {
@@ -439,7 +685,7 @@ export const assertScenarioManifestV2: (
   if (!isRecord(value)) fail("invalid_manifest", path, `${path} must be an object`);
   assertJsonValue(value, path);
   const manifest = value as Record<string, unknown>;
-  assertExactKeys(manifest, manifestKeys, manifestKeys, path);
+  assertExactKeys(manifest, manifestKeys, requiredManifestKeys, path);
   if (manifest.manifest_version !== 2) fail("unsupported_manifest_version", `${path}.manifest_version`, "Only manifest v2 can be registered for new releases");
   if (typeof manifest.scenario_key !== "string" || !scenarioKeyPattern.test(manifest.scenario_key)) {
     fail("invalid_scenario_key", `${path}.scenario_key`, "scenario_key must be stable kebab-case");
@@ -517,6 +763,9 @@ export const assertScenarioManifestV2: (
   validateInternalApi(manifest.internal_api, `${path}.internal_api`);
   validateEventRegistry(manifest.event_registry, `${path}.event_registry`);
   validateGovernanceAndVerification(manifest, path);
+  if (manifest.scenario_contracts !== undefined) {
+    validateScenarioContractDependencies(manifest.scenario_contracts, `${path}.scenario_contracts`);
+  }
 };
 
 export const scenarioManifestHashV2 = (manifest: ScenarioManifestV2): string =>

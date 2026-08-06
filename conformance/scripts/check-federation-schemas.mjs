@@ -268,6 +268,16 @@ const receipt = JSON.parse(await readFile(new URL("scenario-command-receipt-v1.s
 if (!receipt.required.includes("workflow_step_ref")) throw new Error("receipt must bind the exact workflow step identity");
 
 const manifest = JSON.parse(await readFile(new URL("scenario-manifest-v2.schema.json", schemaRoot), "utf8"));
+const scenarioContractManifest = JSON.parse(await readFile(
+  new URL("../fixtures/scenario-contract-manifest-f1.valid.json", import.meta.url),
+  "utf8",
+));
+const validateManifest = ajv.getSchema(
+  "https://morethan.local/contracts/scenario-manifest-v2.schema.json",
+);
+if (!validateManifest || !validateManifest(scenarioContractManifest)) {
+  throw new Error(`scenario-contract manifest fixture failed schema execution: ${JSON.stringify(validateManifest?.errors)}`);
+}
 if (manifest.properties.capabilities.items.properties.enablement_policy.enum.join(",") !== "requires_workspace_activation,disabled") {
   throw new Error("manifest capability policy must be closed and Host-activation restrictive");
 }
@@ -280,6 +290,13 @@ if (
   manifest.$defs.eventRegistry.additionalProperties !== false
 ) {
   throw new Error("manifest nested release structures must reject unknown fields");
+}
+if (
+  manifest.$defs.scenarioContractsV1.additionalProperties !== false ||
+  manifest.$defs.scenarioContractSourceDependencyV1.additionalProperties !== false ||
+  manifest.$defs.scenarioCapabilityDependencyV1.additionalProperties !== false
+) {
+  throw new Error("scenario-contract dependency structures must reject unknown fields");
 }
 
 process.stdout.write(`federation schema package ok: ${expected.length} schemas\n`);

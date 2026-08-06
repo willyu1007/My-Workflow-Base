@@ -197,9 +197,80 @@
         "deterministic_tests": { "$ref": "#/$defs/uniqueStrings" },
         "journey_harness": { "type": "string", "minLength": 1 }
       }
-    }
+    },
+    "scenario_contracts": { "$ref": "#/$defs/scenarioContractsV1" }
   },
   "$defs": {
+    "scenarioContractSourceIdentityV1": {
+      "enum": [
+        "platform_child_family_identity_source_v1",
+        "scenario_interface_source_v1",
+        "scenario_domain_action_source_v1",
+        "scenario_protected_interaction_source_v1"
+      ]
+    },
+    "scenarioContractCapabilityKeyV1": {
+      "enum": [
+        "trusted_scenario_invocation_v1",
+        "scenario_subject_presentation_v1",
+        "scenario_domain_action_execution_v1",
+        "scenario_protected_interaction_v1"
+      ]
+    },
+    "scenarioContractSourceDependencyV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_identity", "source_hash"],
+      "properties": {
+        "source_identity": { "$ref": "#/$defs/scenarioContractSourceIdentityV1" },
+        "source_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "scenarioCapabilityDependencyV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capability_key", "requires_capabilities", "requires_sources"],
+      "properties": {
+        "capability_key": { "$ref": "#/$defs/scenarioContractCapabilityKeyV1" },
+        "requires_capabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/scenarioContractCapabilityKeyV1" }
+        },
+        "requires_sources": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/scenarioContractSourceIdentityV1" }
+        }
+      }
+    },
+    "scenarioContractsV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scenario_contracts_version",
+        "source_dependencies",
+        "capability_dependencies"
+      ],
+      "properties": {
+        "scenario_contracts_version": { "const": 1 },
+        "source_dependencies": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/scenarioContractSourceDependencyV1" }
+        },
+        "capability_dependencies": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/scenarioCapabilityDependencyV1" }
+        }
+      }
+    },
     "uniqueStrings": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
     "runtimeKind": { "enum": ["scenario_action", "model_call", "tool_call", "transform", "human_gate", "wait_for_input", "artifact_write", "event_emit"] },
     "policyFlags": { "type": "array", "uniqueItems": true, "items": { "enum": ["policy_gate", "generation_record_required"] } },

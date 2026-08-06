@@ -61,6 +61,43 @@ export type ManifestCapability = {
   entrypoints: ManifestEntrypoint[];
 };
 
+export const scenarioContractCapabilityKeysV1 = [
+  "trusted_scenario_invocation_v1",
+  "scenario_subject_presentation_v1",
+  "scenario_domain_action_execution_v1",
+  "scenario_protected_interaction_v1",
+] as const;
+
+export type ScenarioContractCapabilityKeyV1 =
+  (typeof scenarioContractCapabilityKeysV1)[number];
+
+export const scenarioContractSourceIdentitiesV1 = [
+  "platform_child_family_identity_source_v1",
+  "scenario_interface_source_v1",
+  "scenario_domain_action_source_v1",
+  "scenario_protected_interaction_source_v1",
+] as const;
+
+export type ScenarioContractSourceIdentityV1 =
+  (typeof scenarioContractSourceIdentitiesV1)[number];
+
+export type ScenarioContractSourceDependencyV1 = {
+  source_identity: ScenarioContractSourceIdentityV1;
+  source_hash: string;
+};
+
+export type ScenarioCapabilityDependencyV1 = {
+  capability_key: ScenarioContractCapabilityKeyV1;
+  requires_capabilities: ScenarioContractCapabilityKeyV1[];
+  requires_sources: ScenarioContractSourceIdentityV1[];
+};
+
+export type ScenarioContractManifestV1 = {
+  scenario_contracts_version: 1;
+  source_dependencies: ScenarioContractSourceDependencyV1[];
+  capability_dependencies: ScenarioCapabilityDependencyV1[];
+};
+
 export type HandoffContextRefTypeManifest = {
   namespace: string;
   object_type: string;
@@ -183,4 +220,5 @@ export type ScenarioManifestV2 = Omit<
   capabilities: Array<Omit<ManifestCapability, "enablement_policy"> & {
     enablement_policy: ScenarioCapabilityEnablementPolicy;
   }>;
+  scenario_contracts?: ScenarioContractManifestV1;
 };
