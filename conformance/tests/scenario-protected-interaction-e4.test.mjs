@@ -326,7 +326,12 @@ test("E4 no-copy sentinels stay absent from generic Base fixtures", async () => 
     JSON.stringify(plainText).slice(1, -1),
     Buffer.from(plainText, "utf8").toString("base64"),
     Array.from(plainText).slice(9, 33).join(""),
+    `prefix-${Array.from(plainText).slice(9, 33).join("")}-suffix`,
     e3Fixture.committed_content.protected_content_ref,
+    Buffer.from(
+      e3Fixture.committed_content.protected_content_ref,
+      "utf8",
+    ).toString("base64url"),
     e3Fixture.committed_content.prepared_content_version,
     e3Fixture.committed_content.committed_content_version,
     e3Fixture.committed_content.keyed_integrity_hash,

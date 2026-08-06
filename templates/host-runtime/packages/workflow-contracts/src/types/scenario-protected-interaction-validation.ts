@@ -698,29 +698,94 @@ const isForbiddenControlKey = (key: string): boolean => {
   );
 };
 
+const minimumProtectedFragmentCharactersV1 = 16;
+
+type ProtectedSearchRepresentationV1 = {
+  value: string;
+  codePointLength: number;
+};
+
+type ProtectedSearchProfileV1 = {
+  representations: ProtectedSearchRepresentationV1[];
+  fragmentWindows: Set<string>;
+};
+
+const protectedSearchRepresentations = (value: string): string[] => [
+  value,
+  JSON.stringify(value).slice(1, -1),
+  Buffer.from(value, "utf8").toString("base64"),
+  Buffer.from(value, "utf8").toString("base64url"),
+];
+
+const createProtectedSearchProfile = (
+  protectedValues: readonly string[],
+): ProtectedSearchProfileV1 => {
+  const representationValues = new Set(
+    protectedValues.flatMap(protectedSearchRepresentations),
+  );
+  const representations = Array.from(representationValues, (value) => ({
+    value,
+    codePointLength: Array.from(value).length,
+  }));
+  const fragmentWindows = new Set<string>();
+  for (const representation of representations) {
+    const codePoints = Array.from(representation.value);
+    if (codePoints.length < minimumProtectedFragmentCharactersV1) continue;
+    for (
+      let index = 0;
+      index <= codePoints.length - minimumProtectedFragmentCharactersV1;
+      index += 1
+    ) {
+      fragmentWindows.add(
+        codePoints
+          .slice(index, index + minimumProtectedFragmentCharactersV1)
+          .join(""),
+      );
+    }
+  }
+  return { representations, fragmentWindows };
+};
+
+const protectedSearchMatch = (
+  value: string,
+  profile: ProtectedSearchProfileV1,
+): "copy" | "fragment" | undefined => {
+  for (const representation of profile.representations) {
+    const matches = representation.codePointLength < minimumProtectedFragmentCharactersV1
+      ? value === representation.value
+      : value.includes(representation.value);
+    if (matches) return "copy";
+  }
+  const candidateCodePoints = Array.from(value);
+  for (
+    let index = 0;
+    index <= candidateCodePoints.length - minimumProtectedFragmentCharactersV1;
+    index += 1
+  ) {
+    const candidateWindow = candidateCodePoints
+      .slice(index, index + minimumProtectedFragmentCharactersV1)
+      .join("");
+    if (profile.fragmentWindows.has(candidateWindow)) return "fragment";
+  }
+  return undefined;
+};
+
 const assertBodyFreeString = (
   value: string,
-  plainText: string,
+  searchProfile: ProtectedSearchProfileV1,
   path: string,
 ): void => {
-  const escapedPlainText = JSON.stringify(plainText).slice(1, -1);
-  const base64PlainText = Buffer.from(plainText, "utf8").toString("base64");
-  const base64UrlPlainText = Buffer.from(plainText, "utf8").toString("base64url");
   const candidateValues = new Set([
     value,
     value.replaceAll("\r\n", "\n").trim(),
     value.replaceAll("\\r\\n", "\\n"),
   ]);
   for (const candidate of candidateValues) {
-    if (
-      candidate.includes(plainText) ||
-      candidate.includes(escapedPlainText) ||
-      candidate.includes(base64PlainText) ||
-      candidate.includes(base64UrlPlainText)
-    ) {
+    const match = protectedSearchMatch(candidate, searchProfile);
+    if (match === "copy") {
       fail("protected_copy", path, `${path} contains protected carrier content`);
     }
-    if (Array.from(candidate).length >= 16 && plainText.includes(candidate)) {
+    if (match === "fragment") {
       fail("protected_fragment", path, `${path} contains a protected carrier fragment`);
     }
   }
@@ -728,7 +793,7 @@ const assertBodyFreeString = (
 
 const assertBodyFreeValue = (
   value: unknown,
-  plainText: string,
+  searchProfile: ProtectedSearchProfileV1,
   path: string,
   ancestors: Set<object>,
 ): void => {
@@ -740,7 +805,7 @@ const assertBodyFreeValue = (
     return;
   }
   if (typeof value === "string") {
-    assertBodyFreeString(value, plainText, path);
+    assertBodyFreeString(value, searchProfile, path);
     return;
   }
   if (typeof value !== "object") {
@@ -752,14 +817,14 @@ const assertBodyFreeValue = (
   ancestors.add(value);
   if (Array.isArray(value)) {
     value.forEach((item, index) =>
-      assertBodyFreeValue(item, plainText, `${path}.${index}`, ancestors),
+      assertBodyFreeValue(item, searchProfile, `${path}.${index}`, ancestors),
     );
   } else {
     for (const [key, item] of Object.entries(value)) {
       if (isForbiddenControlKey(key)) {
         fail("protected_body_field", `${path}.${key}`, `${path}.${key} is not a control field`);
       }
-      assertBodyFreeValue(item, plainText, `${path}.${key}`, ancestors);
+      assertBodyFreeValue(item, searchProfile, `${path}.${key}`, ancestors);
     }
   }
   ancestors.delete(value);
@@ -771,7 +836,12 @@ export const assertScenarioProtectedBodyFreeControlV1 = (
   path = "control",
 ): void => {
   assertScenarioProtectedPlainTextCarrierV1(carrier);
-  assertBodyFreeValue(value, carrier.plain_text, path, new Set());
+  assertBodyFreeValue(
+    value,
+    createProtectedSearchProfile([carrier.plain_text]),
+    path,
+    new Set(),
+  );
   serializedUtf8Bytes(value, path);
 };
 
@@ -780,6 +850,7 @@ const assertNoProtectedControlCopies = (
   protectedValues: readonly string[],
   path: string,
   ancestors = new Set<object>(),
+  searchProfile = createProtectedSearchProfile(protectedValues),
 ): void => {
   if (
     value === null ||
@@ -789,7 +860,7 @@ const assertNoProtectedControlCopies = (
     return;
   }
   if (typeof value === "string") {
-    if (protectedValues.some((protectedValue) => value.includes(protectedValue))) {
+    if (protectedSearchMatch(value, searchProfile) !== undefined) {
       fail(
         "protected_control_copy",
         path,
@@ -810,6 +881,7 @@ const assertNoProtectedControlCopies = (
         protectedValues,
         `${path}.${index}`,
         ancestors,
+        searchProfile,
       ),
     );
   } else {
@@ -819,6 +891,7 @@ const assertNoProtectedControlCopies = (
         protectedValues,
         `${path}.${key}`,
         ancestors,
+        searchProfile,
       );
     }
   }
@@ -1647,6 +1720,17 @@ export const assertScenarioProtectedContentCommitCompositionV1 = (
       "commit_before_prepare",
       "committed_content.committed_at",
       "protected content cannot commit before it was prepared",
+    );
+  }
+  const submitNow = assertCanonicalInstant(
+    context.submit_context.now,
+    "context.submit_context.now",
+  );
+  if (committedAt > submitNow) {
+    fail(
+      "commit_after_context_now",
+      "committed_content.committed_at",
+      "protected content cannot commit after the independently resolved current time",
     );
   }
 };

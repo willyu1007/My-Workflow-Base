@@ -68,7 +68,7 @@ const submitContext = () => ({
   action_key: domainFixture.contract.action_key,
   principal_binding_hash: "7".repeat(64),
   submit_context_expires_at: e2Fixture.results[0].prepared_content.expires_at,
-  now: "2026-08-05T00:02:00.000Z",
+  now: "2026-08-05T00:03:00.000Z",
 });
 const contextForBinding = (binding) => ({
   submit_context: submitContext(),
@@ -202,6 +202,19 @@ test("E3 rejects prepared-object, payload, effect and transaction drift", () => 
     assertComposition(0, domainFixture.execution_results[0], beforePrepare, beforePrepareContext),
   { code: "commit_before_prepare" });
 
+  for (const index of [0, 1]) {
+    const futureCommit = clone(fixture.committed_content);
+    const futureContext = contextForBinding(domainFixture.execution_bindings[index]);
+    futureCommit.committed_at = "2026-08-05T01:00:00.000Z";
+    futureContext.commit_verification.committed_at = futureCommit.committed_at;
+    assert.throws(() => assertComposition(
+      index,
+      domainFixture.execution_results[index],
+      futureCommit,
+      futureContext,
+    ), { code: "commit_after_context_now" });
+  }
+
   const wrongStepContext = contextForBinding(domainFixture.execution_bindings[1]);
   wrongStepContext.execution_path_verification.original_workflow_step_ref.object_id =
     "step_example_02";
@@ -260,6 +273,29 @@ test("E3 recovery composes an exact replay without carrier resend", () => {
   ));
 });
 
+test("E3 accepts short opaque versions without substring false positives", () => {
+  const preparedContent = clone(e2Fixture.results[0].prepared_content);
+  const committedContent = clone(fixture.committed_content);
+  const binding = domainFixture.execution_bindings[0];
+  const context = contextForBinding(binding);
+  preparedContent.protected_content_version = "v";
+  committedContent.prepared_content_version = "v";
+  committedContent.committed_content_version = "w";
+  context.resolved_prepared_content.protected_content_version = "v";
+  context.commit_verification.prepared_content_version = "v";
+  context.commit_verification.committed_content_version = "w";
+  assert.doesNotThrow(() => assertScenarioProtectedContentCommitCompositionV1(
+    e1Fixture.contract,
+    contractForDriver(binding.effect_identity.driver),
+    domainFixture.submit_inputs[0],
+    preparedContent,
+    binding,
+    domainFixture.execution_results[0],
+    committedContent,
+    context,
+  ));
+});
+
 test("E3 contextual evidence rejects broad metadata extensions", () => {
   const context = contextForBinding(domainFixture.execution_bindings[0]);
   context.metadata = { durable: true };
@@ -296,6 +332,28 @@ test("E3 adds no commit input and keeps I1-D envelopes protected-ref free", () =
   assert.throws(() => assertComposition(
     0,
     hiddenRef,
+    fixture.committed_content,
+    contextForBinding(domainFixture.execution_bindings[0]),
+  ), { code: "protected_control_copy" });
+
+  const encodedRef = clone(domainFixture.execution_results[0]);
+  encodedRef.output_refs = [{
+    schema_version: 1,
+    namespace: "scenario.example",
+    object_type: "example_output",
+    object_id: Buffer.from(
+      fixture.committed_content.protected_content_ref,
+      "utf8",
+    ).toString("base64url"),
+  }];
+  assert.equal(
+    validateExecutionResult(encodedRef),
+    true,
+    JSON.stringify(validateExecutionResult.errors),
+  );
+  assert.throws(() => assertComposition(
+    0,
+    encodedRef,
     fixture.committed_content,
     contextForBinding(domainFixture.execution_bindings[0]),
   ), { code: "protected_control_copy" });

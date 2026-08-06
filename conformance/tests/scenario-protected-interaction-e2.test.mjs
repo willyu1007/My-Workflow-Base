@@ -125,9 +125,12 @@ test("E2 schemas and codecs reject payload, authority and mixed branches", async
     ["prepare KMS key", validateInput, assertPrepareScenarioProtectedInteractionInputV1, fixture.input, (value) => { value.action_prepare.action_input.kms_key_id = "opaque"; }],
     ["prepare client kind", validateInput, assertPrepareScenarioProtectedInteractionInputV1, fixture.input, (value) => { value.action_prepare.action_input.client_content_kind = "example.other"; }],
     ["prepare plaintext dev", validateInput, assertPrepareScenarioProtectedInteractionInputV1, fixture.input, (value) => { value.action_prepare.action_input.plain_text_dev = "redacted"; }],
+    ["prepare uppercase plaintext", validateInput, assertPrepareScenarioProtectedInteractionInputV1, fixture.input, (value) => { value.action_prepare.action_input.PlainText = "redacted"; }],
+    ["prepare separator body prefix", validateInput, assertPrepareScenarioProtectedInteractionInputV1, fixture.input, (value) => { value.action_prepare.action_input["body-count"] = 1; }],
     ["prepare derived summary", validateInput, assertPrepareScenarioProtectedInteractionInputV1, fixture.input, (value) => { value.action_prepare.action_input.summary = "redacted"; }],
     ["prepare derived detail", validateInput, assertPrepareScenarioProtectedInteractionInputV1, fixture.input, (value) => { value.action_prepare.action_input.detail = "redacted"; }],
     ["prepare nested body", validateInput, assertPrepareScenarioProtectedInteractionInputV1, fixture.input, (value) => { value.action_prepare.action_input.nested = { plain_text_dev: "redacted" }; }],
+    ["prepare nested protected ref suffix", validateInput, assertPrepareScenarioProtectedInteractionInputV1, fixture.input, (value) => { value.action_prepare.action_input.nested = { "protected.content.refMetadata": "opaque" }; }],
     ["prepare content ref", validateInput, assertPrepareScenarioProtectedInteractionInputV1, fixture.input, (value) => { value.action_prepare.action_input.protected_content_ref = "R".repeat(43); }],
     ["prepare read scope", validateInput, assertPrepareScenarioProtectedInteractionInputV1, fixture.input, (value) => { value.carrier_binding.carrier_scope = "read_output"; }],
     ["prepared unknown", validateControl, assertScenarioPreparedProtectedContentControlV1, fixture.results[0].prepared_content, (value) => { value.body = "redacted"; }],
@@ -143,6 +146,45 @@ test("E2 schemas and codecs reject payload, authority and mixed branches", async
       mutate(value);
       assertParityRejects(validate, codec, value);
     });
+  }
+});
+
+test("E2 schema and codec share the recursive forbidden-key normalization", () => {
+  const forbiddenKeys = [
+    "attachmentrefs",
+    "body",
+    "carrier",
+    "ciphertext",
+    "clientcontentkind",
+    "contentbytes",
+    "detail",
+    "encryptionkey",
+    "keyid",
+    "kmskey",
+    "nonce",
+    "plaintext",
+    "protectedbody",
+    "protectedcarrier",
+    "protectedcontentref",
+    "summary",
+    "narration",
+    "wrappedkey",
+  ];
+  for (const forbiddenKey of forbiddenKeys) {
+    const variants = [
+      `${forbiddenKey[0].toUpperCase()}${forbiddenKey.slice(1)}`,
+      `${Array.from(forbiddenKey).join("-")}Metadata`,
+    ];
+    for (const key of variants) {
+      const value = clone(fixture.input);
+      value.action_prepare.action_input.nested = { [key]: "opaque" };
+      assert.equal(validateInput(value), false, `Schema accepted forbidden key ${key}`);
+      assert.throws(
+        () => assertPrepareScenarioProtectedInteractionInputV1(value),
+        undefined,
+        `codec accepted forbidden key ${key}`,
+      );
+    }
   }
 });
 

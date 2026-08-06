@@ -187,6 +187,19 @@ test("E1 keeps the carrier body out of generic control objects", () => {
   ]) {
     assert.throws(() => assertScenarioProtectedBodyFreeControlV1(value, fixture.carrier));
   }
+
+  assert.throws(() => assertScenarioProtectedBodyFreeControlV1(
+    { operation: `prefix-${fragment}-suffix` },
+    fixture.carrier,
+  ), { code: "protected_fragment" });
+
+  const shortCarrier = clone(fixture.carrier);
+  shortCarrier.plain_text = "a";
+  assert.doesNotThrow(() =>
+    assertScenarioProtectedBodyFreeControlV1(fixture.body_free_control, shortCarrier));
+  assert.throws(() =>
+    assertScenarioProtectedBodyFreeControlV1({ operation: "a" }, shortCarrier),
+  { code: "protected_copy" });
 });
 
 test("E1 enforces code-point, UTF-8 and serialized carrier bounds", () => {
