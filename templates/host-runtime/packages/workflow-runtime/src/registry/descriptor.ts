@@ -27,6 +27,7 @@ export function createWorkflowDescriptor(
     adapters: Object.freeze({ ...module.adapters }),
     presenters: Object.freeze({ ...module.presenters }),
     policies: Object.freeze({ ...module.policies }),
+    trusted_invocation_handlers: Object.freeze({ ...module.trusted_invocation_handlers }),
     internal_api_handlers: Object.freeze({ ...module.internal_api_handlers }),
     validation,
   });

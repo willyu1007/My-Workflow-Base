@@ -32,7 +32,7 @@ consumption surfaces
 - State: in-progress
 - Owner: unassigned
 - Created: 2026-05-25
-- Updated: 2026-08-01
+- Updated: 2026-08-11
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
 - Completed increments:
   - N1 ecosystem model adoption and RB-4
@@ -196,6 +196,11 @@ The current design stance is:
 - D34: My-Chat X1 injects the host-owned
   `WorkflowRuntimePortMaterializationV1` directly into its worker. It does not
   recover the v1 overload from the legacy scenario adapter through a cast.
+- D35: Scenario-private trusted invocation uses a dedicated typed handler
+  registry. Only a transport adapter that has completed credential, signature,
+  route, clock and nonce verification may construct the verified context; the
+  dispatcher exact-matches the published contract and never falls back to
+  ordinary internal API or other implementation registries.
 
 ## Dependencies
 - `docs/context/workflow/v0-convergence.md`
@@ -323,6 +328,12 @@ The current design stance is:
   source hash identify the repaired contract consistently.
 
 ## Current Notes
+- 2026-08-11: Added the scenario-neutral `trusted_invocation_handlers` module
+  registry, exact verified dispatcher and bidirectional manifest validation.
+  Runtime/scenario/conformance behavior is implemented locally. The sole
+  landing gate is an owner-approved source-bearing commit followed by a
+  synchronized `workflow-contract-source-lock.json` revision/hash refresh; no
+  false uncommitted revision is recorded.
 - 2026-05-25: Task package created to preserve macro alignment before further
   contract edits.
 - 2026-05-26: Matrix stance updated: chat is workflow control, dashboard

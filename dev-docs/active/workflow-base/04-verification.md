@@ -440,3 +440,37 @@ that source revision.
   `primitives`, `shell`, `feedback`, `list`, `insight`, `settings`, `hub`,
   `queue`, `record`, and existing `contracts`.
 - 2026-06-26: Published `@willyu1007/web-workbench@0.6.6` to GitHub Packages.
+
+## 2026-08-11 Trusted invocation registry verification
+
+- `pnpm typecheck`: passed for workflow contracts, workflow runtime, scenario
+  module template and conformance package.
+- `pnpm test:runtime`: passed, 2 files / 40 tests.
+- `pnpm test:scenario`: passed, 2 files / 10 tests.
+- The unlocked conformance chain passed: claim-token boundary, contract-doc
+  alignment, consumer-boundary self-test, 66 federation schemas, scenario
+  release contract, semantic lint, canonical-ref lint and 441 Node tests.
+- `git diff --check`: passed.
+- Focused trusted registry/dispatcher regression suite passed, 38/38. It proves
+  missing dedicated bindings fail through `WF-MAN-124`, undeclared bindings
+  fail through `WF-MAN-125`, ordinary internal registry aliases fail, exact
+  verified dispatch succeeds, extra trust-policy metadata is stripped and
+  route drift fails closed.
+- Frozen legacy manifest contract hash remains
+  `9f568ff772d3dafc02dd96f284f7cedb85aff18839b8f26f4691a8b2dc0d0ca6`.
+- Candidate aggregate adoption source hash:
+  `dd888b89f89d4137fb717bba60a400f9f68bb127b4485121270f1c8eb9ea51e7`.
+- Candidate named profiles:
+  - `platform_child_family_identity_source_v1`:
+    `9655e83ff6a973055fb1b3f170cdbcd3c3eea6cb117f59209844a2a355b6a861`
+  - `scenario_interface_source_v1`:
+    `be67d3264a9442ce30a8303d6acf86a05ea86c8a3ed1d933f41c5aa922b1ff95`
+  - `scenario_domain_action_source_v1`:
+    `b962acf3fc35d02d7b903854a3eed3f6177e3dc4d00b32124122a120b458f5f0`
+  - `scenario_protected_interaction_source_v1`:
+    `a34f3864b76d1dc16eadb901f506fcc473a0cb298da7d1e273de9238eb880cf5`
+- `pnpm test:conformance` reaches the source-hash portability step and fails
+  against the intentionally unchanged committed lock. This is the sole landing
+  gate: after an exact source-bearing commit exists, refresh the lock revision,
+  aggregate/per-file/profile hashes together and rerun the full verifier. No
+  false revision was written for the uncommitted candidate.

@@ -1,5 +1,24 @@
 # Plan
 
+## Current local increment: trusted invocation handler registry
+
+- [x] Add a scenario-neutral verified invocation context with no detached
+  signature, credential or trust-policy payload.
+- [x] Add the dedicated `trusted_invocation_handlers` registry to module and
+  frozen descriptor shapes.
+- [x] Require exact declared/registered bindings and reject legacy registry
+  aliases through executable validator findings.
+- [x] Add one dispatcher that matches contract hash, route, operation, schema,
+  ingress and principal origin before invoking only the dedicated registry.
+- [x] Preserve the frozen legacy manifest contract hash and pass all unlocked
+  typecheck/runtime/scenario/conformance checks.
+- [ ] Land the source-bearing change in an exact Base revision, then refresh
+  the aggregate/per-file/profile source lock against that revision and rerun
+  the complete source-lock portability gate.
+
+No deploy, publish, capability activation or traffic change belongs to this
+increment.
+
 ## Current increment: X-5 federation convergence
 
 - [x] Replay the four required federation code changes onto current Base main

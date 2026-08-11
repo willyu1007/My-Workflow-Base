@@ -97,6 +97,7 @@ function collectStringValues(value: unknown, target: Set<string>): void {
 }
 
 function validateScenarioContractModule(input: {
+  module: WorkflowScenarioModule;
   manifest: ScenarioManifestV2;
   host_snapshot: WorkflowHostValidationSnapshot;
   findings: WorkflowModuleValidationFinding[];
@@ -128,11 +129,23 @@ function validateScenarioContractModule(input: {
     legacyHandlerKeys.add(route.handler_key);
     legacyRouteAliases.add(route.path);
   }
+  for (const registry of [
+    input.module.handlers,
+    input.module.actions,
+    input.module.adapters,
+    input.module.presenters,
+    input.module.policies,
+    input.module.internal_api_handlers,
+  ]) {
+    for (const key of Object.keys(registry)) legacyHandlerKeys.add(key);
+  }
   const legacySurfaceValues = new Set<string>();
   collectStringValues(input.manifest.surface_mapping, legacySurfaceValues);
 
   const declarationHandlers: Array<{ key: string; path: string }> = [];
+  const declaredTrustedHandlerKeys = new Set<string>();
   for (const [index, operation] of scenarioContracts.trusted_invocation.operations.entries()) {
+    declaredTrustedHandlerKeys.add(operation.handler_key);
     declarationHandlers.push({
       key: operation.handler_key,
       path: `scenario_contracts.trusted_invocation.operations.${index}.handler_key`,
@@ -147,6 +160,24 @@ function validateScenarioContractModule(input: {
         message: `Scenario operation aliases a legacy entrypoint or route: ${operation.operation_key}`,
         path: `scenario_contracts.trusted_invocation.operations.${index}`,
         remediation: "Use one canonical vNext operation key and remove the legacy alias before adoption.",
+      });
+    }
+    if (!input.module.trusted_invocation_handlers[operation.handler_key]) {
+      addFatal(input.findings, {
+        rule_id: "WF-MAN-124",
+        message: `Trusted invocation handler is missing: ${operation.handler_key}`,
+        path: `scenario_contracts.trusted_invocation.operations.${index}.handler_key`,
+        remediation: "Register every trusted operation in trusted_invocation_handlers after the verifier boundary.",
+      });
+    }
+  }
+  for (const handlerKey of Object.keys(input.module.trusted_invocation_handlers)) {
+    if (!declaredTrustedHandlerKeys.has(handlerKey)) {
+      addFatal(input.findings, {
+        rule_id: "WF-MAN-125",
+        message: `Trusted invocation handler is undeclared: ${handlerKey}`,
+        path: `trusted_invocation_handlers.${handlerKey}`,
+        remediation: "Remove the binding or declare one canonical trusted invocation operation for it.",
       });
     }
   }
@@ -458,11 +489,29 @@ export function validateWorkflowModule(input: {
       }
       if (scenarioContractStructureValid) {
         validateScenarioContractModule({
+          module: input.module,
           manifest: federatedManifest,
           host_snapshot: input.host_snapshot,
           findings,
         });
       }
+    }
+  }
+
+  if (
+    (
+      manifest.manifest_version !== 2 ||
+      (manifest as ScenarioManifestV2).scenario_contracts === undefined
+    ) &&
+    Object.keys(input.module.trusted_invocation_handlers).length > 0
+  ) {
+    for (const handlerKey of Object.keys(input.module.trusted_invocation_handlers)) {
+      addFatal(findings, {
+        rule_id: "WF-MAN-125",
+        message: `Trusted invocation handler is undeclared: ${handlerKey}`,
+        path: `trusted_invocation_handlers.${handlerKey}`,
+        remediation: "Remove the binding or declare one canonical trusted invocation operation for it.",
+      });
     }
   }
 

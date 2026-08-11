@@ -26,6 +26,7 @@ export type WorkflowScenarioModule = {
   };
   presenters: WorkflowPresenters;
   policies: WorkflowPolicies;
+  trusted_invocation_handlers: WorkflowTrustedInvocationHandlerRegistry;
   internal_api_handlers: WorkflowInternalApiRegistry;
 };
 ```
@@ -51,12 +52,14 @@ execute user-authored YAML as code.
 export type WorkflowHandlerRegistry = Record<string, WorkflowStepHandler>;
 export type WorkflowActionRegistry = Record<string, WorkflowActionHandler>;
 export type WorkflowPresenterRegistry = Record<string, unknown>;
+export type WorkflowTrustedInvocationHandlerRegistry =
+  Record<string, WorkflowTrustedInvocationHandler>;
 export type WorkflowInternalApiRegistry = Record<string, unknown>;
 ```
 
 Every registry key must be declared in the manifest or equivalent TS contract.
-Every declared handler, action, adapter, presenter, policy, and internal route
-key must have a registry binding.
+Every declared handler, action, adapter, presenter, policy, trusted invocation,
+and internal route key must have a registry binding.
 
 ## Scenario manifest
 
@@ -442,6 +445,39 @@ Rules:
 - Routes must not be callable by chat, mobile dashboard, forum, RAG,
   notification, public links, or external clients.
 - Routes must not create private run, approval, artifact, or handoff identities.
+
+## Trusted invocation handler contract
+
+`scenario_contracts.trusted_invocation.operations` bind only to the dedicated
+`trusted_invocation_handlers` registry. They MUST NOT resolve through step,
+action, presenter, policy, adapter, or ordinary `internal_api_handlers`
+registries.
+
+The transport adapter MUST finish service-credential authentication, detached
+signature verification, exact route declaration lookup, clock-window checks,
+and one-time nonce consumption before it constructs
+`WorkflowVerifiedScenarioInvocationV1`. The dispatcher does not perform or
+replace those transport-authentication checks. It revalidates the closed
+invocation body, contract hash, manifest operation, ingress and handler binding,
+then passes a sanitized `{ invocation, declaration }` object to the handler.
+Detached signatures, transport credentials, trust policies, public keys and
+other raw authentication material MUST NOT reach the handler.
+
+```ts
+export type WorkflowVerifiedScenarioInvocationV1<TInput = unknown> = {
+  invocation: ScenarioPrivateInvocationV1<TInput>;
+  declaration: ScenarioTrustedInvocationDeclarationV1;
+};
+
+export type WorkflowTrustedInvocationHandler = (
+  verified: WorkflowVerifiedScenarioInvocationV1,
+) => Promise<unknown>;
+```
+
+The host MUST call `dispatchTrustedScenarioInvocation` only with the verifier's
+output. The dispatcher requires one exact manifest operation and one exact
+ingress, resolves only `trusted_invocation_handlers`, and strips any additional
+verification metadata before calling scenario code.
 
 ## Presenter contract
 
@@ -1267,6 +1303,8 @@ Implemented validation rules:
 | `WF-MAN-121` | Fatal | Scenario operation keys and endpoints do not alias legacy entrypoints or routes. |
 | `WF-MAN-122` | Fatal | Scenario product-surface keys do not alias legacy surface mappings. |
 | `WF-MAN-123` | Fatal | Scenario domain-action keys do not alias legacy action availability. |
+| `WF-MAN-124` | Fatal | Every trusted invocation operation has a dedicated `trusted_invocation_handlers` binding. |
+| `WF-MAN-125` | Fatal | Every dedicated trusted invocation handler is declared by one canonical operation. |
 <!-- VALIDATOR-RULE-INVENTORY:END -->
 
 `WF-MAN-043` is warning-only and therefore does not make `report.passed` false.
@@ -1300,6 +1338,8 @@ Loader rules:
   through scenario/version records and deployment, not mutable in-memory edits
 - route all product surfaces through standard adapters/APIs and presenters
 - mount internal APIs only for declared Web/Admin owner surfaces
+- dispatch verified private operations only through the dedicated trusted
+  invocation registry and exact manifest binding
 - keep disabled modules available only for historical replay, rollback, or
   controlled migration
 
@@ -1318,7 +1358,8 @@ export type RegisteredWorkflowScenario = {
   adapters: WorkflowSurfaceAdapters;
   presenters: WorkflowPresenters;
   policies: WorkflowPolicies;
-  internal_api?: WorkflowInternalApiRegistry;
+  trusted_invocation_handlers: WorkflowTrustedInvocationHandlerRegistry;
+  internal_api_handlers: WorkflowInternalApiRegistry;
   handoffs: HandoffManifest[];
   event_registry: EventRegistryManifest;
   validation_report: WorkflowModuleValidationReport;

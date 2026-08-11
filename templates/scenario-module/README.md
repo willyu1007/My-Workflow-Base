@@ -63,6 +63,11 @@ equivalent TypeScript contract constant if it preserves the same fields.
   API/Postgres strong reads through the proper owner.
 - Internal Web/Admin APIs, if any, are contract-declared and not consumed by
   chat/mobile/forum/RAG/notification.
+- Trusted private operations are registered only in
+  `trusted_invocation_handlers`. A transport adapter MUST authenticate the
+  service credential and verify signature, route, clock and nonce before
+  constructing `WorkflowVerifiedScenarioInvocationV1`; the dispatcher is not a
+  signature verifier and never forwards raw authentication material.
 - Chat workflow control, dashboard summary, and citation modes are separately
   defined.
 - Chat does not perform `step_interventions`; Web run workbench owns manual
@@ -81,8 +86,9 @@ remediation.
 Minimum fatal checks:
 - `scenario_key` matches a canonical `Scenario` record.
 - Contract hash/version is stored before pilot or GA activation.
-- Step handlers, action handlers, adapters, presenters, policies, internal API
-  handlers, and tests match the manifest declarations.
+- Step handlers, action handlers, adapters, presenters, policies, trusted
+  invocation handlers, internal API handlers, and tests match the manifest
+  declarations.
 - Internal APIs are Web/Admin-only.
 - Chat does not declare or consume `step_interventions`.
 - Handoffs declare downstream owner, policy key, and receipt requirement.
@@ -114,6 +120,8 @@ expected behavior:
   event registry, and validation report
 - resolve worker handlers from canonical run identity plus stored contract hash
 - expose only standard adapters/presenters to shared product surfaces
+- dispatch verified scenario-private operations through the dedicated trusted
+  invocation registry with exact manifest route/operation binding
 - mount internal APIs only for declared Web/Admin surfaces
 - keep disabled modules available only for replay, rollback, or controlled
   migration

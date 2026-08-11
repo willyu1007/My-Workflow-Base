@@ -13,5 +13,6 @@ export const scenarioModule: WorkflowScenarioModule = {
   adapters: exampleAdapters,
   presenters: examplePresenters,
   policies: examplePolicies,
+  trusted_invocation_handlers: {},
   internal_api_handlers: {},
 };

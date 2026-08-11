@@ -258,3 +258,22 @@
   drift in the federation docs is mechanically unmonitored. Extend the
   alignment check to those surfaces in the next Base slice; until then,
   federation doc changes require manual review against source.
+
+## 2026-08-11 Trusted invocation handler registry
+
+- Added `WorkflowVerifiedScenarioInvocationV1`, containing only the validated
+  invocation body and selected route declaration. Signature, transport
+  credential and trust-policy key material remain at the transport boundary.
+- Added `trusted_invocation_handlers` as a module and registered-descriptor
+  registry distinct from `internal_api_handlers` and all legacy registries.
+- Added `WF-MAN-124` for missing dedicated bindings and `WF-MAN-125` for
+  undeclared bindings. Existing `WF-MAN-120` now also detects aliases against
+  actual ordinary registry keys.
+- Added `dispatchTrustedScenarioInvocation`; it revalidates the closed body and
+  exact contract hash/route/operation/schema/ingress tuple, resolves only the
+  dedicated registry, and rebuilds the handler input to remove extra verifier
+  metadata.
+- Source-lock files are intentionally unchanged while the work is uncommitted.
+  The lock contract requires its exact revision to contain current source, so
+  writing candidate hashes against the old revision would create false
+  evidence.

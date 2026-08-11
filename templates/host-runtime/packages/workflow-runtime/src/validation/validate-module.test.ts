@@ -9,7 +9,10 @@ import type {
   WorkflowScenarioModule,
 } from "@host/workflow-contracts";
 import { loadWorkflowRegistry } from "../registry/loader.js";
-import { resolveStepHandler } from "../registry/resolve-binding.js";
+import {
+  dispatchTrustedScenarioInvocation,
+  resolveStepHandler,
+} from "../registry/resolve-binding.js";
 import { WorkflowWorker } from "../workers/workflow-worker.js";
 import { validateWorkflowModule } from "./validate-module.js";
 
@@ -365,6 +368,7 @@ function createScenarioModule(): WorkflowScenarioModule {
       }),
     },
     policies: {},
+    trusted_invocation_handlers: {},
     internal_api_handlers: {},
   };
 }
@@ -489,6 +493,12 @@ function createScenarioContractModule(): WorkflowScenarioModule {
     domain_action_contracts: [],
     protected_interaction_contracts: [],
   };
+  module.trusted_invocation_handlers = Object.fromEntries(
+    manifest.scenario_contracts.trusted_invocation.operations.map((operation) => [
+      operation.handler_key,
+      async () => ({ operation_key: operation.operation_key }),
+    ]),
+  );
   return module;
 }
 
@@ -567,6 +577,12 @@ function createCompleteScenarioContractModule(): WorkflowScenarioModule {
         principal_origins: ["interactive_session"],
       }],
     },
+  );
+  module.trusted_invocation_handlers = Object.fromEntries(
+    contracts.trusted_invocation.operations.map((operation) => [
+      operation.handler_key,
+      async () => ({ operation_key: operation.operation_key }),
+    ]),
   );
   contracts.product_surfaces[0] = {
     ...contracts.product_surfaces[0],
@@ -698,6 +714,67 @@ describe("workflow module validation and loading", () => {
       rule_id: "WF-MAN-119",
       severity: "fatal",
       path: "scenario_contracts.capability_dependencies.1.capability_key",
+    }));
+  });
+
+  it("requires every trusted operation in the dedicated verified registry", () => {
+    const module = createScenarioContractModule();
+    const manifest = module.manifest as ScenarioManifestV2;
+    const operation = manifest.scenario_contracts?.trusted_invocation.operations[0];
+    if (!operation) throw new Error("scenario trusted operation fixture is missing");
+    delete module.trusted_invocation_handlers[operation.handler_key];
+    module.internal_api_handlers[operation.handler_key] = async () => ({ ok: true });
+
+    const report = validateWorkflowModule({
+      module,
+      host_snapshot: createScenarioContractHostSnapshot(),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toContainEqual(expect.objectContaining({
+      rule_id: "WF-MAN-124",
+      severity: "fatal",
+      path: "scenario_contracts.trusted_invocation.operations.0.handler_key",
+    }));
+  });
+
+  it("rejects an undeclared trusted invocation registry binding", () => {
+    const module = createScenarioContractModule();
+    module.trusted_invocation_handlers["scenario.hidden.handler"] = async () => ({ ok: true });
+
+    const report = validateWorkflowModule({
+      module,
+      host_snapshot: createScenarioContractHostSnapshot(),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toContainEqual(expect.objectContaining({
+      rule_id: "WF-MAN-125",
+      severity: "fatal",
+      path: "trusted_invocation_handlers.scenario.hidden.handler",
+    }));
+  });
+
+  it("rejects a trusted handler key that aliases the ordinary internal registry", () => {
+    const module = createScenarioContractModule();
+    const manifest = module.manifest as ScenarioManifestV2;
+    const operation = manifest.scenario_contracts?.trusted_invocation.operations[0];
+    if (!operation) throw new Error("scenario trusted operation fixture is missing");
+    module.internal_api_handlers[operation.handler_key] = async () => ({ ok: true });
+
+    const report = validateWorkflowModule({
+      module,
+      host_snapshot: createScenarioContractHostSnapshot(),
+      activation_target: "dev",
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.findings).toContainEqual(expect.objectContaining({
+      rule_id: "WF-MAN-120",
+      severity: "fatal",
+      path: "scenario_contracts.trusted_invocation.operations.0.handler_key",
     }));
   });
 
@@ -1167,6 +1244,140 @@ describe("workflow module validation and loading", () => {
         contract_hash: contractHash ?? "",
       }),
     ).toThrow(/workflow handler not registered/);
+  });
+
+  it("dispatches an exact verified invocation only through the trusted registry", async () => {
+    const module = createScenarioContractModule();
+    const scenarioContracts = (module.manifest as ScenarioManifestV2).scenario_contracts;
+    const operation = scenarioContracts?.trusted_invocation.operations[0];
+    const ingress = operation?.ingress[0];
+    if (!operation || !ingress) throw new Error("trusted invocation fixture is missing");
+    let receivedKeys: string[] = [];
+    module.trusted_invocation_handlers[operation.handler_key] = async (verified) => {
+      receivedKeys = Object.keys(verified).sort();
+      return { operation_key: verified.invocation.operation.operation_key };
+    };
+    const registry = loadWorkflowRegistry({
+      modules: [module],
+      host_snapshot: createScenarioContractHostSnapshot(),
+    });
+    const contractHash = registry.scenarios.get("example")?.contract_hash;
+    if (!contractHash) throw new Error("scenario descriptor is missing");
+    const invocation = {
+      invocation_version: 1 as const,
+      contract_version: 1 as const,
+      contract_hash: contractHash,
+      issuer: "my_chat.host",
+      assertion_audience: "scenario.private",
+      caller_binding: { caller_subject: "my-chat-host-runtime" },
+      principal: {
+        principal_version: 1 as const,
+        principal_kind: "human_user" as const,
+        account_ref: { schema_version: 1 as const, namespace: "my_chat", object_type: "user", object_id: "user_01" },
+        actor_ref: { schema_version: 1 as const, namespace: "my_chat", object_type: "actor", object_id: "actor_01" },
+        workspace_ref: { schema_version: 1 as const, namespace: "my_chat", object_type: "workspace", object_id: "workspace_01" },
+        principal_origin: "interactive_session" as const,
+      },
+      route: {
+        scenario_key: "example",
+        endpoint_key: operation.endpoint_key,
+        method: operation.method,
+        ingress: {
+          ingress_version: 1 as const,
+          ingress_category: ingress.ingress_category,
+          ingress_key: ingress.ingress_key,
+        },
+      },
+      request: {
+        request_id: "request_01",
+        correlation_id: "correlation_01",
+        issued_at: "2026-08-11T00:00:00.000Z",
+        expires_at: "2026-08-11T00:00:30.000Z",
+        nonce: "0123456789abcdef0123456789abcdef",
+      },
+      operation: {
+        operation_key: operation.operation_key,
+        input_schema_version: operation.input_schema_version,
+        input: { example_field: "example-value" },
+      },
+    };
+    const verified = {
+      invocation,
+      declaration: {
+        scenario_key: "example",
+        endpoint_key: operation.endpoint_key,
+        method: operation.method,
+        operation_key: operation.operation_key,
+        input_schema_version: operation.input_schema_version,
+        ingress_category: ingress.ingress_category,
+        ingress_key: ingress.ingress_key,
+        principal_origins: ingress.principal_origins,
+      },
+      trust_policy: { credential_subject: "must-not-reach-handler" },
+    };
+
+    await expect(dispatchTrustedScenarioInvocation(registry, verified)).resolves.toEqual({
+      operation_key: operation.operation_key,
+    });
+    expect(receivedKeys).toEqual(["declaration", "invocation"]);
+  });
+
+  it("rejects verified invocation metadata that drifts from the exact manifest route", async () => {
+    const module = createScenarioContractModule();
+    const scenarioContracts = (module.manifest as ScenarioManifestV2).scenario_contracts;
+    const operation = scenarioContracts?.trusted_invocation.operations[0];
+    const ingress = operation?.ingress[0];
+    if (!operation || !ingress) throw new Error("trusted invocation fixture is missing");
+    const registry = loadWorkflowRegistry({
+      modules: [module],
+      host_snapshot: createScenarioContractHostSnapshot(),
+    });
+    const contractHash = registry.scenarios.get("example")?.contract_hash;
+    if (!contractHash) throw new Error("scenario descriptor is missing");
+    const baseRef = { schema_version: 1 as const, namespace: "my_chat", object_type: "user", object_id: "user_01" };
+
+    await expect(dispatchTrustedScenarioInvocation(registry, {
+      invocation: {
+        invocation_version: 1,
+        contract_version: 1,
+        contract_hash: contractHash,
+        issuer: "my_chat.host",
+        assertion_audience: "scenario.private",
+        caller_binding: { caller_subject: "my-chat-host-runtime" },
+        principal: {
+          principal_version: 1,
+          principal_kind: "human_user",
+          account_ref: baseRef,
+          actor_ref: { ...baseRef, object_type: "actor", object_id: "actor_01" },
+          workspace_ref: { ...baseRef, object_type: "workspace", object_id: "workspace_01" },
+          principal_origin: "interactive_session",
+        },
+        route: {
+          scenario_key: "example",
+          endpoint_key: operation.endpoint_key,
+          method: "POST",
+          ingress: { ingress_version: 1, ingress_category: ingress.ingress_category, ingress_key: ingress.ingress_key },
+        },
+        request: {
+          request_id: "request_02",
+          correlation_id: "correlation_02",
+          issued_at: "2026-08-11T00:00:00.000Z",
+          expires_at: "2026-08-11T00:00:30.000Z",
+          nonce: "fedcba9876543210fedcba9876543210",
+        },
+        operation: { operation_key: operation.operation_key, input_schema_version: 1, input: {} },
+      },
+      declaration: {
+        scenario_key: "example",
+        endpoint_key: "scenario.drifted_endpoint",
+        method: "POST",
+        operation_key: operation.operation_key,
+        input_schema_version: 1,
+        ingress_category: ingress.ingress_category,
+        ingress_key: ingress.ingress_key,
+        principal_origins: ingress.principal_origins,
+      },
+    })).rejects.toThrow("declaration does not match invocation");
   });
 
   it("returns runtime read-only registry maps", () => {

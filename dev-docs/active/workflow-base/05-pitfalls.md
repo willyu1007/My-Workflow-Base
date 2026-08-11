@@ -95,6 +95,13 @@
 - Do not validate an ancestor-bound source lock from a default shallow
   checkout. Any verifier that resolves a historical source revision requires
   `fetch-depth: 0`.
+- Do not dispatch a trusted scenario operation through
+  `internal_api_handlers` or another ordinary registry. Transport verification
+  must complete first, and the verified dispatcher must exact-match the
+  manifest before selecting the dedicated registry.
+- Do not refresh a source lock while the changed contract source has no exact
+  commit revision. Candidate hashes paired with an older revision are invalid
+  evidence, even when local typechecks and behavioral tests pass.
 
 ## Historical Notes
 - 2026-07-13: X0-A initially used `tests/**/*.test.ts`; Vitest 4 did not select
