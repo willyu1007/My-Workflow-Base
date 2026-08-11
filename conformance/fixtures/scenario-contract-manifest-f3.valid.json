@@ -1,10 +1,10 @@
 {
   "scenario_contracts_version": 1,
   "source_dependencies": [
-    { "source_identity": "platform_child_family_identity_source_v1", "source_hash": "81d9fb9db244b8e56bc85e8770eb13915ca87b6053bb3411420b569d59d8fed4" },
-    { "source_identity": "scenario_interface_source_v1", "source_hash": "37f0cdae3ad8807073dd250a51f4de990dcccf40952c127b2340161db2e28eaf" },
-    { "source_identity": "scenario_domain_action_source_v1", "source_hash": "b7c35259d03a84778cc909075a08d6b147a43a38a12cddeb875c94f01591e48d" },
-    { "source_identity": "scenario_protected_interaction_source_v1", "source_hash": "78eadaf4448b61ab3629026fefe4befbb2522eccbc7e459366d1032885d90efb" }
+    { "source_identity": "platform_child_family_identity_source_v1", "source_hash": "9655e83ff6a973055fb1b3f170cdbcd3c3eea6cb117f59209844a2a355b6a861" },
+    { "source_identity": "scenario_interface_source_v1", "source_hash": "be67d3264a9442ce30a8303d6acf86a05ea86c8a3ed1d933f41c5aa922b1ff95" },
+    { "source_identity": "scenario_domain_action_source_v1", "source_hash": "b962acf3fc35d02d7b903854a3eed3f6177e3dc4d00b32124122a120b458f5f0" },
+    { "source_identity": "scenario_protected_interaction_source_v1", "source_hash": "a34f3864b76d1dc16eadb901f506fcc473a0cb298da7d1e273de9238eb880cf5" }
   ],
   "capability_dependencies": [
     { "capability_key": "trusted_scenario_invocation_v1", "requires_capabilities": [], "requires_sources": ["scenario_interface_source_v1"] },

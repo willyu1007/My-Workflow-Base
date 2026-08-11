@@ -6,7 +6,7 @@
     "workflow-contracts",
     "workflow-validator"
   ],
-  "source_hash": "d17f23585bb90ab607eb0fc80af629d8ab13ceb4508118de28162e4fd8846383",
+  "source_hash": "dd888b89f89d4137fb717bba60a400f9f68bb127b4485121270f1c8eb9ea51e7",
   "files": [
     {
       "path": "workflow-contracts/index.ts",
@@ -50,8 +50,8 @@
     },
     {
       "path": "workflow-contracts/types/module.ts",
-      "bytes": 3430,
-      "sha256": "9752f54c72105fe58c42c42df524c5c71094409ea1d7f01494cc1bb589e76213"
+      "bytes": 4656,
+      "sha256": "8256e2b9d954f7ecd17c8057e517ba5a24f650de0c089ed73a1424ca792f35b5"
     },
     {
       "path": "workflow-contracts/types/scenario-binding-validation.ts",
@@ -115,14 +115,14 @@
     },
     {
       "path": "workflow-validator/validate-module.ts",
-      "bytes": 33476,
-      "sha256": "e141427a5d4e66593d3d0d959d34e55d2a12c677b09e123dfeb474ee8336ab3b"
+      "bytes": 35466,
+      "sha256": "6a782056fc52cd0ec58b1226a56fd0fb16af12d7ddf5a0d2a9184f62ee3c1b9e"
     }
   ],
   "source_profiles": [
     {
       "source_identity": "platform_child_family_identity_source_v1",
-      "source_hash": "81d9fb9db244b8e56bc85e8770eb13915ca87b6053bb3411420b569d59d8fed4",
+      "source_hash": "9655e83ff6a973055fb1b3f170cdbcd3c3eea6cb117f59209844a2a355b6a861",
       "files": [
         {
           "path": "workflow-contract-schemas/canonical-ref-v1.schema.json",
@@ -256,14 +256,14 @@
         },
         {
           "path": "workflow-validator/validate-module.ts",
-          "bytes": 33476,
-          "sha256": "e141427a5d4e66593d3d0d959d34e55d2a12c677b09e123dfeb474ee8336ab3b"
+          "bytes": 35466,
+          "sha256": "6a782056fc52cd0ec58b1226a56fd0fb16af12d7ddf5a0d2a9184f62ee3c1b9e"
         }
       ]
     },
     {
       "source_identity": "scenario_interface_source_v1",
-      "source_hash": "37f0cdae3ad8807073dd250a51f4de990dcccf40952c127b2340161db2e28eaf",
+      "source_hash": "be67d3264a9442ce30a8303d6acf86a05ea86c8a3ed1d933f41c5aa922b1ff95",
       "files": [
         {
           "path": "workflow-contract-schemas/canonical-ref-v1.schema.json",
@@ -407,14 +407,14 @@
         },
         {
           "path": "workflow-validator/validate-module.ts",
-          "bytes": 33476,
-          "sha256": "e141427a5d4e66593d3d0d959d34e55d2a12c677b09e123dfeb474ee8336ab3b"
+          "bytes": 35466,
+          "sha256": "6a782056fc52cd0ec58b1226a56fd0fb16af12d7ddf5a0d2a9184f62ee3c1b9e"
         }
       ]
     },
     {
       "source_identity": "scenario_domain_action_source_v1",
-      "source_hash": "b7c35259d03a84778cc909075a08d6b147a43a38a12cddeb875c94f01591e48d",
+      "source_hash": "b962acf3fc35d02d7b903854a3eed3f6177e3dc4d00b32124122a120b458f5f0",
       "files": [
         {
           "path": "workflow-contract-schemas/bind-scenario-domain-action-step-input-v1.schema.json",
@@ -638,14 +638,14 @@
         },
         {
           "path": "workflow-validator/validate-module.ts",
-          "bytes": 33476,
-          "sha256": "e141427a5d4e66593d3d0d959d34e55d2a12c677b09e123dfeb474ee8336ab3b"
+          "bytes": 35466,
+          "sha256": "6a782056fc52cd0ec58b1226a56fd0fb16af12d7ddf5a0d2a9184f62ee3c1b9e"
         }
       ]
     },
     {
       "source_identity": "scenario_protected_interaction_source_v1",
-      "source_hash": "78eadaf4448b61ab3629026fefe4befbb2522eccbc7e459366d1032885d90efb",
+      "source_hash": "a34f3864b76d1dc16eadb901f506fcc473a0cb298da7d1e273de9238eb880cf5",
       "files": [
         {
           "path": "workflow-contract-schemas/bind-scenario-domain-action-step-input-v1.schema.json",
@@ -934,11 +934,11 @@
         },
         {
           "path": "workflow-validator/validate-module.ts",
-          "bytes": 33476,
-          "sha256": "e141427a5d4e66593d3d0d959d34e55d2a12c677b09e123dfeb474ee8336ab3b"
+          "bytes": 35466,
+          "sha256": "6a782056fc52cd0ec58b1226a56fd0fb16af12d7ddf5a0d2a9184f62ee3c1b9e"
         }
       ]
     }
   ],
-  "contract_source_revision": "15ff031ed16897920c13fe24c9849531d98607ad"
+  "contract_source_revision": "6740871affd53a1200af8e19eaee67f4f0aff52d"
 }
