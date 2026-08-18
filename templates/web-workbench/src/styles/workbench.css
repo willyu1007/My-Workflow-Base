@@ -227,6 +227,10 @@
 .wb-nav__grouphead {
   display: flex; align-items: center; justify-content: space-between;
   padding-right: 4px;
+  /* Height must not depend on whether the group has an add button (22px + 3px
+     margin), or the label — and the gap above it — shifts between groups and
+     between scenarios. Locked to the with-button height. */
+  min-height: 25px;
 }
 .wb-nav__add {
   display: inline-flex; align-items: center; justify-content: center;
@@ -376,7 +380,10 @@
 /* 新增 nav item + create popup (in the sidebar 常用功能 group) */
 .wb-create { position: relative; }
 .wb-create__pop { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 60; }
-button.wb-nav__item { width: 100%; background: transparent; border: 0; font: inherit; text-align: left; cursor: pointer; }
+/* font-family/line-height as longhands, NOT the `font` shorthand: the shorthand
+   outranks .wb-nav__item (lower specificity) and resets font-size/weight to the
+   body's 15px/400, so button-rendered items (soon, 新增) drift from link items. */
+button.wb-nav__item { width: 100%; background: transparent; border: 0; font-family: inherit; line-height: inherit; text-align: left; cursor: pointer; }
 
 /* Scenario switcher (topbar-left) */
 .wb-scenario { position: relative; }
