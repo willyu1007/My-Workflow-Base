@@ -96,11 +96,19 @@ export interface NavGroupDef {
   readonly add?: NavGroupAddDef;
 }
 
-/** An entry in the sidebar 「新增」 create menu. */
+/** An entry in the sidebar quick-entry menu. */
 export interface CreateItemDef {
   readonly href: string;
   readonly label: string;
   readonly soon?: boolean;
+  /** Leading glyph naming the subject (作业, 学情, …). Optional. */
+  readonly icon?: ReactNode;
+  /**
+   * What the entry does, shown as a trailing affordance. The menu mixes making
+   * something with going somewhere, and a reader should not have to open each
+   * one to find out which. Defaults to `create`.
+   */
+  readonly kind?: "create" | "navigate";
 }
 
 /** Route prefix → topbar breadcrumb section (for non-workflow routes). */
@@ -117,6 +125,12 @@ export interface ShellNav {
   readonly identity?: IdentityConfig;
   readonly groups: readonly NavGroupDef[];
   readonly create?: readonly CreateItemDef[];
+  /**
+   * Label for the create/quick-entry item. Defaults to 「新增」; a scenario whose
+   * menu also navigates should say so, since the shell holds no vocabulary of
+   * its own.
+   */
+  readonly createLabel?: string;
   readonly sections: readonly SectionDef[];
   readonly home?: { readonly label: string; readonly href: string };
 }

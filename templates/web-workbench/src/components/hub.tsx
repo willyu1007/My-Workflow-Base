@@ -17,9 +17,6 @@ import { useState } from "react";
 import type { DashAttention, WorkflowModule } from "../contracts/dashboard.js";
 import type { RowModel } from "../contracts/row-model.js";
 import { EntityRow } from "./entity-row.js";
-import { IconCheck, IconChevronDown, IconMore } from "./icons.js";
-import { Menu } from "./menu.js";
-import { Link } from "./nav.js";
 import { EmptyState, Section, Stat, StatStrip } from "./primitives.js";
 import { Scene } from "./scene.js";
 
@@ -48,65 +45,37 @@ export function Hub({
 }): React.ReactElement {
   const [active, setActive] = useState<string>("all");
 
+  // The stat strip always shows every workflow: it is the overview, and losing
+  // half of it while filtering is what the filter is meant to avoid. Only the
+  // content below narrows.
   const visible = active === "all" ? modules : modules.filter((m) => m.key === active);
-  const quickActions = modules.flatMap((m) => m.quickActions);
   const attention = visible.flatMap((m) => m.attention);
   const highlights = visible.flatMap((m) => m.highlights.map((h) => ({ h, accent: m.accent })));
   const showTag = active === "all" && new Set(attention.map((a) => a.workflow)).size > 1;
 
-  const scopes = [{ key: "all", label: "全部" }, ...modules.map((m) => ({ key: m.key, label: m.label }))];
-  const activeLabel = scopes.find((s) => s.key === active)?.label ?? "全部";
-
-  // Scope filter (left) + quick-actions (right) live in the scene toolbar, never the topbar.
-  const scopeFilter =
-    modules.length > 1 ? (
-      <Menu
-        label="按工作流筛选"
-        align="start"
-        trigger={
-          <>
-            {activeLabel}
-            <IconChevronDown size={14} style={{ color: "var(--mt-stone)" }} />
-          </>
-        }
-      >
-        {scopes.map((s) => (
-          <button
-            key={s.key}
-            type="button"
-            className="mt-menu-item"
-            role="menuitem"
-            aria-current={active === s.key ? "true" : undefined}
-            onClick={() => setActive(s.key)}
-          >
-            <span className="wb-spacer">{s.label}</span>
-            {active === s.key && <IconCheck size={14} style={{ color: "var(--mt-orange-700)" }} />}
-          </button>
-        ))}
-      </Menu>
-    ) : null;
-
-  const quickMenu =
-    quickActions.length > 0 ? (
-      <Menu label="快捷入口" align="end" trigger={<IconMore size={18} />}>
-        <p className="wb-menu-label">快捷入口</p>
-        {quickActions.map((l) => (
-          <Link key={l.href} href={l.href} className="mt-menu-item mt-menu-item--indent" role="menuitem">
-            {l.label}
-          </Link>
-        ))}
-      </Menu>
-    ) : null;
-
   return (
     <Scene
-      filters={scopeFilter}
-      actions={quickMenu}
       stats={
         <div className="wb-statrows">
-          {visible.map((m) => (
+          {modules.map((m) => (
             <div className="wb-statrow" key={m.key}>
-              <span className={`wb-statrow__label wb-emph--${m.accent}`}>{m.label}</span>
+              <button
+                type="button"
+                // Neutral, not the workflow's own colour: `--emph` is a fill
+                // palette and fails text contrast at this size for four of its
+                // six tones. The colour identity moves to the dot beside it,
+                // which is what a fill colour is for.
+                className={`wb-statrow__label${
+                  active !== "all" && active !== m.key ? " wb-statrow__label--dim" : ""
+                }`}
+                aria-pressed={active === m.key}
+                // Selecting the active one again clears the filter, so the
+                // control that narrows is also the one that restores.
+                onClick={() => setActive((a) => (a === m.key ? "all" : m.key))}
+              >
+                <span className={`wb-statrow__dot wb-emph--${m.accent}`} aria-hidden="true" />
+                {m.label}
+              </button>
               <StatStrip>
                 {m.stats.map((s) => (
                   <Stat

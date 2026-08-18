@@ -380,6 +380,11 @@
 /* 新增 nav item + create popup (in the sidebar 常用功能 group) */
 .wb-create { position: relative; }
 .wb-create__pop { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 60; }
+/* The popup is sidebar-width, so a row is leading glyph + label + trailing mark
+   inside ~228px. The mark is muted: it names the kind, it is not the action. */
+.wb-create__lead { display: inline-flex; flex: 0 0 15px; color: var(--fg-3); }
+.wb-create__kind { display: inline-flex; flex: 0 0 auto; color: var(--mt-ink-5); }
+.mt-menu-item:hover .wb-create__kind { color: var(--fg-3); }
 /* font-family/line-height as longhands, NOT the `font` shorthand: the shorthand
    outranks .wb-nav__item (lower specificity) and resets font-size/weight to the
    body's 15px/400, so button-rendered items (soon, 新增) drift from link items. */
@@ -552,10 +557,28 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
 /* Per-workflow stat rows: one row per workflow, each with its own metrics (口径). */
 .wb-statrows { display: flex; flex-direction: column; gap: 6px; margin-bottom: 28px; }
 .wb-statrow { display: flex; align-items: baseline; gap: 20px; }
+/* The label is the workflow filter. Its colour is neutral on purpose: `--emph`
+   is a fill palette, and as 12px text four of its six tones fall under 4.5:1 on
+   the scene background. The workflow's colour identity sits in the dot, which
+   is what a fill colour is for. */
 .wb-statrow__label {
-  flex-shrink: 0; width: 44px;
+  display: inline-flex; align-items: baseline; gap: 6px;
+  flex-shrink: 0; padding: 2px 6px; margin-left: -6px;
+  border: 0; background: transparent; cursor: pointer;
   font-family: var(--font-display); font-weight: 700; font-size: 12px;
-  letter-spacing: 0.02em; color: var(--emph, var(--fg-2));
+  letter-spacing: 0.02em; color: var(--fg-1);
+  border-radius: 6px;
+}
+.wb-statrow__label:hover { background: var(--bg-hover); }
+/* Unselected while a filter is active. `--fg-2` is 7.24:1 here; the next step
+   down, `--mt-ink-5`, is 2.28:1 and cannot carry text. Hover returns it to full
+   strength so dimmed never reads as disabled. */
+.wb-statrow__label--dim { color: var(--fg-2); }
+.wb-statrow__label--dim:hover { color: var(--fg-1); }
+.wb-statrow__dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--emph, var(--fg-3)); flex: 0 0 7px;
+  align-self: center;
 }
 .wb-statrow .wb-stats { flex: 1; min-width: 0; margin-bottom: 0; }
 

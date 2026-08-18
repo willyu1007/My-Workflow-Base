@@ -1,13 +1,33 @@
 /**
- * SidebarCreate — the 「新增」 item that opens a create menu. Items are supplied
+ * SidebarCreate — the quick-entry item that opens its menu. Items are supplied
  * by the scenario via ShellNav.create.
+ *
+ * The label defaults to 「新增」 for callers that only create; a scenario whose
+ * menu also navigates passes its own, and each row carries a trailing mark
+ * saying which it is.
  */
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import type { CreateItemDef } from "../contracts/shell-nav.js";
-import { IconPlus } from "./icons.js";
+import { IconArrowRight, IconList, IconPlus } from "./icons.js";
 import { Link } from "./nav.js";
+
+/**
+ * The trailing affordance. The menu mixes making something with going
+ * somewhere, and the two read identically without it.
+ */
+function KindMark({
+  kind = "create",
+}: {
+  readonly kind?: "create" | "navigate" | undefined;
+}): React.ReactElement {
+  return (
+    <span className="wb-create__kind" aria-hidden="true">
+      {kind === "create" ? <IconPlus size={13} /> : <IconArrowRight size={13} />}
+    </span>
+  );
+}
 
 export function SidebarCreate({
   items,
@@ -47,7 +67,7 @@ export function SidebarCreate({
         onClick={() => setOpen((o) => !o)}
       >
         <span className="wb-nav__icon">
-          <IconPlus />
+          <IconList />
         </span>
         <span className="wb-nav__label">{label}</span>
       </button>
@@ -62,8 +82,10 @@ export function SidebarCreate({
                 aria-disabled="true"
                 style={{ opacity: 0.5, cursor: "not-allowed" }}
               >
+                {c.icon && <span className="wb-create__lead">{c.icon}</span>}
                 <span className="wb-spacer">{c.label}</span>
                 <span className="wb-nav__soon">建设中</span>
+                <KindMark kind={c.kind} />
               </span>
             ) : (
               <Link
@@ -76,7 +98,9 @@ export function SidebarCreate({
                   onNavigate?.();
                 }}
               >
+                {c.icon && <span className="wb-create__lead">{c.icon}</span>}
                 <span className="wb-spacer">{c.label}</span>
+                <KindMark kind={c.kind} />
               </Link>
             ),
           )}

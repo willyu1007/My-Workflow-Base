@@ -27,12 +27,6 @@ export interface DashStat {
 /** A to-do contributed by a workflow; `workflow` tags it in the unified list. */
 export type DashAttention = AttentionItem & { readonly workflow: string };
 
-export interface DashQuickAction {
-  readonly href: string;
-  readonly label: string;
-  readonly icon: ReactNode;
-}
-
 export interface DashHighlight {
   readonly title: string;
   readonly link?: { readonly href: string; readonly label: string };
@@ -48,5 +42,4 @@ export interface WorkflowModule {
   readonly attention: readonly DashAttention[];
   /** Named "ongoing / follow-up" blocks this workflow drops into the Hub region (0..N). */
   readonly highlights: readonly DashHighlight[];
-  readonly quickActions: readonly DashQuickAction[];
 }

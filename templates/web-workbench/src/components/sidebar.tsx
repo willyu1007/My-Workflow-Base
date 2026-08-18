@@ -180,7 +180,11 @@ export function Sidebar({
                 </Link>
               )}
               {nav.create && nav.create.length > 0 && (
-                <SidebarCreate items={nav.create} onNavigate={onClose} />
+                <SidebarCreate
+                  items={nav.create}
+                  {...(nav.createLabel ? { label: nav.createLabel } : {})}
+                  onNavigate={onClose}
+                />
               )}
             </div>
           )}

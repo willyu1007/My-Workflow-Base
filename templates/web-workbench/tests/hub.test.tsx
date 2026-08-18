@@ -1,15 +1,13 @@
 /**
- * <Hub>'s two scene-toolbar menus, and specifically which edge each opens from.
+ * <Hub>'s workflow filter, which is the stat-row labels themselves.
  *
- * The scope filter sits in `Scene`'s left `filters` slot and the quick-actions
- * menu in its right `actions` slot, whose contract says "right-aligned in the
- * scene bar". A right-anchored popover that opens rightward runs off the
- * viewport — which is exactly what shipped, because the quick menu was written
- * by copying the scope filter and its `align` came along.
- *
- * Nothing caught it, so this holds the pairing rather than the fix.
+ * Two things are held here. The strip always shows every workflow, because it
+ * is the overview and filtering is meant to narrow the content below it rather
+ * than hide half the numbers. And the control that narrows is the one that
+ * restores: selecting the active workflow again clears the filter, since after
+ * the scene toolbar was removed there is no other way back.
  */
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { Hub } from "../src/components/hub.js";
@@ -20,44 +18,87 @@ const modules: WorkflowModule[] = [
     key: "work",
     label: "作业",
     accent: "accent",
-    stats: [],
-    attention: [],
+    stats: [{ label: "待批改", value: 2 }],
+    attention: [
+      {
+        id: "a",
+        href: "/a",
+        cta: "去批改",
+        title: "2 份作答待批改",
+        detail: "新提交的作答尚未生成批改结果。",
+        workflow: "作业",
+        tone: "accent",
+      },
+    ],
     highlights: [],
-    quickActions: [{ href: "/new", label: "新建作业", icon: null }],
   },
   {
     key: "insight",
     label: "学情",
-    accent: "accent",
-    stats: [],
-    attention: [],
+    accent: "info",
+    stats: [{ label: "学情报告", value: 2 }],
+    attention: [
+      {
+        id: "b",
+        href: "/b",
+        cta: "去查看",
+        title: "2 份学情报告待查看",
+        detail: "作业分析已生成。",
+        workflow: "学情",
+        tone: "info",
+      },
+    ],
     highlights: [],
-    quickActions: [{ href: "/insights", label: "学情观察", icon: null }],
   },
 ];
 
-const popover = (): HTMLElement => {
-  const el = document.querySelector(".wb-menu2__pop");
-  if (!(el instanceof HTMLElement)) throw new Error("no menu popover is open");
-  return el;
-};
+const labelButton = (name: string): HTMLElement =>
+  screen.getByRole("button", { name: new RegExp(name) });
 
-describe("Hub scene-toolbar menus", () => {
-  it("opens the quick-actions menu from the right edge", async () => {
+describe("Hub workflow filter", () => {
+  it("narrows the content but never the stat strip", async () => {
     render(<Hub modules={modules} />);
-    await userEvent.click(screen.getByRole("button", { name: "快捷入口" }));
+    await userEvent.click(labelButton("作业"));
 
-    // `--end` is `right: 0`; `--start` is `left: 0` and would push a
-    // right-anchored popover off-screen.
-    expect(popover().className).toContain("wb-menu2__pop--end");
-    expect(popover().className).not.toContain("wb-menu2__pop--start");
-    expect(screen.getByRole("menuitem", { name: "新建作业" })).toBeTruthy();
+    // Both rows still stand; the numbers are the overview.
+    expect(labelButton("作业")).toBeTruthy();
+    expect(labelButton("学情")).toBeTruthy();
+    expect(screen.getByText("学情报告")).toBeTruthy();
+
+    // The content below is the part that narrowed.
+    expect(screen.getByText("2 份作答待批改")).toBeTruthy();
+    expect(screen.queryByText("2 份学情报告待查看")).toBeNull();
   });
 
-  it("keeps the left-slot scope filter opening from the left edge", async () => {
+  it("states the selection, and dims only the labels that are not selected", async () => {
     render(<Hub modules={modules} />);
-    await userEvent.click(screen.getByRole("button", { name: "按工作流筛选" }));
+    await userEvent.click(labelButton("作业"));
 
-    expect(popover().className).toContain("wb-menu2__pop--start");
+    expect(labelButton("作业").getAttribute("aria-pressed")).toBe("true");
+    expect(labelButton("作业").className).not.toContain("--dim");
+    expect(labelButton("学情").getAttribute("aria-pressed")).toBe("false");
+    expect(labelButton("学情").className).toContain("--dim");
+  });
+
+  it("clears the filter when the active workflow is selected again", async () => {
+    render(<Hub modules={modules} />);
+    await userEvent.click(labelButton("作业"));
+    expect(screen.queryByText("2 份学情报告待查看")).toBeNull();
+
+    await userEvent.click(labelButton("作业"));
+    expect(screen.getByText("2 份学情报告待查看")).toBeTruthy();
+    // Nothing is dimmed once no workflow is selected.
+    expect(labelButton("作业").className).not.toContain("--dim");
+    expect(labelButton("学情").className).not.toContain("--dim");
+  });
+
+  it("tags attention rows only while several workflows are in view", async () => {
+    render(<Hub modules={modules} />);
+    const unfiltered = screen.getByText("2 份作答待批改").closest("a, div, li");
+    expect(within(unfiltered as HTMLElement).queryByText("作业")).toBeTruthy();
+
+    await userEvent.click(labelButton("作业"));
+    const filtered = screen.getByText("2 份作答待批改").closest("a, div, li");
+    expect(within(filtered as HTMLElement).queryByText("作业")).toBeNull();
   });
 });
