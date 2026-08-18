@@ -70,14 +70,16 @@ describe("Hub workflow filter", () => {
     expect(screen.queryByText("2 份学情报告待查看")).toBeNull();
   });
 
-  it("states the selection, and dims only the labels that are not selected", async () => {
+  it("marks the selected label and only that one", async () => {
     render(<Hub modules={modules} />);
     await userEvent.click(labelButton("作业"));
 
+    // The state is a fill on the selected label, not a lightness step across
+    // the others: `--fg-1` against `--fg-2` is 2.29:1 and reads as no change.
     expect(labelButton("作业").getAttribute("aria-pressed")).toBe("true");
-    expect(labelButton("作业").className).not.toContain("--dim");
+    expect(labelButton("作业").className).toContain("--on");
     expect(labelButton("学情").getAttribute("aria-pressed")).toBe("false");
-    expect(labelButton("学情").className).toContain("--dim");
+    expect(labelButton("学情").className).not.toContain("--on");
   });
 
   it("clears the filter when the active workflow is selected again", async () => {
@@ -87,9 +89,9 @@ describe("Hub workflow filter", () => {
 
     await userEvent.click(labelButton("作业"));
     expect(screen.getByText("2 份学情报告待查看")).toBeTruthy();
-    // Nothing is dimmed once no workflow is selected.
-    expect(labelButton("作业").className).not.toContain("--dim");
-    expect(labelButton("学情").className).not.toContain("--dim");
+    // Nothing is marked once no workflow is selected.
+    expect(labelButton("作业").className).not.toContain("--on");
+    expect(labelButton("学情").className).not.toContain("--on");
   });
 
   it("tags attention rows only while several workflows are in view", async () => {

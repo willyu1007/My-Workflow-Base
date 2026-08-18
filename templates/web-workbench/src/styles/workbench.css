@@ -472,7 +472,9 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
 .wb-content > * {
   width: 100%;
   max-width: 1180px;
-  margin-inline: 0;
+  /* The cap was already here; it was pinned left, so past ~1460px the whole
+     scene drifted away from centre while the right filled with nothing. */
+  margin-inline: auto;
 }
 @media (max-width: 920px) {
   .wb-content { overflow-y: visible; }
@@ -569,18 +571,26 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
   letter-spacing: 0.02em; color: var(--fg-1);
   border-radius: 6px;
 }
-.wb-statrow__label:hover { background: var(--bg-hover); }
-/* Unselected while a filter is active. `--fg-2` is 7.24:1 here; the next step
-   down, `--mt-ink-5`, is 2.28:1 and cannot carry text. Hover returns it to full
-   strength so dimmed never reads as disabled. */
-.wb-statrow__label--dim { color: var(--fg-2); }
-.wb-statrow__label--dim:hover { color: var(--fg-1); }
+.wb-statrow__label:hover { background: var(--mt-sand); }
+/* Selection is a fill, not a lightness step. Dimming the unselected labels was
+   tried first and is why this exists: `--fg-1` against `--fg-2` is 2.29:1
+   between the two, so the state was invisible even though each colour cleared
+   AA against the background. Contrast with the background is not the quantity a
+   reader compares. Both labels keep `--fg-1` (16.62:1) and the pill carries the
+   state, on the same sand the rest of the shell already uses for `--on`. */
+.wb-statrow__label--on,
+.wb-statrow__label--on:hover { background: var(--mt-sand-2); }
 .wb-statrow__dot {
   width: 7px; height: 7px; border-radius: 50%;
   background: var(--emph, var(--fg-3)); flex: 0 0 7px;
   align-self: center;
 }
 .wb-statrow .wb-stats { flex: 1; min-width: 0; margin-bottom: 0; }
+/* Scoped to the Hub's rows: `.wb-stat` is `flex: 1 1 0` elsewhere and should
+   stay that way. Here it pushed four figures into the four corners of a 1022px
+   row, so the spacing between them was whatever was left over rather than
+   anything chosen. Content width reads as one group of numbers. */
+.wb-statrow .wb-stat { flex: 0 0 auto; min-width: 0; }
 
 /* Line-free pulse row: read-only metrics, no tray / card / icon. */
 .wb-stats {

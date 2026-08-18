@@ -64,9 +64,10 @@ export function Hub({
                 // Neutral, not the workflow's own colour: `--emph` is a fill
                 // palette and fails text contrast at this size for four of its
                 // six tones. The colour identity moves to the dot beside it,
-                // which is what a fill colour is for.
+                // which is what a fill colour is for, and the selected state is
+                // a pill rather than a lightness step.
                 className={`wb-statrow__label${
-                  active !== "all" && active !== m.key ? " wb-statrow__label--dim" : ""
+                  active === m.key ? " wb-statrow__label--on" : ""
                 }`}
                 aria-pressed={active === m.key}
                 // Selecting the active one again clears the filter, so the
