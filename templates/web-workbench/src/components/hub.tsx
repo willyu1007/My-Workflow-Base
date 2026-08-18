@@ -88,7 +88,7 @@ export function Hub({
 
   const quickMenu =
     quickActions.length > 0 ? (
-      <Menu label="快捷入口" align="start" trigger={<IconMore size={18} />}>
+      <Menu label="快捷入口" align="end" trigger={<IconMore size={18} />}>
         <p className="wb-menu-label">快捷入口</p>
         {quickActions.map((l) => (
           <Link key={l.href} href={l.href} className="mt-menu-item mt-menu-item--indent" role="menuitem">
