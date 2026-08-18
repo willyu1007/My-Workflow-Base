@@ -34,6 +34,7 @@ export * from "./components/tabs.js";
 export * from "./components/badge.js";
 
 // ---- App shell (Batch 2) — one ShellNav drives sidebar + topbar breadcrumb ----
+export * from "./components/identity-switcher.js";
 export * from "./components/scenario-switcher.js";
 export * from "./components/breadcrumb.js";
 export * from "./components/account-menu.js";

@@ -30,6 +30,32 @@ export interface ScenarioConfig {
   readonly onRegister?: () => void;
 }
 
+/**
+ * One role the account holds. `surface` says where that role is served (e.g.
+ * 仅移动端班级工作台) — shown so a role this workbench cannot serve reads as a
+ * fact about the account rather than a switch target that leads nowhere.
+ */
+export interface IdentityRef {
+  readonly key: string;
+  readonly label: string;
+  readonly surface?: string;
+}
+
+/**
+ * The session's bound role, rendered as the topbar-right chip. A bound role is
+ * reading context — it decides what every number on the page means — so it
+ * stays visible instead of living behind the account menu.
+ *
+ * Omit `onSwitch` when no role is reachable from this surface: `others` then
+ * render as informational entries. (Per-entry switchability is not modelled
+ * until a scenario actually mixes reachable and unreachable roles.)
+ */
+export interface IdentityConfig {
+  readonly current: IdentityRef;
+  readonly others?: readonly IdentityRef[];
+  readonly onSwitch?: (key: string) => void;
+}
+
 /** A breadcrumb segment. */
 export interface Crumb {
   readonly label: string;
@@ -87,6 +113,8 @@ export interface SectionDef {
 export interface ShellNav {
   /** Topbar root — the always-present scenario switcher. */
   readonly scenario: ScenarioConfig;
+  /** Topbar right — the session's bound role. Omit for single-role surfaces. */
+  readonly identity?: IdentityConfig;
   readonly groups: readonly NavGroupDef[];
   readonly create?: readonly CreateItemDef[];
   readonly sections: readonly SectionDef[];
