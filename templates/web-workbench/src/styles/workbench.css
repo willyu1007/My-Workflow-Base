@@ -585,7 +585,21 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
   background: var(--emph, var(--fg-3)); flex: 0 0 7px;
   align-self: center;
 }
-.wb-statrow .wb-stats { flex: 1; min-width: 0; margin-bottom: 0; }
+/* A fixed four-column grid rather than flex, so a workflow reporting one figure
+   leaves three empty columns instead of stretching that figure across the row.
+   Flex was the reason a single stat ballooned to the full width, and it is also
+   why centring alone put it under the second column instead of the first. */
+.wb-statrow .wb-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  flex: 1; min-width: 0; margin-bottom: 0;
+}
+.wb-statrow .wb-stat {
+  /* Centred in its own column; the 24px inset belonged to the left-aligned
+     layout and would push centred content off-centre. */
+  align-items: center; text-align: center;
+  padding-left: 0; min-width: 0;
+}
 
 /* Line-free pulse row: read-only metrics, no tray / card / icon. */
 .wb-stats {
