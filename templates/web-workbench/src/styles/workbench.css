@@ -586,11 +586,6 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
   align-self: center;
 }
 .wb-statrow .wb-stats { flex: 1; min-width: 0; margin-bottom: 0; }
-/* Scoped to the Hub's rows: `.wb-stat` is `flex: 1 1 0` elsewhere and should
-   stay that way. Here it pushed four figures into the four corners of a 1022px
-   row, so the spacing between them was whatever was left over rather than
-   anything chosen. Content width reads as one group of numbers. */
-.wb-statrow .wb-stat { flex: 0 0 auto; min-width: 0; }
 
 /* Line-free pulse row: read-only metrics, no tray / card / icon. */
 .wb-stats {
