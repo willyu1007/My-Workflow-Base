@@ -79,6 +79,7 @@
 ## Kickoff gate
 
 - Status: ready
+- Authorized boundary: none
 - [x] Decisions: authority, trust, dispatch, and recovery choices are settled.
 - [x] Design: the public contract and owner boundaries are recorded.
 - [x] Route: all planned phases completed with exit evidence.

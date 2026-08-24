@@ -78,6 +78,7 @@
 ## Kickoff gate
 
 - Status: ready
+- Authorized boundary: none
 - [x] Decisions: value, token, composition, and skill boundaries are settled.
 - [x] Design: consumed contracts and ownership are reflected in `02-architecture.md`.
 - [x] Route: all convergence phases completed and shipped.

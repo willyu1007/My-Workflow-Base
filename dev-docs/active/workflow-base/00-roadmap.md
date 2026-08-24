@@ -95,6 +95,7 @@
 ## Kickoff gate
 
 - Status: ready
+- Authorized boundary: none
 - [x] Decisions: the contract, ownership, event, handoff, and trust boundaries are settled.
 - [x] Design: current public interfaces and invariants are captured in `02-architecture.md`.
 - [x] Route: the remaining qualification phase has a concrete first action and recovery boundary.
