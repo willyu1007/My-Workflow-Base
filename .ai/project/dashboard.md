@@ -18,7 +18,7 @@ next step here.
 <!-- AUTO-GENERATED:START dashboard -->
 ## Summary
 
-- Tasks: 4 (planned: 0, in-progress: 1, blocked: 0, done: 3, archived: 0)
+- Tasks: 4 (planned: 0, in-progress: 1, blocked: 0, done: 2, archived: 1)
 
 ## Recently registered or status-changed tasks
 
@@ -27,5 +27,5 @@ next step here.
 | T-001 workflow-base | in-progress | F-001 | dev-docs/active/workflow-base |
 | T-003 workflow-batch-execution-control | done | F-001 | dev-docs/active/workflow-batch-execution-control |
 | T-004 ui-kit-convergence | done | F-002 | dev-docs/active/ui-kit-convergence |
-| T-005 repository-governance-convergence | done | F-000 | dev-docs/active/repository-governance-convergence |
+| T-005 repository-governance-convergence | archived | F-000 | dev-docs/archive/repository-governance-convergence |
 <!-- AUTO-GENERATED:END dashboard -->

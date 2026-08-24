@@ -13,7 +13,7 @@
 
 | Task | Status | Dev Docs |
 | --- | --- | --- |
-| T-005 repository-governance-convergence | done | dev-docs/active/repository-governance-convergence |
+| T-005 repository-governance-convergence | archived | dev-docs/archive/repository-governance-convergence |
 
 ## M-001 Federated scenario framework
 
