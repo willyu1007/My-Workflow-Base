@@ -29,7 +29,7 @@ Today the shared-name set is value-identical.
 | Token schema shape | My-Chat ui-visual-system until stable, then copied here (B) | shape only; no runtime coupling |
 | Component chrome / paradigms | Base (PARADIGMS.md, components) | unchanged by this program |
 | Enforcement in consumers | Base ships presets; consumers wire them into their CI (C) | Base has no gate of its own to run against consumers |
-| `data-ui` role contract | My-Chat only | competing composition model; excluded (00-overview non-goals) |
+| `data-ui` role contract | My-Chat only | competing composition model; excluded (`00-roadmap.md` out of scope) |
 
 ## Key risks
 
@@ -38,8 +38,8 @@ Today the shared-name set is value-identical.
   per-app, not per-kit. Nothing in B–D may import the `data-ui` vocabulary
   into the workbench.
 - **B before My-Chat stabilizes** would copy a moving schema (dark theme
-  roles are explicitly unfinished there). The entry condition in 01-plan is
-  the guard.
+  roles are explicitly unfinished there). The entry condition in
+  `00-roadmap.md` is the guard.
 - **Consumer visual drift during the 0.7→0.8 window.** Until Education and
   Nurture re-pin, screenshots across repos disagree on neutrals. Keep the
   window short.
