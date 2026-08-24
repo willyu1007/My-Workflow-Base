@@ -1,0 +1,846 @@
+{
+  "schema_version": "workflow_batch_execution_control_canonical_vectors_v1",
+  "canonicalization_profile": "rfc8785_jcs_sha256_v1",
+  "vectors": [
+    {
+      "name": "create-if-absent-request",
+      "kind": "request",
+      "domain_prefix": "workflow_batch_execution_control_v1/request\u0000",
+      "output_hash_path": ["request_meta", "request_hash"],
+      "document": {
+        "kind": "create_if_absent",
+        "operation": "open_or_resume_batch",
+        "schema_version": 1,
+        "pins": {
+          "capability_family": "workflow_batch_execution_control_v1",
+          "capability_version": 1,
+          "contract_revision": "contract-revision-1",
+          "contract_source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "canonicalization_profile": "rfc8785_jcs_sha256_v1",
+          "vector_release_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "owner_namespace": "owner.workflow",
+          "receipt_issuer": "owner.workflow",
+          "receipt_audience": "consumer.workflow",
+          "receipt_authority_id": "receipt-authority-1",
+          "receipt_authority_version": "1",
+          "owner_deployment_id": "owner-deployment-1",
+          "owner_deployment_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "ledger_schema_revision": "ledger-v1",
+          "trust_mode": "opaque_owner_readback_v1"
+        },
+        "scope": {
+          "kind": "platform",
+          "scope_id": "platform-control"
+        },
+        "policy_decision": {
+          "kind": "forward_window",
+          "decision_ref": "policy:forward-1",
+          "decision_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+          "decision_issuer": "policy.workflow",
+          "decision_audience": "owner.workflow",
+          "not_before": "2026-07-23T00:00:00.000Z",
+          "expires_at": "2026-07-23T00:15:00.000Z"
+        },
+        "request_meta": {
+          "command_id": "command:create-1",
+          "idempotency_key": "idempotency:create-1",
+          "correlation_id": "correlation:create-1",
+          "request_hash": "92e6c761106f10f0c42f57006791caef39f282fbef00d0d6e66d2c06d4957877"
+        },
+        "binding": {
+          "client_generation_key": "generation:series-1:0",
+          "logical_series_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+          "purpose_profile_hash": "5555555555555555555555555555555555555555555555555555555555555555",
+          "logical_unit_collection_root": "6666666666666666666666666666666666666666666666666666666666666666",
+          "logical_unit_count": 1,
+          "binding_hash": "7777777777777777777777777777777777777777777777777777777777777777",
+          "logical_units": [
+            {
+              "logical_unit_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+              "execution_binding_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+              "workload_class_hash": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          ],
+          "generation": 0,
+          "supersession": null
+        },
+        "precondition": {
+          "kind": "expected_absent",
+          "expected_global_head": {
+            "ledger_sequence": "0",
+            "last_event_hash": null,
+            "registry_version": "0",
+            "admission_root": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "uniqueness_root": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "active_claim_count": 0,
+            "active_reserved_execution_count": 0,
+            "lifetime_logical_unit_count": 0,
+            "lifetime_task_id_count": 0,
+            "lifetime_execution_id_count": 0
+          }
+        }
+      },
+      "projection": {
+        "kind": "create_if_absent",
+        "operation": "open_or_resume_batch",
+        "schema_version": 1,
+        "pins": {
+          "capability_family": "workflow_batch_execution_control_v1",
+          "capability_version": 1,
+          "contract_revision": "contract-revision-1",
+          "contract_source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "canonicalization_profile": "rfc8785_jcs_sha256_v1",
+          "vector_release_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "owner_namespace": "owner.workflow",
+          "receipt_issuer": "owner.workflow",
+          "receipt_audience": "consumer.workflow",
+          "receipt_authority_id": "receipt-authority-1",
+          "receipt_authority_version": "1",
+          "owner_deployment_id": "owner-deployment-1",
+          "owner_deployment_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "ledger_schema_revision": "ledger-v1",
+          "trust_mode": "opaque_owner_readback_v1"
+        },
+        "scope": {
+          "kind": "platform",
+          "scope_id": "platform-control"
+        },
+        "policy_decision": {
+          "kind": "forward_window",
+          "decision_ref": "policy:forward-1",
+          "decision_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+          "decision_issuer": "policy.workflow",
+          "decision_audience": "owner.workflow",
+          "not_before": "2026-07-23T00:00:00.000Z",
+          "expires_at": "2026-07-23T00:15:00.000Z"
+        },
+        "request_meta": {
+          "command_id": "command:create-1",
+          "idempotency_key": "idempotency:create-1",
+          "correlation_id": "correlation:create-1"
+        },
+        "binding": {
+          "client_generation_key": "generation:series-1:0",
+          "logical_series_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+          "purpose_profile_hash": "5555555555555555555555555555555555555555555555555555555555555555",
+          "logical_unit_collection_root": "6666666666666666666666666666666666666666666666666666666666666666",
+          "logical_unit_count": 1,
+          "binding_hash": "7777777777777777777777777777777777777777777777777777777777777777",
+          "logical_units": [
+            {
+              "logical_unit_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+              "execution_binding_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+              "workload_class_hash": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          ],
+          "generation": 0,
+          "supersession": null
+        },
+        "precondition": {
+          "kind": "expected_absent",
+          "expected_global_head": {
+            "ledger_sequence": "0",
+            "last_event_hash": null,
+            "registry_version": "0",
+            "admission_root": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "uniqueness_root": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "active_claim_count": 0,
+            "active_reserved_execution_count": 0,
+            "lifetime_logical_unit_count": 0,
+            "lifetime_task_id_count": 0,
+            "lifetime_execution_id_count": 0
+          }
+        }
+      },
+      "expected_projection_sha256": "e2f5f86a36ed417696b1217b27d3cd40090f821ae31fdc79afcc3c639c94ecfa",
+      "expected_domain_hash": "92e6c761106f10f0c42f57006791caef39f282fbef00d0d6e66d2c06d4957877",
+      "mutated_output_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "tamper_cases": [
+        {
+          "name": "changed-requested-generation-key",
+          "path": ["binding", "client_generation_key"],
+          "replacement": "generation:series-1:changed",
+          "expected_domain_hash": "8e157220efc620e0d254becd8e4f6a7342191e3e65a70519ed57d828c223a11b"
+        },
+        {
+          "name": "omitted-policy-decision-hash",
+          "path": ["policy_decision", "decision_hash"],
+          "remove": true,
+          "expected_domain_hash": "65b592be47d9101897b5e9929ce4b9c6e2bc9a1059c7fb75172cc87bc031cde1"
+        }
+      ]
+    },
+    {
+      "name": "batch-opened-authority-envelope",
+      "kind": "authority_envelope",
+      "domain_prefix": "workflow_batch_execution_control_v1/authority-envelope\u0000",
+      "output_hash_path": ["authority_envelope_hash"],
+      "preallocated_ref": {
+        "path": ["receipt_ref"],
+        "value": "receipt:batch-opened-1"
+      },
+      "document": {
+        "schema_version": 1,
+        "receipt_ref": "receipt:batch-opened-1",
+        "pins": {
+          "capability_family": "workflow_batch_execution_control_v1",
+          "capability_version": 1,
+          "contract_revision": "contract-revision-1",
+          "contract_source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "canonicalization_profile": "rfc8785_jcs_sha256_v1",
+          "vector_release_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "owner_namespace": "owner.workflow",
+          "receipt_issuer": "owner.workflow",
+          "receipt_audience": "consumer.workflow",
+          "receipt_authority_id": "receipt-authority-1",
+          "receipt_authority_version": "1",
+          "owner_deployment_id": "owner-deployment-1",
+          "owner_deployment_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "ledger_schema_revision": "ledger-v1",
+          "trust_mode": "opaque_owner_readback_v1"
+        },
+        "scope": {
+          "kind": "platform",
+          "scope_id": "platform-control"
+        },
+        "causation": {
+          "kind": "client_command",
+          "command_id": "command:create-1",
+          "idempotency_key": "idempotency:create-1",
+          "request_hash": "92e6c761106f10f0c42f57006791caef39f282fbef00d0d6e66d2c06d4957877"
+        },
+        "before_batch_head": null,
+        "after_batch_head": {
+          "owner_batch_id": "batch-1",
+          "state": "planned",
+          "snapshot_version": "1",
+          "ledger_sequence": "1",
+          "last_event_hash": "3333333333333333333333333333333333333333333333333333333333333333"
+        },
+        "before_global_head": {
+          "ledger_sequence": "0",
+          "last_event_hash": null,
+          "registry_version": "0",
+          "admission_root": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "uniqueness_root": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "active_claim_count": 0,
+          "active_reserved_execution_count": 0,
+          "lifetime_logical_unit_count": 0,
+          "lifetime_task_id_count": 0,
+          "lifetime_execution_id_count": 0
+        },
+        "after_global_head": {
+          "ledger_sequence": "1",
+          "last_event_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+          "registry_version": "1",
+          "admission_root": "abababababababababababababababababababababababababababababababab",
+          "uniqueness_root": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+          "active_claim_count": 0,
+          "active_reserved_execution_count": 0,
+          "lifetime_logical_unit_count": 1,
+          "lifetime_task_id_count": 0,
+          "lifetime_execution_id_count": 0
+        },
+        "batch_event": {
+          "event_id": "event:batch-opened-1",
+          "event_type": "batch_opened",
+          "causation": {
+            "kind": "client_command",
+            "command_id": "command:create-1",
+            "idempotency_key": "idempotency:create-1",
+          "request_hash": "92e6c761106f10f0c42f57006791caef39f282fbef00d0d6e66d2c06d4957877"
+          },
+          "stream": {
+            "kind": "batch",
+            "owner_batch_id": "batch-1"
+          },
+          "ledger_sequence": "1",
+          "previous_event_hash": null,
+          "owner_event_at": "2026-07-23T00:00:01.000Z",
+          "capacity_delta": {
+            "active_claim_count": 0,
+            "active_reserved_execution_count": 0,
+            "lifetime_logical_unit_count": 1,
+            "lifetime_task_id_count": 0,
+            "lifetime_execution_id_count": 0
+          },
+          "fact_root": "1111111111111111111111111111111111111111111111111111111111111111",
+          "event_hash": "3333333333333333333333333333333333333333333333333333333333333333"
+        },
+        "global_event": {
+          "event_id": "event:global-admission-1",
+          "event_type": "global_admission_changed",
+          "causation": {
+            "kind": "client_command",
+            "command_id": "command:create-1",
+            "idempotency_key": "idempotency:create-1",
+          "request_hash": "92e6c761106f10f0c42f57006791caef39f282fbef00d0d6e66d2c06d4957877"
+          },
+          "stream": {
+            "kind": "global",
+            "owner_namespace": "owner.workflow"
+          },
+          "ledger_sequence": "1",
+          "previous_event_hash": null,
+          "owner_event_at": "2026-07-23T00:00:01.000Z",
+          "capacity_delta": {
+            "active_claim_count": 0,
+            "active_reserved_execution_count": 0,
+            "lifetime_logical_unit_count": 1,
+            "lifetime_task_id_count": 0,
+            "lifetime_execution_id_count": 0
+          },
+          "fact_root": "abababababababababababababababababababababababababababababababab",
+          "event_hash": "4444444444444444444444444444444444444444444444444444444444444444"
+        },
+        "capacity_delta": {
+          "active_claim_count": 0,
+          "active_reserved_execution_count": 0,
+          "lifetime_logical_unit_count": 1,
+          "lifetime_task_id_count": 0,
+          "lifetime_execution_id_count": 0
+        },
+        "result_snapshot": {
+          "schema_version": 1,
+          "pins": {
+            "capability_family": "workflow_batch_execution_control_v1",
+            "capability_version": 1,
+            "contract_revision": "contract-revision-1",
+            "contract_source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "canonicalization_profile": "rfc8785_jcs_sha256_v1",
+            "vector_release_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "owner_namespace": "owner.workflow",
+            "receipt_issuer": "owner.workflow",
+            "receipt_audience": "consumer.workflow",
+            "receipt_authority_id": "receipt-authority-1",
+            "receipt_authority_version": "1",
+            "owner_deployment_id": "owner-deployment-1",
+            "owner_deployment_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "ledger_schema_revision": "ledger-v1",
+            "trust_mode": "opaque_owner_readback_v1"
+          },
+          "scope": {
+            "kind": "platform",
+            "scope_id": "platform-control"
+          },
+          "state": "planned",
+          "binding": {
+            "owner_batch_id": "batch-1",
+            "client_generation_key": "generation:series-1:0",
+            "logical_series_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+            "purpose_profile_hash": "5555555555555555555555555555555555555555555555555555555555555555",
+            "logical_unit_collection_root": "6666666666666666666666666666666666666666666666666666666666666666",
+            "logical_unit_count": 1,
+            "binding_hash": "7777777777777777777777777777777777777777777777777777777777777777",
+            "generation": 0,
+            "supersession": null
+          },
+          "logical_units": [
+            {
+              "logical_unit_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+              "execution_binding_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+              "workload_class_hash": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          ],
+          "batch_head": {
+            "owner_batch_id": "batch-1",
+            "state": "planned",
+            "snapshot_version": "1",
+            "ledger_sequence": "1",
+            "last_event_hash": "3333333333333333333333333333333333333333333333333333333333333333"
+          },
+          "global_head": {
+            "ledger_sequence": "1",
+            "last_event_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+            "registry_version": "1",
+            "admission_root": "abababababababababababababababababababababababababababababababab",
+            "uniqueness_root": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+            "active_claim_count": 0,
+            "active_reserved_execution_count": 0,
+            "lifetime_logical_unit_count": 1,
+            "lifetime_task_id_count": 0,
+            "lifetime_execution_id_count": 0
+          },
+          "snapshot_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "claim": {
+            "kind": "none"
+          }
+        },
+        "dispatch_commit_hash": null,
+        "owner_issued_at": "2026-07-23T00:00:01.000Z",
+        "authority_envelope_hash": "da320dbb2335b23945127b98d112999c51006482ce265c54ca99b6a3137cb8ff"
+      },
+      "projection": {
+        "schema_version": 1,
+        "receipt_ref": "receipt:batch-opened-1",
+        "pins": {
+          "capability_family": "workflow_batch_execution_control_v1",
+          "capability_version": 1,
+          "contract_revision": "contract-revision-1",
+          "contract_source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "canonicalization_profile": "rfc8785_jcs_sha256_v1",
+          "vector_release_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "owner_namespace": "owner.workflow",
+          "receipt_issuer": "owner.workflow",
+          "receipt_audience": "consumer.workflow",
+          "receipt_authority_id": "receipt-authority-1",
+          "receipt_authority_version": "1",
+          "owner_deployment_id": "owner-deployment-1",
+          "owner_deployment_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "ledger_schema_revision": "ledger-v1",
+          "trust_mode": "opaque_owner_readback_v1"
+        },
+        "scope": {
+          "kind": "platform",
+          "scope_id": "platform-control"
+        },
+        "causation": {
+          "kind": "client_command",
+          "command_id": "command:create-1",
+          "idempotency_key": "idempotency:create-1",
+          "request_hash": "92e6c761106f10f0c42f57006791caef39f282fbef00d0d6e66d2c06d4957877"
+        },
+        "before_batch_head": null,
+        "after_batch_head": {
+          "owner_batch_id": "batch-1",
+          "state": "planned",
+          "snapshot_version": "1",
+          "ledger_sequence": "1",
+          "last_event_hash": "3333333333333333333333333333333333333333333333333333333333333333"
+        },
+        "before_global_head": {
+          "ledger_sequence": "0",
+          "last_event_hash": null,
+          "registry_version": "0",
+          "admission_root": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "uniqueness_root": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "active_claim_count": 0,
+          "active_reserved_execution_count": 0,
+          "lifetime_logical_unit_count": 0,
+          "lifetime_task_id_count": 0,
+          "lifetime_execution_id_count": 0
+        },
+        "after_global_head": {
+          "ledger_sequence": "1",
+          "last_event_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+          "registry_version": "1",
+          "admission_root": "abababababababababababababababababababababababababababababababab",
+          "uniqueness_root": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+          "active_claim_count": 0,
+          "active_reserved_execution_count": 0,
+          "lifetime_logical_unit_count": 1,
+          "lifetime_task_id_count": 0,
+          "lifetime_execution_id_count": 0
+        },
+        "batch_event": {
+          "event_id": "event:batch-opened-1",
+          "event_type": "batch_opened",
+          "causation": {
+            "kind": "client_command",
+            "command_id": "command:create-1",
+            "idempotency_key": "idempotency:create-1",
+          "request_hash": "92e6c761106f10f0c42f57006791caef39f282fbef00d0d6e66d2c06d4957877"
+          },
+          "stream": {
+            "kind": "batch",
+            "owner_batch_id": "batch-1"
+          },
+          "ledger_sequence": "1",
+          "previous_event_hash": null,
+          "owner_event_at": "2026-07-23T00:00:01.000Z",
+          "capacity_delta": {
+            "active_claim_count": 0,
+            "active_reserved_execution_count": 0,
+            "lifetime_logical_unit_count": 1,
+            "lifetime_task_id_count": 0,
+            "lifetime_execution_id_count": 0
+          },
+          "fact_root": "1111111111111111111111111111111111111111111111111111111111111111",
+          "event_hash": "3333333333333333333333333333333333333333333333333333333333333333"
+        },
+        "global_event": {
+          "event_id": "event:global-admission-1",
+          "event_type": "global_admission_changed",
+          "causation": {
+            "kind": "client_command",
+            "command_id": "command:create-1",
+            "idempotency_key": "idempotency:create-1",
+          "request_hash": "92e6c761106f10f0c42f57006791caef39f282fbef00d0d6e66d2c06d4957877"
+          },
+          "stream": {
+            "kind": "global",
+            "owner_namespace": "owner.workflow"
+          },
+          "ledger_sequence": "1",
+          "previous_event_hash": null,
+          "owner_event_at": "2026-07-23T00:00:01.000Z",
+          "capacity_delta": {
+            "active_claim_count": 0,
+            "active_reserved_execution_count": 0,
+            "lifetime_logical_unit_count": 1,
+            "lifetime_task_id_count": 0,
+            "lifetime_execution_id_count": 0
+          },
+          "fact_root": "abababababababababababababababababababababababababababababababab",
+          "event_hash": "4444444444444444444444444444444444444444444444444444444444444444"
+        },
+        "capacity_delta": {
+          "active_claim_count": 0,
+          "active_reserved_execution_count": 0,
+          "lifetime_logical_unit_count": 1,
+          "lifetime_task_id_count": 0,
+          "lifetime_execution_id_count": 0
+        },
+        "result_snapshot": {
+          "schema_version": 1,
+          "pins": {
+            "capability_family": "workflow_batch_execution_control_v1",
+            "capability_version": 1,
+            "contract_revision": "contract-revision-1",
+            "contract_source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "canonicalization_profile": "rfc8785_jcs_sha256_v1",
+            "vector_release_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "owner_namespace": "owner.workflow",
+            "receipt_issuer": "owner.workflow",
+            "receipt_audience": "consumer.workflow",
+            "receipt_authority_id": "receipt-authority-1",
+            "receipt_authority_version": "1",
+            "owner_deployment_id": "owner-deployment-1",
+            "owner_deployment_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "ledger_schema_revision": "ledger-v1",
+            "trust_mode": "opaque_owner_readback_v1"
+          },
+          "scope": {
+            "kind": "platform",
+            "scope_id": "platform-control"
+          },
+          "state": "planned",
+          "binding": {
+            "owner_batch_id": "batch-1",
+            "client_generation_key": "generation:series-1:0",
+            "logical_series_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+            "purpose_profile_hash": "5555555555555555555555555555555555555555555555555555555555555555",
+            "logical_unit_collection_root": "6666666666666666666666666666666666666666666666666666666666666666",
+            "logical_unit_count": 1,
+            "binding_hash": "7777777777777777777777777777777777777777777777777777777777777777",
+            "generation": 0,
+            "supersession": null
+          },
+          "logical_units": [
+            {
+              "logical_unit_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+              "execution_binding_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+              "workload_class_hash": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          ],
+          "batch_head": {
+            "owner_batch_id": "batch-1",
+            "state": "planned",
+            "snapshot_version": "1",
+            "ledger_sequence": "1",
+            "last_event_hash": "3333333333333333333333333333333333333333333333333333333333333333"
+          },
+          "global_head": {
+            "ledger_sequence": "1",
+            "last_event_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+            "registry_version": "1",
+            "admission_root": "abababababababababababababababababababababababababababababababab",
+            "uniqueness_root": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+            "active_claim_count": 0,
+            "active_reserved_execution_count": 0,
+            "lifetime_logical_unit_count": 1,
+            "lifetime_task_id_count": 0,
+            "lifetime_execution_id_count": 0
+          },
+          "snapshot_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "claim": {
+            "kind": "none"
+          }
+        },
+        "dispatch_commit_hash": null,
+        "owner_issued_at": "2026-07-23T00:00:01.000Z"
+      },
+      "expected_projection_sha256": "f813f8483385726166790ce8ee1e62b6d9ae6ca661a03792cddfdd0085104b45",
+      "expected_domain_hash": "da320dbb2335b23945127b98d112999c51006482ce265c54ca99b6a3137cb8ff",
+      "mutated_output_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "tamper_cases": [
+        {
+          "name": "changed-preallocated-receipt-ref",
+          "path": ["receipt_ref"],
+          "replacement": "receipt:batch-opened-2",
+          "expected_domain_hash": "17513be22aecace1930d9499e2f2b71781c6f7d6f8a8477b8e3e5c102a22deee"
+        },
+        {
+          "name": "omitted-global-event-hash",
+          "path": ["global_event", "event_hash"],
+          "remove": true,
+          "expected_domain_hash": "6a1e2734d548e4f6ea65f78e8678c28a506b33b26a460c6398c3864006d316dd"
+        }
+      ]
+    },
+    {
+      "name": "history-page-read-observation",
+      "kind": "read_observation",
+      "domain_prefix": "workflow_batch_execution_control_v1/read-observation\u0000",
+      "output_hash_path": ["read_observation_hash"],
+      "preallocated_ref": {
+        "path": ["observation_ref"],
+        "value": "observation:history-1"
+      },
+      "document": {
+        "schema_version": 1,
+        "observation_ref": "observation:history-1",
+        "pins": {
+          "capability_family": "workflow_batch_execution_control_v1",
+          "capability_version": 1,
+          "contract_revision": "contract-revision-1",
+          "contract_source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "canonicalization_profile": "rfc8785_jcs_sha256_v1",
+          "vector_release_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "owner_namespace": "owner.workflow",
+          "receipt_issuer": "owner.workflow",
+          "receipt_audience": "consumer.workflow",
+          "receipt_authority_id": "receipt-authority-1",
+          "receipt_authority_version": "1",
+          "owner_deployment_id": "owner-deployment-1",
+          "owner_deployment_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "ledger_schema_revision": "ledger-v1",
+          "trust_mode": "opaque_owner_readback_v1"
+        },
+        "scope": {
+          "kind": "platform",
+          "scope_id": "platform-control"
+        },
+        "query_binding": {
+          "operation": "read_batch_history_page",
+          "query_id": "query:history-1",
+          "query_hash": "7777777777777777777777777777777777777777777777777777777777777777",
+          "read_policy": {
+            "kind": "readback",
+            "decision_ref": "policy:readback-1",
+            "decision_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "decision_issuer": "policy.workflow",
+            "decision_audience": "owner.workflow",
+            "not_before": "2026-07-23T00:00:00.000Z",
+            "expires_at": "2026-07-23T00:15:00.000Z"
+          }
+        },
+        "as_of_batch_head": {
+          "owner_batch_id": "batch-1",
+          "state": "planned",
+          "snapshot_version": "1",
+          "ledger_sequence": "1",
+          "last_event_hash": "3333333333333333333333333333333333333333333333333333333333333333"
+        },
+        "as_of_global_head": {
+          "ledger_sequence": "1",
+          "last_event_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+          "registry_version": "1",
+          "admission_root": "abababababababababababababababababababababababababababababababab",
+          "uniqueness_root": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+          "active_claim_count": 0,
+          "active_reserved_execution_count": 0,
+          "lifetime_logical_unit_count": 1,
+          "lifetime_task_id_count": 0,
+          "lifetime_execution_id_count": 0
+        },
+        "page": {
+          "kind": "collection_page",
+          "cursor_start": null,
+          "cursor_end": "QUJDREVGR0hJSktM",
+          "next_cursor": null,
+          "limit": 100,
+          "item_count": 1,
+          "page_hash": "8888888888888888888888888888888888888888888888888888888888888888",
+          "full_collection_root": "9999999999999999999999999999999999999999999999999999999999999999"
+        },
+        "result": [
+          {
+            "owner_event": {
+              "event_id": "event:batch-opened-1",
+              "event_type": "batch_opened",
+              "causation": {
+                "kind": "client_command",
+                "command_id": "command:create-1",
+                "idempotency_key": "idempotency:create-1",
+          "request_hash": "92e6c761106f10f0c42f57006791caef39f282fbef00d0d6e66d2c06d4957877"
+              },
+              "stream": {
+                "kind": "batch",
+                "owner_batch_id": "batch-1"
+              },
+              "ledger_sequence": "1",
+              "previous_event_hash": null,
+              "owner_event_at": "2026-07-23T00:00:01.000Z",
+              "capacity_delta": {
+                "active_claim_count": 0,
+                "active_reserved_execution_count": 0,
+                "lifetime_logical_unit_count": 1,
+                "lifetime_task_id_count": 0,
+                "lifetime_execution_id_count": 0
+              },
+              "fact_root": "1111111111111111111111111111111111111111111111111111111111111111",
+              "event_hash": "3333333333333333333333333333333333333333333333333333333333333333"
+            },
+            "authority_envelope_hash": "da320dbb2335b23945127b98d112999c51006482ce265c54ca99b6a3137cb8ff",
+            "receipt_ref": "receipt:batch-opened-1"
+          }
+        ],
+        "observed_at": "2026-07-23T00:04:00.000Z",
+        "read_observation_hash": "c7c5051aac8ea29509ad90269f2a834d6e7de7895a54591b7cbe7b4f8eb3b8e7"
+      },
+      "projection": {
+        "schema_version": 1,
+        "observation_ref": "observation:history-1",
+        "pins": {
+          "capability_family": "workflow_batch_execution_control_v1",
+          "capability_version": 1,
+          "contract_revision": "contract-revision-1",
+          "contract_source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "canonicalization_profile": "rfc8785_jcs_sha256_v1",
+          "vector_release_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "owner_namespace": "owner.workflow",
+          "receipt_issuer": "owner.workflow",
+          "receipt_audience": "consumer.workflow",
+          "receipt_authority_id": "receipt-authority-1",
+          "receipt_authority_version": "1",
+          "owner_deployment_id": "owner-deployment-1",
+          "owner_deployment_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "ledger_schema_revision": "ledger-v1",
+          "trust_mode": "opaque_owner_readback_v1"
+        },
+        "scope": {
+          "kind": "platform",
+          "scope_id": "platform-control"
+        },
+        "query_binding": {
+          "operation": "read_batch_history_page",
+          "query_id": "query:history-1",
+          "query_hash": "7777777777777777777777777777777777777777777777777777777777777777",
+          "read_policy": {
+            "kind": "readback",
+            "decision_ref": "policy:readback-1",
+            "decision_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "decision_issuer": "policy.workflow",
+            "decision_audience": "owner.workflow",
+            "not_before": "2026-07-23T00:00:00.000Z",
+            "expires_at": "2026-07-23T00:15:00.000Z"
+          }
+        },
+        "as_of_batch_head": {
+          "owner_batch_id": "batch-1",
+          "state": "planned",
+          "snapshot_version": "1",
+          "ledger_sequence": "1",
+          "last_event_hash": "3333333333333333333333333333333333333333333333333333333333333333"
+        },
+        "as_of_global_head": {
+          "ledger_sequence": "1",
+          "last_event_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+          "registry_version": "1",
+          "admission_root": "abababababababababababababababababababababababababababababababab",
+          "uniqueness_root": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+          "active_claim_count": 0,
+          "active_reserved_execution_count": 0,
+          "lifetime_logical_unit_count": 1,
+          "lifetime_task_id_count": 0,
+          "lifetime_execution_id_count": 0
+        },
+        "page": {
+          "kind": "collection_page",
+          "cursor_start": null,
+          "cursor_end": "QUJDREVGR0hJSktM",
+          "next_cursor": null,
+          "limit": 100,
+          "item_count": 1,
+          "page_hash": "8888888888888888888888888888888888888888888888888888888888888888",
+          "full_collection_root": "9999999999999999999999999999999999999999999999999999999999999999"
+        },
+        "result": [
+          {
+            "owner_event": {
+              "event_id": "event:batch-opened-1",
+              "event_type": "batch_opened",
+              "causation": {
+                "kind": "client_command",
+                "command_id": "command:create-1",
+                "idempotency_key": "idempotency:create-1",
+          "request_hash": "92e6c761106f10f0c42f57006791caef39f282fbef00d0d6e66d2c06d4957877"
+              },
+              "stream": {
+                "kind": "batch",
+                "owner_batch_id": "batch-1"
+              },
+              "ledger_sequence": "1",
+              "previous_event_hash": null,
+              "owner_event_at": "2026-07-23T00:00:01.000Z",
+              "capacity_delta": {
+                "active_claim_count": 0,
+                "active_reserved_execution_count": 0,
+                "lifetime_logical_unit_count": 1,
+                "lifetime_task_id_count": 0,
+                "lifetime_execution_id_count": 0
+              },
+              "fact_root": "1111111111111111111111111111111111111111111111111111111111111111",
+              "event_hash": "3333333333333333333333333333333333333333333333333333333333333333"
+            },
+            "authority_envelope_hash": "da320dbb2335b23945127b98d112999c51006482ce265c54ca99b6a3137cb8ff",
+            "receipt_ref": "receipt:batch-opened-1"
+          }
+        ],
+        "observed_at": "2026-07-23T00:04:00.000Z"
+      },
+      "expected_projection_sha256": "130aefb63cc3b351f50c2328bf516df89c10723f50ede62b3126251f8100621c",
+      "expected_domain_hash": "c7c5051aac8ea29509ad90269f2a834d6e7de7895a54591b7cbe7b4f8eb3b8e7",
+      "mutated_output_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "tamper_cases": [
+        {
+          "name": "changed-preallocated-observation-ref",
+          "path": ["observation_ref"],
+          "replacement": "observation:history-2",
+          "expected_domain_hash": "10f707bc3d1ea97d8643efff332dbd1d750de8bf4f1b65b4fa4adfa696754e35"
+        },
+        {
+          "name": "omitted-full-collection-root",
+          "path": ["page", "full_collection_root"],
+          "remove": true,
+          "expected_domain_hash": "f48c7ea1881309d80f1a8ac881ba810428e38ff3ecbb7a600c80d8fb4b02c4fe"
+        }
+      ]
+    }
+  ],
+  "negative_vectors": [
+    {
+      "name": "request-projection-self-reference",
+      "kind": "request",
+      "output_hash_path": ["request_meta", "request_hash"],
+      "container_key": "request_hash_projection",
+      "projection": {
+        "request_meta": {
+          "request_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      },
+      "expected_error": "invalid_hash_projection"
+    },
+    {
+      "name": "authority-envelope-projection-self-reference",
+      "kind": "authority_envelope",
+      "output_hash_path": ["authority_envelope_hash"],
+      "container_key": "authority_envelope_hash_projection",
+      "projection": {
+        "authority_envelope_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "expected_error": "invalid_hash_projection"
+    },
+    {
+      "name": "read-observation-projection-self-reference",
+      "kind": "read_observation",
+      "output_hash_path": ["read_observation_hash"],
+      "container_key": "read_observation_hash_projection",
+      "projection": {
+        "read_observation_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "expected_error": "invalid_hash_projection"
+    }
+  ]
+}

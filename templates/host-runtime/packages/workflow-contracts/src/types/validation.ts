@@ -8,6 +8,7 @@ export const workflowHostCapabilities = [
   "scenario_subject_presentation_v1",
   "scenario_domain_action_execution_v1",
   "scenario_protected_interaction_v1",
+  "workflow_batch_execution_control_v1",
 ] as const;
 
 export type WorkflowHostCapability = (typeof workflowHostCapabilities)[number];

@@ -15,5 +15,6 @@ export * from "./services/handoff.service.js";
 export * from "./services/workflow-command.service.js";
 export * from "./services/workflow-query.service.js";
 export * from "./validation/validate-module.js";
+export * from "./validation/validate-batch-execution-control.js";
 export * from "./workers/workflow-worker.materialization-v1.example.js";
 export * from "./workers/workflow-worker.js";
