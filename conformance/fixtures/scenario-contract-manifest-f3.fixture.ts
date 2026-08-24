@@ -5,19 +5,19 @@ export const scenarioContractManifestF3Fixture = {
   source_dependencies: [
     {
       source_identity: "platform_child_family_identity_source_v1",
-      source_hash: "9655e83ff6a973055fb1b3f170cdbcd3c3eea6cb117f59209844a2a355b6a861",
+      source_hash: "f86dbd27f069ede33cca69185a90d1c1fbdf6865c3551b8bcd942729bebcae80",
     },
     {
       source_identity: "scenario_interface_source_v1",
-      source_hash: "be67d3264a9442ce30a8303d6acf86a05ea86c8a3ed1d933f41c5aa922b1ff95",
+      source_hash: "8cf09f3fc72fb9d0abdd7307f7f7eb979d9a9b7d7c9fedf1ce61b41e4f031caf",
     },
     {
       source_identity: "scenario_domain_action_source_v1",
-      source_hash: "b962acf3fc35d02d7b903854a3eed3f6177e3dc4d00b32124122a120b458f5f0",
+      source_hash: "53266915153bee4e38fcc49d8c1c337fd9232dfb6e4858af02d14328c4add7e3",
     },
     {
       source_identity: "scenario_protected_interaction_source_v1",
-      source_hash: "a34f3864b76d1dc16eadb901f506fcc473a0cb298da7d1e273de9238eb880cf5",
+      source_hash: "1b0fb578be7ce4314e2baeea68478827a360db35e7e2aeef599a773e96739da9",
     },
   ],
   capability_dependencies: [

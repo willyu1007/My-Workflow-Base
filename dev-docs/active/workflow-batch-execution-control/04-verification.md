@@ -69,3 +69,8 @@ Additionally verify:
   (3 files, 77 tests), including the new recovery-dispatch authority-receipt case. Batch scenario-boundary,
   secret-boundary, and canonical-vector checks passed. The release check correctly remained pending until
   the merge creates the new contract-bearing revision used to regenerate the aggregate source lock.
+- 2026-08-24: after merge revision `092bbb69da34f367cbe31f234111f28c399de7e6`, the aggregate source
+  lock and batch release evidence were regenerated. `pnpm verify:workflow-contracts` passed all four
+  typechecks, canonical-reference lint, runtime 77/77, scenario 10/10, conformance 441/441, batch release,
+  source-hash portability, and exact source-lock verification at
+  `242ffad72f2a0e644753bc6ffa75f8d519b04e1e2d0f8ffe5fcabeeaa3576238`.
