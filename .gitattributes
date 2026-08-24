@@ -1,0 +1,3 @@
+# All tracked blobs are LF; keep working trees LF on every platform so that
+# byte-hash conformance checks (e.g. release vector hashes) stay reproducible.
+* text=auto eol=lf

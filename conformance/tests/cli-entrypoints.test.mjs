@@ -2,6 +2,7 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { mkdtemp, readFile, readdir, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { after, before, test } from "node:test";
 import assert from "node:assert/strict";
 import {
@@ -137,7 +138,7 @@ test("CLI modules remain importable from stdin and eval entrypoints", () => {
       [
         "--input-type=module",
         "--eval",
-        `await import(${JSON.stringify(resolve(conformanceRoot, "scripts", script))})`,
+        `await import(${JSON.stringify(pathToFileURL(resolve(conformanceRoot, "scripts", script)).href)})`,
       ],
       { encoding: "utf8" },
     );
