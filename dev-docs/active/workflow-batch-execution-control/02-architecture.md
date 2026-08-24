@@ -47,7 +47,7 @@ Claim/lease is an orthogonal overlay, not a batch state. Reservation allocates t
 atomically and has no execution effect. Seal is a separate, later CAS over the exact immutable execution
 manifest. Cancellation creates a permanent tombstone. A later generation uses new globally unique IDs and
 binds the superseded cancellation; crash recovery never creates replacement IDs. The complete client,
-owner-worker, watchdog, release, expiry, and recovery matrix is fixed in `06-contract-lock.md`.
+owner-worker, watchdog, release, expiry, and recovery matrix is fixed in `contract-lock.md`.
 
 ## Concurrency And Admission
 

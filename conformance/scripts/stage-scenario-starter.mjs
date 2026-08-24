@@ -2,7 +2,7 @@
 
 import { existsSync } from "node:fs";
 import { cp, rename, rm } from "node:fs/promises";
-import { basename, dirname, resolve } from "node:path";
+import { basename, dirname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
@@ -14,6 +14,7 @@ const sourceTemplateRoot = resolve(
 const bundledTemplateRoot = resolve(conformanceRoot, "starter-template");
 const excludedNames = new Set([
   ".typecheck-dist",
+  "dev-docs",
   "dist",
   "node_modules",
 ]);
@@ -27,7 +28,7 @@ export async function stageScenarioStarter(
   if (!existsSync(source)) {
     throw new Error(`scenario Starter source is missing: ${source}`);
   }
-  if (target === source || !target.startsWith(`${resolve(target, "..")}/`)) {
+  if (target === source || !target.startsWith(`${resolve(target, "..")}${sep}`)) {
     throw new Error(`unsafe scenario Starter staging target: ${target}`);
   }
 

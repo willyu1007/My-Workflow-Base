@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "task_id": "T-001",
+  "slug": "workflow-base",
+  "keywords": ["scenario-federation", "contract-v1", "scenario-starter", "source-lock"]
+}

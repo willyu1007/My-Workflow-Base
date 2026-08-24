@@ -24,9 +24,10 @@ import { dirname, join } from "node:path";
 const here = dirname(fileURLToPath(import.meta.url));
 const kit = join(here, "..");
 const OUT = join(kit, "src/styles/tokens.css");
+const normalizeEol = (value) => value.replace(/\r\n/gu, "\n");
 
 const source = JSON.parse(readFileSync(join(here, "base.json"), "utf8"));
-const tail = readFileSync(join(here, "tail.css"), "utf8");
+const tail = normalizeEol(readFileSync(join(here, "tail.css"), "utf8"));
 const motionLock = JSON.parse(readFileSync(join(here, "motion-role-lock.json"), "utf8"));
 
 const HEADER = `/* =========================================================
@@ -223,8 +224,8 @@ const brand = buildBrand();
 const BRAND_OUT = join(kit, "src/brand.ts");
 
 if (process.argv.includes("--check")) {
-  const current = readFileSync(OUT, "utf8");
-  const currentBrand = readFileSync(BRAND_OUT, "utf8");
+  const current = normalizeEol(readFileSync(OUT, "utf8"));
+  const currentBrand = normalizeEol(readFileSync(BRAND_OUT, "utf8"));
   if (current === css && currentBrand === brand) {
     console.log("tokens: src/styles/tokens.css and src/brand.ts match tokens/base.json");
     process.exit(0);

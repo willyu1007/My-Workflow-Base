@@ -29,6 +29,9 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Verify repository governance
+        run: node .ai/scripts/ctl-project-governance.mjs lint --strict
+
       - name: Enable Corepack
         run: corepack enable
 

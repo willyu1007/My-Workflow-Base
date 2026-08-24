@@ -93,16 +93,7 @@ test("scenario generator accepts the package-manager argument separator", async 
     await readFile(resolve(target, "src/registry.ts"), "utf8"),
     /scenario_key: "qualification-scenario"/u,
   );
-  assert.match(
-    await readFile(
-      resolve(
-        target,
-        "dev-docs/active/scenario-integration/00-overview.md",
-      ),
-      "utf8",
-    ),
-    /Scenario key: `qualification-scenario`/u,
-  );
+  assert.ok(!(await readdir(target)).includes("dev-docs"));
   assert.ok(
     JSON.parse(
       await readFile(
@@ -122,7 +113,7 @@ test("package staging carries the complete Starter without build output", async 
 
   assert.ok((await readdir(target)).includes("gitignore.template"));
   assert.ok((await readdir(target)).includes("github-template"));
-  assert.ok((await readdir(target)).includes("dev-docs"));
+  assert.ok(!(await readdir(target)).includes("dev-docs"));
   assert.ok(
     (
       await readdir(

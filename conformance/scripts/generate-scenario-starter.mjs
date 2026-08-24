@@ -67,7 +67,12 @@ if ((await readdir(targetRoot)).length > 0) {
   throw new Error(`target directory must be empty: ${targetRoot}`);
 }
 
-const excludedNames = new Set(["dist", "node_modules", ".typecheck-dist"]);
+const excludedNames = new Set([
+  ".typecheck-dist",
+  "dev-docs",
+  "dist",
+  "node_modules",
+]);
 await cp(templateRoot, targetRoot, {
   recursive: true,
   filter: (source) => {

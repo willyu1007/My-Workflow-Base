@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "task_id": "T-003",
+  "slug": "workflow-batch-execution-control",
+  "keywords": ["batch-execution", "controller-port", "fenced-recovery", "source-lock"]
+}

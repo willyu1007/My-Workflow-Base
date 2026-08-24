@@ -42,7 +42,6 @@ still not published — consumers do not change token values, they consume them.
 | Changing a **motion** token, or adding one | `tokens/motion-role-lock.json` — durations and curves are the platform host's roles under kit names; `pnpm tokens:check` fails on drift *and* on a new motion token nobody classified. See [DECISIONS.md](./DECISIONS.md) D-A10 |
 | Wondering why a token has the value it has | [DECISIONS.md](./DECISIONS.md) |
 | Changing a component, or adding one | [TESTING.md](./TESTING.md) — `pnpm test`; the suite runs against `src/` and gates publish |
-| Reviewing or planning motion in a consuming app | [skills/](./skills/) — copyable agent skills, starting with `audit-workbench-motion` |
 
 ## What's inside
 

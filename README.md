@@ -23,9 +23,9 @@ Workflow modular base template。这个仓库不提供运行时服务；具体 w
 
 ## 当前任务包
 
-- [Workflow base task package](dev-docs/active/workflow-base/00-overview.md)：用于收敛双层架构表、manifest/API 对齐和后续实现骨架。
-- [Workflow base roadmap](dev-docs/active/workflow-base/roadmap.md)：宏观里程碑与收敛顺序。
-- [My-Chat X1 adoption handoff](dev-docs/active/workflow-base/06-x1-adoption-handoff.md)：记录 X0 合同源码 revision/hash、跨仓逻辑路径映射和 X1 禁止越界项。
+- [Workflow base task status](dev-docs/active/workflow-base/01-status.md)：记录当前目标、进展、下一步和验收引用。
+- [Workflow base roadmap](dev-docs/active/workflow-base/00-roadmap.md)：记录已对齐决策、阶段路线、风险和恢复边界。
+- [My-Chat X1 adoption handoff](dev-docs/active/workflow-base/my-chat-x1-adoption.md)：记录 X0 合同源码 revision/hash、跨仓逻辑路径映射和 X1 禁止越界项。
 
 ## 源仓验证
 

@@ -3,6 +3,13 @@
 Use this template when adding a controlled concrete workflow based on the
 workflow base contracts. The base repository is not a runtime dependency.
 
+## Repository governance ownership
+
+This Starter does not distribute a task bundle, project hub, Task ID, or agent skill. The consuming
+repository owns its governance installation and opens its own scenario-integration task when the
+work needs durable tracking. Generated source and verification artifacts remain product scaffolding,
+not repository identity.
+
 ## Required contract fields
 
 The default artifact is `scenario.manifest.yaml`. A concrete workflow may use an

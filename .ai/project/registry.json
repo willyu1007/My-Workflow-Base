@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "milestones": [
+    {
+      "id": "M-000",
+      "title": "Inbox / Triage",
+      "status": "in-progress",
+      "description": "Triage queue for new or unplanned work."
+    },
+    {
+      "id": "M-001",
+      "title": "Federated scenario framework",
+      "status": "in-progress",
+      "description": "Publish a reusable scenario-neutral contract, conformance suite, and complete Starter for controlled host adoption."
+    },
+    {
+      "id": "M-002",
+      "title": "Reusable web workbench",
+      "status": "done",
+      "description": "Publish and sustain the reusable scenario-neutral web workbench UI contract."
+    }
+  ],
+  "features": [
+    {
+      "id": "F-000",
+      "title": "Inbox / Untriaged",
+      "milestone_id": "M-000",
+      "status": "in-progress",
+      "description": "Untriaged tasks live here until mapped to a real feature."
+    },
+    {
+      "id": "F-001",
+      "title": "Scenario federation contract v1",
+      "milestone_id": "M-001",
+      "status": "in-progress",
+      "description": "Scenario-neutral workflow contracts, reproducible multi-repository qualification, standard product surfaces, source locks, and the generated Starter."
+    },
+    {
+      "id": "F-002",
+      "title": "Web workbench UI kit convergence",
+      "milestone_id": "M-002",
+      "status": "done",
+      "description": "Converged tokens, locked Scene paradigms, enforceable UI governance, and focused behavior tests for the published workbench kit."
+    }
+  ],
+  "ideas": [],
+  "tasks": [
+    {
+      "id": "T-001",
+      "slug": "workflow-base",
+      "status": "in-progress",
+      "updated": "2026-08-24",
+      "dev_docs_path": "dev-docs/active/workflow-base",
+      "feature_id": "F-001"
+    },
+    {
+      "id": "T-003",
+      "slug": "workflow-batch-execution-control",
+      "status": "done",
+      "updated": "2026-08-24",
+      "dev_docs_path": "dev-docs/active/workflow-batch-execution-control",
+      "feature_id": "F-001"
+    },
+    {
+      "id": "T-004",
+      "slug": "ui-kit-convergence",
+      "status": "done",
+      "updated": "2026-08-24",
+      "dev_docs_path": "dev-docs/active/ui-kit-convergence",
+      "feature_id": "F-002"
+    },
+    {
+      "id": "T-005",
+      "slug": "repository-governance-convergence",
+      "status": "done",
+      "updated": "2026-08-24",
+      "dev_docs_path": "dev-docs/active/repository-governance-convergence",
+      "feature_id": "F-000"
+    }
+  ]
+}

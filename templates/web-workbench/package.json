@@ -87,7 +87,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prepublishOnly": "npm run test && npm run build"
+    "prepublishOnly": "pnpm test && pnpm build"
   },
   "peerDependencies": {
     "next": ">=15",
