@@ -18,7 +18,7 @@ Workflow modular base template。这个仓库不提供运行时服务；具体 w
 - [Workflow scenario readiness proof](docs/context/workflow/scenario-readiness-proof.md)：用教育种子场景和非教育场景草图验证底座没有场景语义耦合。
 - [Workflow v0 readiness checklist](docs/context/workflow/v0-readiness-checklist.md)：记录语义漂移检查和 v0 contract readiness。
 - [Scenario module template](templates/scenario-module/README.md)：新增场景模块时必须填写的接入清单。
-- [Scenario manifest example](templates/scenario-module/scenario.manifest.yaml)：可复制的场景 manifest 骨架。
+- [Scenario manifest example](templates/scenario-module/src/registry.ts)：Starter 唯一的可执行场景 manifest 权威。
 - [Workflow templates](templates/README.md)：可复制的 host runtime package 脚手架与 scenario module 代码脚手架。
 
 ## 当前任务包

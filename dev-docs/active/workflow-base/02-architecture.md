@@ -310,3 +310,33 @@ The main risk is accidental second-system creation: a scenario or surface might
 introduce private APIs, private status, private domain stores, or private handoff
 semantics because it feels faster. The v0 matrix must make those shortcuts
 visibly invalid.
+
+## 2026-07-21 replay and publication closure
+
+- Full command identity includes release, workspace, Run, Step, Actor,
+  represented Organization, purpose, expected versions, context refs, command
+  schema and idempotency identity. Trace/correlation metadata does not change
+  business identity.
+- A response-loss receipt lookup is the same authorization-sensitive Owner
+  operation as replay: the complete refs-only envelope is validated and current
+  scenario authorization is rerun before a receipt is returned.
+- Receipt `reason_code` is a bounded lowercase machine token, not a prose
+  channel. This rule exists in JSON Schema and reference runtime validation.
+- Public contract and Starter packages export built ESM/declarations and build
+  during `prepack`; conformance/runtime tests depend on freshly built `dist`.
+
+## 2026-07-26 distributable Starter boundary
+
+- The repository template remains source-owned under
+  `templates/scenario-module`; the conformance package stages an exact copy for
+  npm distribution and the packaged generator consumes that copy.
+- npm-safe names (`gitignore.template` and `github-template`) are transport
+  details only. The generated repository restores `.gitignore` and
+  `.github/workflows`, so source generation and package generation have the
+  same repository contract.
+- Prisma schema and every migration are part of scenario logical source.
+  Evidence-only integration-lock refreshes remain outside logical source to
+  avoid self-referential hashes.
+- Presenter reads are synchronous, closed and owner-reread. Durable handoffs
+  remain refs-only. Delete is a scenario action whose domain deletion,
+  CommandExecution and owner event commit in one Owner transaction.

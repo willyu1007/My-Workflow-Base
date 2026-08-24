@@ -16,6 +16,19 @@ function sameRef(left: CanonicalRef, right: CanonicalRef): boolean {
   return left.namespace === right.namespace && left.object_type === right.object_type && left.object_id === right.object_id && left.version === right.version;
 }
 
+function assertSupportedOwnerTarget(input: ScenarioCommandEnvelopeV1): void {
+  if (!["example.prepare", "example.delete"].includes(input.command_type)) {
+    throw new Error("unsupported_scenario_command");
+  }
+  if (
+    !input.context_refs.some(
+      (ref) => ref.namespace === "example" && ref.object_type === "record",
+    )
+  ) {
+    throw new Error("owner_target_ref_required");
+  }
+}
+
 export class ExampleOwnerApi {
   constructor(
     private readonly repositories: ExampleScenarioRepositories,
@@ -26,6 +39,7 @@ export class ExampleOwnerApi {
   async execute(input: unknown): Promise<ScenarioCommandReceiptV1> {
     assertScenarioCommandEnvelopeV1(input);
     if (input.scenario_release.scenario_key !== "example") throw new Error("scenario_key_mismatch");
+    assertSupportedOwnerTarget(input);
     const authorization = await this.authorization.authorize(input);
     if (!authorization.allowed) throw new Error(`scenario_authorization_denied:${authorization.reason_code}`);
     const identityHash = scenarioCommandIdentityHash(input);
@@ -60,8 +74,10 @@ export class ExampleOwnerApi {
         committed_at: this.now().toISOString(),
       };
       await transaction.command_executions.insert({
+        scenario_key: "example",
         command_id: input.command_id,
         idempotency_key: input.idempotency_key,
+        command_envelope: input,
         workflow_step_ref: input.workflow_step_ref,
         command_identity_hash: identityHash,
         receipt,
@@ -69,7 +85,10 @@ export class ExampleOwnerApi {
       const event: ScenarioEventEnvelopeV1 = {
         envelope_version: 1,
         event_id: `${input.command_id}:applied`,
-        event_type: "example.command.applied",
+        event_type:
+          input.command_type === "example.delete"
+            ? "example.record.deleted"
+            : "example.command.applied",
         event_schema_version: 1,
         scenario_release: input.scenario_release,
         owner_event_ref: executionRef,
@@ -88,6 +107,7 @@ export class ExampleOwnerApi {
   async getReceipt(input: unknown): Promise<ScenarioCommandReceiptV1 | null> {
     assertScenarioCommandEnvelopeV1(input);
     if (input.scenario_release.scenario_key !== "example") throw new Error("scenario_key_mismatch");
+    assertSupportedOwnerTarget(input);
     const authorization = await this.authorization.authorize(input);
     if (!authorization.allowed) throw new Error(`scenario_authorization_denied:${authorization.reason_code}`);
     const identityHash = scenarioCommandIdentityHash(input);

@@ -1,0 +1,26 @@
+{
+  "repository": "Generated-Scenario-Example",
+  "role": "scenario_owner",
+  "platform_ref_namespace": "my_chat",
+  "manifest_module": {
+    "path": "./dist/registry.js",
+    "export": "scenarioManifest"
+  },
+  "providers": [],
+  "scenario_aliases": [],
+  "canonical_objects": [
+    { "key": "example.record", "owner": "Generated-Scenario-Example" },
+    {
+      "key": "example.scenario_command_execution",
+      "owner": "Generated-Scenario-Example"
+    },
+    {
+      "key": "example.owner_integration_outbox",
+      "owner": "Generated-Scenario-Example"
+    },
+    {
+      "key": "example.owner_integration_inbox",
+      "owner": "Generated-Scenario-Example"
+    }
+  ]
+}

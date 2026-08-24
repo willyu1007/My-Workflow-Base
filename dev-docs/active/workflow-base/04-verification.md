@@ -474,3 +474,19 @@ that source revision.
   gate: after an exact source-bearing commit exists, refresh the lock revision,
   aggregate/per-file/profile hashes together and rerun the full verifier. No
   false revision was written for the uncommitted candidate.
+
+## 2026-08-24 Scenario platform worktree integration
+
+- Integrated the package-complete generated Starter assets while retaining the
+  current `main` contract, manifest, validator, federation, and source-lock
+  semantics at every merge conflict.
+- Added the owner-local Prisma repository, locked migration, body-free
+  outbox/inbox persistence, generator/staging CLIs, symlink-safe CLI entrypoints,
+  package-continuity files, and opt-in database journey.
+- `pnpm verify:workflow-contracts` passed: all four typechecks,
+  canonical-reference lint, runtime 77/77, Scenario 12/12, conformance 447/447,
+  batch release verification, and exact aggregate source-lock verification at
+  `242ffad72f2a0e644753bc6ffa75f8d519b04e1e2d0f8ffe5fcabeeaa3576238`.
+- The database integration suite was not executed because this integration did
+  not provision a disposable PostgreSQL database. No database or external
+  environment was accessed.

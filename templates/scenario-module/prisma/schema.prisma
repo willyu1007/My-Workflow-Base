@@ -20,6 +20,7 @@ model ScenarioCommandExecution {
   scenarioKey         String
   commandId           String   @unique
   idempotencyKey      String
+  commandEnvelope     Json
   workflowRunRef      Json
   workflowStepRef     Json
   commandIdentityHash String
@@ -33,33 +34,48 @@ model ScenarioCommandExecution {
 }
 
 model OwnerIntegrationOutbox {
-  id              String   @id @default(cuid())
-  eventId         String   @unique
-  eventType       String
-  ownerEventRef   Json
-  subjectRefs     Json
-  purpose         String
-  correlationId   String
-  traceId         String?
-  occurredAt      DateTime
-  dispatchedAt    DateTime?
-  attemptCount    Int      @default(0)
-  nextAttemptAt   DateTime @default(now())
-  createdAt       DateTime @default(now())
+  id                 String   @id @default(cuid())
+  scenarioKey        String
+  eventId            String   @unique
+  eventType          String
+  eventSchemaVersion Int
+  scenarioRelease    Json
+  ownerEventRef      Json
+  subjectRefs        Json
+  actorRef           Json
+  purpose            String
+  correlationId      String
+  traceId            String?
+  occurredAt         DateTime
+  dispatchedAt       DateTime?
+  attemptCount       Int      @default(0)
+  nextAttemptAt      DateTime @default(now())
+  createdAt          DateTime @default(now())
 
-  @@index([dispatchedAt, nextAttemptAt])
+  @@index([scenarioKey, dispatchedAt, nextAttemptAt])
 }
 
 model OwnerIntegrationInbox {
-  id             String   @id @default(cuid())
-  hostEventId    String   @unique
-  hostEventType  String
-  ownerTargetRef Json
-  purpose        String
-  correlationId  String
-  processedAt    DateTime?
-  failureCode    String?
-  createdAt      DateTime @default(now())
+  id                 String   @id @default(cuid())
+  scenarioKey        String
+  hostEventId        String   @unique
+  hostEventType      String
+  eventSchemaVersion Int
+  scenarioRelease    Json
+  ownerEventRef      Json
+  subjectRefs        Json
+  actorRef           Json
+  ownerTargetRef     Json
+  purpose            String
+  correlationId      String
+  traceId            String?
+  occurredAt         DateTime
+  receivedAt         DateTime @default(now())
+  processedAt        DateTime?
+  failureCode        String?
+  attemptCount       Int      @default(0)
+  nextAttemptAt      DateTime @default(now())
+  createdAt          DateTime @default(now())
 
-  @@index([processedAt, createdAt])
+  @@index([scenarioKey, processedAt, nextAttemptAt])
 }

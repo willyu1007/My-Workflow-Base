@@ -28,7 +28,12 @@
     "source": "git",
     "repository": ".",
     "revision": "replace-with-exact-commit",
-    "logical_paths": ["package.json", "src", "prisma/schema.prisma"],
+    "logical_paths": [
+      "package.json",
+      "src",
+      "prisma/schema.prisma",
+      "prisma/migrations"
+    ],
     "hash_algorithm": "sha256-path-content-source-hash-normalized-v1",
     "source_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
   }

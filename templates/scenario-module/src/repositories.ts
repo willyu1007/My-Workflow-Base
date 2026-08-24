@@ -6,8 +6,10 @@ import type {
 } from "@host/workflow-contracts";
 
 export type ScenarioCommandExecutionRecord = {
+  scenario_key: string;
   command_id: string;
   idempotency_key: string;
+  command_envelope: ScenarioCommandEnvelopeV1;
   workflow_step_ref: CanonicalRef;
   command_identity_hash: string;
   receipt: ScenarioCommandReceiptV1;

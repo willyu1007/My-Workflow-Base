@@ -3,5 +3,6 @@ export * from "./module.js";
 export * from "./owner-api.js";
 export * from "./policies.js";
 export * from "./presenters.js";
+export * from "./prisma-repositories.js";
 export * from "./registry.js";
 export * from "./repositories.js";

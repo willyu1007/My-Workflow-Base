@@ -32,13 +32,16 @@ consumption surfaces
 - State: in-progress
 - Owner: unassigned
 - Created: 2026-05-25
-- Updated: 2026-08-11
+- Updated: 2026-08-24
 - Roadmap: `dev-docs/active/workflow-base/roadmap.md`
 - Completed increments:
   - N1 ecosystem model adoption and RB-4
     documentation/template/conformance reconciliation at `df13843`
   - X-5 Base federation-v1 contract convergence at source revision `eb19433`
     and evidence revision `6cf298c`
+  - package-complete generated Scenario Starter integration with project
+    continuity, locked Prisma migration, owner-local transaction/outbox/inbox
+    example, generator CLI, and opt-in database journey
 - Next-gate outcome (recorded 2026-08-01 by My-Chat/T-030 R6): satisfied -
   My-Chat adopted the converged contract layer at `042b880`, Education
   removed its forks and re-pinned (their `e12605b`), Nurture re-pinned
@@ -84,12 +87,16 @@ The current design stance is:
   contracts for later explicit host materialization.
 - Source-repo workspace, deterministic legacy/vNext conformance fixtures, and CI
   gates that validate templates before host adoption.
+- A generated Scenario Starter that demonstrates owner-local Prisma
+  persistence, atomic command/outbox writes, body-free inbox handling, and
+  package-manager-safe generation without becoming a production host runtime.
 
 ## Scope Out
-- Implementing runtime services.
+- Implementing production runtime services.
 - Implementing a host product integration.
-- Implementing Prisma models, database transactions, queues, outbox dispatch, or
-  a concrete Handoff Ledger.
+- Implementing host-owned production persistence, queues, outbox dispatch, or a
+  concrete Handoff Ledger. The generated Starter retains only its owner-local
+  reference implementation and opt-in database journey.
 - Implementing forum, RAG, notification, or public draft downstream modules.
 - User-editable workflow builders.
 - Plugin marketplace behavior.
