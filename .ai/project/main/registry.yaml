@@ -8,12 +8,21 @@ project:
     - dev-docs
 
 milestones:
+  - id: M-000
+    title: "Inbox / Triage"
+    status: in-progress
+    description: "Operational and governance work awaiting or not requiring a product milestone."
   - id: M-001
     title: "Federated scenario framework"
     status: in-progress
     description: "Publish a reusable contract, conformance suite and complete Starter for My-Chat scenarios."
 
 features:
+  - id: F-000
+    title: "Inbox / Untriaged"
+    status: in-progress
+    description: "Operational tasks that do not introduce a durable product capability."
+    milestone_id: M-000
   - id: F-001
     title: "Scenario federation contract v1"
     status: in-progress
@@ -21,6 +30,11 @@ features:
     milestone_id: M-001
 
 requirements:
+  - id: R-000
+    title: "Repository operational convergence"
+    status: in-progress
+    description: "Keep repository governance and durable task records internally consistent."
+    feature_id: F-000
   - id: R-001
     title: "Reproducible multi-repository qualification"
     status: in-progress
@@ -36,3 +50,11 @@ tasks:
     requirement_id: R-001
     dev_docs_path: dev-docs/active/workflow-base
     updated: 2026-07-20
+  - id: T-005
+    slug: repository-governance-convergence
+    status: in-progress
+    milestone_id: M-000
+    feature_id: F-000
+    requirement_id: R-000
+    dev_docs_path: dev-docs/active/repository-governance-convergence
+    updated: 2026-08-24

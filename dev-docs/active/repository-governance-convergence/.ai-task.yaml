@@ -1,0 +1,12 @@
+version: 1
+task_id: T-005
+project: main
+slug: repository-governance-convergence
+status: in-progress
+updated: "2026-08-24"
+keywords:
+  - task-governance
+  - project-hub
+  - task-bundle
+  - repository-convergence
+
