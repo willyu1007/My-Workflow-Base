@@ -669,9 +669,12 @@
   min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .mt-select__caret { flex-shrink: 0; color: var(--fg-3); }
+/* Portaled to <body>; the trigger-derived geometry (top/bottom, left,
+   min-width, max-height clamp) arrives inline from the component. z-index 90
+   sits above the drawer overlay (80) and below toasts (100). */
 .mt-select__pop {
-  position: absolute; top: calc(100% + 4px); left: 0; z-index: 50;
-  min-width: 100%; width: max-content; max-width: min(360px, 80vw);
+  position: fixed; z-index: 90;
+  width: max-content; max-width: min(360px, 80vw);
   margin: 0; padding: 4px; list-style: none;
   background: var(--bg-surface); border: 1px solid var(--border-2);
   border-radius: var(--r-md); box-shadow: var(--shadow-sm);

@@ -363,3 +363,33 @@ slightly better muted contrast than the repaired pair. The repair still wins:
 it restores the adjudicated brand system, re-aligns text with the shadow and
 border families that were always cold, and keeps this kit byte-comparable with
 My-Chat's token layer for the planned schema convergence.
+
+## Select popup: portal, fixed position, and the Escape contract (0.21.1)
+
+Two defects surfaced with a `Select` inside a `Drawer` (The-Nurture's
+confirmation drawers). Both were kit bugs, not consumer misuse.
+
+**The popup portals to `<body>` and is fixed-positioned from the trigger's
+rect.** The old popup was `position: absolute` inside the trigger's box, so any
+`overflow` ancestor clips it — the kit's own `.wb-panel__body` (`overflow-y:
+auto`) is one, and near the drawer footer only the first option survived.
+Constraining the popup's height inside the scroller was rejected: a popup that
+fits two options is not a listbox. The portaled popup takes z-index 90 — a
+deliberate slot on the existing layer scale: above the drawer overlay (80),
+below toasts (100), so a toast can still report over an open popup. Near the
+viewport edge the popup flips above the trigger; its max-height clamps to the
+available side.
+
+**Opening the menu explicitly focuses the trigger.** Safari and Firefox on
+macOS do not focus a `<button>` on click, so the trigger's keyboard handler
+never received the arrows — an open listbox nobody can navigate. The
+aria-activedescendant pattern requires focus on the trigger; now the component
+guarantees it rather than trusting the browser's click behavior.
+
+**Escape closes the top transient surface only, and the contract is
+`defaultPrevented`.** The Select consumes its Escape with `preventDefault`;
+`useEscape` (Drawer) ignores default-prevented events. `stopPropagation` cannot
+carry this contract: under Next's App Router React delegates events from
+`document` — the same node the drawer listens on — and sibling listeners on one
+node run regardless. Verified in the live consumer, where the RTL harness
+(which roots React on a child of `<body>`) could not reproduce the collision.

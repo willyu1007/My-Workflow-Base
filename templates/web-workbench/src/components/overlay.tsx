@@ -12,7 +12,12 @@ function useEscape(open: boolean, onClose: () => void): void {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent): void => {
-      if (e.key === "Escape") onClose();
+      // An inner transient surface (an open Select popup) consumes Escape by
+      // preventing default — the drawer must survive that press and close on
+      // the next one. stopPropagation alone cannot express this: under Next's
+      // App Router React delegates from `document`, the same node this listens
+      // on, and sibling listeners on one node still run.
+      if (e.key === "Escape" && !e.defaultPrevented) onClose();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
