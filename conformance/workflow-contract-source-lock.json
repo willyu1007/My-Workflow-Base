@@ -6,22 +6,17 @@
     "workflow-contracts",
     "workflow-validator"
   ],
-  "source_hash": "242ffad72f2a0e644753bc6ffa75f8d519b04e1e2d0f8ffe5fcabeeaa3576238",
+  "source_hash": "dd888b89f89d4137fb717bba60a400f9f68bb127b4485121270f1c8eb9ea51e7",
   "files": [
     {
       "path": "workflow-contracts/index.ts",
-      "bytes": 998,
-      "sha256": "00a3d6b71d96be5838e27974a3b2c78e764002a1f754c30d5fd17c33e46277fa"
+      "bytes": 946,
+      "sha256": "ed42d186e46f2a2b587ca08654a489bc2d7c30953d1eaadc58876af9312b07c8"
     },
     {
       "path": "workflow-contracts/types/api.ts",
       "bytes": 9128,
       "sha256": "a700bdf2b734b23e13764b7d323bfa1578ecd43297aec24dddab2dff1bca2896"
-    },
-    {
-      "path": "workflow-contracts/types/batch-execution-control.ts",
-      "bytes": 45253,
-      "sha256": "c735ded3431e6bf5515661066829a05006299d2d7a3addecaac5eea0d5fe841d"
     },
     {
       "path": "workflow-contracts/types/events.ts",
@@ -115,13 +110,8 @@
     },
     {
       "path": "workflow-contracts/types/validation.ts",
-      "bytes": 1334,
-      "sha256": "940c53b88009b854784bf03a613c4db76d857b3b41b6043e315b8b9c9d3bde21"
-    },
-    {
-      "path": "workflow-validator/validate-batch-execution-control.ts",
-      "bytes": 177940,
-      "sha256": "e12d590248a6be282c006a9a55053edb402e647b327958c2ff8d308f1da76b1c"
+      "bytes": 1293,
+      "sha256": "e0b08d4a32075b06ceffda5071e7061356268b20341808eac5bc826a10633b83"
     },
     {
       "path": "workflow-validator/validate-module.ts",
@@ -132,7 +122,7 @@
   "source_profiles": [
     {
       "source_identity": "platform_child_family_identity_source_v1",
-      "source_hash": "f86dbd27f069ede33cca69185a90d1c1fbdf6865c3551b8bcd942729bebcae80",
+      "source_hash": "9655e83ff6a973055fb1b3f170cdbcd3c3eea6cb117f59209844a2a355b6a861",
       "files": [
         {
           "path": "workflow-contract-schemas/canonical-ref-v1.schema.json",
@@ -261,8 +251,8 @@
         },
         {
           "path": "workflow-contracts/types/validation.ts",
-          "bytes": 1334,
-          "sha256": "940c53b88009b854784bf03a613c4db76d857b3b41b6043e315b8b9c9d3bde21"
+          "bytes": 1293,
+          "sha256": "e0b08d4a32075b06ceffda5071e7061356268b20341808eac5bc826a10633b83"
         },
         {
           "path": "workflow-validator/validate-module.ts",
@@ -273,7 +263,7 @@
     },
     {
       "source_identity": "scenario_interface_source_v1",
-      "source_hash": "8cf09f3fc72fb9d0abdd7307f7f7eb979d9a9b7d7c9fedf1ce61b41e4f031caf",
+      "source_hash": "be67d3264a9442ce30a8303d6acf86a05ea86c8a3ed1d933f41c5aa922b1ff95",
       "files": [
         {
           "path": "workflow-contract-schemas/canonical-ref-v1.schema.json",
@@ -412,8 +402,8 @@
         },
         {
           "path": "workflow-contracts/types/validation.ts",
-          "bytes": 1334,
-          "sha256": "940c53b88009b854784bf03a613c4db76d857b3b41b6043e315b8b9c9d3bde21"
+          "bytes": 1293,
+          "sha256": "e0b08d4a32075b06ceffda5071e7061356268b20341808eac5bc826a10633b83"
         },
         {
           "path": "workflow-validator/validate-module.ts",
@@ -424,7 +414,7 @@
     },
     {
       "source_identity": "scenario_domain_action_source_v1",
-      "source_hash": "53266915153bee4e38fcc49d8c1c337fd9232dfb6e4858af02d14328c4add7e3",
+      "source_hash": "b962acf3fc35d02d7b903854a3eed3f6177e3dc4d00b32124122a120b458f5f0",
       "files": [
         {
           "path": "workflow-contract-schemas/bind-scenario-domain-action-step-input-v1.schema.json",
@@ -643,8 +633,8 @@
         },
         {
           "path": "workflow-contracts/types/validation.ts",
-          "bytes": 1334,
-          "sha256": "940c53b88009b854784bf03a613c4db76d857b3b41b6043e315b8b9c9d3bde21"
+          "bytes": 1293,
+          "sha256": "e0b08d4a32075b06ceffda5071e7061356268b20341808eac5bc826a10633b83"
         },
         {
           "path": "workflow-validator/validate-module.ts",
@@ -655,7 +645,7 @@
     },
     {
       "source_identity": "scenario_protected_interaction_source_v1",
-      "source_hash": "1b0fb578be7ce4314e2baeea68478827a360db35e7e2aeef599a773e96739da9",
+      "source_hash": "a34f3864b76d1dc16eadb901f506fcc473a0cb298da7d1e273de9238eb880cf5",
       "files": [
         {
           "path": "workflow-contract-schemas/bind-scenario-domain-action-step-input-v1.schema.json",
@@ -939,8 +929,8 @@
         },
         {
           "path": "workflow-contracts/types/validation.ts",
-          "bytes": 1334,
-          "sha256": "940c53b88009b854784bf03a613c4db76d857b3b41b6043e315b8b9c9d3bde21"
+          "bytes": 1293,
+          "sha256": "e0b08d4a32075b06ceffda5071e7061356268b20341808eac5bc826a10633b83"
         },
         {
           "path": "workflow-validator/validate-module.ts",
@@ -950,5 +940,5 @@
       ]
     }
   ],
-  "contract_source_revision": "092bbb69da34f367cbe31f234111f28c399de7e6"
+  "contract_source_revision": "9b51ad747a091a88c51ed8a6f4c0842da85d2d0d"
 }

@@ -56,9 +56,9 @@
     {
       "id": "T-003",
       "slug": "workflow-batch-execution-control",
-      "status": "done",
-      "updated": "2026-08-24",
-      "dev_docs_path": "dev-docs/active/workflow-batch-execution-control",
+      "status": "archived",
+      "updated": "2026-09-17",
+      "dev_docs_path": "dev-docs/archive/workflow-batch-execution-control",
       "feature_id": "F-001"
     },
     {

@@ -28,7 +28,7 @@
 | Task | Status | Dev Docs |
 | --- | --- | --- |
 | T-001 workflow-base | in-progress | dev-docs/active/workflow-base |
-| T-003 workflow-batch-execution-control | done | dev-docs/active/workflow-batch-execution-control |
+| T-003 workflow-batch-execution-control | archived | dev-docs/archive/workflow-batch-execution-control |
 
 ## M-002 Reusable web workbench
 
