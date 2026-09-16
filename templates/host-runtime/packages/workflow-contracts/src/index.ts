@@ -1,5 +1,4 @@
 export * from "./types/api.js";
-export * from "./types/batch-execution-control.js";
 export * from "./types/events.js";
 export * from "./types/federation.js";
 export * from "./types/federation-validation.js";

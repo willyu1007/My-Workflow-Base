@@ -41,7 +41,7 @@
 
 | Task | Relationship from this task | Owned boundary / exchanged contract | Coordination condition |
 |---|---|---|---|
-| T-003 | sibling | T-003 owns the additive batch-execution-control capability within the shared contract package. | T-001 preserves additive compatibility and source-lock inclusion. |
+| T-003 | sibling (retired) | T-003 owned the additive batch-execution-control capability within the shared contract package; the contract was retired on 2026-09-17 with zero consumers and the bundle is archived. | None; the capability no longer exists in the package or source lock. |
 
 ## Implementation plan
 
