@@ -41,6 +41,13 @@
       "milestone_id": "M-002",
       "status": "done",
       "description": "Converged tokens, locked Scene paradigms, enforceable UI governance, and focused behavior tests for the published workbench kit."
+    },
+    {
+      "id": "F-003",
+      "title": "Pre-shell workbench entry",
+      "milestone_id": "M-002",
+      "status": "done",
+      "description": "Scenario-neutral pre-shell EntryFrame for institution workbench login chrome, published as @willyu1007/web-workbench 0.22.0."
     }
   ],
   "ideas": [],
@@ -80,10 +87,10 @@
     {
       "id": "T-006",
       "slug": "web-workbench-entry-frame",
-      "status": "in-progress",
+      "status": "done",
       "updated": "2026-09-19",
       "dev_docs_path": "dev-docs/active/web-workbench-entry-frame",
-      "feature_id": "F-000"
+      "feature_id": "F-003"
     }
   ]
 }

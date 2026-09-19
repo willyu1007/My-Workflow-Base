@@ -27,6 +27,7 @@
 | Status model in the kit | Encode `sign_in` / `unavailable` / `signed_in` versus one frame with slots | One frame with slots; no auth enum | decided | User, 2026-09-19 | Ownership discussion | Mapping stays in the consumer |
 | Accessory corner | Kit-owned developer menu versus empty slot | Empty `accessory` slot; optional labeled disclosure helper | decided | User, 2026-09-19 | Developer-slot discussion | Ordinary mode renders nothing there |
 | Apply / opening actions | Ship apply buttons in the kit versus consumer body | Consumer body only | decided | User, 2026-09-19 | Ownership discussion | Kit choice rows stay generic |
+| Feature placement | Keep F-000; fold into closed F-002; new Feature under M-002 | New Feature F-003 under M-002 | decided | User, 2026-09-19 | “按照你的建议闭环任务” | F-002 stays the six-paradigm convergence |
 
 ### Assumptions
 
@@ -81,7 +82,7 @@
 ## Kickoff gate
 
 - Status: ready
-- Authorized boundary: through phase 3
+- Authorized boundary: complete task
 - [x] Decisions: kit ownership, flat navy, slot model, empty accessory, and consumer-owned apply/opening are decided.
 - [x] Design: settled `EntryFrame` slots and export path are in `02-architecture.md`.
 - [x] Route: Phase 1 is executable; the user authorized Phase 3 publish on 2026-09-19.

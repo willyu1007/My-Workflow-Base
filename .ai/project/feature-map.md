@@ -14,7 +14,6 @@
 | Task | Status | Dev Docs |
 | --- | --- | --- |
 | T-005 repository-governance-convergence | archived | dev-docs/archive/repository-governance-convergence |
-| T-006 web-workbench-entry-frame | in-progress | dev-docs/active/web-workbench-entry-frame |
 
 ## M-001 Federated scenario framework
 
@@ -44,5 +43,14 @@
 | Task | Status | Dev Docs |
 | --- | --- | --- |
 | T-004 ui-kit-convergence | done | dev-docs/active/ui-kit-convergence |
+
+### F-003 Pre-shell workbench entry
+
+- Status: done
+- Description: Scenario-neutral pre-shell EntryFrame for institution workbench login chrome, published as @willyu1007/web-workbench 0.22.0.
+
+| Task | Status | Dev Docs |
+| --- | --- | --- |
+| T-006 web-workbench-entry-frame | done | dev-docs/active/web-workbench-entry-frame |
 
 <!-- AUTO-GENERATED:END feature-map -->

@@ -18,13 +18,13 @@ next step here.
 <!-- AUTO-GENERATED:START dashboard -->
 ## Summary
 
-- Tasks: 5 (planned: 0, in-progress: 2, blocked: 0, done: 1, archived: 2)
+- Tasks: 5 (planned: 0, in-progress: 1, blocked: 0, done: 2, archived: 2)
 
 ## Recently registered or status-changed tasks
 
 | Task | Status | Feature | Dev Docs |
 | --- | --- | --- | --- |
-| T-006 web-workbench-entry-frame | in-progress | F-000 | dev-docs/active/web-workbench-entry-frame |
+| T-006 web-workbench-entry-frame | done | F-003 | dev-docs/active/web-workbench-entry-frame |
 | T-003 workflow-batch-execution-control | archived | F-001 | dev-docs/archive/workflow-batch-execution-control |
 | T-001 workflow-base | in-progress | F-001 | dev-docs/active/workflow-base |
 | T-004 ui-kit-convergence | done | F-002 | dev-docs/active/ui-kit-convergence |

@@ -15,6 +15,8 @@
 | Sibling source-hash pin | `pnpm reseal:pins apply --allow-base-move` then `verify:workflow-contract-pin` | passed | Sealed to the current Base HEAD; `web_workbench` sha256 `93e79e890067…`. The same reseal also moved My-Chat HEAD (`467339cc` → `7168a9da`, revision only) and reminted the Nurture scenario hash for the 0.22.0 lockfile. |
 | Consumer signed-in gate | Nurture `/entry` after 以测试园长进入 against registry `0.22.0` | passed | 200; `MORETHAN \| 托育`, heading `正在进入`, aside `测试园长 · 开发测试园`, `进入`. Auto-enter then reached `/nurture/overview`. |
 | Consumer unavailable gate | Same session after stopping My-Chat `:8001`, then retry after restart | passed | `/entry` showed `暂时无法进入` with `重试`, ghost `登录`, and quiet `退出登录`. After API restart, `/entry?retry=1` returned to `正在进入`. |
+| Scene sign-out stays off EntrySubmit | `/nurture/account` after the closeout fix | passed | Button is `wb-action` `type=submit`, not inside `.wb-entry`. |
+| Single-role frame keeps sign-out | Entry markup test plus signed-in `/entry` | passed | `server.test.ts` asserts `正在进入` + `退出登录`; browser snapshot showed both before auto-enter. |
 
 ## Outstanding verification
 
