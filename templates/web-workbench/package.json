@@ -1,6 +1,6 @@
 {
   "name": "@willyu1007/web-workbench",
-  "version": "0.21.1",
+  "version": "0.22.0",
   "type": "module",
   "description": "Scenario-agnostic web workbench UI kit (Scene paradigms) — contracts + presentational React components.",
   "license": "MIT",
@@ -67,6 +67,10 @@
     "./record": {
       "types": "./dist/record.d.ts",
       "default": "./dist/record.js"
+    },
+    "./entry": {
+      "types": "./dist/entry.d.ts",
+      "default": "./dist/entry.js"
     },
     "./styles": "./dist/styles/index.css",
     "./styles/*": "./dist/styles/*",

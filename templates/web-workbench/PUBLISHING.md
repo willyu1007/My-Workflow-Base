@@ -65,7 +65,7 @@ not support changing a public package back to private.
    ```
 
    Prefer grouped entries for new code: `primitives`, `shell`, `feedback`, `list`,
-   `insight`, `settings`, `hub`, `queue`, and `record`. The root entry remains
+   `insight`, `settings`, `hub`, `queue`, `record`, and `entry`. The root entry remains
    available only as a legacy compatibility barrel.
 
 4. **Remove the local-dev hacks** (they are only needed for the `link:` setup):

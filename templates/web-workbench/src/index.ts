@@ -75,3 +75,6 @@ export * from "./components/record.js";
 
 // ---- Hub paradigm (aggregation台 renderer; structure is component-locked) ----
 export * from "./components/hub.js";
+
+// ---- Pre-shell entry chrome (outside AppShell and the six Scene paradigms) ----
+export * from "./components/entry.js";

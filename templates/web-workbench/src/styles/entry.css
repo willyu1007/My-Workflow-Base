@@ -1,0 +1,301 @@
+/* Pre-shell entry chrome. Flat navy canvas; not a Scene, not .wb-centered. */
+
+.wb-entry {
+  --wb-entry-muted: color-mix(in oklab, var(--mt-cream) 55%, transparent);
+  --wb-entry-line: color-mix(in oklab, var(--mt-cream) 12%, transparent);
+  --wb-entry-ghost: color-mix(in oklab, var(--mt-cream) 28%, transparent);
+  --wb-entry-panel: color-mix(in oklab, var(--mt-cream) 6%, var(--mt-navy-700));
+
+  box-sizing: border-box;
+  min-height: 100dvh;
+  margin: 0;
+  padding: var(--sp-5) var(--sp-6) var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  background: var(--mt-navy-700);
+  color: var(--mt-cream);
+  font-family: var(--font-sans);
+}
+
+.wb-entry__chrome {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-5);
+}
+
+.wb-entry__brand {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  margin: 0;
+  line-height: 1;
+}
+
+.wb-entry__wordmark {
+  color: var(--mt-orange);
+  font-weight: var(--display-weight);
+  font-size: var(--label-size);
+  letter-spacing: 0.06em;
+}
+
+.wb-entry__sep {
+  color: var(--wb-entry-muted);
+  font-weight: var(--body-weight);
+}
+
+.wb-entry__scene {
+  color: var(--fg-on-navy);
+  font-weight: 500;
+  font-size: var(--label-size);
+}
+
+.wb-entry__accessory-slot {
+  flex-shrink: 0;
+}
+
+.wb-entry__body {
+  box-sizing: border-box;
+  width: min(100%, 22.5rem);
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.wb-entry__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}
+
+.wb-entry__title {
+  margin: 0;
+  color: var(--mt-cream);
+  font-size: 17px;
+  font-weight: 520;
+  letter-spacing: -0.015em;
+  line-height: var(--h4-lh);
+}
+
+.wb-entry__aside {
+  margin: 0;
+  color: var(--wb-entry-muted);
+  font-size: var(--small-size);
+}
+
+.wb-entry__copy {
+  margin: 0;
+  color: var(--wb-entry-muted);
+  font-size: var(--body-size);
+  line-height: var(--body-lh);
+}
+
+.wb-entry__notice {
+  margin: 0;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--r-md);
+  background: var(--mt-sand);
+  color: var(--fg-2);
+  font-size: var(--small-size);
+  line-height: var(--small-lh);
+}
+
+.wb-entry__alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+}
+
+.wb-entry__alert svg {
+  flex-shrink: 0;
+  color: var(--mt-warning);
+}
+
+.wb-entry__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.wb-entry__actions > form {
+  min-width: 0;
+}
+
+.wb-entry__action {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 var(--sp-4);
+  border: 0;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: var(--label-size);
+  font-weight: var(--h4-weight);
+  line-height: var(--label-lh);
+  text-align: center;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wb-entry__action--accent {
+  background: var(--mt-orange);
+  color: var(--fg-on-orange);
+}
+
+.wb-entry__action--accent:hover {
+  background: var(--mt-orange-500);
+}
+
+.wb-entry__action--ghost {
+  background: transparent;
+  color: var(--mt-cream);
+  box-shadow: inset 0 0 0 1px var(--wb-entry-ghost);
+}
+
+.wb-entry__action--quiet {
+  width: fit-content;
+  min-height: 0;
+  padding: 0;
+  background: none;
+  color: var(--wb-entry-muted);
+  font-weight: var(--body-weight);
+  font-size: var(--small-size);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.wb-entry__action:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.wb-entry__action:disabled {
+  opacity: var(--state-disabled-opacity);
+  cursor: not-allowed;
+}
+
+.wb-entry__choices {
+  display: flex;
+  flex-direction: column;
+}
+
+.wb-entry__choices > * {
+  border-top: 1px solid var(--wb-entry-line);
+}
+
+.wb-entry__choices > :last-child {
+  border-bottom: 1px solid var(--wb-entry-line);
+}
+
+.wb-entry__choice {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: var(--sp-3) 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wb-entry__choice:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.wb-entry__choice:disabled {
+  opacity: var(--state-disabled-opacity);
+  cursor: not-allowed;
+}
+
+.wb-entry__mark {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-pill);
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: color-mix(in oklab, var(--mt-cream) 18%, var(--mt-navy-700));
+  color: var(--mt-cream);
+  font-size: var(--small-size);
+  font-weight: 700;
+}
+
+.wb-entry__choice-copy {
+  min-width: 0;
+}
+
+.wb-entry__choice-copy strong {
+  display: block;
+  font-size: var(--body-size);
+  font-weight: 520;
+}
+
+.wb-entry__choice-copy small {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--small-size);
+  color: var(--wb-entry-muted);
+}
+
+.wb-entry__choice em {
+  margin-left: auto;
+  font-style: normal;
+  font-size: var(--small-size);
+  font-weight: var(--h4-weight);
+  color: var(--mt-orange);
+}
+
+.wb-entry__quiet {
+  width: fit-content;
+}
+
+.wb-entry__accessory {
+  position: relative;
+}
+
+.wb-entry__accessory summary {
+  list-style: none;
+  cursor: pointer;
+  color: var(--wb-entry-muted);
+  font-size: var(--small-size);
+  line-height: 1;
+}
+
+.wb-entry__accessory summary::-webkit-details-marker {
+  display: none;
+}
+
+.wb-entry__accessory-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: 15.5rem;
+  padding: var(--sp-3) 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--sp-2);
+  background: var(--wb-entry-panel);
+  box-shadow: inset 0 0 0 1px var(--wb-entry-line);
+  border-radius: 10px;
+  text-align: right;
+}
+
+.wb-entry__accessory-panel p {
+  margin: 0;
+  font-size: var(--caption-size);
+  line-height: var(--caption-lh);
+  color: var(--wb-entry-muted);
+}

@@ -56,7 +56,8 @@ still not published — consumers do not change token values, they consume them.
 | **Queue paradigm** | `Queue` (rows + trailing action → right `Drawer`; shape is component-locked) |
 | **Record paradigm** | `Record` (intro + tabs + top-right action + `Drawer`; shape is component-locked) |
 | **Form paradigm** | `FormFrame` (single guided column, required + declarative constraints, validate → submit) · shared `Field` schema |
-| **Styles** | `tokens.css` · `components.css` · `workbench.css` |
+| **Pre-shell entry** | `<EntryFrame>` — navy gate outside AppShell; brand + empty accessory slot + heading / actions / choices. Not a seventh Scene paradigm. |
+| **Styles** | `tokens.css` · `components.css` · `workbench.css` · `entry.css` |
 
 ## Install
 
@@ -89,6 +90,12 @@ import "@willyu1007/web-workbench/styles/index.css";
 > webfont files (no third-party `@import`). Load them once host-side — `next/font` is the
 > recommended, self-hosted path — and map them onto the `--font-*` tokens. Full recipe:
 > [TYPOGRAPHY.md → Fonts (host-provided)](./TYPOGRAPHY.md#fonts-host-provided).
+
+> ⚠️ **Upgrading to 0.22.0 (additive).** Pre-shell `<EntryFrame>` at
+> `@willyu1007/web-workbench/entry`: full navy-700 canvas, `MORETHAN | {scene}`,
+> empty accessory slot, heading/aside, alert, two-column actions, and choice rows.
+> Not a seventh Scene paradigm and not `.wb-centered`. Scene `ActionButton`
+> primary stays navy.
 
 > ⚠️ **Upgrading to 0.18.0 (additive).** `.mt-value-label` joins `.mt-field-label` —
 > same appearance, different job: one names a control, the other names a displayed
@@ -193,7 +200,7 @@ import "@willyu1007/web-workbench/styles/index.css";
    ```
 
    Available grouped entries: `primitives`, `shell`, `feedback`, `list`, `insight`,
-   `settings`, `hub`, `queue`, and `record`. The root package entry remains for
+   `settings`, `hub`, `queue`, `record`, and `entry`. The root package entry remains for
    legacy consumers, but new code should avoid it.
 
    See [`examples/education-adapters`](./examples/education-adapters) for worked adapters

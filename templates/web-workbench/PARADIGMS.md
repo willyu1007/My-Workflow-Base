@@ -45,3 +45,16 @@ it does not invent layouts. The components are built so the right structure is t
 
 > Rule of thumb: if you reach for `EntityCard` on a dashboard, stop — the Hub wants rows.
 > Use `<Hub>`; it makes the wrong thing unreachable.
+
+## Pre-shell chrome — not a seventh paradigm
+
+Institution login sits **outside** `AppShell` and the six postures above. Render it
+with **`<EntryFrame>`** (`@willyu1007/web-workbench/entry`).
+
+- Full `--mt-navy-700` canvas, no card, no texture. Do not reuse `.wb-centered`.
+- Brand row is `MORETHAN | {scene}`. The scene label is required; the accessory
+  slot stays empty unless the scenario passes children.
+- The kit has no auth enum. The scenario maps unsigned / blocked / ready onto
+  the same slots (heading, alert, two-column actions, choice rows, quiet row).
+- Dark-canvas actions are `.wb-entry__action*`. Do not change Scene
+  `ActionButton kind="primary"` (navy).
