@@ -12,7 +12,7 @@
 | Consumer unsigned gate | Nurture `/entry` in the browser against a local `link:` | passed | 200; `MORETHAN \| 托育`, 登录工作台, orange 登录; `?signout=local` shows the status notice. CJK in screenshots is unreliable. |
 | Publish `0.22.0` | `pnpm publish` then `pnpm view` | passed | Registry latest is `0.22.0` |
 | Consumer registry pin | Nurture `@willyu1007/web-workbench` `0.22.0` (exact) + lockfile tarball | passed | Frontend typecheck, entry CSS lint, and 21 related tests passed. `/entry?reason=sign_in` and `?signout=local` return 200 with `wb-entry__brand` / `MORETHAN | 托育`. Install swap caused a brief Next resolve 500, then compiled. |
-| Sibling source-hash pin | `pnpm verify:workflow-contract-pin` `web_workbench` | deferred | Still sealed to Base `51f33137…`. Reseal only after T-006 is committed. |
+| Sibling source-hash pin | `pnpm reseal:pins apply --allow-base-move` then `verify:workflow-contract-pin` | passed | Base revision `24abff0e221a`; `web_workbench` sha256 `93e79e890067…`. The same reseal also moved My-Chat HEAD (`467339cc` → `7168a9da`, revision only) and reminted the Nurture scenario hash for the 0.22.0 lockfile. |
 
 ## Outstanding verification
 

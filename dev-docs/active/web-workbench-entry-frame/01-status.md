@@ -6,7 +6,7 @@ Ship a scenario-neutral pre-shell `EntryFrame` in `templates/web-workbench` so i
 ## Progress
 - State: in-progress
 - Current phase: Phase 3 — Publish 0.22.0
-- Next step: After this Base revision is committed, reseal Nurture's sibling `web_workbench` source-hash pin with `--allow-base-move`. Feature placement under M-002 still needs confirmation.
+- Next step: Confirm Feature placement (proposed: a new Feature under M-002, not the closed F-002). Signed-in and unavailable browser states against the registry pin are still open.
 - Blocker: none
 
 ## Done when
