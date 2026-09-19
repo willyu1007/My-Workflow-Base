@@ -14,6 +14,7 @@
 | Task | Status | Dev Docs |
 | --- | --- | --- |
 | T-005 repository-governance-convergence | archived | dev-docs/archive/repository-governance-convergence |
+| T-006 web-workbench-entry-frame | in-progress | dev-docs/active/web-workbench-entry-frame |
 
 ## M-001 Federated scenario framework
 

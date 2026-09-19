@@ -76,6 +76,14 @@
       "updated": "2026-08-24",
       "dev_docs_path": "dev-docs/archive/repository-governance-convergence",
       "feature_id": "F-000"
+    },
+    {
+      "id": "T-006",
+      "slug": "web-workbench-entry-frame",
+      "status": "in-progress",
+      "updated": "2026-09-19",
+      "dev_docs_path": "dev-docs/active/web-workbench-entry-frame",
+      "feature_id": "F-000"
     }
   ]
 }
