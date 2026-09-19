@@ -6,7 +6,7 @@ Ship a scenario-neutral pre-shell `EntryFrame` in `templates/web-workbench` so i
 ## Progress
 - State: in-progress
 - Current phase: Phase 3 — Publish 0.22.0
-- Next step: Confirm Feature placement (proposed: a new Feature under M-002, not the closed F-002). Signed-in and unavailable browser states against the registry pin are still open.
+- Next step: Confirm Feature placement (proposed: a new Feature under M-002, not the closed F-002). Then the task can be accepted as done.
 - Blocker: none
 
 ## Done when
