@@ -798,7 +798,9 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
 /* Primary: progress — a foundation bar flush at the card's bottom edge (the
    fraction itself folds into the metrics line). Grounds the card, no top band. */
 .wb-card__baseline { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--mt-navy-100); }
-.wb-card__baseline-fill { height: 100%; background: var(--mt-navy-500); }
+/* The fill is a <span>; without display:block its inline width is ignored and
+   the progress reads as empty for every card. */
+.wb-card__baseline-fill { display: block; height: 100%; background: var(--mt-navy-500); }
 .wb-card__baseline--accent .wb-card__baseline-fill { background: var(--mt-orange-300); }
 .wb-card__baseline--success .wb-card__baseline-fill { background: var(--mt-success); }
 .wb-card__baseline--warning .wb-card__baseline-fill { background: var(--mt-warning); }
@@ -953,7 +955,9 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
 }
 .wb-panel__title { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.01em; margin: 0; }
 .wb-panel__desc { font-size: 13px; color: var(--fg-3); margin: 4px 0 0; }
-.wb-panel__body { padding: 22px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+/* flex:1 pins the foot to the drawer's bottom edge when the body is short;
+   min-height:0 lets a long body scroll instead of pushing the foot off-panel. */
+.wb-panel__body { flex: 1; min-height: 0; padding: 22px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
 .wb-panel__foot {
   display: flex; align-items: center; justify-content: flex-end; gap: 10px;
   padding: 16px 22px;

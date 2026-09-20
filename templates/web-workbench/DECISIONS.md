@@ -393,3 +393,22 @@ carry this contract: under Next's App Router React delegates events from
 `document` — the same node the drawer listens on — and sibling listeners on one
 node run regardless. Verified in the live consumer, where the RTL harness
 (which roots React on a child of `<body>`) could not reproduce the collision.
+
+## Card baseline fill and drawer foot placement (0.22.1)
+
+Two CSS defects found while mocking The-Nurture's class and people scenes
+against the kit's own stylesheet. Both are kit bugs.
+
+**`.wb-card__baseline-fill` is a `<span>` and now declares `display: block`.**
+`EntityCard` writes the progress as an inline `width: N%` on that span, but an
+inline element ignores `width`, so every card's baseline rendered as the empty
+track. Making the fill a block is the smallest repair; switching the element to
+a `<div>` would change the DOM consumers snapshot against for no gain.
+
+**`.wb-panel__body` takes `flex: 1; min-height: 0`.** The drawer is a column
+flexbox, but nothing claimed the free space, so with a short body the foot sat
+directly under the content mid-panel instead of on the drawer's bottom edge.
+`flex: 1` pins the foot; `min-height: 0` keeps a long body scrolling inside the
+panel (the default `min-height: auto` would let it grow and push the foot off
+the visible area). No component change; the overlay markup already puts head,
+body and foot as direct children of `.wb-drawer`.
