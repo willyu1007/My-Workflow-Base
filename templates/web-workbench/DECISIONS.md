@@ -412,3 +412,19 @@ directly under the content mid-panel instead of on the drawer's bottom edge.
 panel (the default `min-height: auto` would let it grow and push the foot off
 the visible area). No component change; the overlay markup already puts head,
 body and foot as direct children of `.wb-drawer`.
+
+## The reveal keyframe ends at `transform: none` (0.22.2)
+
+Found while The-Nurture rebuilt its class scenes: every `Drawer` opened from
+inside a `Scene` was boxed to the scene's own height on a short page.
+
+**`wb-fade-up` now ends at `transform: none`, not `translateY(0)`.** The
+`.wb-reveal` animation runs with `both` fill, so its last keyframe is the
+element's resting style for as long as it lives. `translateY(0)` moves nothing
+but is still a transform, and a transformed element is the containing block
+for every `position: fixed` descendant — the overlay's `inset: 0` then means
+the scene's box, not the viewport. `none` is the resting value that creates no
+containing block, so a drawer rendered anywhere inside a scene reaches the
+viewport again. Portaling the overlay was the larger repair for the same
+symptom and would have changed the DOM consumers snapshot against; the
+keyframe is the cause.

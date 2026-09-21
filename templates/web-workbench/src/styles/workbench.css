@@ -1199,7 +1199,7 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
    Animations
    ============================================================ */
 @keyframes wb-fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes wb-fade-up { from { opacity: 0; transform: translateY(var(--wb-reveal-shift, 6px)); } to { opacity: 1; transform: translateY(0); } }
+@keyframes wb-fade-up { from { opacity: 0; transform: translateY(var(--wb-reveal-shift, 6px)); } to { opacity: 1; transform: none; } }
 @keyframes wb-slide-in-right { from { transform: translateX(24px); opacity: 0.6; } to { transform: translateX(0); opacity: 1; } }
 @keyframes wb-slide-in-up { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes wb-shimmer { 100% { transform: translateX(100%); } }
