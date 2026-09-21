@@ -413,18 +413,23 @@ panel (the default `min-height: auto` would let it grow and push the foot off
 the visible area). No component change; the overlay markup already puts head,
 body and foot as direct children of `.wb-drawer`.
 
-## The reveal keyframe ends at `transform: none` (0.22.2)
+## The reveal animation fills backwards, not both (0.22.2 → 0.22.3)
 
 Found while The-Nurture rebuilt its class scenes: every `Drawer` opened from
 inside a `Scene` was boxed to the scene's own height on a short page.
 
-**`wb-fade-up` now ends at `transform: none`, not `translateY(0)`.** The
-`.wb-reveal` animation runs with `both` fill, so its last keyframe is the
-element's resting style for as long as it lives. `translateY(0)` moves nothing
-but is still a transform, and a transformed element is the containing block
-for every `position: fixed` descendant — the overlay's `inset: 0` then means
-the scene's box, not the viewport. `none` is the resting value that creates no
-containing block, so a drawer rendered anywhere inside a scene reaches the
-viewport again. Portaling the overlay was the larger repair for the same
-symptom and would have changed the DOM consumers snapshot against; the
-keyframe is the cause.
+The cause is the reveal's fill mode. `.wb-reveal` ran `wb-fade-up` with
+`both`, so after the animation the scene kept the animation's final output —
+and an animated `transform` resolves to a matrix, never to the keyword `none`,
+even when the last keyframe says `none`. A transformed element is the
+containing block for every `position: fixed` descendant, so the overlay's
+`inset: 0` meant the scene's box, not the viewport. 0.22.2 ended the keyframe
+at `transform: none` and did not help, for exactly that reason (measured in
+the consumer: computed `transform` stayed `matrix(1, 0, 0, 1, 0, 0)`).
+
+**0.22.3 fills `backwards`.** The from-state (opacity 0) still applies during
+any delay, so nothing flashes; once the animation finishes, no animated value
+applies and the scene's transform is the stylesheet's `none`, which creates no
+containing block. Portaling the overlay was the larger repair for the same
+symptom and would have changed the DOM consumers snapshot against; the fill
+mode is the cause.

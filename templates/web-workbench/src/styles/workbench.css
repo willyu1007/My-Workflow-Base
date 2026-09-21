@@ -1152,7 +1152,7 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
 /* Reveal on mount — a brief settle, not an entrance. Duration + shift are tokens
    so a host can tune or disable it (--wb-reveal-duration: 0ms); it replays on
    every Scene mount, so the default is deliberately short. */
-.wb-reveal { animation: wb-fade-up var(--wb-reveal-duration, 180ms) var(--ease-out) both; }
+.wb-reveal { animation: wb-fade-up var(--wb-reveal-duration, 180ms) var(--ease-out) backwards; }
 
 /* ============================================================
    Skeleton (loading placeholder)
