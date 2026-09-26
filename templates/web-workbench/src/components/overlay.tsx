@@ -5,7 +5,7 @@
  */
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode, type RefObject } from "react";
 import { IconX } from "./icons.js";
 
 function useEscape(open: boolean, onClose: () => void): void {
@@ -22,6 +22,42 @@ function useEscape(open: boolean, onClose: () => void): void {
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onClose]);
+}
+
+function useDrawerFocus(open: boolean, ref: RefObject<HTMLDivElement | null>): void {
+  useEffect(() => {
+    const panel = ref.current;
+    if (!open || !panel) return;
+    const previous = document.activeElement;
+    const controls = () => Array.from(panel.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]',
+    )).filter(element => {
+      if (element.tabIndex < 0 || element.matches(":disabled")) return false;
+      for (let parent: HTMLElement | null = element; parent && parent !== panel; parent = parent.parentElement) {
+        const style = getComputedStyle(parent);
+        if (parent.hidden || parent.hasAttribute("inert") || style.display === "none" || style.visibility === "hidden") return false;
+        if (parent.tagName === "DETAILS" && !parent.hasAttribute("open")
+          && !parent.querySelector(":scope > summary")?.contains(element)) return false;
+      }
+      return true;
+    });
+    controls()[0]?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Tab" || event.defaultPrevented) return;
+      const candidates = controls(), first = candidates[0], last = candidates.at(-1);
+      if (!first || !last) return;
+      const active = document.activeElement;
+      if (!panel.contains(active) || (event.shiftKey ? active === first : active === last)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      if (previous instanceof HTMLElement && previous.isConnected) previous.focus();
+    };
+  }, [open, ref]);
 }
 
 interface PanelProps {
@@ -52,7 +88,9 @@ function PanelInner({ title, desc, children, footer, onClose }: Omit<PanelProps,
 }
 
 export function Drawer(props: PanelProps): React.ReactElement | null {
+  const panel = useRef<HTMLDivElement>(null);
   useEscape(props.open, props.onClose);
+  useDrawerFocus(props.open, panel);
   if (!props.open) return null;
   return (
     <div
@@ -61,7 +99,7 @@ export function Drawer(props: PanelProps): React.ReactElement | null {
         if (e.target === e.currentTarget) props.onClose();
       }}
     >
-      <div className="wb-drawer" role="dialog" aria-modal="true" aria-label={props.title}>
+      <div ref={panel} className="wb-drawer" role="dialog" aria-modal="true" aria-label={props.title}>
         <PanelInner {...props} />
       </div>
     </div>

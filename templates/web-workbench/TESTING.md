@@ -83,7 +83,7 @@ tells you far less.
 **Test the logic, not the framework.** Pure logic (`checkConstraints`) is tested
 directly; only behaviour that needs a DOM goes through `render`.
 
-## Coverage today
+## Initial coverage (0.15.0)
 
 57 tests across the five components that carry real state or branching logic:
 
@@ -95,10 +95,20 @@ directly; only behaviour that needs a DOM goes through `render`.
 | `ListView` | 9 | filter predicates, counts against the full list, load-more window and its reset on filter change, the presenter receiving only filtered+capped items |
 | `Queue` | 7 | rows get a trailing action, the action opens a Drawer rather than navigating, the clicked row's drawer, close by callback and Escape, reopen with a new item |
 
-The other 26 components remain untested. That is honest rather than complete —
+The other 26 components were initially untested. That is honest rather than complete —
 these five were chosen because they hold state and branch; most of the rest map
 props onto markup, where a typecheck already catches the likely mistakes. Adding
 a suite to one is now a file, not a project.
+
+## Drawer focus (0.22.4)
+
+The suite now has 86 tests in ten files. Drawer focus tests hold first focus,
+Tab wrapping, disabled/hidden/folded controls, stable focus across rerenders,
+and restoration to the opening control on close. Both the original missing
+focus behavior and inherited `fieldset disabled` / explicit disabled
+`tabIndex` candidates were observed failing before the repair.
+
+Consumer browser checks remain necessary for layout and nested popup behavior.
 
 ### Fake timers and `userEvent`
 
