@@ -102,13 +102,18 @@ a suite to one is now a file, not a project.
 
 ## Drawer focus (0.22.4)
 
-The suite now has 86 tests in ten files. Drawer focus tests hold first focus,
+The suite at 0.22.4 has 86 tests in ten files. Drawer focus tests hold first focus,
 Tab wrapping, disabled/hidden/folded controls, stable focus across rerenders,
 and restoration to the opening control on close. Both the original missing
 focus behavior and inherited `fieldset disabled` / explicit disabled
 `tabIndex` candidates were observed failing before the repair.
 
 Consumer browser checks remain necessary for layout and nested popup behavior.
+
+At 0.22.5 the suite has 87 tests. The nested Menu test reproduces a consumer
+browser failure: Escape closed both Menu and Drawer. Menu now consumes that
+press before the enclosing Drawer and restores its trigger; the second press
+closes the Drawer and restores the original opening control.
 
 ### Fake timers and `userEvent`
 

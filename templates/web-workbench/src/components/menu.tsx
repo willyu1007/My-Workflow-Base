@@ -26,13 +26,17 @@ export function Menu({
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     const onKey = (e: KeyboardEvent): void => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      // Consume Escape before an enclosing Drawer handles its document listener.
+      e.preventDefault();
+      setOpen(false);
+      ref.current?.querySelector<HTMLButtonElement>(":scope > button")?.focus();
     };
     document.addEventListener("mousedown", onDown);
-    document.addEventListener("keydown", onKey);
+    document.addEventListener("keydown", onKey, true);
     return () => {
       document.removeEventListener("mousedown", onDown);
-      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("keydown", onKey, true);
     };
   }, [open]);
 

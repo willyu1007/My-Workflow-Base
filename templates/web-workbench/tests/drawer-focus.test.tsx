@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, it } from "vitest";
 import { Drawer } from "../src/components/overlay.js";
+import { Menu } from "../src/components/menu.js";
 
 function Example() {
   const [open, setOpen] = useState(false);
@@ -14,6 +15,7 @@ function Example() {
       <button disabled>检测中</button>
       <div hidden><button>隐藏操作</button></div>
       <button onClick={() => setCount(count + 1)}>刷新 {count}</button>
+      <Menu trigger="更多" label="称呼操作"><button>修改</button></Menu>
       <details><summary>说明</summary><button>折叠内容</button></details>
       <fieldset disabled><input aria-label="锁定称呼" /></fieldset>
       <button disabled tabIndex={0}>锁定保存</button>
@@ -39,8 +41,25 @@ it("cycles Tab inside the drawer and skips disabled, hidden and folded controls"
   expect(document.activeElement).toBe(screen.getByRole("button", { name: "关闭" }));
   await user.tab(); expect(document.activeElement).toBe(screen.getByRole("textbox", { name: "称呼" }));
   await user.tab(); expect(document.activeElement).toBe(screen.getByRole("button", { name: "刷新 0" }));
+  await user.tab(); expect(document.activeElement).toBe(screen.getByRole("button", { name: "称呼操作" }));
   await user.tab(); expect(document.activeElement).toBe(screen.getByText("说明"));
   await user.tab(); expect(document.activeElement).toBe(screen.getByRole("button", { name: "关闭" }));
+});
+
+it("closes an inner Menu on Escape before closing the drawer", async () => {
+  const user = userEvent.setup(); render(<Example />);
+  await user.click(screen.getByRole("button", { name: "打开资料" }));
+  const trigger = screen.getByRole("button", { name: "称呼操作" });
+  await user.click(trigger);
+  await user.tab();
+  expect(document.activeElement).toBe(screen.getByRole("button", { name: "修改" }));
+  await user.keyboard("{Escape}");
+  expect(screen.queryByRole("menu")).toBeNull();
+  expect(screen.getByRole("dialog")).toBeTruthy();
+  expect(document.activeElement).toBe(trigger);
+  await user.keyboard("{Escape}");
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(document.activeElement).toBe(screen.getByRole("button", { name: "打开资料" }));
 });
 
 it("keeps the current control focused when the drawer callback rerenders", async () => {
