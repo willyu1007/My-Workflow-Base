@@ -124,10 +124,11 @@ fake timers a click never lands and the test **times out rather than failing** â
 a misleading signal. Use `fireEvent` for plain clicks in a fake-timer test;
 `userEvent` is still right everywhere else.
 
-### Editing overlays (0.23.0)
+### Editing overlays (0.23.1)
 
 89 tests pass in ten files. Header controls precede the body and receive initial
 focus in the wide, inline variant. Escape from a Dialog closes that edit while
-preserving its parent Drawer. jsdom stubs native dialog methods for the event
-test; real native focus, inertness, restoration and responsive layout still
-require a consumer browser check.
+preserving its parent Drawer and restores its trigger. Tab wraps inside Dialog
+using the same focus loop. The restoration assertion failed before the 0.23.1
+repair. jsdom stubs native dialog methods; real top layer, background inertness
+and responsive layout still require a consumer browser check.

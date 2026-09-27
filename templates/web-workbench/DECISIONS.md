@@ -444,7 +444,10 @@ Those controls stay before the scrolling body in both DOM and focus order.
 Section titles accept composed content for a related action or explanation.
 
 Dialog is a focused edit within the work surface. Native `showModal()` owns its
-top layer, inert background, focus containment, and restoration. It consumes
-Escape before Drawer; Drawer defers its focus loop while a kit Dialog is open.
+top layer and inert background. It consumes Escape before Drawer; Drawer defers
+its focus loop while a kit Dialog is open. At 0.23.1 Dialog reuses the kit's
+focus loop and explicit restoration: React removes the dialog before effect
+cleanup calls `close()`, so native restoration alone lost the opening control
+in the real consumer. A reproduced focus test holds the repair and Tab wrapping.
 No additional motion or dependency is introduced. Both overlays are exported
 through `primitives`; consumers continue using the published package.

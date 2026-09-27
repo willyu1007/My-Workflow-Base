@@ -79,27 +79,37 @@ it("keeps header actions ahead of the body when using an inline wide drawer", as
   expect(screen.queryByRole("button", { name: "关闭" })).toBeNull();
 });
 
-it("leaves the parent drawer open when Escape dismisses a focused edit dialog", () => {
+it("leaves the parent drawer open and restores focus when Escape dismisses a focused edit dialog", async () => {
   // jsdom does not implement the browser's native dialog focus lifecycle.
-  const show = vi.fn(function (this: HTMLDialogElement) { this.open = true; });
+  const show = vi.fn(function (this: HTMLDialogElement) { this.open = true; this.querySelector('input')?.focus(); });
   const close = vi.fn(function (this: HTMLDialogElement) { this.open = false; });
   const originalShow = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, "showModal");
   const originalClose = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, "close");
   Object.defineProperties(HTMLDialogElement.prototype, { showModal: { configurable: true, value: show }, close: { configurable: true, value: close } });
   const parentClose = vi.fn();
   function Nested() {
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
     return <Drawer open title="资料" onClose={parentClose}>
-      <Dialog open={open} title="修改" onClose={() => setOpen(false)}><input aria-label="称呼" /></Dialog>
+      <button onClick={() => setOpen(true)}>修改资料</button>
+      <Dialog open={open} title="修改" onClose={() => setOpen(false)}><input aria-label="称呼" /><button>编辑保存</button></Dialog>
     </Drawer>;
   }
   try {
     render(<Nested />);
+    const user = userEvent.setup();
+    const trigger = screen.getByRole('button', { name: '修改资料' });
+    await user.click(trigger);
     fireEvent.keyDown(screen.getByRole("textbox"), { key: "Escape" });
     expect(screen.queryByRole("dialog", { name: "修改" })).toBeNull();
     expect(screen.getByRole("dialog", { name: "资料" })).toBeTruthy();
     expect(parentClose).not.toHaveBeenCalled();
     expect(close).toHaveBeenCalledOnce();
+    expect(document.activeElement).toBe(trigger);
+    await user.click(trigger);
+    await user.tab({ shift: true });
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: '编辑保存' }));
+    await user.tab(); expect(document.activeElement).toBe(screen.getByRole('textbox'));
+    fireEvent.keyDown(screen.getByRole('textbox'), { key: 'Escape' });
     fireEvent.keyDown(document, { key: "Escape" }); expect(parentClose).toHaveBeenCalledOnce();
   } finally {
     if (originalShow) Object.defineProperty(HTMLDialogElement.prototype, "showModal", originalShow);

@@ -24,7 +24,7 @@ function useEscape(open: boolean, onClose: () => void): void {
   }, [open, onClose]);
 }
 
-function useDrawerFocus(open: boolean, ref: RefObject<HTMLDivElement | null>): void {
+function usePanelFocus(open: boolean, ref: RefObject<HTMLElement | null>): void {
   useEffect(() => {
     const panel = ref.current;
     if (!open || !panel) return;
@@ -43,7 +43,9 @@ function useDrawerFocus(open: boolean, ref: RefObject<HTMLDivElement | null>): v
     });
     controls()[0]?.focus();
     const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "Tab" || event.defaultPrevented || document.querySelector('.wb-dialog[open]')) return;
+      if (event.key !== "Tab" || event.defaultPrevented) return;
+      const topDialog = Array.from(document.querySelectorAll('.wb-dialog[open]')).at(-1);
+      if (topDialog && topDialog !== panel) return;
       const candidates = controls(), first = candidates[0], last = candidates.at(-1);
       if (!first || !last) return;
       const active = document.activeElement;
@@ -93,7 +95,7 @@ function PanelInner({ title, desc, children, footer, onClose, headingLayout = "s
 export function Drawer(props: PanelProps): React.ReactElement | null {
   const panel = useRef<HTMLDivElement>(null);
   useEscape(props.open, props.onClose);
-  useDrawerFocus(props.open, panel);
+  usePanelFocus(props.open, panel);
   if (!props.open) return null;
   return (
     <div
@@ -109,9 +111,10 @@ export function Drawer(props: PanelProps): React.ReactElement | null {
   );
 }
 
-/** A focused edit inside an existing work surface; the browser owns modal focus and restoration. */
+/** Native modal top layer with the same focus loop and restoration as Drawer. */
 export function Dialog({ open, title, onClose, children }: Pick<PanelProps, "open" | "title" | "onClose" | "children">): React.ReactElement | null {
   const dialog = useRef<HTMLDialogElement>(null);
+  usePanelFocus(open, dialog);
   useEffect(() => {
     const element = dialog.current;
     if (!open || !element) return;
