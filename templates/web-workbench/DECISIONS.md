@@ -433,3 +433,18 @@ applies and the scene's transform is the stylesheet's `none`, which creates no
 containing block. Portaling the overlay was the larger repair for the same
 symptom and would have changed the DOM consumers snapshot against; the fill
 mode is the cause.
+
+## Wide editing surfaces and focused dialogs (0.23.0)
+
+Drawer keeps the default 460px surface and adds the explicit `width="wide"`
+variant (960px, capped to the viewport). `headingLayout="inline"` places the
+object and its context together; `headerActions` supplies the caller's explicit
+cancel/save controls in the fixed header instead of the default close button.
+Those controls stay before the scrolling body in both DOM and focus order.
+Section titles accept composed content for a related action or explanation.
+
+Dialog is a focused edit within the work surface. Native `showModal()` owns its
+top layer, inert background, focus containment, and restoration. It consumes
+Escape before Drawer; Drawer defers its focus loop while a kit Dialog is open.
+No additional motion or dependency is introduced. Both overlays are exported
+through `primitives`; consumers continue using the published package.

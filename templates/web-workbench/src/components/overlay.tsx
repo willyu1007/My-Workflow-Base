@@ -17,7 +17,7 @@ function useEscape(open: boolean, onClose: () => void): void {
       // the next one. stopPropagation alone cannot express this: under Next's
       // App Router React delegates from `document`, the same node this listens
       // on, and sibling listeners on one node still run.
-      if (e.key === "Escape" && !e.defaultPrevented) onClose();
+      if (e.key === "Escape" && !e.defaultPrevented && !document.querySelector('.wb-dialog[open]')) onClose();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
@@ -43,7 +43,7 @@ function useDrawerFocus(open: boolean, ref: RefObject<HTMLDivElement | null>): v
     });
     controls()[0]?.focus();
     const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "Tab" || event.defaultPrevented) return;
+      if (event.key !== "Tab" || event.defaultPrevented || document.querySelector('.wb-dialog[open]')) return;
       const candidates = controls(), first = candidates[0], last = candidates.at(-1);
       if (!first || !last) return;
       const active = document.activeElement;
@@ -67,19 +67,22 @@ interface PanelProps {
   readonly desc?: string | undefined;
   readonly children: ReactNode;
   readonly footer?: ReactNode;
+  readonly width?: "default" | "wide";
+  readonly headingLayout?: "stacked" | "inline";
+  readonly headerActions?: ReactNode;
 }
 
-function PanelInner({ title, desc, children, footer, onClose }: Omit<PanelProps, "open">) {
+function PanelInner({ title, desc, children, footer, onClose, headingLayout = "stacked", headerActions }: Omit<PanelProps, "open">) {
   return (
     <>
       <div className="wb-panel__head">
-        <div style={{ minWidth: 0 }}>
+        <div className={`wb-panel__identity wb-panel__identity--${headingLayout}`}>
           <h2 className="wb-panel__title">{title}</h2>
           {desc && <p className="wb-panel__desc">{desc}</p>}
         </div>
-        <button type="button" className="wb-iconbtn" onClick={onClose} aria-label="关闭">
+        {headerActions ?? <button type="button" className="wb-iconbtn" onClick={onClose} aria-label="关闭">
           <IconX size={18} />
-        </button>
+        </button>}
       </div>
       <div className="wb-panel__body">{children}</div>
       {footer && <div className="wb-panel__foot">{footer}</div>}
@@ -99,9 +102,34 @@ export function Drawer(props: PanelProps): React.ReactElement | null {
         if (e.target === e.currentTarget) props.onClose();
       }}
     >
-      <div ref={panel} className="wb-drawer" role="dialog" aria-modal="true" aria-label={props.title}>
+      <div ref={panel} className={`wb-drawer${props.width === "wide" ? " wb-drawer--wide" : ""}`} role="dialog" aria-modal="true" aria-label={props.title}>
         <PanelInner {...props} />
       </div>
     </div>
   );
+}
+
+/** A focused edit inside an existing work surface; the browser owns modal focus and restoration. */
+export function Dialog({ open, title, onClose, children }: Pick<PanelProps, "open" | "title" | "onClose" | "children">): React.ReactElement | null {
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const element = dialog.current;
+    if (!open || !element) return;
+    element.showModal();
+    return () => element.close();
+  }, [open]);
+  if (!open) return null;
+  return <dialog ref={dialog} className="wb-dialog" aria-label={title}
+    onCancel={event => { event.preventDefault(); onClose(); }}
+    onKeyDownCapture={event => {
+      if (event.key === "Escape" && !event.defaultPrevented) { event.preventDefault(); onClose(); }
+    }}
+    onClick={event => {
+      if (event.target !== event.currentTarget) return;
+      const bounds = event.currentTarget.getBoundingClientRect();
+      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onClose();
+    }}>
+    <h2 className="wb-panel__title">{title}</h2>
+    {children}
+  </dialog>;
 }

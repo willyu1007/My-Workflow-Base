@@ -123,3 +123,11 @@ suite that waits them out is a suite nobody runs. One trap comes with that:
 fake timers a click never lands and the test **times out rather than failing** —
 a misleading signal. Use `fireEvent` for plain clicks in a fake-timer test;
 `userEvent` is still right everywhere else.
+
+### Editing overlays (0.23.0)
+
+89 tests pass in ten files. Header controls precede the body and receive initial
+focus in the wide, inline variant. Escape from a Dialog closes that edit while
+preserving its parent Drawer. jsdom stubs native dialog methods for the event
+test; real native focus, inertness, restoration and responsive layout still
+require a consumer browser check.

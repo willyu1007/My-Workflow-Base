@@ -10,3 +10,4 @@ export * from "./components/expandable-text-field.js";
 export * from "./components/tabs.js";
 export * from "./components/badge.js";
 export * from "./components/breadcrumb.js";
+export * from "./components/overlay.js";

@@ -949,6 +949,24 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
   display: flex; flex-direction: column;
   animation: wb-slide-in-right var(--t-slow) var(--ease-out);
 }
+.wb-drawer--wide { width: min(960px, 100%); }
+.wb-panel__identity { min-width: 0; }
+.wb-panel__identity--inline { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--sp-3); }
+.wb-panel__identity--inline .wb-panel__desc { margin: 0; }
+.wb-panel__head:has(.wb-panel__identity--inline) { align-items: center; flex-wrap: wrap; }
+.wb-dialog {
+  width: min(420px, calc(100% - var(--sp-6)));
+  max-height: calc(100% - var(--sp-6));
+  overflow-y: auto;
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+  color: var(--fg-1);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-xl);
+}
+.wb-dialog::backdrop { background: var(--scrim); }
+.wb-dialog > .wb-panel__title { margin-bottom: var(--sp-4); }
 .wb-panel__head {
   display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
   padding: 20px 22px 12px;

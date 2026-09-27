@@ -70,7 +70,7 @@ export function Section({
   link,
   children,
 }: {
-  readonly title: string;
+  readonly title: ReactNode;
   readonly link?: { readonly href: string; readonly label: string };
   readonly children: ReactNode;
 }): React.ReactElement {

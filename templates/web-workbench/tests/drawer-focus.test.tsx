@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { expect, it } from "vitest";
-import { Drawer } from "../src/components/overlay.js";
+import { expect, it, vi } from "vitest";
+import { Dialog, Drawer } from "../src/components/overlay.js";
 import { Menu } from "../src/components/menu.js";
 
 function Example() {
@@ -67,4 +67,44 @@ it("keeps the current control focused when the drawer callback rerenders", async
   await user.click(screen.getByRole("button", { name: "打开资料" }));
   await user.click(screen.getByRole("button", { name: "刷新 0" }));
   expect(document.activeElement).toBe(screen.getByRole("button", { name: "刷新 1" }));
+});
+
+it("keeps header actions ahead of the body when using an inline wide drawer", async () => {
+  const user = userEvent.setup();
+  render(<Drawer open title="资料" desc="当前对象" width="wide" headingLayout="inline" onClose={() => {}}
+    headerActions={<><button>取消</button><button>保存</button></>}><input aria-label="正文" /></Drawer>);
+  expect(document.activeElement).toBe(screen.getByRole("button", { name: "取消" }));
+  await user.tab(); expect(document.activeElement).toBe(screen.getByRole("button", { name: "保存" }));
+  await user.tab(); expect(document.activeElement).toBe(screen.getByRole("textbox"));
+  expect(screen.queryByRole("button", { name: "关闭" })).toBeNull();
+});
+
+it("leaves the parent drawer open when Escape dismisses a focused edit dialog", () => {
+  // jsdom does not implement the browser's native dialog focus lifecycle.
+  const show = vi.fn(function (this: HTMLDialogElement) { this.open = true; });
+  const close = vi.fn(function (this: HTMLDialogElement) { this.open = false; });
+  const originalShow = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, "showModal");
+  const originalClose = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, "close");
+  Object.defineProperties(HTMLDialogElement.prototype, { showModal: { configurable: true, value: show }, close: { configurable: true, value: close } });
+  const parentClose = vi.fn();
+  function Nested() {
+    const [open, setOpen] = useState(true);
+    return <Drawer open title="资料" onClose={parentClose}>
+      <Dialog open={open} title="修改" onClose={() => setOpen(false)}><input aria-label="称呼" /></Dialog>
+    </Drawer>;
+  }
+  try {
+    render(<Nested />);
+    fireEvent.keyDown(screen.getByRole("textbox"), { key: "Escape" });
+    expect(screen.queryByRole("dialog", { name: "修改" })).toBeNull();
+    expect(screen.getByRole("dialog", { name: "资料" })).toBeTruthy();
+    expect(parentClose).not.toHaveBeenCalled();
+    expect(close).toHaveBeenCalledOnce();
+    fireEvent.keyDown(document, { key: "Escape" }); expect(parentClose).toHaveBeenCalledOnce();
+  } finally {
+    if (originalShow) Object.defineProperty(HTMLDialogElement.prototype, "showModal", originalShow);
+    else Reflect.deleteProperty(HTMLDialogElement.prototype, "showModal");
+    if (originalClose) Object.defineProperty(HTMLDialogElement.prototype, "close", originalClose);
+    else Reflect.deleteProperty(HTMLDialogElement.prototype, "close");
+  }
 });
