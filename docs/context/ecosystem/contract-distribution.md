@@ -41,6 +41,12 @@ Each consumer keeps a short, repeatable procedure:
 
 A pin more than one contract-affecting baseline behind the host is a defect.
 
+One live edition per family. When an owner publishes a new edition of a
+contract family, the consumer re-pins to it and the old edition is deleted in
+the same batch: its route or dispatch branch, its contract directory, and the
+consumer's frozen copy, fixture and pin. No owner serves an edition that no
+consumer pins.
+
 ## Advisory checker
 
 Base ships `conformance/scripts/check-consumer-boundaries.mjs`.
