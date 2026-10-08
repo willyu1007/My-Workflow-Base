@@ -6,7 +6,7 @@
     "workflow-contracts",
     "workflow-validator"
   ],
-  "source_hash": "dd888b89f89d4137fb717bba60a400f9f68bb127b4485121270f1c8eb9ea51e7",
+  "source_hash": "d059917e5575c64f204e1d1d280a0303016e73eb0f1599e644fb245184bb199e",
   "files": [
     {
       "path": "workflow-contracts/index.ts",
@@ -15,8 +15,8 @@
     },
     {
       "path": "workflow-contracts/types/api.ts",
-      "bytes": 9128,
-      "sha256": "a700bdf2b734b23e13764b7d323bfa1578ecd43297aec24dddab2dff1bca2896"
+      "bytes": 8159,
+      "sha256": "9ec5e3400ec4b7ccef9140e8abf6842bea9d9ea2807e70183fb5572cda3b03b2"
     },
     {
       "path": "workflow-contracts/types/events.ts",
@@ -40,13 +40,13 @@
     },
     {
       "path": "workflow-contracts/types/identity.ts",
-      "bytes": 2445,
-      "sha256": "82dcec9daf196246c923f56623365633c6b59490002a6b90bdb7ac0d9a898bd8"
+      "bytes": 2303,
+      "sha256": "506a8d952800a9e94e75f74e1d446cd582b21eaf8b5743ba8f9f7386db6cf539"
     },
     {
       "path": "workflow-contracts/types/manifest.ts",
-      "bytes": 8978,
-      "sha256": "227ff2959d5e526190166108ed693566b8c62e61c00111082472a9787bbc39ee"
+      "bytes": 8610,
+      "sha256": "060ed486d2c3719632effb5d1092ea52e75efefa3b52ba2719553e93460cba8d"
     },
     {
       "path": "workflow-contracts/types/module.ts",
@@ -105,24 +105,24 @@
     },
     {
       "path": "workflow-contracts/types/scenario-release.ts",
-      "bytes": 66065,
-      "sha256": "d41ff97261fc742acb6147e9aa562b20766ba880c2ba17d76ef3f33db395087c"
+      "bytes": 66043,
+      "sha256": "933bb22c707cdee4274f64b349f5a5ac9e406c5a464dca4f115dfc01f6208626"
     },
     {
       "path": "workflow-contracts/types/validation.ts",
-      "bytes": 1293,
-      "sha256": "e0b08d4a32075b06ceffda5071e7061356268b20341808eac5bc826a10633b83"
+      "bytes": 1283,
+      "sha256": "122bc8c03804fff221dba6589253ad5d2e8e3ac8866f42eaf81c1c3cbbb9f1d3"
     },
     {
       "path": "workflow-validator/validate-module.ts",
-      "bytes": 35466,
-      "sha256": "6a782056fc52cd0ec58b1226a56fd0fb16af12d7ddf5a0d2a9184f62ee3c1b9e"
+      "bytes": 35212,
+      "sha256": "4b256363e51d851e5f518ee0ba42a19138910eeef0187fd497625ac97e3acf44"
     }
   ],
   "source_profiles": [
     {
       "source_identity": "platform_child_family_identity_source_v1",
-      "source_hash": "9655e83ff6a973055fb1b3f170cdbcd3c3eea6cb117f59209844a2a355b6a861",
+      "source_hash": "a48288595bbee062315698a6a4b8fe22cf51202a13c97526746922a93bde97fd",
       "files": [
         {
           "path": "workflow-contract-schemas/canonical-ref-v1.schema.json",
@@ -181,8 +181,8 @@
         },
         {
           "path": "workflow-contract-schemas/scenario-manifest-v2.schema.json",
-          "bytes": 25480,
-          "sha256": "bac2ad97b1d8d2852f3048e1142e9334018b7a12fcce76f96b3b86f55bfd8091"
+          "bytes": 25504,
+          "sha256": "a272c68d6ca80610efb3d97e369d737867087edf2e140e47cf031a414593c74e"
         },
         {
           "path": "workflow-contract-schemas/scenario-owner-binding-ref-v1.schema.json",
@@ -216,13 +216,13 @@
         },
         {
           "path": "workflow-contracts/types/identity.ts",
-          "bytes": 2445,
-          "sha256": "82dcec9daf196246c923f56623365633c6b59490002a6b90bdb7ac0d9a898bd8"
+          "bytes": 2303,
+          "sha256": "506a8d952800a9e94e75f74e1d446cd582b21eaf8b5743ba8f9f7386db6cf539"
         },
         {
           "path": "workflow-contracts/types/manifest.ts",
-          "bytes": 8978,
-          "sha256": "227ff2959d5e526190166108ed693566b8c62e61c00111082472a9787bbc39ee"
+          "bytes": 8610,
+          "sha256": "060ed486d2c3719632effb5d1092ea52e75efefa3b52ba2719553e93460cba8d"
         },
         {
           "path": "workflow-contracts/types/scenario-binding-validation.ts",
@@ -246,24 +246,24 @@
         },
         {
           "path": "workflow-contracts/types/scenario-release.ts",
-          "bytes": 66065,
-          "sha256": "d41ff97261fc742acb6147e9aa562b20766ba880c2ba17d76ef3f33db395087c"
+          "bytes": 66043,
+          "sha256": "933bb22c707cdee4274f64b349f5a5ac9e406c5a464dca4f115dfc01f6208626"
         },
         {
           "path": "workflow-contracts/types/validation.ts",
-          "bytes": 1293,
-          "sha256": "e0b08d4a32075b06ceffda5071e7061356268b20341808eac5bc826a10633b83"
+          "bytes": 1283,
+          "sha256": "122bc8c03804fff221dba6589253ad5d2e8e3ac8866f42eaf81c1c3cbbb9f1d3"
         },
         {
           "path": "workflow-validator/validate-module.ts",
-          "bytes": 35466,
-          "sha256": "6a782056fc52cd0ec58b1226a56fd0fb16af12d7ddf5a0d2a9184f62ee3c1b9e"
+          "bytes": 35212,
+          "sha256": "4b256363e51d851e5f518ee0ba42a19138910eeef0187fd497625ac97e3acf44"
         }
       ]
     },
     {
       "source_identity": "scenario_interface_source_v1",
-      "source_hash": "be67d3264a9442ce30a8303d6acf86a05ea86c8a3ed1d933f41c5aa922b1ff95",
+      "source_hash": "b7d6063b2a9175d38dd5b5122d336c8f840e946979d6949415dd4ba96e5fd99c",
       "files": [
         {
           "path": "workflow-contract-schemas/canonical-ref-v1.schema.json",
@@ -297,8 +297,8 @@
         },
         {
           "path": "workflow-contract-schemas/scenario-manifest-v2.schema.json",
-          "bytes": 25480,
-          "sha256": "bac2ad97b1d8d2852f3048e1142e9334018b7a12fcce76f96b3b86f55bfd8091"
+          "bytes": 25504,
+          "sha256": "a272c68d6ca80610efb3d97e369d737867087edf2e140e47cf031a414593c74e"
         },
         {
           "path": "workflow-contract-schemas/scenario-navigation-offer-v1.schema.json",
@@ -367,13 +367,13 @@
         },
         {
           "path": "workflow-contracts/types/identity.ts",
-          "bytes": 2445,
-          "sha256": "82dcec9daf196246c923f56623365633c6b59490002a6b90bdb7ac0d9a898bd8"
+          "bytes": 2303,
+          "sha256": "506a8d952800a9e94e75f74e1d446cd582b21eaf8b5743ba8f9f7386db6cf539"
         },
         {
           "path": "workflow-contracts/types/manifest.ts",
-          "bytes": 8978,
-          "sha256": "227ff2959d5e526190166108ed693566b8c62e61c00111082472a9787bbc39ee"
+          "bytes": 8610,
+          "sha256": "060ed486d2c3719632effb5d1092ea52e75efefa3b52ba2719553e93460cba8d"
         },
         {
           "path": "workflow-contracts/types/scenario-invocation-validation.ts",
@@ -397,24 +397,24 @@
         },
         {
           "path": "workflow-contracts/types/scenario-release.ts",
-          "bytes": 66065,
-          "sha256": "d41ff97261fc742acb6147e9aa562b20766ba880c2ba17d76ef3f33db395087c"
+          "bytes": 66043,
+          "sha256": "933bb22c707cdee4274f64b349f5a5ac9e406c5a464dca4f115dfc01f6208626"
         },
         {
           "path": "workflow-contracts/types/validation.ts",
-          "bytes": 1293,
-          "sha256": "e0b08d4a32075b06ceffda5071e7061356268b20341808eac5bc826a10633b83"
+          "bytes": 1283,
+          "sha256": "122bc8c03804fff221dba6589253ad5d2e8e3ac8866f42eaf81c1c3cbbb9f1d3"
         },
         {
           "path": "workflow-validator/validate-module.ts",
-          "bytes": 35466,
-          "sha256": "6a782056fc52cd0ec58b1226a56fd0fb16af12d7ddf5a0d2a9184f62ee3c1b9e"
+          "bytes": 35212,
+          "sha256": "4b256363e51d851e5f518ee0ba42a19138910eeef0187fd497625ac97e3acf44"
         }
       ]
     },
     {
       "source_identity": "scenario_domain_action_source_v1",
-      "source_hash": "b962acf3fc35d02d7b903854a3eed3f6177e3dc4d00b32124122a120b458f5f0",
+      "source_hash": "3833b1c7cab806ecca276edacb343ba9cfb42c8328801d4c5175d05cbf700797",
       "files": [
         {
           "path": "workflow-contract-schemas/bind-scenario-domain-action-step-input-v1.schema.json",
@@ -518,8 +518,8 @@
         },
         {
           "path": "workflow-contract-schemas/scenario-manifest-v2.schema.json",
-          "bytes": 25480,
-          "sha256": "bac2ad97b1d8d2852f3048e1142e9334018b7a12fcce76f96b3b86f55bfd8091"
+          "bytes": 25504,
+          "sha256": "a272c68d6ca80610efb3d97e369d737867087edf2e140e47cf031a414593c74e"
         },
         {
           "path": "workflow-contract-schemas/scenario-navigation-offer-v1.schema.json",
@@ -598,13 +598,13 @@
         },
         {
           "path": "workflow-contracts/types/identity.ts",
-          "bytes": 2445,
-          "sha256": "82dcec9daf196246c923f56623365633c6b59490002a6b90bdb7ac0d9a898bd8"
+          "bytes": 2303,
+          "sha256": "506a8d952800a9e94e75f74e1d446cd582b21eaf8b5743ba8f9f7386db6cf539"
         },
         {
           "path": "workflow-contracts/types/manifest.ts",
-          "bytes": 8978,
-          "sha256": "227ff2959d5e526190166108ed693566b8c62e61c00111082472a9787bbc39ee"
+          "bytes": 8610,
+          "sha256": "060ed486d2c3719632effb5d1092ea52e75efefa3b52ba2719553e93460cba8d"
         },
         {
           "path": "workflow-contracts/types/scenario-domain-action-validation.ts",
@@ -628,24 +628,24 @@
         },
         {
           "path": "workflow-contracts/types/scenario-release.ts",
-          "bytes": 66065,
-          "sha256": "d41ff97261fc742acb6147e9aa562b20766ba880c2ba17d76ef3f33db395087c"
+          "bytes": 66043,
+          "sha256": "933bb22c707cdee4274f64b349f5a5ac9e406c5a464dca4f115dfc01f6208626"
         },
         {
           "path": "workflow-contracts/types/validation.ts",
-          "bytes": 1293,
-          "sha256": "e0b08d4a32075b06ceffda5071e7061356268b20341808eac5bc826a10633b83"
+          "bytes": 1283,
+          "sha256": "122bc8c03804fff221dba6589253ad5d2e8e3ac8866f42eaf81c1c3cbbb9f1d3"
         },
         {
           "path": "workflow-validator/validate-module.ts",
-          "bytes": 35466,
-          "sha256": "6a782056fc52cd0ec58b1226a56fd0fb16af12d7ddf5a0d2a9184f62ee3c1b9e"
+          "bytes": 35212,
+          "sha256": "4b256363e51d851e5f518ee0ba42a19138910eeef0187fd497625ac97e3acf44"
         }
       ]
     },
     {
       "source_identity": "scenario_protected_interaction_source_v1",
-      "source_hash": "a34f3864b76d1dc16eadb901f506fcc473a0cb298da7d1e273de9238eb880cf5",
+      "source_hash": "d349e68fc40243d8e8bf36247f02223bbfe946a75a161ddb7b55fe9a886012a0",
       "files": [
         {
           "path": "workflow-contract-schemas/bind-scenario-domain-action-step-input-v1.schema.json",
@@ -774,8 +774,8 @@
         },
         {
           "path": "workflow-contract-schemas/scenario-manifest-v2.schema.json",
-          "bytes": 25480,
-          "sha256": "bac2ad97b1d8d2852f3048e1142e9334018b7a12fcce76f96b3b86f55bfd8091"
+          "bytes": 25504,
+          "sha256": "a272c68d6ca80610efb3d97e369d737867087edf2e140e47cf031a414593c74e"
         },
         {
           "path": "workflow-contract-schemas/scenario-navigation-offer-v1.schema.json",
@@ -884,13 +884,13 @@
         },
         {
           "path": "workflow-contracts/types/identity.ts",
-          "bytes": 2445,
-          "sha256": "82dcec9daf196246c923f56623365633c6b59490002a6b90bdb7ac0d9a898bd8"
+          "bytes": 2303,
+          "sha256": "506a8d952800a9e94e75f74e1d446cd582b21eaf8b5743ba8f9f7386db6cf539"
         },
         {
           "path": "workflow-contracts/types/manifest.ts",
-          "bytes": 8978,
-          "sha256": "227ff2959d5e526190166108ed693566b8c62e61c00111082472a9787bbc39ee"
+          "bytes": 8610,
+          "sha256": "060ed486d2c3719632effb5d1092ea52e75efefa3b52ba2719553e93460cba8d"
         },
         {
           "path": "workflow-contracts/types/scenario-domain-action-validation.ts",
@@ -924,21 +924,21 @@
         },
         {
           "path": "workflow-contracts/types/scenario-release.ts",
-          "bytes": 66065,
-          "sha256": "d41ff97261fc742acb6147e9aa562b20766ba880c2ba17d76ef3f33db395087c"
+          "bytes": 66043,
+          "sha256": "933bb22c707cdee4274f64b349f5a5ac9e406c5a464dca4f115dfc01f6208626"
         },
         {
           "path": "workflow-contracts/types/validation.ts",
-          "bytes": 1293,
-          "sha256": "e0b08d4a32075b06ceffda5071e7061356268b20341808eac5bc826a10633b83"
+          "bytes": 1283,
+          "sha256": "122bc8c03804fff221dba6589253ad5d2e8e3ac8866f42eaf81c1c3cbbb9f1d3"
         },
         {
           "path": "workflow-validator/validate-module.ts",
-          "bytes": 35466,
-          "sha256": "6a782056fc52cd0ec58b1226a56fd0fb16af12d7ddf5a0d2a9184f62ee3c1b9e"
+          "bytes": 35212,
+          "sha256": "4b256363e51d851e5f518ee0ba42a19138910eeef0187fd497625ac97e3acf44"
         }
       ]
     }
   ],
-  "contract_source_revision": "9b51ad747a091a88c51ed8a6f4c0842da85d2d0d"
+  "contract_source_revision": "208a71a86a1d08009e2c0b30b4eb500edc742041"
 }
