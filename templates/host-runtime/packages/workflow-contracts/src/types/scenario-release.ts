@@ -1191,7 +1191,7 @@ const validateHandoffs = (value: unknown, path: string): void => {
     const handoff = requireRecord(rawHandoff, itemPath);
     assertExactKeys(handoff, handoffKeys, new Set([
       "handoff_type", "source_artifact_types", "requested_purposes", "downstream_owner",
-      "policy_key", "receipt_required",
+      "policy_key", "receipt_required", "materialization_mode",
     ]), itemPath);
     if (!(standardWorkflowHandoffTypes as readonly unknown[]).includes(handoff.handoff_type)) {
       fail("invalid_handoff_type", `${itemPath}.handoff_type`, "handoff_type must use the standard Base vocabulary");
@@ -1201,7 +1201,7 @@ const validateHandoffs = (value: unknown, path: string): void => {
     for (const field of ["downstream_owner", "policy_key"] as const) assertNonEmptyString(handoff[field], `${itemPath}.${field}`);
     assertBoolean(handoff.receipt_required, `${itemPath}.receipt_required`);
     if (handoff.handoff_key !== undefined) assertNonEmptyString(handoff.handoff_key, `${itemPath}.handoff_key`);
-    if (handoff.materialization_mode !== undefined && handoff.materialization_mode !== "workflow_step_complete_v1") {
+    if (handoff.materialization_mode !== "workflow_step_complete_v1") {
       fail("invalid_materialization_mode", `${itemPath}.materialization_mode`, "Unknown handoff materialization mode");
     }
     if (handoff.source_context_ref_types !== undefined) {

@@ -89,9 +89,9 @@ for (const name of expected) {
   schemas.push(schema);
 }
 
-// Legacy package schemas predate Ajv strict annotations; execution still
-// proves that every published schema resolves and compiles as JSON Schema.
-const ajv = new Ajv2020({ allErrors: true, strict: false });
+// Strict mode, except strictRequired: oneOf branches (integration-lock-v3)
+// require properties that the enclosing object declares.
+const ajv = new Ajv2020({ allErrors: true, strict: true, strictRequired: false });
 addFormats(ajv);
 for (const schema of schemas) ajv.addSchema(schema);
 for (const schema of schemas) {

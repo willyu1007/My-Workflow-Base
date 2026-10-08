@@ -93,7 +93,7 @@ export type CapabilityManifest = {
   capability_key: string;
   label: string;
   description?: string;
-  enablement_policy: "admin_enabled" | "workspace_enabled" | "always_on";
+  enablement_policy: "requires_workspace_activation" | "disabled";
   entrypoints: WorkflowEntrypointManifest[];
 };
 
@@ -269,14 +269,13 @@ export type HandoffManifest = {
     namespace: string;
     object_type: string;
   }>;
-  materialization_mode?: "workflow_step_complete_v1";
+  materialization_mode: "workflow_step_complete_v1";
 };
 ```
 
-The three optional fields are additive X0 vNext declarations. Their presence
-does not alter legacy behavior by itself. Only the explicit
-`materialization_mode` opts a declaration into the vNext validator path; X0-C
-defines the warning/fatal activation rules.
+Every handoff declares `materialization_mode`; X0-C defines the fatal
+activation rules that also require a stable `handoff_key` and a declared
+source.
 
 ## Scenario canonical record
 `Scenario` is a database object. A module cannot activate itself with YAML only.
@@ -1257,12 +1256,12 @@ Implemented validation rules:
 | `WF-MAN-040` | Fatal | Every declared handoff requires a downstream receipt. |
 | `WF-MAN-041` | Fatal | Every declared handoff policy key is registered by the scenario module. |
 | `WF-MAN-042` | Fatal | Every handoff downstream owner is registered in the host snapshot. |
-| `WF-MAN-043` | Warning | A legacy handoff omits `materialization_mode`; registration remains allowed and legacy semantics stay active. |
+| `WF-MAN-043` | Fatal | A handoff omits `materialization_mode`. |
 | `WF-MAN-044` | Fatal | A `workflow_step_complete_v1` handoff has no non-empty stable `handoff_key`. |
 | `WF-MAN-045` | Fatal | A `workflow_step_complete_v1` handoff declares no non-empty artifact or context source type. |
 | `WF-MAN-046` | Fatal | At least one vNext handoff exists but the host snapshot does not enable `workflow_handoff_materialization_v1`. |
 | `WF-MAN-047` | Fatal | A non-empty `handoff_key` is declared more than once. |
-| `WF-MAN-048` | Fatal | `materialization_mode` is present but is not the supported `workflow_step_complete_v1` value. |
+| `WF-MAN-048` | Fatal | `materialization_mode` is not the supported `workflow_step_complete_v1` value. |
 | `WF-MAN-050` | Fatal | Event payload policy is refs-only and bodyless. |
 | `WF-MAN-051` | Fatal | Every standard workflow event is registered by the host. |
 | `WF-MAN-052` | Fatal | Every platform event is registered by the host. |
@@ -1307,12 +1306,9 @@ Implemented validation rules:
 | `WF-MAN-125` | Fatal | Every dedicated trusted invocation handler is declared by one canonical operation. |
 <!-- VALIDATOR-RULE-INVENTORY:END -->
 
-`WF-MAN-043` is warning-only and therefore does not make `report.passed` false.
 The capability check emits one host-level `WF-MAN-046` finding even when a
-manifest contains multiple vNext handoffs. Existing `WF-MAN-040` through
-`WF-MAN-042` semantics and finding paths remain unchanged.
-An explicitly unknown or null materialization mode is not legacy: it fails
-closed through `WF-MAN-048`.
+manifest contains multiple handoffs. An omitted materialization mode fails
+closed through `WF-MAN-043`; an unknown or null one through `WF-MAN-048`.
 
 Activation phases:
 

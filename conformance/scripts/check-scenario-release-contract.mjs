@@ -154,5 +154,16 @@ expectFailure({
   scenario_record: { ...manifest.scenario_record, required_status: "pilot" },
 }, "invalid_lifecycle_status");
 expectFailure({ ...manifest, allowed_user_classes: ["minor"] }, "invalid_user_class");
+expectFailure({
+  ...manifest,
+  handoffs: [{
+    handoff_type: "notification",
+    source_artifact_types: [],
+    requested_purposes: ["user_attention"],
+    downstream_owner: "notification",
+    policy_key: "example.can_notify",
+    receipt_required: true,
+  }],
+}, "missing_field");
 
 process.stdout.write(`scenario release contract ok: ${first.manifest_hash}\n`);

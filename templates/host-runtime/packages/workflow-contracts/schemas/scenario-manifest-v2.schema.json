@@ -530,7 +530,7 @@
     },
     "handoff": {
       "type": "object", "additionalProperties": false,
-      "required": ["handoff_type", "source_artifact_types", "requested_purposes", "downstream_owner", "policy_key", "receipt_required"],
+      "required": ["handoff_type", "source_artifact_types", "requested_purposes", "downstream_owner", "policy_key", "receipt_required", "materialization_mode"],
       "properties": {
         "handoff_type": { "enum": ["public_draft", "indexing", "notification", "external_delivery"] },
         "source_artifact_types": { "$ref": "#/$defs/uniqueStrings" }, "requested_purposes": { "$ref": "#/$defs/uniqueStrings" },

@@ -18,9 +18,6 @@ export type WorkflowExposureLevel = "L0" | "L1" | "L2" | "L3" | "L4";
 export const scenarioLaunchPhases = ["dev", "pilot", "ga", "disabled"] as const;
 export type ScenarioLaunchPhase = (typeof scenarioLaunchPhases)[number];
 
-/** @deprecated Use ScenarioLaunchPhase. This value never authorizes traffic. */
-export type WorkflowActivationTarget = ScenarioLaunchPhase;
-
 export const workflowScenarioStatuses = ["draft", "active", "disabled", "archived"] as const;
 export type WorkflowScenarioStatus = (typeof workflowScenarioStatuses)[number];
 

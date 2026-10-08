@@ -11,16 +11,6 @@ export const scenarioCapabilityEnablementPolicies = [
 export type ScenarioCapabilityEnablementPolicy =
   (typeof scenarioCapabilityEnablementPolicies)[number];
 
-export const legacyScenarioCapabilityEnablementPolicies = [
-  "admin_enabled",
-  "workspace_enabled",
-  "workspace_activation_required",
-  "teacher_workspace_enabled",
-  "always_on",
-] as const;
-export type LegacyScenarioCapabilityEnablementPolicy =
-  (typeof legacyScenarioCapabilityEnablementPolicies)[number];
-
 export const scenarioAdmittedUserClasses = [
   "teacher",
   "curriculum_researcher",
@@ -57,9 +47,7 @@ export type ManifestCapability = {
   capability_key: string;
   label: string;
   description: string;
-  enablement_policy:
-    | ScenarioCapabilityEnablementPolicy
-    | LegacyScenarioCapabilityEnablementPolicy;
+  enablement_policy: ScenarioCapabilityEnablementPolicy;
   entrypoints: ManifestEntrypoint[];
 };
 
@@ -170,7 +158,7 @@ export type HandoffManifest = {
   receipt_required: boolean;
   handoff_key?: string;
   source_context_ref_types?: HandoffContextRefTypeManifest[];
-  materialization_mode?: WorkflowHandoffMaterializationMode;
+  materialization_mode: WorkflowHandoffMaterializationMode;
 };
 
 export type ScenarioManifest = {

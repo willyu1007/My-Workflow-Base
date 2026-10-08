@@ -25,7 +25,7 @@ implementations live in the host product.
 - Add real repository implementations for workflow ledger, handoff ledger, and
   evidence records.
 - Wire HTTP/RPC controllers to the route metadata and services.
-- Wire queue consumers to `WorkflowWorker`.
+- Wire queue consumers to `WorkflowWorker` with the host-owned, claim-bound `WorkflowRuntimePort`.
 - Add a deterministic journey harness for the first concrete scenario.
 - Add CI gates for module validation before pilot or GA activation.
 

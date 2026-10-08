@@ -32,7 +32,7 @@ const moduleTypeSource = read(
   "templates/host-runtime/packages/workflow-contracts/src/types/module.ts",
 );
 const materializationWorker = read(
-  "templates/host-runtime/packages/workflow-runtime/src/workers/workflow-worker.materialization-v1.example.ts",
+  "templates/host-runtime/packages/workflow-runtime/src/workers/workflow-worker.ts",
 );
 
 const inventoryMatch = moduleContract.match(
@@ -86,13 +86,13 @@ for (const [label, source] of [
 }
 
 for (const token of [
-  "WorkflowRuntimePortMaterializationV1",
+  "WorkflowRuntimePort",
   "completion_contract_version: 1",
   "claim_token: lease.claim_token",
   "handoff_drafts: result.handoff_drafts",
 ]) {
   if (!materializationWorker.includes(token)) {
-    throw new Error(`materialization-v1 worker example is missing ${token}`);
+    throw new Error(`copyable worker is missing ${token}`);
   }
 }
 

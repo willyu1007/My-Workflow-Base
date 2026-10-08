@@ -2,9 +2,7 @@ import type {
   MaterializedHandoff,
   ScenarioCommandDriverContext,
   ScenarioHandoffRequestSnapshot,
-  WorkflowCompleteStepLegacyInput,
   WorkflowCompleteStepMaterializationInputV1,
-  WorkflowCompleteStepResult,
   WorkflowHandoffDraft,
   WorkflowStepMaterializationResultV1,
 } from "@host/workflow-contracts";
@@ -39,16 +37,6 @@ export const vnextCompletionWithoutClaimToken: WorkflowCompleteStepMaterializati
   step_id: "step-negative",
   expected_version: 1,
   output_refs: [],
-  meta: commandMeta,
-};
-
-export const legacyCompletionRejectsClaimToken: WorkflowCompleteStepLegacyInput = {
-  run_id: "run-negative",
-  step_id: "step-negative",
-  expected_version: 1,
-  output_refs: [],
-  // @ts-expect-error -- legacy completion cannot silently opt into the trusted v1 branch.
-  claim_token: transientClaimToken,
   meta: commandMeta,
 };
 
@@ -94,8 +82,8 @@ export const completionResultRejectsClaimToken: WorkflowStepMaterializationResul
   claim_token: transientClaimToken,
 };
 
-// @ts-expect-error -- a v1-discriminated completion result must include deterministic materialization output.
-export const vnextCompletionResultRequiresMaterializedHandoffs: WorkflowCompleteStepResult = {
+// @ts-expect-error -- a completion result must include deterministic materialization output.
+export const vnextCompletionResultRequiresMaterializedHandoffs: WorkflowStepMaterializationResultV1 = {
   completion_contract_version: 1,
   run_id: "run-negative",
   step_id: "step-negative",

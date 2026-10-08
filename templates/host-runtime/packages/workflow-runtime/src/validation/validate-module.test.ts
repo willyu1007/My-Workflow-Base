@@ -53,7 +53,7 @@ const manifest: ScenarioManifest = {
       capability_key: "example_capability",
       label: "Example capability",
       description: "Scenario-neutral test capability.",
-      enablement_policy: "workspace_enabled",
+      enablement_policy: "requires_workspace_activation",
       entrypoints: [
         {
           entrypoint_key: "authoring",
@@ -201,11 +201,13 @@ const workerRuntime: WorkflowRuntimePort = {
   complete_step: async () => ({
     ok: true,
     data: {
+      completion_contract_version: 1,
       run_id: "run-1",
       step_id: "step-1",
       status: "completed",
       aggregate_version: 2,
       output_refs: [],
+      materialized_handoffs: [],
     },
     canonical_refs: [],
     aggregate_versions: {},
@@ -636,21 +638,10 @@ function createCompleteScenarioContractHostSnapshot(): WorkflowHostValidationSna
   });
 }
 
-function createLegacyHandoff(overrides: Partial<HandoffManifest> = {}): HandoffManifest {
-  return {
-    handoff_type: "notification",
-    source_artifact_types: ["example_summary"],
-    requested_purposes: ["user_attention"],
-    downstream_owner: "notification",
-    policy_key: "example.can_request_user_attention",
-    receipt_required: true,
-    ...overrides,
-  };
-}
-
 function createVnextHandoff(overrides: Partial<HandoffManifest> = {}): HandoffManifest {
-  return createLegacyHandoff({
+  return {
     handoff_key: "user_attention",
+    handoff_type: "notification",
     source_artifact_types: [],
     source_context_ref_types: [
       {
@@ -658,9 +649,13 @@ function createVnextHandoff(overrides: Partial<HandoffManifest> = {}): HandoffMa
         object_type: "care_item",
       },
     ],
+    requested_purposes: ["user_attention"],
+    downstream_owner: "notification",
+    policy_key: "example.can_request_user_attention",
+    receipt_required: true,
     materialization_mode: "workflow_step_complete_v1",
     ...overrides,
-  });
+  };
 }
 
 function createModuleWithHandoffs(handoffs: HandoffManifest[]): WorkflowScenarioModule {
@@ -925,7 +920,7 @@ describe("workflow module validation and loading", () => {
       };
     }, "WF-MAN-116"],
     ["capability enablement policy", (module: WorkflowScenarioModule) => {
-      module.manifest.capabilities[0].enablement_policy = "workspace_enabled";
+      module.manifest.capabilities[0].enablement_policy = "workspace_enabled" as never;
     }, "WF-MAN-117"],
   ])("fails closed on an invalid %s", (_label, mutate, ruleId) => {
     const module = createFederatedScenarioModule();
@@ -965,7 +960,7 @@ describe("workflow module validation and loading", () => {
     ]));
   });
 
-  it("passes the legacy scenario module without changing its contract hash", () => {
+  it("passes the manifest v1 scenario module with a stable contract hash", () => {
     const report = validateWorkflowModule({
       module: createScenarioModule(),
       host_snapshot: hostSnapshot,
@@ -974,33 +969,29 @@ describe("workflow module validation and loading", () => {
 
     expect(report.passed).toBe(true);
     expect(report.contract_hash).toMatch(/^[a-f0-9]{64}$/);
-    expect(report.contract_hash).toBe("9f568ff772d3dafc02dd96f284f7cedb85aff18839b8f26f4691a8b2dc0d0ca6");
+    expect(report.contract_hash).toBe("c84f2593902f0b28a0c6c902789ef2380729b1f195e22538bc9940bc49db7196");
     expect(report.findings.some((finding) => finding.rule_id.startsWith("WF-MAN-04"))).toBe(false);
   });
 
-  it("warns for a legacy handoff without blocking registration", () => {
-    const module = createModuleWithHandoffs([createLegacyHandoff()]);
-    const handoffHostSnapshot = createHandoffHostSnapshot();
+  it("rejects a handoff without a materialization mode", () => {
+    const handoff: Partial<HandoffManifest> = createVnextHandoff();
+    delete handoff.materialization_mode;
     const report = validateWorkflowModule({
-      module,
-      host_snapshot: handoffHostSnapshot,
+      module: createModuleWithHandoffs([handoff as HandoffManifest]),
+      host_snapshot: createHandoffHostSnapshot({
+        host_capabilities: ["workflow_handoff_materialization_v1"],
+      }),
       activation_target: "dev",
     });
 
-    expect(report.passed).toBe(true);
+    expect(report.passed).toBe(false);
     expect(report.findings).toEqual([
       expect.objectContaining({
         rule_id: "WF-MAN-043",
-        severity: "warning",
+        severity: "fatal",
         path: "handoffs.0.materialization_mode",
       }),
     ]);
-    expect(() =>
-      loadWorkflowRegistry({
-        modules: [module],
-        host_snapshot: handoffHostSnapshot,
-      }),
-    ).not.toThrow();
   });
 
   it.each([
@@ -1008,7 +999,7 @@ describe("workflow module validation and loading", () => {
     ["null", null],
   ])("rejects an explicitly %s materialization mode", (_label, materializationMode) => {
     const invalidHandoff = {
-      ...createLegacyHandoff(),
+      ...createVnextHandoff(),
       materialization_mode: materializationMode,
     } as unknown as HandoffManifest;
     const report = validateWorkflowModule({
@@ -1028,10 +1019,10 @@ describe("workflow module validation and loading", () => {
     expect(report.findings.some((finding) => finding.rule_id === "WF-MAN-043")).toBe(false);
   });
 
-  it("preserves existing legacy handoff finding paths", () => {
+  it("reports handoff receipt findings at the handoff list path", () => {
     const report = validateWorkflowModule({
       module: createModuleWithHandoffs([
-        createLegacyHandoff({
+        createVnextHandoff({
           receipt_required: false,
         }),
       ]),
@@ -1137,10 +1128,10 @@ describe("workflow module validation and loading", () => {
     expect(report.findings.filter((finding) => finding.rule_id === "WF-MAN-046")).toHaveLength(1);
   });
 
-  it("rejects duplicate declared handoff keys across migration and vNext declarations", () => {
+  it("rejects duplicate declared handoff keys", () => {
     const report = validateWorkflowModule({
       module: createModuleWithHandoffs([
-        createLegacyHandoff({ handoff_key: "user_attention" }),
+        createVnextHandoff(),
         createVnextHandoff({ handoff_type: "external_delivery" }),
       ]),
       host_snapshot: createHandoffHostSnapshot({
@@ -1413,7 +1404,7 @@ describe("workflow module validation and loading", () => {
   it("claims and completes a worker step through the runtime port", async () => {
     const calls: string[] = [];
     const module = createScenarioModule();
-    module.adapters.worker_runtime = {
+    const runtimePort: WorkflowRuntimePort = {
       claim_step: async (input) => {
         calls.push(`claim:${input.expected_version}:${input.worker_id}`);
         return {
@@ -1426,15 +1417,17 @@ describe("workflow module validation and loading", () => {
         };
       },
       complete_step: async (input) => {
-        calls.push(`complete:${input.expected_version}:${input.status ?? "completed"}`);
+        calls.push(`complete:${input.expected_version}:${input.status ?? "completed"}:${input.claim_token}`);
         return {
           ok: true,
           data: {
+            completion_contract_version: 1,
             run_id: input.run_id,
             step_id: input.step_id,
             status: input.status ?? "completed",
             aggregate_version: 3,
             output_refs: input.output_refs,
+            materialized_handoffs: [],
           },
           canonical_refs: [],
           aggregate_versions: {},
@@ -1463,7 +1456,7 @@ describe("workflow module validation and loading", () => {
 
     const registry = loadWorkflowRegistry({ modules: [module], host_snapshot: hostSnapshot });
     const contractHash = registry.scenarios.get("example")?.contract_hash ?? "";
-    const worker = new WorkflowWorker(registry);
+    const worker = new WorkflowWorker(registry, runtimePort);
 
     await worker.run({
       workspace_id: "workspace-1",
@@ -1481,7 +1474,7 @@ describe("workflow module validation and loading", () => {
       correlation_id: "correlation-1",
     });
 
-    expect(calls).toEqual(["claim:1:worker-1", "complete:2:completed"]);
+    expect(calls).toEqual(["claim:1:worker-1", "complete:2:completed:claim-1"]);
   });
 
   it("records a failed worker step through the runtime port", async () => {
@@ -1490,7 +1483,7 @@ describe("workflow module validation and loading", () => {
     module.handlers["example.collect_context"] = async () => {
       throw new Error("handler failed");
     };
-    module.adapters.worker_runtime = {
+    const runtimePort: WorkflowRuntimePort = {
       ...workerRuntime,
       claim_step: async (input) => {
         calls.push(`claim:${input.expected_version}`);
@@ -1524,7 +1517,7 @@ describe("workflow module validation and loading", () => {
 
     const registry = loadWorkflowRegistry({ modules: [module], host_snapshot: hostSnapshot });
     const contractHash = registry.scenarios.get("example")?.contract_hash ?? "";
-    const worker = new WorkflowWorker(registry);
+    const worker = new WorkflowWorker(registry, runtimePort);
 
     await expect(
       worker.run({

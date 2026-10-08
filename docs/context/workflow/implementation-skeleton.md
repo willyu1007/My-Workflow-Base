@@ -274,25 +274,24 @@ claim step through WorkflowRuntimePort
 
 The queue is never the source of business truth.
 
-For the vNext path, the trusted worker passes the live claim evidence through
-two internal-only calls: the service-authenticated scenario driver context and
-`WorkflowRuntimePortMaterializationV1.complete_step`. The Step handler may
+The trusted worker passes the live claim evidence through two internal-only
+calls: the service-authenticated scenario driver context and
+`WorkflowRuntimePort.complete_step`. The Step handler may
 return typed `handoff_drafts`, but neither the queue payload nor any scenario
 snapshot/draft persists the token.
 
-The v1 runtime port is host-owned and injected directly into the worker. It is
-not recovered from the legacy-typed scenario `worker_runtime` adapter with a
-cast. A source-repo compile fixture proves the claimed driver, handler result,
+The runtime port is host-owned and injected directly into the worker. It is
+not recovered from the scenario `worker_runtime` adapter. A source-repo compile fixture proves the claimed driver, handler result,
 and injected v1 port compose without a type assertion. Host adoption remains
 owned by `My-Chat/T-024`; lease/reclaim and atomic persistence are host runtime
 work, not Base responsibilities.
 
-The implemented copyable example is
-`templates/host-runtime/packages/workflow-runtime/src/workers/workflow-worker.materialization-v1.example.ts`.
-It injects `WorkflowRuntimePortMaterializationV1`, forwards the live
-`claim_token` only to the trusted handler and completion call, and passes typed
+The copyable worker is
+`templates/host-runtime/packages/workflow-runtime/src/workers/workflow-worker.ts`.
+It takes the injected `WorkflowRuntimePort`, forwards the live `claim_token`
+only to the trusted handler and completion call, and passes typed
 `handoff_drafts` with `completion_contract_version: 1`. It is an adoption
-example, not a Base runtime service.
+template, not a Base runtime service.
 
 ## Journey harness skeleton
 

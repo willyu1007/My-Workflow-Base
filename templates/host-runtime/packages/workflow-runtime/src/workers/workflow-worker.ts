@@ -1,4 +1,4 @@
-import type { WorkflowCommandMeta } from "@host/workflow-contracts";
+import type { WorkflowCommandMeta, WorkflowRuntimePort } from "@host/workflow-contracts";
 import { resolveStepHandlerBinding } from "../registry/resolve-binding.js";
 import type { WorkflowRegistry } from "../registry/loader.js";
 
@@ -19,12 +19,19 @@ export type WorkflowWorkerPayload = {
   correlation_id: string;
 };
 
+/**
+ * Copyable worker wiring. The host injects its own claim-bound runtime port;
+ * scenario modules never supply or cast this authority through an adapter.
+ */
 export class WorkflowWorker {
-  constructor(private readonly registry: WorkflowRegistry) {}
+  constructor(
+    private readonly registry: WorkflowRegistry,
+    private readonly runtimePort: WorkflowRuntimePort,
+  ) {}
 
   async run(payload: WorkflowWorkerPayload): Promise<void> {
     const binding = resolveStepHandlerBinding(this.registry, payload);
-    const runtimePort = binding.scenario.adapters.worker_runtime;
+    const runtimePort = this.runtimePort;
     const meta: WorkflowCommandMeta = {
       workspace_id: payload.workspace_id,
       idempotency_key: `${payload.run_id}:${payload.step_id}:${payload.expected_step_version}`,
@@ -57,6 +64,8 @@ export class WorkflowWorker {
       });
 
       await runtimePort.complete_step({
+        completion_contract_version: 1,
+        claim_token: lease.claim_token,
         run_id: payload.run_id,
         step_id: payload.step_id,
         expected_version: lease.aggregate_version,
@@ -64,6 +73,7 @@ export class WorkflowWorker {
         output_refs: result.output_refs,
         artifact_drafts: result.artifact_drafts,
         context_bindings: result.context_bindings,
+        handoff_drafts: result.handoff_drafts,
         event_drafts: result.event_drafts,
         meta,
       });

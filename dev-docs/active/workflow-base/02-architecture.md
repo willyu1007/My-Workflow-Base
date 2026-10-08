@@ -173,19 +173,16 @@ It does not make this repository a runtime and does not give a scenario module
 permission to create Handoff Ledger or standard `workflow.handoff.*` outbox
 records directly.
 
-Compatibility rules:
+Contract rules (the legacy completion and handoff tracks were removed in 2026-10
+under the one-live-edition rule):
 
-- Legacy handoff declarations remain valid and keep their existing lifecycle.
-- An explicit optional `materialization_mode` is the vNext discriminator. The
-  validator must not infer vNext behavior from a legacy handoff type or owner.
+- Every handoff declares `materialization_mode: workflow_step_complete_v1`, a
+  stable `handoff_key` and at least one source type.
 - Host capability evidence is optional in the snapshot type and defaults to an
-  empty/disabled capability set for legacy hosts.
-- The vNext completion branch requires the claim token and expected version and
-  accepts typed handoff drafts. The legacy completion branch remains valid.
-- `WorkflowRuntimePort` retains its legacy completion signature. The additive
-  `WorkflowRuntimePortMaterializationV1` replaces only `complete_step` with
-  correlated overloads so a v1 input yields a v1 result without weakening
-  legacy implementers or callers with an uncorrelated union.
+  empty/disabled capability set.
+- `WorkflowRuntimePort.complete_step` accepts only the claim-bound v1 input
+  (claim token, expected version, typed handoff drafts) and returns the
+  materialization result.
 - The new Handoff lifecycle status is versioned separately from the existing
   `WorkflowHandoffResult` status union.
 - Contract/hash validation occurs before host persistence. Base defines the
@@ -193,16 +190,14 @@ Compatibility rules:
 
 X0-C validator behavior:
 
-- no handoff declaration produces no migration finding
-- a legacy declaration without `materialization_mode` emits warning-only
-  `WF-MAN-043`; warnings do not block registry loading
-- vNext missing-key/source/capability defects are fatal `WF-MAN-044`–`046`
+- no handoff declaration produces no handoff finding
+- an omitted `materialization_mode` is fatal `WF-MAN-043`
+- missing-key/source/capability defects are fatal `WF-MAN-044`–`046`
 - host capability absence/empty state produces one host-level finding rather
-  than one duplicate finding per vNext declaration
-- declared non-empty keys must be unique across legacy migration and vNext
-  declarations (`WF-MAN-047`) so pinned-contract lookup cannot be ambiguous
-- explicit unknown or null materialization modes fail closed through
-  `WF-MAN-048`; only an omitted mode is treated as legacy
+  than one duplicate finding per handoff declaration
+- declared non-empty keys must be unique (`WF-MAN-047`) so pinned-contract
+  lookup cannot be ambiguous
+- unknown or null materialization modes fail closed through `WF-MAN-048`
 - existing `WF-MAN-040`–`042` outputs remain stable
 
 The source repository verifies these rules through copyable packages and
@@ -226,11 +221,10 @@ The claim token:
 Base conformance can enforce type placement and fixture behavior. My-Chat X2/X3
 must enforce lease, claim, replay, transaction, and persistence behavior.
 
-My-Chat X1 injects the host-owned `WorkflowRuntimePortMaterializationV1`
-directly into its worker. The scenario registry remains legacy-compatible and
-is not used as an unsafe type-narrowing authority for host capability. A compile
-fixture proves the driver evidence and handler drafts can reach the injected v1
-port without `as WorkflowRuntimePortMaterializationV1`.
+The host injects its own `WorkflowRuntimePort` directly into the worker. The
+scenario registry is not used as a type-narrowing authority for host
+capability. A compile fixture proves the driver evidence and handler drafts
+reach the injected port without a type assertion.
 
 ## X0-D Source Adoption Hash Boundary
 

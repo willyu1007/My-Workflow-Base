@@ -1,5 +1,10 @@
 # My-Chat X1 Adoption Handoff
 
+> Historical record. The legacy completion branch, the
+> `WorkflowRuntimePortMaterializationV1` overload type and the warning-only
+> `WF-MAN-043` described below were removed in 2026-10; `02-architecture.md`
+> holds the current contract.
+
 ## Status
 
 - Handoff state: ready for My-Chat X1 after post-review repair

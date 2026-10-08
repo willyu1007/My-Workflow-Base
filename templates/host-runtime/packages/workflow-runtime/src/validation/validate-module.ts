@@ -1,6 +1,6 @@
 import type {
+  ScenarioLaunchPhase,
   ScenarioManifestV2,
-  WorkflowActivationTarget,
   WorkflowHostValidationSnapshot,
   WorkflowModuleValidationFinding,
   WorkflowModuleValidationReport,
@@ -55,13 +55,6 @@ function addFatal(
   input: Omit<WorkflowModuleValidationFinding, "severity">,
 ): void {
   findings.push({ ...input, severity: "fatal" });
-}
-
-function addWarning(
-  findings: WorkflowModuleValidationFinding[],
-  input: Omit<WorkflowModuleValidationFinding, "severity">,
-): void {
-  findings.push({ ...input, severity: "warning" });
 }
 
 function isNonEmpty(value: string | undefined): value is string {
@@ -242,7 +235,7 @@ function validateScenarioContractModule(input: {
 export function validateWorkflowModule(input: {
   module: WorkflowScenarioModule;
   host_snapshot: WorkflowHostValidationSnapshot;
-  activation_target: WorkflowActivationTarget;
+  activation_target: ScenarioLaunchPhase;
 }): WorkflowModuleValidationReport {
   const findings: WorkflowModuleValidationFinding[] = [];
   const manifest = input.module.manifest;
@@ -661,11 +654,11 @@ export function validateWorkflowModule(input: {
     const materializationMode: unknown = handoff.materialization_mode;
 
     if (materializationMode === undefined) {
-      addWarning(findings, {
+      addFatal(findings, {
         rule_id: "WF-MAN-043",
-        message: `Legacy handoff does not opt into vNext materialization: ${handoff.handoff_type}`,
+        message: `Handoff does not declare a materialization mode: ${handoff.handoff_type}`,
         path: `${handoffPath}.materialization_mode`,
-        remediation: "Keep legacy behavior or migrate explicitly with materialization_mode and all vNext requirements.",
+        remediation: "Declare materialization_mode workflow_step_complete_v1 with a stable handoff_key and a declared source.",
       });
       continue;
     }
@@ -675,7 +668,7 @@ export function validateWorkflowModule(input: {
         rule_id: "WF-MAN-048",
         message: `Unsupported handoff materialization mode: ${String(materializationMode)}`,
         path: `${handoffPath}.materialization_mode`,
-        remediation: "Omit materialization_mode for legacy behavior or use workflow_step_complete_v1.",
+        remediation: "Use workflow_step_complete_v1.",
       });
       continue;
     }

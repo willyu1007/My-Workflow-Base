@@ -1,4 +1,4 @@
-import type { WorkflowActivationTarget } from "./identity.js";
+import type { ScenarioLaunchPhase } from "./identity.js";
 
 export const workflowHostCapabilities = [
   "workflow_handoff_materialization_v1",
@@ -26,7 +26,7 @@ export type WorkflowModuleValidationFinding = {
 export type WorkflowModuleValidationReport = {
   scenario_key: string;
   contract_hash: string;
-  activation_target: WorkflowActivationTarget;
+  activation_target: ScenarioLaunchPhase;
   passed: boolean;
   findings: WorkflowModuleValidationFinding[];
 };
