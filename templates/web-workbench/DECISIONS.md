@@ -451,3 +451,15 @@ cleanup calls `close()`, so native restoration alone lost the opening control
 in the real consumer. A reproduced focus test holds the repair and Tab wrapping.
 No additional motion or dependency is introduced. Both overlays are exported
 through `primitives`; consumers continue using the published package.
+
+## Scene bar secondaries are outlined buttons (0.23.2)
+
+A scene bar holds at most one primary. Its other actions (a settings entry, a
+management link, a second create) used the quiet `.wb-action` default: 12.5px,
+`--fg-3`, a 0.5px `--border-1` hairline. Beside a 13.5px navy primary they
+read as captions, not buttons, and consumers had started hand-rolling plain
+text buttons for the same slot. Inside `.wb-scene__bar` every `.wb-action` now
+takes the primary's size (36px, 13.5px, `--h3-weight`), and a non-primary one
+is outlined: `--border-2`, `--bg-surface`, `--fg-1`, `--mt-sand` on hover.
+Card and row actions outside the bar keep the quiet default; changing the
+default itself would have raised every inline action in every list.

@@ -78,7 +78,10 @@
 .wb-action--primary:active {
   color: #fff;
 }
-.wb-scene__bar .wb-action--primary {
+/* A scene bar holds at most one primary; its other actions are secondaries at
+ * the primary's size, outlined so they read as buttons beside it rather than
+ * as captions. Card and row actions keep the quiet default above. */
+.wb-scene__bar .wb-action {
   --wb-action-control-font-size: 13.5px;
 
   min-height: 36px;
@@ -87,6 +90,12 @@
   font-weight: var(--h3-weight);
   line-height: 1.4;
 }
+.wb-scene__bar .wb-action:not(.wb-action--primary) {
+  border: 1px solid var(--border-2);
+  background: var(--bg-surface);
+  color: var(--fg-1);
+}
+.wb-scene__bar .wb-action:not(.wb-action--primary):hover { background: var(--mt-sand); color: var(--fg-1); }
 .wb-action__icon { display: inline-flex; }
 .wb-action[disabled] { opacity: var(--state-disabled-opacity); cursor: not-allowed; pointer-events: none; }
 
