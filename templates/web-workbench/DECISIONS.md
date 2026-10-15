@@ -463,3 +463,8 @@ takes the primary's size (36px, 13.5px, `--h3-weight`), and a non-primary one
 is outlined: `--border-2`, `--bg-surface`, `--fg-1`, `--mt-sand` on hover.
 Card and row actions outside the bar keep the quiet default; changing the
 default itself would have raised every inline action in every list.
+
+At 0.23.3 the same rule also matches `.wb-scene__actions` outside the bar.
+Consumers place a scene's actions in an intro header (a class's info strip,
+a person's head) with that class, and there the secondaries had stayed quiet
+and the primary small. The slot, not its parent, now carries the look.
