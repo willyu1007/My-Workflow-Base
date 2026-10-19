@@ -1,6 +1,6 @@
 /**
  * EntryFrame — pre-shell gate chrome. Outside AppShell and the six Scene
- * paradigms. Domain-agnostic: the kit locks the navy canvas, brand row, and
+ * paradigms. Domain-agnostic: the kit locks the paper canvas, brand row, and
  * slots; the scenario supplies scene label, copy, actions, and any accessory.
  */
 import type { ReactNode } from "react";
@@ -8,12 +8,10 @@ import { IconAlert } from "./icons.js";
 
 export function EntryFrame({
   scene,
-  brand = "MORETHAN",
   accessory,
   children,
 }: {
   readonly scene: string;
-  readonly brand?: string;
   readonly accessory?: ReactNode;
   readonly children: ReactNode;
 }): React.ReactElement {
@@ -21,7 +19,9 @@ export function EntryFrame({
     <main className="wb-entry">
       <div className="wb-entry__chrome">
         <p className="wb-entry__brand">
-          <span className="wb-entry__wordmark">{brand}</span>
+          <span className="wb-entry__wordmark" role="img" aria-label="morethan">
+            more<span className="wb-entry__wordmark-than">than</span>
+          </span>
           <span className="wb-entry__sep" aria-hidden="true">
             |
           </span>

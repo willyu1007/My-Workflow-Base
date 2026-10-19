@@ -25,7 +25,7 @@ describe("EntryFrame chrome", () => {
       </EntryFrame>,
     );
 
-    expect(screen.getByText("MORETHAN")).toBeTruthy();
+    expect(screen.getByRole("img", { name: "morethan" })).toBeTruthy();
     expect(screen.getByText("场景")).toBeTruthy();
     expect(screen.getByRole("heading", { name: "登录工作台" })).toBeTruthy();
   });

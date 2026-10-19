@@ -1,25 +1,45 @@
-/* Pre-shell entry chrome. Flat navy canvas; not a Scene, not .wb-centered. */
+/* Pre-shell entry chrome. Paper canvas shared with the unified sign-in page and the
+   portal: cream ground, two-colour wordmark, serif title, and the portal's orange
+   route along the lower third. Not a Scene, not .wb-centered. */
 
 .wb-entry {
-  --wb-entry-muted: color-mix(in oklab, var(--mt-cream) 55%, transparent);
-  --wb-entry-line: color-mix(in oklab, var(--mt-cream) 12%, transparent);
-  --wb-entry-ghost: color-mix(in oklab, var(--mt-cream) 28%, transparent);
-  --wb-entry-panel: color-mix(in oklab, var(--mt-cream) 6%, var(--mt-navy-700));
+  --wb-entry-muted: var(--fg-3);
+  --wb-entry-line: var(--border-1);
+  /* The portal hero route; drawn through a mask so its colour stays a token. */
+  --wb-entry-route: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1280 320' preserveAspectRatio='none'%3E%3Cpath d='M0 120 C 240 90 380 70 560 170 S 900 300 1060 170 S 1220 70 1280 60' fill='none' stroke='black' stroke-width='2.2' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
 
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   box-sizing: border-box;
   min-height: 100dvh;
   margin: 0;
   padding: var(--sp-5) var(--sp-6) var(--sp-6);
   display: flex;
   flex-direction: column;
-  background: var(--mt-navy-700);
-  color: var(--mt-cream);
+  background: var(--bg-canvas);
+  color: var(--fg-1);
   font-family: var(--font-sans);
+}
+
+.wb-entry::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  bottom: 8%;
+  height: clamp(160px, 30vh, 320px);
+  background: var(--mt-orange-500);
+  opacity: 0.7;
+  -webkit-mask: var(--wb-entry-route) center / 100% 100% no-repeat;
+  mask: var(--wb-entry-route) center / 100% 100% no-repeat;
+  pointer-events: none;
 }
 
 .wb-entry__chrome {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--sp-5);
 }
@@ -33,19 +53,24 @@
 }
 
 .wb-entry__wordmark {
-  color: var(--mt-orange);
+  font-family: var(--font-display);
   font-weight: var(--display-weight);
-  font-size: var(--label-size);
-  letter-spacing: 0.06em;
+  font-size: var(--h3-size);
+  letter-spacing: -0.035em;
+  color: var(--mt-navy);
+}
+
+.wb-entry__wordmark-than {
+  color: var(--mt-orange);
 }
 
 .wb-entry__sep {
-  color: var(--wb-entry-muted);
+  color: var(--wb-entry-line);
   font-weight: var(--body-weight);
 }
 
 .wb-entry__scene {
-  color: var(--fg-on-navy);
+  color: var(--fg-2);
   font-weight: 500;
   font-size: var(--label-size);
 }
@@ -56,11 +81,12 @@
 
 .wb-entry__body {
   box-sizing: border-box;
-  width: min(100%, 22.5rem);
+  width: min(100%, 30rem);
   margin: auto;
+  padding-bottom: var(--sp-7);
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: var(--sp-5);
 }
 
 .wb-entry__head {
@@ -72,11 +98,12 @@
 
 .wb-entry__title {
   margin: 0;
-  color: var(--mt-cream);
-  font-size: 17px;
-  font-weight: 520;
-  letter-spacing: -0.015em;
-  line-height: var(--h4-lh);
+  color: var(--mt-navy);
+  font-family: var(--font-serif);
+  font-size: var(--h1-size);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: var(--h1-lh);
 }
 
 .wb-entry__aside {
@@ -87,7 +114,7 @@
 
 .wb-entry__copy {
   margin: 0;
-  color: var(--wb-entry-muted);
+  color: var(--fg-2);
   font-size: var(--body-size);
   line-height: var(--body-lh);
 }
@@ -128,8 +155,8 @@
 .wb-entry__action {
   box-sizing: border-box;
   width: 100%;
-  min-height: 40px;
-  padding: 0 var(--sp-4);
+  min-height: 44px;
+  padding: 0 var(--sp-5);
   border: 0;
   border-radius: var(--r-pill);
   cursor: pointer;
@@ -147,6 +174,7 @@
 .wb-entry__action--accent {
   background: var(--mt-orange);
   color: var(--fg-on-orange);
+  box-shadow: var(--shadow-sm);
 }
 
 .wb-entry__action--accent:hover {
@@ -154,9 +182,13 @@
 }
 
 .wb-entry__action--ghost {
-  background: transparent;
-  color: var(--mt-cream);
-  box-shadow: inset 0 0 0 1px var(--wb-entry-ghost);
+  background: var(--bg-surface);
+  color: var(--mt-navy);
+  box-shadow: inset 0 0 0 1px var(--border-2);
+}
+
+.wb-entry__action--ghost:hover {
+  background: var(--bg-hover);
 }
 
 .wb-entry__action--quiet {
@@ -184,14 +216,7 @@
 .wb-entry__choices {
   display: flex;
   flex-direction: column;
-}
-
-.wb-entry__choices > * {
-  border-top: 1px solid var(--wb-entry-line);
-}
-
-.wb-entry__choices > :last-child {
-  border-bottom: 1px solid var(--wb-entry-line);
+  gap: var(--sp-3);
 }
 
 .wb-entry__choice {
@@ -200,13 +225,19 @@
   align-items: center;
   gap: var(--sp-3);
   width: 100%;
-  padding: var(--sp-3) 0;
+  padding: var(--sp-4) var(--sp-4);
   border: 0;
-  background: none;
+  border-radius: var(--r-xl);
+  background: var(--bg-surface);
+  box-shadow: inset 0 0 0 1px var(--wb-entry-line), var(--shadow-sm);
   color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
+}
+
+.wb-entry__choice:hover {
+  box-shadow: inset 0 0 0 1px var(--mt-orange-300), var(--shadow-sm);
 }
 
 .wb-entry__choice:focus-visible {
@@ -220,14 +251,14 @@
 }
 
 .wb-entry__mark {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--r-pill);
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  background: color-mix(in oklab, var(--mt-cream) 18%, var(--mt-navy-700));
-  color: var(--mt-cream);
+  background: var(--mt-navy);
+  color: var(--fg-on-navy);
   font-size: var(--small-size);
   font-weight: 700;
 }
@@ -239,7 +270,7 @@
 .wb-entry__choice-copy strong {
   display: block;
   font-size: var(--body-size);
-  font-weight: 520;
+  font-weight: 600;
 }
 
 .wb-entry__choice-copy small {
@@ -251,10 +282,18 @@
 
 .wb-entry__choice em {
   margin-left: auto;
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  background: var(--mt-orange-50);
   font-style: normal;
   font-size: var(--small-size);
   font-weight: var(--h4-weight);
-  color: var(--mt-orange);
+  color: var(--mt-orange-700);
+}
+
+.wb-entry__choice:hover em {
+  background: var(--mt-orange);
+  color: var(--fg-on-orange);
 }
 
 .wb-entry__quiet {
@@ -279,6 +318,7 @@
 
 .wb-entry__accessory-panel {
   position: absolute;
+  z-index: 1;
   right: 0;
   top: calc(100% + 10px);
   width: 15.5rem;
@@ -287,8 +327,8 @@
   flex-direction: column;
   align-items: flex-end;
   gap: var(--sp-2);
-  background: var(--wb-entry-panel);
-  box-shadow: inset 0 0 0 1px var(--wb-entry-line);
+  background: var(--bg-surface);
+  box-shadow: inset 0 0 0 1px var(--wb-entry-line), var(--shadow-sm);
   border-radius: 10px;
   text-align: right;
 }
