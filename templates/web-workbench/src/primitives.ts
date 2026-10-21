@@ -11,3 +11,4 @@ export * from "./components/tabs.js";
 export * from "./components/badge.js";
 export * from "./components/breadcrumb.js";
 export * from "./components/overlay.js";
+export * from "./components/floating-panel.js";

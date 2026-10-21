@@ -46,9 +46,11 @@ function usePanelFocus(open: boolean, ref: RefObject<HTMLElement | null>): void 
       if (event.key !== "Tab" || event.defaultPrevented) return;
       const topDialog = Array.from(document.querySelectorAll('.wb-dialog[open]')).at(-1);
       if (topDialog && topDialog !== panel) return;
+      const active = document.activeElement;
+      // A FloatingPanel above the scrim keeps its own Tab order.
+      if (active instanceof Element && active.closest("[data-wb-float]")) return;
       const candidates = controls(), first = candidates[0], last = candidates.at(-1);
       if (!first || !last) return;
-      const active = document.activeElement;
       if (!panel.contains(active) || (event.shiftKey ? active === first : active === last)) {
         event.preventDefault();
         (event.shiftKey ? last : first).focus();

@@ -468,3 +468,37 @@ At 0.23.3 the same rule also matches `.wb-scene__actions` outside the bar.
 Consumers place a scene's actions in an intro header (a class's info strip,
 a person's head) with that class, and there the secondaries had stayed quiet
 and the primary small. The slot, not its parent, now carries the look.
+
+## A non-modal floating companion above the drawer scrim (0.25.0)
+
+The-Nurture's workbench assistant lived in a `Drawer`. The drawer is modal, so
+acting on its answer meant closing it, and reopening meant finding the sidebar
+search button again. Its most valuable answer is a set of steps to follow while
+working, and much of that work happens inside another Drawer. `FloatingPanel`
+is the companion surface for that case; "do one thing" still opens a Drawer.
+
+**Layer 85.** Above the drawer overlay (80), below Select popups (90) and toasts
+(100). Below the scrim it would vanish exactly when its steps are needed. A
+native `Dialog` owns the top layer and still covers it; that is intended for
+short consequence confirmations.
+
+**The Drawer cooperates in two places.** Its Tab loop returns early when focus is
+inside `[data-wb-float]`, so the panel keeps its own Tab order. The panel claims
+Escape with `preventDefault()`, which `useEscape` already honours, so collapsing
+the panel leaves the Drawer open. `aria-modal` still hides the panel from screen
+readers while a Drawer is open; that limit is accepted rather than lying about
+modality. Both behaviours are held by mutation-checked tests.
+
+**Dragging is pointer-only by design.** The header drags with pointer capture,
+clamped 8px inside the viewport and re-clamped on resize. Controls in the header
+never start a drag. The equivalent non-gesture action (INTERACTION.md) is
+collapse: it moves the panel out of the way. Position lives in component memory
+only. The collapsed button does not drag, so a click never has to be told apart
+from a drag. At ≤920px the panel is a bottom sheet with no drag; resizing into
+that width discards a dragged position, because an inline position would
+otherwise beat the sheet rule.
+
+**No new motion values.** Opening reuses `wb-slide-in-up` at `--t-base`; the busy
+ring reuses the nav status pulse (`wb-proc`); both stop under reduced motion.
+Toasts share the bottom-right corner, so they stack above the button and beside
+an unmoved panel.

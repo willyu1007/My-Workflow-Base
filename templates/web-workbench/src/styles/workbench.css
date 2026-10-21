@@ -990,6 +990,90 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
 .wb-iconbtn:hover { background: var(--mt-sand); color: var(--fg-1); }
 
 /* ============================================================
+   Floating companion (FloatingPanel)
+   Layer 85: above the drawer overlay (80) so a companion stays usable during a
+   Drawer task, below Select popups (90) and toasts (100). Non-modal: no scrim.
+   ============================================================ */
+.wb-float-bubble {
+  position: fixed; right: 24px; bottom: 24px; z-index: 85;
+  width: 56px; height: 56px; padding: 0; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--bg-surface); border: 1px solid var(--border-1); box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  transition: box-shadow var(--t-fast) var(--ease-out), transform var(--t-fast) var(--ease-out);
+}
+.wb-float-bubble:hover { box-shadow: var(--shadow-xl); transform: translateY(-1px); }
+.wb-float-bubble:focus-visible { outline: none; box-shadow: var(--shadow-lg), var(--shadow-focus); }
+.wb-float-bubble__icon { display: grid; width: 32px; height: 32px; }
+.wb-float-bubble__icon > svg { width: 100%; height: 100%; }
+.wb-float-bubble__dot {
+  position: absolute; top: 1px; right: 1px; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--mt-orange); box-shadow: 0 0 0 2px var(--bg-surface);
+}
+/* 1px: measured from the button's border edge, not its padding box. */
+.wb-float-bubble__tip {
+  position: absolute; bottom: calc(100% + 1px + 8px); left: 50%; transform: translateX(-50%);
+  padding: 3px 8px; border-radius: var(--r-sm); white-space: nowrap; pointer-events: none;
+  background: var(--mt-ink); color: var(--fg-on-navy); font-size: 12px;
+  opacity: 0; transition: opacity var(--t-fast) var(--ease-out);
+}
+.wb-float-bubble:hover .wb-float-bubble__tip, .wb-float-bubble:focus-visible .wb-float-bubble__tip { opacity: 1; }
+.wb-float-bubble--busy::after {
+  content: ""; position: absolute; inset: -5px; border-radius: 50%;
+  border: 2px solid var(--mt-orange-100); border-top-color: var(--mt-orange);
+  animation: wb-proc 1.1s infinite ease-in-out;
+}
+
+.wb-float {
+  position: fixed; right: 24px; bottom: 24px; z-index: 85;
+  width: min(400px, calc(100vw - 48px)); height: min(600px, calc(100vh - 48px));
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--bg-surface); border: 1px solid var(--border-1); border-radius: var(--r-xl); box-shadow: var(--shadow-xl);
+  animation: wb-slide-in-up var(--t-base) var(--ease-out);
+}
+.wb-float:focus { outline: none; }
+.wb-float--placed { right: auto; bottom: auto; }
+.wb-float--dragging { border-color: var(--mt-navy-100); user-select: none; }
+.wb-float__head {
+  position: relative; flex-shrink: 0;
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: 14px 8px 10px 16px; border-bottom: 1px solid var(--border-1);
+  cursor: grab; user-select: none; touch-action: none;
+}
+.wb-float--dragging .wb-float__head { cursor: grabbing; background: var(--bg-sunken); }
+.wb-float__grip {
+  position: absolute; top: 5px; left: 50%; width: 28px; height: 4px; margin-left: -14px;
+  border-radius: 99px; background: var(--border-2);
+}
+.wb-float__icon { display: grid; width: 22px; height: 22px; flex-shrink: 0; }
+.wb-float__icon > svg { width: 100%; height: 100%; }
+.wb-float__title { flex: 1; min-width: 0; margin: 0; font-size: 14px; font-weight: 600; color: var(--fg-1); }
+.wb-float__head .wb-action { flex-shrink: 0; }
+.wb-float__body { flex: 1; min-height: 0; overflow-y: auto; padding: var(--sp-4) var(--sp-4) var(--sp-5); }
+.wb-float__body::-webkit-scrollbar { width: 4px; }
+.wb-float__body::-webkit-scrollbar-track { background: transparent; }
+.wb-float__body::-webkit-scrollbar-thumb { background: var(--mt-ink-5); border-radius: 99px; }
+@supports not selector(::-webkit-scrollbar) {
+  .wb-float__body { scrollbar-width: thin; scrollbar-color: var(--mt-ink-5) transparent; }
+}
+.wb-float__foot { flex-shrink: 0; padding: var(--sp-3) var(--sp-4); border-top: 1px solid var(--border-1); }
+
+/* Toasts share the bottom-right corner: stack above the button, or beside an unmoved panel. */
+body:has(.wb-float-bubble) .wb-toasts { bottom: 96px; }
+body:has(.wb-float:not(.wb-float--placed)) .wb-toasts { right: 440px; }
+
+@media (max-width: 920px) {
+  .wb-float-bubble { right: 16px; bottom: 16px; }
+  .wb-float {
+    left: 0; right: 0; bottom: 0; width: auto; height: 74vh;
+    border-bottom: 0; border-radius: var(--r-xl) var(--r-xl) 0 0;
+  }
+  .wb-float__head { cursor: default; padding-top: 12px; }
+  .wb-float__grip { display: none; }
+  body:has(.wb-float) .wb-toasts { right: 16px; bottom: calc(74vh + 12px); }
+}
+
+/* ============================================================
    Toast / status region
    ============================================================ */
 .wb-toasts {
@@ -1223,7 +1307,9 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
 @keyframes wb-shimmer { 100% { transform: translateX(100%); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .wb-reveal, .wb-toast, .wb-drawer, .wb-overlay { animation: none !important; }
+  .wb-reveal, .wb-toast, .wb-drawer, .wb-overlay, .wb-float { animation: none !important; }
+  .wb-float-bubble--busy::after { animation: none !important; opacity: 0.7; }
+  .wb-float-bubble, .wb-float-bubble__tip { transition: none !important; }
   .wb-skeleton::after { animation: none !important; }
   /* The mobile sidebar arrives by TRANSITION, not animation, so the rules above
      never reached it — a full 280px panel sweeping the viewport was the most
