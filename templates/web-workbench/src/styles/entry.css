@@ -91,9 +91,10 @@
 
 .wb-entry__head {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: var(--sp-4);
+  gap: var(--sp-2) var(--sp-4);
 }
 
 .wb-entry__title {
@@ -110,6 +111,8 @@
   margin: 0;
   color: var(--wb-entry-muted);
   font-size: var(--small-size);
+  /* Too long to sit beside the title: the whole aside wraps under it. */
+  white-space: nowrap;
 }
 
 .wb-entry__copy {
@@ -131,13 +134,18 @@
 
 .wb-entry__alert {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 40px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-4);
 }
 
-.wb-entry__alert svg {
-  flex-shrink: 0;
+.wb-entry__alert-mark {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--r-pill);
+  display: grid;
+  place-items: center;
+  background: var(--mt-warning-bg);
   color: var(--mt-warning);
 }
 

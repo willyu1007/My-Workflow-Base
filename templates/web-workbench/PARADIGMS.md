@@ -59,5 +59,7 @@ with **`<EntryFrame>`** (`@willyu1007/web-workbench/entry`).
   scenario passes children.
 - The kit has no auth enum. The scenario maps unsigned / blocked / ready onto
   the same slots (heading, alert, two-column actions, choice rows, quiet row).
+- The heading aside sits on the title row while it fits; otherwise it wraps whole
+  under the title. The alert's mark sits above its title on the shared left edge.
 - Entry actions are `.wb-entry__action*` (orange pill, white ghost). Do not change Scene
   `ActionButton kind="primary"` (navy).

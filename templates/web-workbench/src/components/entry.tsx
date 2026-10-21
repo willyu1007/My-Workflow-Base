@@ -76,7 +76,9 @@ export function EntryAlert({
 }): React.ReactElement {
   return (
     <div className="wb-entry__alert">
-      <IconAlert size={18} />
+      <span className="wb-entry__alert-mark" aria-hidden="true">
+        <IconAlert size={24} />
+      </span>
       <h1 className="wb-entry__title">{children}</h1>
     </div>
   );

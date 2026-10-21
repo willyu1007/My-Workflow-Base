@@ -91,6 +91,10 @@ import "@willyu1007/web-workbench/styles/index.css";
 > recommended, self-hosted path — and map them onto the `--font-*` tokens. Full recipe:
 > [TYPOGRAPHY.md → Fonts (host-provided)](./TYPOGRAPHY.md#fonts-host-provided).
 
+> **0.24.1 (visual).** `<EntryHeading>` wraps a long aside under the title
+> instead of breaking both into columns; `<EntryAlert>` stacks a round warning
+> mark above its title. No API change.
+
 > ⚠️ **Upgrading to 0.24.0 (visual, one removal).** `<EntryFrame>` moves from the
 > navy canvas to the paper ground shared with the unified sign-in page: cream
 > canvas, lowercase two-colour `morethan` wordmark (exposed as `role="img"` named
