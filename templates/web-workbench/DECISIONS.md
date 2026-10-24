@@ -502,3 +502,26 @@ otherwise beat the sheet rule.
 ring reuses the nav status pulse (`wb-proc`); both stop under reduced motion.
 Toasts share the bottom-right corner, so they stack above the button and beside
 an unmoved panel.
+
+## A Select inside a Dialog (0.25.1)
+
+Two kit decisions met: the Select popup portals to `<body>` (0.21.1) and Dialog
+is a native `showModal()` (0.23.0). A modal dialog makes everything outside it
+inert, so a Select in a Dialog showed its options but could not pick one; a click
+on an option reached the dialog's backdrop and closed the Dialog. Found in My-Chat
+T-108's workbench 禁言 and 举报 forms, which moved to Drawers meanwhile.
+
+**The popup joins the dialog.** The Select portals into the trigger's nearest
+`<dialog>` and keeps `<body>` everywhere else, Drawer included. The fixed placement
+is unchanged: `.wb-dialog` has no transform, so the viewport stays the popup's
+containing block, and its `overflow-y` does not clip a fixed descendant.
+
+**Escape follows the 0.21.1 contract inside a Dialog too.** Dialog handled Escape
+in the capture phase, before the Select on its trigger could consume it, so one
+press closed the Dialog with the popup. Dialog now listens in the bubble phase
+and still skips a default-prevented press. Drawer ordering is unchanged:
+`useEscape` already stands down while a `.wb-dialog[open]` exists.
+
+Both behaviours are mutation-checked in jsdom; jsdom has no top layer, so the
+inert click and the Escape order were also reproduced and cleared in Chrome
+against the 0.25.0 build.

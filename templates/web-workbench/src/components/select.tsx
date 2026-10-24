@@ -8,7 +8,9 @@
  * The popup renders through a portal to <body>, fixed-positioned from the
  * trigger's rect: an in-flow popup is clipped by any `overflow` ancestor (the
  * kit's own Drawer body is one), and near the viewport edge it flips above the
- * trigger instead of running off-screen.
+ * trigger instead of running off-screen. Inside a native modal <dialog> (the
+ * kit's Dialog) it portals into that dialog instead: `showModal()` makes
+ * everything outside the dialog inert, so a popup on <body> could not be picked.
  */
 "use client";
 
@@ -57,6 +59,7 @@ export function Select({
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [placement, setPlacement] = useState<PopPlacement | null>(null);
+  const [host, setHost] = useState<HTMLElement | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
@@ -117,6 +120,7 @@ export function Select({
   function openMenu(): void {
     if (disabled) return;
     setActiveIndex(selectedIndex >= 0 ? selectedIndex : 0);
+    setHost(triggerRef.current?.closest("dialog") ?? document.body);
     setOpen(true);
     // Safari and Firefox on macOS do not focus a <button> on click; without
     // this the arrow keys go to the document and the listbox never moves.
@@ -163,8 +167,8 @@ export function Select({
         break;
       case "Escape":
         e.preventDefault();
-        // Escape closes the top transient surface only — a host Drawer listens
-        // on document and must not close together with the popup.
+        // Escape closes the top transient surface only — a host Drawer (on
+        // document) or Dialog (on itself) must not close together with the popup.
         e.stopPropagation();
         setOpen(false);
         break;
@@ -195,6 +199,7 @@ export function Select({
       </button>
       {open &&
         placement !== null &&
+        host !== null &&
         createPortal(
           <ul
             className="mt-select__pop"
@@ -224,7 +229,7 @@ export function Select({
               </li>
             ))}
           </ul>,
-          document.body,
+          host,
         )}
     </div>
   );

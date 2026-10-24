@@ -126,7 +126,8 @@ export function Dialog({ open, title, onClose, children }: Pick<PanelProps, "ope
   if (!open) return null;
   return <dialog ref={dialog} className="wb-dialog" aria-label={title}
     onCancel={event => { event.preventDefault(); onClose(); }}
-    onKeyDownCapture={event => {
+    // Bubble phase, so an inner transient surface (an open Select) consumes Escape first.
+    onKeyDown={event => {
       if (event.key === "Escape" && !event.defaultPrevented) { event.preventDefault(); onClose(); }
     }}
     onClick={event => {

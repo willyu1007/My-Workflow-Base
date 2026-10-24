@@ -8,9 +8,9 @@
  * down and hide the defect.
  */
 import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { Select } from "../src/components/select.js";
-import { Drawer } from "../src/components/overlay.js";
+import { Dialog, Drawer } from "../src/components/overlay.js";
 
 beforeAll(() => {
   // jsdom has no layout; the component's scroll-follow only needs it to exist.
@@ -133,6 +133,54 @@ describe("inside a Drawer", () => {
     expect(onClose).not.toHaveBeenCalled();
 
     fireEvent.keyDown(document, { key: "Escape" });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("inside a Dialog", () => {
+  // jsdom has no top layer; stub showModal/close so the Dialog renders open.
+  const originals = ["showModal", "close"].map((name) => [name, Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, name)] as const);
+  beforeAll(() => {
+    Object.defineProperties(HTMLDialogElement.prototype, {
+      showModal: { configurable: true, value(this: HTMLDialogElement) { this.open = true; } },
+      close: { configurable: true, value(this: HTMLDialogElement) { this.open = false; } },
+    });
+  });
+  afterAll(() => {
+    for (const [name, original] of originals) {
+      if (original) Object.defineProperty(HTMLDialogElement.prototype, name, original);
+      else Reflect.deleteProperty(HTMLDialogElement.prototype, name);
+    }
+  });
+  const renderInDialog = (onClose: () => void, onChange: (v: string) => void = () => {}) =>
+    render(
+      <Dialog open onClose={onClose} title="禁言">
+        <Select value="a" options={OPTIONS} onChange={onChange} ariaLabel="选项" />
+      </Dialog>,
+    );
+
+  it("portals the listbox into the dialog, whose modal top layer makes <body> inert", () => {
+    const onChange = vi.fn();
+    renderInDialog(() => {}, onChange);
+    openByClick();
+
+    // A popup on <body> renders but cannot be picked in a real browser; jsdom has
+    // no inertness, so the placement itself is the observable contract.
+    expect(screen.getByRole("listbox").closest("dialog")).toBe(document.querySelector("dialog.wb-dialog"));
+    fireEvent.click(screen.getByRole("option", { name: "第二项" }));
+    expect(onChange).toHaveBeenCalledWith("b");
+  });
+
+  it("Escape closes only the popup first, then the dialog", () => {
+    const onClose = vi.fn();
+    renderInDialog(onClose);
+    openByClick();
+
+    fireEvent.keyDown(trigger(), { key: "Escape" });
+    expect(screen.queryByRole("listbox")).toBeNull();
+    expect(onClose).not.toHaveBeenCalled();
+
+    fireEvent.keyDown(trigger(), { key: "Escape" });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 });
