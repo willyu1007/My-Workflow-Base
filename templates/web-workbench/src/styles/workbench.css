@@ -994,9 +994,18 @@ button.mt-menu-item { width: 100%; background: transparent; border: 0; font: inh
    Layer 85: above the drawer overlay (80) so a companion stays usable during a
    Drawer task, below Select popups (90) and toasts (100). Non-modal: no scrim.
    ============================================================ */
+body:has(.wb-float-bubble) {
+  --wb-float-edge: 24px;
+  --wb-float-size: 56px;
+  --wb-float-gap: var(--sp-2);
+}
+/* The collapsed companion stays usable without covering a Drawer's actions. */
+body:has(.wb-float-bubble) .wb-drawer .wb-panel__foot {
+  padding-inline-end: calc(var(--wb-float-edge) + var(--wb-float-size) + var(--wb-float-gap));
+}
 .wb-float-bubble {
-  position: fixed; right: 24px; bottom: 24px; z-index: 85;
-  width: 56px; height: 56px; padding: 0; border-radius: 50%;
+  position: fixed; right: var(--wb-float-edge); bottom: var(--wb-float-edge); z-index: 85;
+  width: var(--wb-float-size); height: var(--wb-float-size); padding: 0; border-radius: 50%;
   display: grid; place-items: center;
   background: var(--bg-surface); border: 1px solid var(--border-1); box-shadow: var(--shadow-lg);
   cursor: pointer;
@@ -1063,7 +1072,7 @@ body:has(.wb-float-bubble) .wb-toasts { bottom: 96px; }
 body:has(.wb-float:not(.wb-float--placed)) .wb-toasts { right: 440px; }
 
 @media (max-width: 920px) {
-  .wb-float-bubble { right: 16px; bottom: 16px; }
+  body:has(.wb-float-bubble) { --wb-float-edge: 16px; }
   .wb-float {
     left: 0; right: 0; bottom: 0; width: auto; height: 74vh;
     border-bottom: 0; border-radius: var(--r-xl) var(--r-xl) 0 0;
