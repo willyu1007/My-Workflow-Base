@@ -24,16 +24,20 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node and dependency cache
         uses: actions/setup-node@v6
         with:
           node-version: "24"
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            templates/web-workbench/pnpm-lock.yaml
 
       - name: Verify repository governance
         run: node .ai/scripts/ctl-project-governance.mjs lint --strict
-
-      - name: Enable Corepack
-        run: corepack enable
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
