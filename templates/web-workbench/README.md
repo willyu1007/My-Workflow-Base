@@ -128,7 +128,8 @@ import "@willyu1007/web-workbench/styles/index.css";
 > vitest + testing-library, 57 tests across the five stateful components, all
 > mutation-checked. `prepublishOnly`
 > and CI now run it, so a failing component cannot ship. Nothing in `dist/` changed;
-> tests are source-side and stay out of the tarball. See [TESTING.md](./TESTING.md).
+> tests are source-side and stay out of the tarball. This describes the original
+> harness; the current bounded core and retired coverage are in [TESTING.md](./TESTING.md).
 
 > ⚠️ **Upgrading to 0.14.0 (additive).** The Form paradigm finally has a component:
 > `<FormFrame>` at `@willyu1007/web-workbench/form` — one guided column, required

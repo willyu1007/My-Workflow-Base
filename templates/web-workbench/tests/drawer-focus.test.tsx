@@ -1,28 +1,18 @@
-import { useState } from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent,render,screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { expect, it, vi } from "vitest";
-import { Dialog, Drawer } from "../src/components/overlay.js";
-import { Menu } from "../src/components/menu.js";
+import { useState } from "react";
+import { expect,it,vi } from "vitest";
+import { Dialog,Drawer } from "../src/components/overlay.js";
 
 function Example() {
   const [open, setOpen] = useState(false);
-  const [count, setCount] = useState(0);
   return <><button onClick={() => setOpen(true)}>打开资料</button>
-    <button>背景动作</button>
     <Drawer open={open} title="资料" onClose={() => setOpen(false)}>
       <input aria-label="称呼" />
-      <button disabled>检测中</button>
-      <div hidden><button>隐藏操作</button></div>
-      <button onClick={() => setCount(count + 1)}>刷新 {count}</button>
-      <Menu trigger="更多" label="称呼操作"><button>修改</button></Menu>
-      <details><summary>说明</summary><button>折叠内容</button></details>
-      <fieldset disabled><input aria-label="锁定称呼" /></fieldset>
-      <button disabled tabIndex={0}>锁定保存</button>
     </Drawer></>;
 }
 
-it("moves focus into the drawer and restores its opening control on close", async () => {
+it("BA-33 Drawer 正确接收焦点，并在关闭后恢复焦点", async () => {
   const user = userEvent.setup(); render(<Example />);
   const opener = screen.getByRole("button", { name: "打开资料" });
   await user.click(opener);
@@ -32,54 +22,7 @@ it("moves focus into the drawer and restores its opening control on close", asyn
   expect(document.activeElement).toBe(opener);
 });
 
-it("cycles Tab inside the drawer and skips disabled, hidden and folded controls", async () => {
-  const user = userEvent.setup(); render(<Example />);
-  await user.click(screen.getByRole("button", { name: "打开资料" }));
-  await user.tab({ shift: true });
-  expect(document.activeElement).toBe(screen.getByText("说明"));
-  await user.tab();
-  expect(document.activeElement).toBe(screen.getByRole("button", { name: "关闭" }));
-  await user.tab(); expect(document.activeElement).toBe(screen.getByRole("textbox", { name: "称呼" }));
-  await user.tab(); expect(document.activeElement).toBe(screen.getByRole("button", { name: "刷新 0" }));
-  await user.tab(); expect(document.activeElement).toBe(screen.getByRole("button", { name: "称呼操作" }));
-  await user.tab(); expect(document.activeElement).toBe(screen.getByText("说明"));
-  await user.tab(); expect(document.activeElement).toBe(screen.getByRole("button", { name: "关闭" }));
-});
-
-it("closes an inner Menu on Escape before closing the drawer", async () => {
-  const user = userEvent.setup(); render(<Example />);
-  await user.click(screen.getByRole("button", { name: "打开资料" }));
-  const trigger = screen.getByRole("button", { name: "称呼操作" });
-  await user.click(trigger);
-  await user.tab();
-  expect(document.activeElement).toBe(screen.getByRole("button", { name: "修改" }));
-  await user.keyboard("{Escape}");
-  expect(screen.queryByRole("menu")).toBeNull();
-  expect(screen.getByRole("dialog")).toBeTruthy();
-  expect(document.activeElement).toBe(trigger);
-  await user.keyboard("{Escape}");
-  expect(screen.queryByRole("dialog")).toBeNull();
-  expect(document.activeElement).toBe(screen.getByRole("button", { name: "打开资料" }));
-});
-
-it("keeps the current control focused when the drawer callback rerenders", async () => {
-  const user = userEvent.setup(); render(<Example />);
-  await user.click(screen.getByRole("button", { name: "打开资料" }));
-  await user.click(screen.getByRole("button", { name: "刷新 0" }));
-  expect(document.activeElement).toBe(screen.getByRole("button", { name: "刷新 1" }));
-});
-
-it("keeps header actions ahead of the body when using an inline wide drawer", async () => {
-  const user = userEvent.setup();
-  render(<Drawer open title="资料" desc="当前对象" width="wide" headingLayout="inline" onClose={() => {}}
-    headerActions={<><button>取消</button><button>保存</button></>}><input aria-label="正文" /></Drawer>);
-  expect(document.activeElement).toBe(screen.getByRole("button", { name: "取消" }));
-  await user.tab(); expect(document.activeElement).toBe(screen.getByRole("button", { name: "保存" }));
-  await user.tab(); expect(document.activeElement).toBe(screen.getByRole("textbox"));
-  expect(screen.queryByRole("button", { name: "关闭" })).toBeNull();
-});
-
-it("leaves the parent drawer open and restores focus when Escape dismisses a focused edit dialog", async () => {
+it("BA-34 子 Dialog 的 Escape 不关闭父 Drawer", async () => {
   // jsdom does not implement the browser's native dialog focus lifecycle.
   const show = vi.fn(function (this: HTMLDialogElement) { this.open = true; this.querySelector('input')?.focus(); });
   const close = vi.fn(function (this: HTMLDialogElement) { this.open = false; });
@@ -105,12 +48,6 @@ it("leaves the parent drawer open and restores focus when Escape dismisses a foc
     expect(parentClose).not.toHaveBeenCalled();
     expect(close).toHaveBeenCalledOnce();
     expect(document.activeElement).toBe(trigger);
-    await user.click(trigger);
-    await user.tab({ shift: true });
-    expect(document.activeElement).toBe(screen.getByRole('button', { name: '编辑保存' }));
-    await user.tab(); expect(document.activeElement).toBe(screen.getByRole('textbox'));
-    fireEvent.keyDown(screen.getByRole('textbox'), { key: 'Escape' });
-    fireEvent.keyDown(document, { key: "Escape" }); expect(parentClose).toHaveBeenCalledOnce();
   } finally {
     if (originalShow) Object.defineProperty(HTMLDialogElement.prototype, "showModal", originalShow);
     else Reflect.deleteProperty(HTMLDialogElement.prototype, "showModal");

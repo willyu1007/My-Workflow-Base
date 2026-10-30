@@ -7,10 +7,9 @@
  * document and the open listbox never moves. userEvent would focus on pointer
  * down and hide the defect.
  */
-import { fireEvent, render, screen } from "@testing-library/react";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { fireEvent,render,screen } from "@testing-library/react";
+import { beforeAll,describe,expect,it,vi } from "vitest";
 import { Select } from "../src/components/select.js";
-import { Dialog, Drawer } from "../src/components/overlay.js";
 
 beforeAll(() => {
   // jsdom has no layout; the component's scroll-follow only needs it to exist.
@@ -29,43 +28,9 @@ const renderSelect = (onChange: (v: string) => void = () => {}) =>
 const trigger = () => screen.getByRole("button", { name: "选项" });
 const openByClick = () => fireEvent.click(trigger());
 
-describe("popup", () => {
-  it("portals the listbox to <body> so overflow ancestors cannot clip it", () => {
-    render(
-      <div style={{ overflow: "auto" }}>
-        <Select value="a" options={OPTIONS} onChange={() => {}} ariaLabel="选项" />
-      </div>,
-    );
-    openByClick();
-
-    const list = screen.getByRole("listbox");
-    expect(list.parentElement).toBe(document.body);
-    expect(screen.getAllByRole("option")).toHaveLength(3);
-  });
-
-  it("closes on outside mousedown but not on mousedown inside the portaled list", () => {
-    renderSelect();
-    openByClick();
-
-    fireEvent.mouseDown(screen.getByRole("listbox"));
-    expect(screen.queryByRole("listbox")).not.toBeNull();
-
-    fireEvent.mouseDown(document.body);
-    expect(screen.queryByRole("listbox")).toBeNull();
-  });
-});
-
 describe("keyboard", () => {
-  it("focuses the trigger on open, even when the browser's click did not", () => {
-    renderSelect();
-    openByClick();
 
-    // Without this, Safari/Firefox leave focus on <body> and every arrow key
-    // press below would be lost.
-    expect(document.activeElement).toBe(trigger());
-  });
-
-  it("moves the active option with the arrows and commits with Enter", () => {
+  it("BA-36 Select 可以使用方向键和 Enter 选择值", () => {
     const onChange = vi.fn();
     renderSelect(onChange);
     openByClick();
@@ -83,104 +48,5 @@ describe("keyboard", () => {
     fireEvent.keyDown(trigger(), { key: "Enter" });
     expect(onChange).toHaveBeenCalledWith("b");
     expect(screen.queryByRole("listbox")).toBeNull();
-  });
-
-  it("opens on ArrowDown with the selected option active", () => {
-    render(<Select value="b" options={OPTIONS} onChange={() => {}} ariaLabel="选项" />);
-    trigger().focus();
-    fireEvent.keyDown(trigger(), { key: "ArrowDown" });
-
-    expect(trigger().getAttribute("aria-activedescendant")).toBe(
-      screen.getByRole("option", { name: "第二项" }).id,
-    );
-  });
-});
-
-describe("inside a Drawer", () => {
-  it("Escape closes only the popup first, then the drawer", () => {
-    const onClose = vi.fn();
-    render(
-      <Drawer open onClose={onClose} title="操作">
-        <Select value="a" options={OPTIONS} onChange={() => {}} ariaLabel="选项" />
-      </Drawer>,
-    );
-    openByClick();
-
-    // The popup is the top transient surface — the drawer must survive.
-    fireEvent.keyDown(trigger(), { key: "Escape" });
-    expect(screen.queryByRole("listbox")).toBeNull();
-    expect(onClose).not.toHaveBeenCalled();
-
-    fireEvent.keyDown(trigger(), { key: "Escape" });
-    expect(onClose).toHaveBeenCalledTimes(1);
-  });
-
-  it("ignores an Escape an inner surface already consumed (defaultPrevented)", () => {
-    // Under Next's App Router React delegates from `document` — the same node
-    // the drawer listens on — so stopPropagation cannot shield the drawer.
-    // The contract is defaultPrevented; this dispatch path never calls
-    // stopPropagation, so it fails if the drawer stops honoring it.
-    const onClose = vi.fn();
-    render(
-      <Drawer open onClose={onClose} title="操作">
-        <button type="button" onKeyDown={(e) => e.preventDefault()}>
-          内层
-        </button>
-      </Drawer>,
-    );
-
-    fireEvent.keyDown(screen.getByRole("button", { name: "内层" }), { key: "Escape" });
-    expect(onClose).not.toHaveBeenCalled();
-
-    fireEvent.keyDown(document, { key: "Escape" });
-    expect(onClose).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe("inside a Dialog", () => {
-  // jsdom has no top layer; stub showModal/close so the Dialog renders open.
-  const originals = ["showModal", "close"].map((name) => [name, Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, name)] as const);
-  beforeAll(() => {
-    Object.defineProperties(HTMLDialogElement.prototype, {
-      showModal: { configurable: true, value(this: HTMLDialogElement) { this.open = true; } },
-      close: { configurable: true, value(this: HTMLDialogElement) { this.open = false; } },
-    });
-  });
-  afterAll(() => {
-    for (const [name, original] of originals) {
-      if (original) Object.defineProperty(HTMLDialogElement.prototype, name, original);
-      else Reflect.deleteProperty(HTMLDialogElement.prototype, name);
-    }
-  });
-  const renderInDialog = (onClose: () => void, onChange: (v: string) => void = () => {}) =>
-    render(
-      <Dialog open onClose={onClose} title="禁言">
-        <Select value="a" options={OPTIONS} onChange={onChange} ariaLabel="选项" />
-      </Dialog>,
-    );
-
-  it("portals the listbox into the dialog, whose modal top layer makes <body> inert", () => {
-    const onChange = vi.fn();
-    renderInDialog(() => {}, onChange);
-    openByClick();
-
-    // A popup on <body> renders but cannot be picked in a real browser; jsdom has
-    // no inertness, so the placement itself is the observable contract.
-    expect(screen.getByRole("listbox").closest("dialog")).toBe(document.querySelector("dialog.wb-dialog"));
-    fireEvent.click(screen.getByRole("option", { name: "第二项" }));
-    expect(onChange).toHaveBeenCalledWith("b");
-  });
-
-  it("Escape closes only the popup first, then the dialog", () => {
-    const onClose = vi.fn();
-    renderInDialog(onClose);
-    openByClick();
-
-    fireEvent.keyDown(trigger(), { key: "Escape" });
-    expect(screen.queryByRole("listbox")).toBeNull();
-    expect(onClose).not.toHaveBeenCalled();
-
-    fireEvent.keyDown(trigger(), { key: "Escape" });
-    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

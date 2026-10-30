@@ -101,7 +101,7 @@ Base lock verification:
 
 ```bash
 corepack pnpm check:workflow-contract-source
-corepack pnpm verify:x0-d
+corepack pnpm verify:workflow-contracts
 ```
 
 After My-Chat adoption, the Base script can calculate the My-Chat logical

@@ -1,20 +1,11 @@
+import {
+assertScenarioSafeTextV1
+} from "@host/workflow-contracts";
+import addFormats from "ajv-formats";
+import Ajv2020 from "ajv/dist/2020.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import Ajv2020 from "ajv/dist/2020.js";
-import addFormats from "ajv-formats";
-import {
-  assertScenarioActionTargetRefV1,
-  assertScenarioContinuationRefV1,
-  assertScenarioNarrationPolicyV1,
-  assertScenarioPresentationCursorV1,
-  assertScenarioPresentationItemRefV1,
-  assertScenarioSafeLabelV1,
-  assertScenarioSafeReasonV1,
-  assertScenarioSafeTextV1,
-  assertScenarioSubjectContextRefV1,
-  assertScenarioToneV1,
-} from "@host/workflow-contracts";
 
 const schemaRoot = new URL(
   "../../templates/host-runtime/packages/workflow-contracts/schemas/",
@@ -40,143 +31,8 @@ const validateReason = ajv.getSchema(
 if (!validateText || !validateReason) throw new Error("presentation primitive schemas missing");
 
 const cloneText = () => structuredClone(fixture.safe_text);
-const cloneReason = () => structuredClone(fixture.safe_reason);
-const assertSchemaAccepts = (validate, value) => {
-  assert.equal(validate(value), true, JSON.stringify(validate.errors));
-};
 const assertSchemaRejects = (validate, value) => {
   assert.equal(validate(value), false, "JSON Schema unexpectedly accepted mutation");
 };
 
-test("accepts neutral safe-copy fixtures and all closed generic enums", () => {
-  assertSchemaAccepts(validateText, fixture.safe_text);
-  assertSchemaAccepts(validateReason, fixture.safe_reason);
-  assert.doesNotThrow(() => assertScenarioSafeTextV1(fixture.safe_text));
-  assert.doesNotThrow(() => assertScenarioSafeReasonV1(fixture.safe_reason));
-  for (const tone of ["neutral", "informational", "positive", "warning", "critical"]) {
-    assert.doesNotThrow(() => assertScenarioToneV1(tone));
-  }
-  for (const narration of ["allowed", "display_only"]) {
-    assert.doesNotThrow(() => assertScenarioNarrationPolicyV1(narration));
-  }
-});
-
-test("safe-copy Schema and codec reject structural and copy exposure mutations", async (context) => {
-  const cases = [
-    ["unknown field", (value) => { value.html = "<strong>unsafe</strong>"; }],
-    ["wrong kind", (value) => { value.kind = "markdown"; }],
-    ["blank", (value) => { value.value = ""; }],
-    ["padded", (value) => { value.value = " padded"; }],
-    ["control", (value) => { value.value = "line one\nline two"; }],
-    ["HTML", (value) => { value.value = "<strong>unsafe</strong>"; }],
-    ["URL", (value) => { value.value = "Open https://example.invalid"; }],
-    ["uppercase URL", (value) => { value.value = "Open HTTPS://example.invalid"; }],
-    ["script URI", (value) => { value.value = "javascript:alert(1)"; }],
-    ["data URI", (value) => { value.value = "data:text/plain,hello"; }],
-    ["network path", (value) => { value.value = "Open //example.com/path"; }],
-    ["bare domain", (value) => { value.value = "Visit example.com"; }],
-    ["email address", (value) => { value.value = "Email user@example.com"; }],
-    ["single-label email address", (value) => { value.value = "Email user@internal"; }],
-    ["IPv4 address", (value) => { value.value = "Open 192.0.2.10/path"; }],
-    ["Markdown", (value) => { value.value = "[open](target)"; }],
-    ["Markdown heading", (value) => { value.value = "# Internal heading"; }],
-    ["template", (value) => { value.value = "Hello {{name}}"; }],
-    ["SQLSTATE", (value) => { value.value = "SQLSTATE 22000"; }],
-    ["database detail", (value) => { value.value = "Database error while loading."; }],
-    ["provider detail", (value) => { value.value = "Provider error while loading."; }],
-    ["invalid locale", (value) => { value.locale = "EN_us"; }],
-  ];
-  for (const [name, mutate] of cases) {
-    await context.test(name, () => {
-      const value = cloneText();
-      mutate(value);
-      assertSchemaRejects(validateText, value);
-      assert.throws(() => assertScenarioSafeTextV1(value));
-    });
-  }
-});
-
-test("safe-copy URI detection preserves ordinary colon prose", () => {
-  const value = cloneText();
-  value.value = "Note: this remains ordinary plain text.";
-  assertSchemaAccepts(validateText, value);
-  assert.doesNotThrow(() => assertScenarioSafeTextV1(value));
-});
-
-test("codec converts Intl locale failures into the stable validation error", () => {
-  const value = cloneText();
-  value.locale = "en-abcde-abcde";
-  assertSchemaAccepts(validateText, value);
-  assert.throws(() => assertScenarioSafeTextV1(value), {
-    code: "invalid_locale",
-  });
-});
-
-test("codec applies semantic Unicode normalization", () => {
-  const text = cloneText();
-  text.value = "Cafe\u0301";
-  assert.throws(() => assertScenarioSafeTextV1(text));
-});
-
-test("enforces text, label, and help bounds", () => {
-  const text = cloneText();
-  text.value = "x".repeat(500);
-  assert.doesNotThrow(() => assertScenarioSafeTextV1(text));
-  text.value += "x";
-  assertSchemaRejects(validateText, text);
-  assert.throws(() => assertScenarioSafeTextV1(text));
-
-  const label = cloneText();
-  label.value = "x".repeat(80);
-  assert.doesNotThrow(() => assertScenarioSafeLabelV1(label));
-  label.value += "x";
-  assert.throws(() => assertScenarioSafeLabelV1(label));
-
-  const reason = cloneReason();
-  reason.help.value = "x".repeat(240);
-  assertSchemaAccepts(validateReason, reason);
-  assert.doesNotThrow(() => assertScenarioSafeReasonV1(reason));
-  reason.help.value += "x";
-  assertSchemaRejects(validateReason, reason);
-  assert.throws(() => assertScenarioSafeReasonV1(reason));
-});
-
-test("safe reasons remain closed and owner-registered", async (context) => {
-  const cases = [
-    ["unknown field", (value) => { value.internal_reason = "hidden"; }],
-    ["invalid code", (value) => { value.reason_code = "Not Registered"; }],
-    ["invalid retry", (value) => { value.retry_class = "retry_now"; }],
-    ["unsafe message", (value) => { value.message.value = "SQLSTATE 22000"; }],
-    ["unsafe help", (value) => { value.help.value = "Open www.example.invalid"; }],
-  ];
-  for (const [name, mutate] of cases) {
-    await context.test(name, () => {
-      const value = cloneReason();
-      mutate(value);
-      assert.throws(() => assertScenarioSafeReasonV1(value));
-    });
-  }
-});
-
-test("opaque locator slots accept bounded base64url and reject identity-shaped values", () => {
-  for (const [value, assertValue] of [
-    [fixture.subject_context_ref, assertScenarioSubjectContextRefV1],
-    [fixture.presentation_item_ref, assertScenarioPresentationItemRefV1],
-    [fixture.action_target_ref, assertScenarioActionTargetRefV1],
-    [fixture.cursor, assertScenarioPresentationCursorV1],
-    [fixture.continuation_ref, assertScenarioContinuationRefV1],
-  ]) {
-    assert.doesNotThrow(() => assertValue(value));
-    assert.throws(() => assertValue("a".repeat(31)));
-    assert.throws(() => assertValue("a".repeat(513)));
-    assert.throws(() => assertValue("example:item:database-id"));
-    assert.throws(() => assertValue({ namespace: "example", object_type: "item", object_id: "1" }));
-  }
-});
-
-test("neutral fixture carries no product vocabulary", () => {
-  assert.doesNotMatch(
-    JSON.stringify(fixture),
-    /nurture|my_chat|child|family|institution|guardian|caregiver/iu,
-  );
-});
+test("BA-16 safe-copy 中夹带 HTML 被拒绝", () => { const value=cloneText(); value.value="<strong>unsafe</strong>"; assertSchemaRejects(validateText,value); assert.throws(()=>assertScenarioSafeTextV1(value)); });

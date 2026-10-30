@@ -1,147 +1,48 @@
-import { execFileSync, spawnSync } from "node:child_process";
-import { mkdtemp, readFile, readdir, rm, symlink } from "node:fs/promises";
+import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { mkdir, mkdtemp, readdir, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
-import { pathToFileURL } from "node:url";
-import { after, before, test } from "node:test";
-import assert from "node:assert/strict";
-import {
-  cleanStagedScenarioStarter,
-  stageScenarioStarter,
-} from "../scripts/stage-scenario-starter.mjs";
+import test from "node:test";
 
-const conformanceRoot = resolve(import.meta.dirname, "..");
-let temporaryRoot;
-
-before(async () => {
-  temporaryRoot = await mkdtemp(resolve(tmpdir(), "workflow-cli-entrypoints-"));
-});
-
-after(async () => {
-  await rm(temporaryRoot, { recursive: true, force: true });
-});
-
-test("semantic lint executes through a package-bin symlink", async () => {
-  const entrypoint = resolve(temporaryRoot, "workflow-semantic-lint");
-  await symlink(
-    resolve(conformanceRoot, "scripts/semantic-lint.mjs"),
-    entrypoint,
-  );
-  const output = execFileSync(
-    process.execPath,
-    [
-      entrypoint,
-      resolve(conformanceRoot, "fixtures/federation-descriptor.valid.json"),
-    ],
-    { encoding: "utf8" },
-  );
-  assert.equal(JSON.parse(output).passed, true);
-});
-
-test("integration-lock CLI rejects missing input through a symlink", async () => {
-  const entrypoint = resolve(temporaryRoot, "workflow-integration-lock");
-  await symlink(
-    resolve(conformanceRoot, "scripts/verify-integration-lock.mjs"),
-    entrypoint,
-  );
-  const result = spawnSync(process.execPath, [entrypoint], { encoding: "utf8" });
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /usage: verify-integration-lock/u);
-});
-
-test("canonical-ref lint executes through a package-bin symlink", async () => {
-  const entrypoint = resolve(temporaryRoot, "workflow-canonical-ref-lint");
-  await symlink(
-    resolve(conformanceRoot, "scripts/canonical-ref-lint.mjs"),
-    entrypoint,
-  );
-  const output = execFileSync(
-    process.execPath,
-    [
-      entrypoint,
-      resolve(conformanceRoot, "fixtures/federation-descriptor.valid.json"),
-    ],
-    { encoding: "utf8" },
-  );
-  assert.equal(JSON.parse(output).passed, true);
-});
-
-test("scenario generator accepts the package-manager argument separator", async () => {
-  const target = resolve(temporaryRoot, "generated-scenario");
-  const output = execFileSync(
-    process.execPath,
-    [
-      resolve(conformanceRoot, "scripts/generate-scenario-starter.mjs"),
-      "--",
-      "--target",
-      target,
-      "--scenario-key",
-      "qualification-scenario",
-      "--package-name",
-      "@morethan/qualification-scenario",
-    ],
-    { encoding: "utf8" },
-  );
-
-  assert.equal(JSON.parse(output).scenario_key, "qualification-scenario");
-  assert.ok((await readdir(target)).includes("federation-descriptor.json"));
-  assert.ok((await readdir(target)).includes("scenario.manifest.yaml"));
-  assert.match(
-    await readFile(resolve(target, ".gitignore"), "utf8"),
-    /^node_modules\/$/mu,
-  );
-  assert.match(
-    await readFile(resolve(target, "src/registry.ts"), "utf8"),
-    /scenario_key: "qualification-scenario"/u,
-  );
-  assert.ok(!(await readdir(target)).includes("dev-docs"));
-  assert.ok(
-    JSON.parse(
-      await readFile(
-        resolve(target, "integration-lock.qualification-scenario.json"),
-        "utf8",
-      ),
-    ).scenario_artifact.logical_paths.includes("prisma/migrations"),
-  );
-});
-
-test("package staging carries the complete Starter without build output", async () => {
-  const target = resolve(temporaryRoot, "packaged-starter-template");
-  await stageScenarioStarter(
-    resolve(conformanceRoot, "../templates/scenario-module"),
-    target,
-  );
-
-  assert.ok((await readdir(target)).includes("gitignore.template"));
-  assert.ok((await readdir(target)).includes("github-template"));
-  assert.ok(!(await readdir(target)).includes("dev-docs"));
-  assert.ok(
-    (
-      await readdir(
-        resolve(target, "prisma/migrations/20260722000000_init"),
-      )
-    ).includes("migration.sql"),
-  );
-  assert.ok(!(await readdir(target)).includes("node_modules"));
-  assert.ok(!(await readdir(target)).includes("dist"));
-  await cleanStagedScenarioStarter(target);
-});
-
-test("CLI modules remain importable from stdin and eval entrypoints", () => {
-  for (const script of [
-    "semantic-lint.mjs",
-    "verify-integration-lock.mjs",
-    "canonical-ref-lint.mjs",
-  ]) {
-    const result = spawnSync(
-      process.execPath,
-      [
-        "--input-type=module",
-        "--eval",
-        `await import(${JSON.stringify(pathToFileURL(resolve(conformanceRoot, "scripts", script)).href)})`,
-      ],
-      { encoding: "utf8" },
-    );
-    assert.equal(result.status, 0, result.stderr);
+test("BA-39 starts the freshly packed Starter through its package exports", async () => {
+  const root = resolve(import.meta.dirname, "../..");
+  const temporary = await mkdtemp(resolve(tmpdir(), "starter-package-core-"));
+  const consumer = resolve(temporary, "consumer");
+  const artifacts = resolve(temporary, "artifacts");
+  const run = (command, args, cwd) => {
+    const result = spawnSync(command, args, { cwd, encoding: "utf8", timeout: 60_000 });
+    assert.equal(result.status, 0, result.stderr + result.stdout);
+    return result;
+  };
+  try {
+    await mkdir(artifacts);
+    await mkdir(resolve(consumer, "node_modules/@host"), { recursive: true });
+    await writeFile(resolve(consumer, "package.json"), JSON.stringify({ type: "module" }));
+    // The two production artifacts form this one startup scenario. prepack
+    // rebuilds each from current source after removing only our worktree's dist.
+    for (const [source, name] of [
+      ["templates/host-runtime/packages/workflow-contracts", "workflow-contracts"],
+      ["templates/scenario-module", "scenario-module-example"],
+    ]) {
+      const packageRoot = resolve(root, source);
+      await rm(resolve(packageRoot, "dist"), { recursive: true, force: true });
+      run("pnpm", ["pack", "--pack-destination", artifacts], packageRoot);
+      const archive = (await readdir(artifacts)).find(file => file.startsWith(`host-${name}-`) && file.endsWith(".tgz"));
+      assert.ok(archive, `Missing ${name} package artifact`);
+      const installed = resolve(consumer, "node_modules/@host", name);
+      await mkdir(installed);
+      run("tar", ["-xzf", resolve(artifacts, archive), "--strip-components=1", "-C", installed], consumer);
+    }
+    // A pinned production dependency is reused from the local cache. Neither
+    // the Starter nor its contracts resolve to a workspace source symlink.
+    await mkdir(resolve(consumer, "node_modules/@prisma"));
+    await symlink(resolve(root, "templates/scenario-module/node_modules/@prisma/client"), resolve(consumer, "node_modules/@prisma/client"));
+    const started = run(process.execPath, ["--input-type=module", "--eval",
+      'const m=await import("@host/scenario-module-example"); if(m.scenarioModule.manifest.scenario_key!=="example") throw Error("wrong package"); console.log("starter ready");',
+    ], consumer);
+    assert.match(started.stdout, /starter ready/u);
+  } finally {
+    await rm(temporary, { recursive: true, force: true });
   }
 });

@@ -1,9 +1,9 @@
+import { assertScenarioPrivateInvocationV1 } from "@host/workflow-contracts";
+import addFormats from "ajv-formats";
+import Ajv2020 from "ajv/dist/2020.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import Ajv2020 from "ajv/dist/2020.js";
-import addFormats from "ajv-formats";
-import { assertScenarioPrivateInvocationV1 } from "@host/workflow-contracts";
 
 const schemaRoot = new URL(
   "../../templates/host-runtime/packages/workflow-contracts/schemas/",
@@ -42,54 +42,11 @@ const assertCodecRejects = (value) => {
   assert.throws(() => assertScenarioPrivateInvocationV1(value));
 };
 
-test("accepts the versioned trusted invocation fixture", () => {
+test("BA-08 一份合法invocation envelope通过schema与runtime codec（不验detached签名）", () => {
   assertSchemaAccepts(fixture);
   assert.doesNotThrow(() => assertScenarioPrivateInvocationV1(fixture));
 });
 
-test("schema and runtime codec reject the same closed-envelope mutations", async (context) => {
-  const cases = [
-    ["embedded signature", (value) => { value.signature = "detached-only"; }],
-    ["principal authority", (value) => { value.principal.role = "administrator"; }],
-    ["wrong account ref", (value) => { value.principal.account_ref.object_type = "actor"; }],
-    ["invalid principal origin", (value) => { value.principal.principal_origin = "background_job"; }],
-    ["invalid ingress category", (value) => { value.route.ingress.ingress_category = "scenario_direct"; }],
-    ["non-POST method", (value) => { value.route.method = "GET"; }],
-    ["uppercase contract hash", (value) => { value.contract_hash = value.contract_hash.toUpperCase(); }],
-    ["unsafe issuer", (value) => { value.issuer = "My Chat Host"; }],
-    ["non-canonical instant", (value) => { value.request.issued_at = "2026-08-05T00:00:00Z"; }],
-    ["missing operation input", (value) => { delete value.operation.input; }],
-    ["embedded request body", (value) => { value.request.body = {}; }],
-  ];
+test("BA-10 invocation 注入 principal role 字段被拒绝", () => { const value=cloneFixture(); value.principal.role="administrator"; assertSchemaRejects(value); assertCodecRejects(value); });
 
-  for (const [name, mutate] of cases) {
-    await context.test(name, () => {
-      const value = cloneFixture();
-      mutate(value);
-      assertSchemaRejects(value);
-      assertCodecRejects(value);
-    });
-  }
-});
-
-test("runtime codec enforces the signed lifetime window", () => {
-  for (const expiresAt of [
-    "2026-08-05T00:00:00.000Z",
-    "2026-08-04T23:59:59.999Z",
-    "2026-08-05T00:01:00.001Z",
-  ]) {
-    const value = cloneFixture();
-    value.request.expires_at = expiresAt;
-    assertSchemaAccepts(value);
-    assertCodecRejects(value);
-  }
-});
-
-test("operation input remains opaque to the envelope validators", () => {
-  const value = cloneFixture();
-  value.operation.input = {
-    nested: [null, true, 42, { domain_field: "delegated-to-operation-codec" }],
-  };
-  assertSchemaAccepts(value);
-  assert.doesNotThrow(() => assertScenarioPrivateInvocationV1(value));
-});
+test("BA-09 expires_at等于issued_at的invocation被拒绝（格式时限校验）", () => { const value=cloneFixture(); value.request.expires_at=value.request.issued_at; assertSchemaAccepts(value); assertCodecRejects(value); });

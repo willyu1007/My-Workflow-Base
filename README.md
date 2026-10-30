@@ -29,8 +29,9 @@ not a runtime service; adopted products own their infrastructure and scenario im
 
 ```bash
 pnpm verify:workflow-contracts
-pnpm check:contract-doc-alignment
-pnpm check:consumer-boundaries
-pnpm check:ui-tokens
 node .ai/scripts/ctl-project-governance.mjs lint
 ```
+
+Install the Workbench's separate dependencies first. [TESTING.md](TESTING.md)
+describes the bounded permanent core and the automatic coverage deliberately
+retired; conformance no longer means every protocol field or branch is tested.

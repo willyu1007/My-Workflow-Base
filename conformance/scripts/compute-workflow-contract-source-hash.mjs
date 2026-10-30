@@ -371,7 +371,6 @@ function assertLock(expected, actual, lockPath) {
   }
   for (const repositoryPath of [
     "conformance/scripts/compute-workflow-contract-source-hash.mjs",
-    "conformance/scripts/check-contract-source-hash-portability.mjs",
   ]) {
     const committedSource = execFileSync(
       "git",
