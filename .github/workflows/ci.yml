@@ -24,17 +24,26 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Setup Node and dependency cache
+      - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: "24"
-          cache: pnpm
-          cache-dependency-path: |
-            pnpm-lock.yaml
-            templates/web-workbench/pnpm-lock.yaml
+
+      # Templates declare their own pnpm versions. Keep Corepack's per-project
+      # selection rather than putting one fixed pnpm binary ahead of its shims.
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Locate dependency store
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache root and standalone workbench dependencies
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ runner.os }}-${{ runner.arch }}-pnpm-node24-${{ hashFiles('pnpm-lock.yaml', 'templates/web-workbench/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-pnpm-node24-
 
       - name: Verify repository governance
         run: node .ai/scripts/ctl-project-governance.mjs lint --strict
