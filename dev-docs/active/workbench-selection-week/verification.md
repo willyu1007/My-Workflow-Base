@@ -9,9 +9,10 @@
 | 独立代码复核 | 相对6436247全批源码，根审查＋只读子代理；补缺陷后复核 | no unresolved source findings | 焦点动态禁用/移除/空态恢复、日期action同源和full-cell槽均修正；durationMs与现有消费补丁一致 | 浏览器报告由Root验证；仍未覆盖包产物、真实消费或后端事实 |
 | KIT-PACKAGE | 正常build/pack，逐项核对19个exports/256文件、无过期JS，隔离pnpm安装tarball后tsc/SSR/CSS；发布后registry读回 | passed；g-preview=0.26.0-g.1、latest=0.25.3 | Base4cd5e8c源码，用户2026-11-03明确授权；7文件10测试/typecheck/tokens/consumer-boundaries重跑通过 | tarball SHA-256 80e2bc9b52e45e2d63bf61e806ec9a8e477644ffb527486f07d8f361569a009b；registry发布integrity为sha512-MHTpBR0ahsYx3bWqtmGsC1lDUkY0Hao+CDYfG9KoQcTVTfWYfZ/ZgxfE5PdfcAol9w4tTeM+Lu6VJDcRZmMgrA==；registry重装后dist/类型/CSS/公开文档逐文件匹配预验证包，差异仅发布规范化scripts元数据；类型/SSR/CSS再过。不是Nurture接入或部署通过 |
 | 本轮质量/清理 | 独立全批源码复核；任务改动目录全文件、全仓精确重复/依赖名信号、样式实例键扫描 | 无新增有证据缺陷，无待清理候选 | 6436247..31c8822；组件tests/source及逐项tarball清单 | 双份LICENSE属包分发；类型包/tsc依赖为约定入口，保留。未深扫其他模板业务；任务记录、ignored内容与他人文件排除；未把未使用静态信号当作删除证据 |
+| g.2窄表头修正 / KIT-PACKAGE | 实际Nurture适配器+registry包的浏览器核对；独立复核、10项Base测试/typecheck/build/pack；再次registry安装比对 | passed；g-preview=0.26.0-g.2、latest=0.25.3 | d9e70ec；用户已明确批准g.2；Nurture实际适配器临时夹具在本地使用样例数据/替身server actions，非线上验收 | 54px周末列内日期24×18、Menu24×24、表头54；默认Menu逻辑未改。g.2 tarball SHA-256 3bbb521f5e9ee85a7e99b13cd06c5f39c85a5f783d105349d2a754bfbdecbd94，registry/local同sha512-PPDEMSHA9dtAghlPY2Di533L6qg/ipQMPIsytJSTZzAivXrUr9oSP6dRaHbcWMn2BuBI1wB3w69sw1w4PVoz7A==；19exports/全部dist/types/CSS/文档一致 |
 
 ## Outstanding verification
-- **KIT-PACKAGE** — g.1已通过；g.2补充紧凑Menu和窄列日期修正后，须重新核对发布产物/registry安装/exports/CSS及标签。条件：本轮用户已明确批准g.2远端发布，即在Phase2执行；Owner本任务。真实消费者G-COMP仍属于The-Nurture T-122。
+无。KIT-PACKAGE仅持包供给；真实消费者G-COMP属于The-Nurture T-122。
 
 ## Deployment changes
-候选包0.26.0-g.1已发布GitHub Packages的g-preview并读回确认，latest保持0.25.3。无产品部署、schema/环境或D-019变化。发布版本不可覆盖；回退由消费者重新钉原版本及原补丁，候选标签不转为latest。
+候选包g.1及修正版g.2已发布GitHub Packages，当前g-preview=0.26.0-g.2并读回确认，latest保持0.25.3。无产品部署、schema/环境或D-019变化。发布版本不可覆盖；回退由消费者重新钉原版本及原补丁，候选标签不转为latest。
