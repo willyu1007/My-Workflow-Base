@@ -50,7 +50,8 @@
 .wb-week__table th, .wb-week__table td { padding: 0; border-right: 1px solid var(--border-1); border-bottom: 1px solid var(--border-1); }
 .wb-week__table tr > :last-child { border-right: 0; }
 .wb-week__table thead th { height: 54px; text-align: center; font-weight: 400; color: var(--fg-2); background: var(--bg-canvas); }
-.wb-week__day { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 53px; }
+.wb-week__day { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 53px; }
+.wb-week__date { white-space: nowrap; flex: none; }
 .wb-week__date > span, .wb-week__date > time { display: block; }
 .wb-week__table thead time { color: var(--fg-3); font-size: var(--caption-size); margin-top: var(--sp-1); }
 .wb-week__table tbody th { padding: 11px 10px; text-align: left; font-weight: var(--h4-weight); background: var(--bg-sunken); overflow-wrap: anywhere; }

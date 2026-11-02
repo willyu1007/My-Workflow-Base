@@ -71,7 +71,8 @@ chrome remains unclipped; only the rows scroll. Row content is non-interactive.
 and explicit navigation callbacks. Its title and date headers use those same
 dates without reading the current clock. Each row's ordered cells must cover all
 seven days; `span` is explicit, and `narrow` controls width only. A day's `action`
-is an additional control beside the generated date, such as an existing `Menu`.
+is an additional control beside the generated date, such as an existing `Menu`. Use `Menu compact` for icon triggers in narrow day
+headers; it keeps a 24px target without changing the popup or default Menu size.
 
 Cell `content` retains its own input/editor semantics. For an editor that owns
 the whole cell, pass `fill: true` with one root element: the shared stylesheet

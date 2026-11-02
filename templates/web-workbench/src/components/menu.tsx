@@ -10,11 +10,14 @@ export function Menu({
   trigger,
   label,
   align = "end",
+  compact = false,
   children,
 }: {
   readonly trigger: ReactNode;
   readonly label: string;
   readonly align?: "start" | "end";
+  /** A 24px trigger for constrained headers; the popup and interaction stay unchanged. */
+  readonly compact?: boolean;
   readonly children: ReactNode;
 }): React.ReactElement {
   const [open, setOpen] = useState(false);
@@ -44,7 +47,7 @@ export function Menu({
     <div className="wb-menu2" ref={ref}>
       <button
         type="button"
-        className={`wb-menu2__btn${open ? " wb-menu2__btn--on" : ""}`}
+        className={`wb-menu2__btn${compact ? " wb-menu2__btn--compact" : ""}${open ? " wb-menu2__btn--on" : ""}`}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={label}

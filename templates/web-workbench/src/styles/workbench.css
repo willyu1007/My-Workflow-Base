@@ -356,6 +356,7 @@
 }
 .wb-menu2__btn:hover { background: var(--mt-sand); color: var(--fg-1); }
 .wb-menu2__btn--on { background: var(--mt-sand); color: var(--fg-1); }
+.wb-menu2__btn--compact { height: 24px; min-width: 24px; padding: 0 4px; }
 .wb-menu2__pop { position: absolute; top: calc(100% + 6px); z-index: 60; }
 .wb-menu2__pop--end { right: 0; }
 .wb-menu2__pop--start { left: 0; }

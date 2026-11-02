@@ -11,7 +11,7 @@
 | 本轮质量/清理 | 独立全批源码复核；任务改动目录全文件、全仓精确重复/依赖名信号、样式实例键扫描 | 无新增有证据缺陷，无待清理候选 | 6436247..31c8822；组件tests/source及逐项tarball清单 | 双份LICENSE属包分发；类型包/tsc依赖为约定入口，保留。未深扫其他模板业务；任务记录、ignored内容与他人文件排除；未把未使用静态信号当作删除证据 |
 
 ## Outstanding verification
-无。KIT-PACKAGE仅持包供给；真实消费者G-COMP属于The-Nurture T-122。
+- **KIT-PACKAGE** — g.1已通过；g.2补充紧凑Menu和窄列日期修正后，须重新核对发布产物/registry安装/exports/CSS及标签。条件：本轮用户已明确批准g.2远端发布，即在Phase2执行；Owner本任务。真实消费者G-COMP仍属于The-Nurture T-122。
 
 ## Deployment changes
 候选包0.26.0-g.1已发布GitHub Packages的g-preview并读回确认，latest保持0.25.3。无产品部署、schema/环境或D-019变化。发布版本不可覆盖；回退由消费者重新钉原版本及原补丁，候选标签不转为latest。
