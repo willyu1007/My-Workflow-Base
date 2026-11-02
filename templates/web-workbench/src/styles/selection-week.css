@@ -1,0 +1,75 @@
+/* Embedded selection panes: the menu-bearing bar is deliberately not clipped. */
+.wb-selection {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border-radius: var(--r-lg);
+  background: var(--bg-surface);
+}
+.wb-selection--framed { border: 1px solid var(--border-2); }
+.wb-selection__bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+  min-height: 46px;
+  padding: 0 var(--sp-4);
+  border-bottom: 1px solid var(--border-1);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  background: var(--bg-canvas);
+}
+.wb-selection__bar > :first-child { min-width: 0; flex: 1; }
+.wb-selection__bar--expanded > :last-child { flex: 1; min-width: 0; }
+.wb-selection__divider { align-self: center; width: 1px; height: 20px; background: var(--border-2); }
+.wb-selection__rows { min-height: 0; overflow: auto; padding: var(--sp-1) 0; border-radius: 0 0 var(--r-lg) var(--r-lg); }
+.wb-selection__option { cursor: pointer; }
+.wb-selection__option:hover { background: var(--bg-hover); }
+.wb-selection__option[aria-selected="true"] { background: var(--mt-sand-2); }
+.wb-selection__option[aria-disabled="true"] { cursor: not-allowed; opacity: .5; }
+.wb-selection__option:focus-visible { outline: 2px solid var(--mt-navy-300); outline-offset: -2px; }
+.wb-selection__option > .wb-list__row { min-height: 38.5px; padding: var(--sp-2) var(--sp-4); border: 0; gap: 10px; line-height: 1.5; }
+.wb-selection__option .wb-list__title { font-size: var(--body-size); font-weight: var(--h2-weight); }
+.wb-selection__option .wb-list__aside { min-width: 0; max-width: 50%; }
+.wb-selection__summary { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--caption-size); color: var(--fg-3); }
+.wb-selection__empty { padding: var(--sp-4); color: var(--fg-3); font-size: var(--small-size); }
+
+/* A shared table frame; narrow columns carry no closure or read-only meaning. */
+.wb-week { min-width: 0; --wb-week-row-height: 61px; --wb-week-content-padding: 9px 10px; }
+.wb-week__toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.wb-week__navigation, .wb-week__actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.wb-week__actions { margin-left: auto; }
+.wb-week__toolbar .wb-action, .wb-week__toolbar .wb-iconbtn { min-height: 34px; height: 34px; font-size: var(--caption-size); }
+.wb-week__previous > svg { transform: rotate(180deg); }
+.wb-week__range { white-space: nowrap; font-size: var(--caption-size); font-weight: var(--h2-weight); }
+.wb-week__scroll { overflow: auto; border: 1px solid var(--border-2); border-radius: var(--r-md); }
+.wb-week__table { width: 100%; min-width: 600px; table-layout: fixed; border-collapse: separate; border-spacing: 0; font-size: var(--caption-size); line-height: 1.5; }
+.wb-week__caption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.wb-week__heading-column { width: 116px; }
+.wb-week__narrow-column { width: 54px; }
+.wb-week__table th, .wb-week__table td { padding: 0; border-right: 1px solid var(--border-1); border-bottom: 1px solid var(--border-1); }
+.wb-week__table tr > :last-child { border-right: 0; }
+.wb-week__table thead th { height: 54px; text-align: center; font-weight: 400; color: var(--fg-2); background: var(--bg-canvas); }
+.wb-week__day { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 53px; }
+.wb-week__date > span, .wb-week__date > time { display: block; }
+.wb-week__table thead time { color: var(--fg-3); font-size: var(--caption-size); margin-top: var(--sp-1); }
+.wb-week__table tbody th { padding: 11px 10px; text-align: left; font-weight: var(--h4-weight); background: var(--bg-sunken); overflow-wrap: anywhere; }
+.wb-week__table tbody td { height: var(--wb-week-row-height); vertical-align: middle; background: var(--bg-surface); }
+.wb-week__row--accent > th { border-left: 2px solid var(--mt-stone); }
+.wb-week__content { padding: var(--wb-week-content-padding); min-width: 0; overflow-wrap: anywhere; }
+/* A definite minimum lets a 100% editor follow a taller neighboring table cell. */
+.wb-week__table .wb-week__cell--fill { height: 1px; }
+.wb-week__cell--fill > .wb-week__content { height: 100%; padding: 0; }
+.wb-week__cell--fill > .wb-week__content > * { box-sizing: border-box; width: 100%; height: 100%; min-height: calc(var(--wb-week-row-height) - 1px); padding: var(--wb-week-content-padding); font: inherit; }
+.wb-week__table .wb-week__cell--subtle { background: var(--bg-canvas); color: var(--fg-3); }
+.wb-week__table .wb-week__cell--changed { background: var(--mt-warning-bg); }
+.wb-week__cell--selected { box-shadow: inset 0 0 0 1px var(--mt-navy-300); }
+.wb-week__table tfoot td { height: 42px; padding: var(--sp-2) var(--sp-3); text-align: center; background: var(--bg-surface); border-bottom: 0; }
+.wb-week__table:not(:has(tfoot)) tbody tr:last-child > * { border-bottom: 0; }
+.wb-week--compact .wb-week__heading-column { width: 105px; }
+.wb-week--compact .wb-week__narrow-column { width: 49px; }
+.wb-week--compact { --wb-week-row-height: 50px; --wb-week-content-padding: var(--sp-2); }
+.wb-week--compact .wb-week__scroll { max-height: 288px; }
+.wb-week--compact .wb-week__table tbody th { padding: var(--sp-2); line-height: 16px; }
+.wb-week--compact .wb-week__table thead th { position: sticky; top: 0; z-index: 2; }
+.wb-week--compact .wb-week__table tfoot td { position: sticky; bottom: 0; z-index: 2; height: 32px; padding: var(--sp-1) var(--sp-3); }

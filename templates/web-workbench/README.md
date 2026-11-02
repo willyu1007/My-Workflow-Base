@@ -49,15 +49,39 @@ still not published — consumers do not change token values, they consume them.
 | --- | --- |
 | **Contracts** (`src/contracts`) | `CardModel` · `RowModel` · `TableModel` · `InsightModel` · `WorkflowModule`/`AttentionItem` (Hub) |
 | **Scene shell** | `Scene` + `SceneSkeleton` (loading placeholder) + app shell/navigation chrome |
-| **Primitives** | `StatStrip`/`Stat` · `Section` · `EmptyState` · `Meter` · `icons` · `tabs` · `StatusBadge` |
+| **Primitives** | `StatStrip`/`Stat` · `Section` · `EmptyState` · `Meter` · `icons` · `tabs` · `StatusBadge` · `WeekTable` |
 | **Hub paradigm** | `<Hub modules={…}/>` — aggregation台 renderer; structure is component-locked (to-dos = rows, per-workflow stats, topbar filter) |
-| **List paradigm** | `EntityCard` · `EntityRow` · `EntityTable` + cell kit (`CellIdentity`/`CellMetric`/`CellProgress`/`CellStatus`) · `ListView` (shared container: topbar filter + stats + empty + load-more) |
+| **List paradigm** | `EntityCard` · `EntityRow` · `EntityTable` + cell kit (`CellIdentity`/`CellMetric`/`CellProgress`/`CellStatus`) · `ListView` (whole Scene container) · `SelectionList` (embedded controlled choice pane) |
 | **Insight paradigm** | `InsightCard` (narrative → breakdown → overview, one hairline + whitespace) |
 | **Queue paradigm** | `Queue` (rows + trailing action → right `Drawer`; shape is component-locked) |
 | **Record paradigm** | `Record` (intro + tabs + top-right action + `Drawer`; shape is component-locked) |
 | **Form paradigm** | `FormFrame` (single guided column, required + declarative constraints, validate → submit) · shared `Field` schema |
 | **Pre-shell entry** | `<EntryFrame>` — paper gate outside AppShell; brand + empty accessory slot + heading / actions / choices. Not a seventh Scene paradigm. |
-| **Styles** | `tokens.css` · `components.css` · `workbench.css` · `entry.css` |
+| **Styles** | `tokens.css` · `components.css` · `workbench.css` · `entry.css` · `selection-week.css` |
+
+### Embedded selection and weekly tables
+
+`SelectionList` comes from `/list`. The consumer owns `items`, `selectedId` and
+`onSelect`; moving keyboard focus never selects. The optional toolbar separates
+`filter` from `accessory`; `expanded` gives that accessory the whole bar without
+owning a search value. Use `appearance="plain"` inside another popup. Menu-bearing
+chrome remains unclipped; only the rows scroll. Row content is non-interactive.
+
+`WeekTable` comes from `/primitives`. Pass seven consecutive `YYYY-MM-DD` dates
+and explicit navigation callbacks. Its title and date headers use those same
+dates without reading the current clock. Each row's ordered cells must cover all
+seven days; `span` is explicit, and `narrow` controls width only. A day's `action`
+is an additional control beside the generated date, such as an existing `Menu`.
+
+Cell `content` retains its own input/editor semantics. For an editor that owns
+the whole cell, pass `fill: true` with one root element: the shared stylesheet
+fills the cell and supplies density-specific padding. Other content is padded
+by the wrapper. `density="compact"` supplies the bounded scroll and sticky header
+and footer; `regular` lets multiline content grow. Neither component knows any
+domain permission, category, save command or scheduling rule.
+
+`ToastProvider` also accepts optional `durationMs`, preserving the existing
+consumer extension without requiring a patch of the next package release.
 
 ## Install
 

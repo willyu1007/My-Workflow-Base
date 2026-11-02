@@ -14,13 +14,19 @@ The permanent component core contains these independent interactions:
 - BA-34: Escape dismisses a nested Dialog without closing its parent Drawer.
 - BA-35: the second Queue row opens that row's details.
 - BA-36: arrow keys and Enter select the intended Select option.
+- BA-41: a selection pane skips disabled options, keeps focus separate from the
+  controlled value, and activates a choice with Enter/Space.
+- BA-42: one seven-day cross-year table retains merged cells, native editing and
+  disabled navigation.
+- BA-43: disabling or removing the focused choice restores focus within the pane
+  without submitting a value.
 
 These tests use jsdom and import current `src/`, so no previous build is tested.
 Native dialog methods are stubbed because jsdom does not implement their focus
 lifecycle. They do not establish real-browser layout, top-layer behavior or
 physical-device accessibility. Consumer checks are still needed when those change.
 
-Toast, list/filter/count, small layout/copy, exhaustive constraints, error timing
+Toast, list/filter/count outside the selection pane, small layout/copy, exhaustive constraints, error timing
 and additional overlay variants are no longer permanent regression coverage.
 Their old matrices and helpers were removed, rather than moved to another runner.
 The historical mutation campaign and old counts describe retired suites and are

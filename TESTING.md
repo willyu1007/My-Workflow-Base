@@ -22,6 +22,7 @@ The permanent behavioral core is intentionally bounded:
 | BA-28–29 | Starter handoff and idempotent Owner API | `templates/scenario-module/tests/` |
 | BA-30–36 | Required form, failed save, focus, row selection and keyboard interaction | `templates/web-workbench/tests/` |
 | BA-37–40 | Immutable distribution identity, fresh Starter startup and a scenario fork rejection | `conformance/tests/` and `conformance/scripts/check-consumer-boundaries.test.mjs` |
+| BA-41–43 | Controlled selection-pane keyboard/focus recovery and a cross-year seven-day editable table | `templates/web-workbench/tests/` |
 
 Each test uses one selected input or a bounded continuous interaction. Adding a
 loop, fixture replay or parameter matrix changes the actual execution population

@@ -43,7 +43,11 @@ export function useToast(): ToastApi {
   return ctx;
 }
 
-export function ToastProvider({ children }: { readonly children: ReactNode }): React.ReactElement {
+export function ToastProvider({ children, durationMs }: {
+  readonly children: ReactNode;
+  /** Consumer-specific notification duration; busy work still ends with its operation. */
+  readonly durationMs?: number;
+}): React.ReactElement {
   const [toasts, setToasts] = useState<readonly Toast[]>([]);
   const idRef = useRef(0);
 
@@ -56,11 +60,11 @@ export function ToastProvider({ children }: { readonly children: ReactNode }): R
       const id = ++idRef.current;
       setToasts((prev) => [...prev, { id, tone, title, ...(msg ? { msg } : {}) }]);
       if (autoClose) {
-        setTimeout(() => dismiss(id), tone === "error" ? 6000 : 3800);
+        setTimeout(() => dismiss(id), durationMs ?? (tone === "error" ? 6000 : 3800));
       }
       return id;
     },
-    [dismiss],
+    [dismiss, durationMs],
   );
 
   const notify = useCallback(

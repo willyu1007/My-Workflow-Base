@@ -12,3 +12,4 @@ export * from "./components/badge.js";
 export * from "./components/breadcrumb.js";
 export * from "./components/overlay.js";
 export * from "./components/floating-panel.js";
+export * from "./components/week-table.js";
