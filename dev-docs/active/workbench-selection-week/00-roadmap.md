@@ -3,7 +3,7 @@
 ## Scope and constraints
 - 为已授权的The-Nurture T-122 G包提供最小共用呈现；源位于templates/web-workbench，不新建组件库。
 - 用户已确认当前G mock及实施顺序；本记录只管Base供给，不复制G的周保存/媒体/午睡/权限规划。
-- 不改当前发布/D-019，不执行未单独授权的build/远端publish或部署；验证优先noEmit类型、组件交互和tokens。
+- 不改当前发布/D-019，本轮获明确授权构建并仅将0.26.0-g.1发布到g-preview；不部署业务服务，不改latest或D-019。
 - Feature建议归既有F-002 UI基座；暂留F-000，行政映射不改变实施范围。
 
 ## Decision alignment
@@ -12,7 +12,7 @@
 |---|---|---|---|---|
 | 共享责任 | SelectionList持列表呈现，WeekTable持周导航/原生table；领域规则由消费者负责 | decided | 用户 | G已定稿，用户明确按建议开始实施 |
 | 供给路径 | 现有web-workbench包/分组导出；禁止生产直接导入Base源码 | decided | 用户及现有分发契约 | G定稿与Base AGENTS |
-| 包发布 | 准备源码/验证，构建和远端publish单独处理 | decided | 用户当前边界 | 不动当前发布和D-019，未明确授权build/publish |
+| 包发布 | 完成质量复核后构建，并将0.26.0-g.1发布到g-preview | decided | 用户 | 本轮明确授权；latest仍为0.25.3，不动当前产品发布/D-019 |
 
 ## Task relationships
 
@@ -36,19 +36,19 @@
 
 ### Phase 2 — 包采用交付
 - Outcome: 构建产物/版本及公开导出/CSS可验证，正常包供给交付G采用。
-- Approach: 需要时申请具体build/publish授权；不使用直接源码导入规避。
+- Approach: 按本轮明确授权验证tarball后发布g-preview，并读回版本/完整性；不使用直接源码导入规避。
 - Planned changes:
   1. 正常包产物、导出/CSS和公开API验证；G持实际consumer采用及去除旧覆盖。
   2. 保留现有durationMs消费能力。
 - Affected boundaries / entry points: 既有包源/分发和Nurture消费者。
-- Dependencies: Phase1已通过；候选源码为0.26.0-g.1，仍需包产物与必要build/publish授权。
+- Dependencies: Phase1已通过；候选源码为0.26.0-g.1，本轮已获构建/候选发布授权。
 - Exit criteria: KIT-PACKAGE通过。
 - Verification: KIT-PACKAGE；G-COMP为消费者独立验收，不作为本供给项前置。
 - Recovery: 消费者保持原已发布版本，避免半切换。
 
 ## Kickoff gate
 - Status: ready
-- Authorized boundary: through phase 1
+- Authorized boundary: complete task
 - [x] Decisions: 用户已批准G mock及Base共享呈现实施。
 - [x] Design: 最小接口来自G architecture，EntityRow/原生table/图标足以复用；Base当前工作树无其他写者改动。
 - [x] Route: 先共享源码/类型/交互，再正常包供给和真实消费。
@@ -58,9 +58,11 @@ Phase1 closeout：4cd5e8c完成源码/分组导出和durationMs既有补丁回�
 
 ## Risks and recovery
 - 不把班级、菜品、保存、排程或权限控制加入共用组件。
-- 构建/发布未授权时保留已验证源码，不能宣称消费者已采用。
+- 候选发布只供给包；不能宣称Nurture消费者或产品部署已通过。
 
 ## Phase closeout
 - Review: 按定稿和最小职责检查源码与受影响调用面，修正后再验证。
 - Record update: 只记录实际类型/交互/包结果，不把源码测试当consumer采用。
-- Checkpoint: 每个可回退单元验证通过后提交，不push或远端发布。
+- Checkpoint: 每个可回退单元验证通过后提交，不push；远端只发布已授权g-preview候选。
+
+Phase2 closeout：0.26.0-g.1构建、256文件/19入口tarball核对及隔离pnpm安装的类型/SSR/CSS验证通过；已发布g-preview，registry读回标签/完整性，重装后dist/类型/CSS/公开文档与预验证包逐文件一致（仅发布规范化scripts元数据），latest保持0.25.3。KIT-PACKAGE关闭；Nurture实际采用继续由G-COMP持有。

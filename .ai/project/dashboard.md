@@ -18,13 +18,13 @@ next step here.
 <!-- AUTO-GENERATED:START dashboard -->
 ## Summary
 
-- Tasks: 6 (planned: 0, in-progress: 2, blocked: 0, done: 2, archived: 2)
+- Tasks: 6 (planned: 0, in-progress: 1, blocked: 0, done: 3, archived: 2)
 
 ## Recently registered or status-changed tasks
 
 | Task | Status | Feature | Dev Docs |
 | --- | --- | --- | --- |
-| T-082 workbench-selection-week | in-progress | F-000 | dev-docs/active/workbench-selection-week |
+| T-082 workbench-selection-week | done | F-000 | dev-docs/active/workbench-selection-week |
 | T-006 web-workbench-entry-frame | done | F-003 | dev-docs/active/web-workbench-entry-frame |
 | T-003 workflow-batch-execution-control | archived | F-001 | dev-docs/archive/workflow-batch-execution-control |
 | T-001 workflow-base | in-progress | F-001 | dev-docs/active/workflow-base |

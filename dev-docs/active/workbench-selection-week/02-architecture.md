@@ -12,7 +12,7 @@ Base现有包0.25.3有EntityRow/ListView和通用图标，缺嵌入式选择容�
 - 字体、配色、图标沿既有tokens；不引入新主题、组件状态机或第三方控件库。
 
 ## Interfaces and ownership
-源码提交4cd5e8c，候选版本0.26.0-g.1，尚未构建/发布。接口细节以本源导出为最终技术定义；G最小接口草案作为输入，必要技术调整只为原生语义/类型约束，不改变产品方向。Nurture持搜索、过滤、班型、日期生成、选中对象、格子编辑和保存/恢复。
+源码提交4cd5e8c，版本0.26.0-g.1已按正常包构建并发布g-preview，latest保持0.25.3。接口细节以本源导出为最终技术定义；G最小接口草案作为输入，必要技术调整只为原生语义/类型约束，不改变产品方向。Nurture持搜索、过滤、班型、日期生成、选中对象、格子编辑和保存/恢复。
 
 ## Migration and operation
-当前不改已发布包或consumer pin，旧dist不作为本轮产物。durationMs已按现有Nurture消费补丁移入owner源码，默认时间和run生命周期不变；Nurture消费补丁在真正升级时再退出。需正常包产物后再采用，既有durationMs消费补丁不得在升级时丢失；具体版本/构建结果有证据后记录。
+已发布候选0.26.0-g.1至g-preview，未改变latest=0.25.3或任何业务部署。包dist由正常构建生成；19个exports、CSS和隔离安装类型/SSR核对通过。durationMs按Nurture消费补丁移回owner源码，默认时间和run生命周期不变；Nurture在真实升级时退出本地0.25.3补丁。包发布不可覆盖同版本；若后续供给发现缺陷须发布新候选，consumer可回退原精确0.25.3及其补丁，不移动latest。
