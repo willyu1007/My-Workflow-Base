@@ -34,16 +34,16 @@
 - Verification: KIT-SELECTION、KIT-WEEK、KIT-CHECK。
 - Recovery: 源码单元可独立回退，不发布未验证的包。
 
-### Phase 2 — 包采用交付 (provisional)
-- Outcome: 构建产物/版本与消费者正常采用结果配对。
+### Phase 2 — 包采用交付
+- Outcome: 构建产物/版本及公开导出/CSS可验证，正常包供给交付G采用。
 - Approach: 需要时申请具体build/publish授权；不使用直接源码导入规避。
 - Planned changes:
-  1. 正常包产物验证、consumer精确采用及去除旧覆盖。
+  1. 正常包产物、导出/CSS和公开API验证；G持实际consumer采用及去除旧覆盖。
   2. 保留现有durationMs消费能力。
 - Affected boundaries / entry points: 既有包源/分发和Nurture消费者。
-- Dependencies: Phase1通过、包产物与必要授权。
+- Dependencies: Phase1已通过；候选源码为0.26.0-g.1，仍需包产物与必要build/publish授权。
 - Exit criteria: KIT-PACKAGE通过。
-- Verification: KIT-PACKAGE；消费者部分引用G-COMP。
+- Verification: KIT-PACKAGE；G-COMP为消费者独立验收，不作为本供给项前置。
 - Recovery: 消费者保持原已发布版本，避免半切换。
 
 ## Kickoff gate
@@ -53,6 +53,8 @@
 - [x] Design: 最小接口来自G architecture，EntityRow/原生table/图标足以复用；Base当前工作树无其他写者改动。
 - [x] Route: 先共享源码/类型/交互，再正常包供给和真实消费。
 - [x] Verification: noEmit/组件行为与实际包/浏览器证据分开。
+
+Phase1 closeout：4cd5e8c完成源码/分组导出和durationMs既有补丁回收；10项组件测试、noEmit、tokens、consumer boundaries及原契约source lock通过。独立复核三处问题已修正；真实源码浏览器核对通过。包构建/发布/真实consumer仍属Phase2，不能外推。
 
 ## Risks and recovery
 - 不把班级、菜品、保存、排程或权限控制加入共用组件。
