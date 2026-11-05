@@ -1,6 +1,6 @@
 {
   "name": "@willyu1007/web-workbench",
-  "version": "0.26.0-g.2",
+  "version": "0.26.0-t130.1",
   "type": "module",
   "description": "Scenario-agnostic web workbench UI kit (Scene paradigms) — contracts + presentational React components.",
   "license": "MIT",
