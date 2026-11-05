@@ -83,6 +83,9 @@ domain permission, category, save command or scheduling rule.
 
 `ToastProvider` also accepts optional `durationMs`, preserving the existing
 consumer extension without requiring a patch of the next package release.
+Feedback issued in a native modal joins that dialog, retaining viewport-fixed
+placement and interactive dismissal. When the dialog closes, pending feedback
+returns to the remaining modal or the provider's ordinary page position.
 
 ## Install
 

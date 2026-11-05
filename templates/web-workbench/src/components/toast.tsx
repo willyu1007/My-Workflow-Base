@@ -9,7 +9,8 @@
  */
 "use client";
 
-import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { IconAlert, IconCheck, IconClock, IconX } from "./icons.js";
 
 export type ToastTone = "info" | "success" | "error" | "busy";
@@ -37,6 +38,14 @@ export interface ToastApi {
 
 const ToastContext = createContext<ToastApi | null>(null);
 
+/** A native modal makes feedback outside it inert, regardless of z-index. */
+function currentToastDialog(): HTMLDialogElement | null {
+  const focused = document.activeElement instanceof Element
+    ? document.activeElement.closest<HTMLDialogElement>("dialog[open]") : null;
+  return focused?.isConnected ? focused
+    : Array.from(document.querySelectorAll<HTMLDialogElement>(".wb-dialog[open]")).at(-1) ?? null;
+}
+
 export function useToast(): ToastApi {
   const ctx = useContext(ToastContext);
   if (!ctx) throw new Error("useToast must be used within ToastProvider");
@@ -49,7 +58,24 @@ export function ToastProvider({ children, durationMs }: {
   readonly durationMs?: number;
 }): React.ReactElement {
   const [toasts, setToasts] = useState<readonly Toast[]>([]);
+  const [dialog, setDialog] = useState<HTMLDialogElement | null>(null);
   const idRef = useRef(0);
+
+  useEffect(() => {
+    if (!dialog) return;
+    const release = () => setDialog(current => current === dialog ? currentToastDialog() : current);
+    if (!dialog.isConnected || !dialog.open) { release(); return; }
+    dialog.addEventListener("close", release);
+    // Removing a modal (or its ancestor) need not dispatch a native close event.
+    const observer = new MutationObserver(() => {
+      if (!dialog.isConnected || !dialog.open) release();
+    });
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["open"] });
+    return () => {
+      dialog.removeEventListener("close", release);
+      observer.disconnect();
+    };
+  }, [dialog]);
 
   const dismiss = useCallback((id: number) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -58,6 +84,7 @@ export function ToastProvider({ children, durationMs }: {
   const push = useCallback(
     (tone: ToastTone, title: string, msg?: string, autoClose = true): number => {
       const id = ++idRef.current;
+      setDialog(currentToastDialog());
       setToasts((prev) => [...prev, { id, tone, title, ...(msg ? { msg } : {}) }]);
       if (autoClose) {
         setTimeout(() => dismiss(id), durationMs ?? (tone === "error" ? 6000 : 3800));
@@ -96,16 +123,13 @@ export function ToastProvider({ children, durationMs }: {
     [push, dismiss],
   );
 
-  return (
-    <ToastContext.Provider value={{ notify, run, dismiss }}>
-      {children}
-      <div className="wb-toasts" role="status" aria-live="polite">
-        {toasts.map((t) => (
-          <ToastView key={t.id} toast={t} onClose={() => dismiss(t.id)} />
-        ))}
-      </div>
-    </ToastContext.Provider>
-  );
+  const feedback = <div className="wb-toasts" role="status" aria-live="polite">
+    {toasts.map((t) => <ToastView key={t.id} toast={t} onClose={() => dismiss(t.id)} />)}
+  </div>;
+  return <ToastContext.Provider value={{ notify, run, dismiss }}>
+    {children}
+    {dialog ? createPortal(feedback, dialog) : feedback}
+  </ToastContext.Provider>;
 }
 
 function ToastView({ toast, onClose }: { readonly toast: Toast; readonly onClose: () => void }) {
