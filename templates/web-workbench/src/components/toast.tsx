@@ -9,7 +9,7 @@
  */
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { IconAlert, IconCheck, IconClock, IconX } from "./icons.js";
 
@@ -61,21 +61,14 @@ export function ToastProvider({ children, durationMs }: {
   const [dialog, setDialog] = useState<HTMLDialogElement | null>(null);
   const idRef = useRef(0);
 
-  useEffect(() => {
-    if (!dialog) return;
-    const release = () => setDialog(current => current === dialog ? currentToastDialog() : current);
-    if (!dialog.isConnected || !dialog.open) { release(); return; }
-    dialog.addEventListener("close", release);
-    // Removing a modal (or its ancestor) need not dispatch a native close event.
-    const observer = new MutationObserver(() => {
-      if (!dialog.isConnected || !dialog.open) release();
-    });
+  useLayoutEffect(() => {
+    // Existing feedback must follow a modal opened after its last notification.
+    const update = () => setDialog(currentToastDialog());
+    update();
+    const observer = new MutationObserver(update);
     observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["open"] });
-    return () => {
-      dialog.removeEventListener("close", release);
-      observer.disconnect();
-    };
-  }, [dialog]);
+    return () => observer.disconnect();
+  }, []);
 
   const dismiss = useCallback((id: number) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -133,6 +126,19 @@ export function ToastProvider({ children, durationMs }: {
 }
 
 function ToastView({ toast, onClose }: { readonly toast: Toast; readonly onClose: () => void }) {
+  const closeButton = useRef<HTMLButtonElement>(null);
+  const previousFocus = useRef<HTMLElement | null>(null);
+  useLayoutEffect(() => {
+    const button = closeButton.current;
+    return () => {
+      // Removing focused feedback must hand focus back to the active modal.
+      if (!button || document.activeElement !== button) return;
+      const dialog = currentToastDialog();
+      const previous = previousFocus.current;
+      if (previous?.isConnected && (!dialog || dialog.contains(previous))) previous.focus();
+      if (document.activeElement === button) dialog?.focus();
+    };
+  }, []);
   return (
     <div className={`wb-toast wb-toast--${toast.tone}`}>
       <span className="wb-toast__icon">
@@ -148,7 +154,8 @@ function ToastView({ toast, onClose }: { readonly toast: Toast; readonly onClose
         <div className="wb-toast__title">{toast.title}</div>
         {toast.msg && <div className="wb-toast__msg">{toast.msg}</div>}
       </div>
-      <button type="button" className="wb-iconbtn" onClick={onClose} aria-label="关闭">
+      <button ref={closeButton} type="button" className="wb-iconbtn" onClick={onClose} aria-label="关闭"
+        onFocus={event => { if (event.relatedTarget instanceof HTMLElement) previousFocus.current = event.relatedTarget; }}>
         <IconX size={15} />
       </button>
     </div>
