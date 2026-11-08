@@ -525,3 +525,13 @@ and still skips a default-prevented press. Drawer ordering is unchanged:
 Both behaviours are mutation-checked in jsdom; jsdom has no top layer, so the
 inert click and the Escape order were also reproduced and cleared in Chrome
 against the 0.25.0 build.
+
+## Toast feedback inside a native Dialog
+
+A toast on the ordinary page cannot report above `showModal()`, regardless of
+z-index. Feedback issued while a dialog is active now uses the same portal
+boundary as Select: it joins that dialog and keeps viewport-fixed placement.
+The existing Toast view, status region, timing and API stay shared. Native close
+moves pending feedback to the remaining modal or the original provider position;
+closing a toast leaves the edit open. Real-browser verification must cover the
+top layer, nested close and notify-then-close; jsdom does not establish these.
