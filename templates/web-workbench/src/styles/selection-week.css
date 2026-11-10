@@ -42,6 +42,8 @@
 .wb-week__toolbar .wb-action, .wb-week__toolbar .wb-iconbtn { min-height: 34px; height: 34px; font-size: var(--caption-size); }
 .wb-week__previous > svg { transform: rotate(180deg); }
 .wb-week__range { white-space: nowrap; font-size: var(--caption-size); font-weight: var(--h2-weight); }
+button.wb-week__range { min-height: 34px; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; }
+button.wb-week__range:focus-visible { outline: 2px solid var(--mt-navy-300); outline-offset: 2px; }
 .wb-week__scroll { overflow: auto; border: 1px solid var(--border-2); border-radius: var(--r-md); }
 .wb-week__table { width: 100%; min-width: 600px; table-layout: fixed; border-collapse: separate; border-spacing: 0; font-size: var(--caption-size); line-height: 1.5; }
 .wb-week__caption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
