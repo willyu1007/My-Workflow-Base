@@ -59,3 +59,12 @@ it("rejects a cell that overlaps a covered column on a later row", () => {
       {id: "b", heading: "二", cells: [{date: days[0].date, span: 7, content: "错误"}]},
     ]} />)).toThrow(/WeekTable/);
 });
+
+it("allows the range to open a week picker while hiding weekday numbers", async () => {
+  const open = vi.fn(), user = userEvent.setup();
+  render(<WeekTable label="选择周" rowHeading="时间段" days={days} showDayNumbers={false}
+    navigation={{previous: {onPress() {}}, next: {onPress() {}}, range: {onPress: open}}} rows={[]} />);
+  expect(screen.getByRole("columnheader", {name: "周日"})).toBeTruthy();
+  await user.click(screen.getByRole("button", {name: "选择周 · 2026年12月28日–2027年1月3日"}));
+  expect(open).toHaveBeenCalledOnce();
+});

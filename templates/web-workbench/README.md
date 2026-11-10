@@ -69,7 +69,7 @@ chrome remains unclipped; only the rows scroll. Row content is non-interactive.
 
 `WeekTable` comes from `/primitives`. Pass seven consecutive `YYYY-MM-DD` dates
 and explicit navigation callbacks. Its title and date headers use those same
-dates without reading the current clock. Cells must cover the entire two-dimensional grid exactly once. `span` covers
+dates without reading the current clock. `navigation.range` makes that same range a week-picker trigger; `showDayNumbers={false}` keeps weekday headings without a second numeric line. Cells must cover the entire two-dimensional grid exactly once. `span` covers
 consecutive dates and `rowSpan` covers consecutive rows; omit cells already covered
 by an earlier row. Overlap, holes and out-of-bounds ranges are rejected. `narrow` controls width only. A day's `action`
 is an additional control beside the generated date, such as an existing `Menu`. Use `Menu compact` for icon triggers in narrow day
