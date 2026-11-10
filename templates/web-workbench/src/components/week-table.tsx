@@ -14,8 +14,9 @@ type WeekAction = Readonly<{ onPress: () => void; disabled?: boolean }>;
 export type WeekTableProps = Readonly<{
   label: string;
   rowHeading: ReactNode;
+  showDayNumbers?: boolean;
   days: readonly WeekTableDay[];
-  navigation: Readonly<{ previous: WeekAction; next: WeekAction; current?: WeekAction }>;
+  navigation: Readonly<{ previous: WeekAction; next: WeekAction; current?: WeekAction; range?: WeekAction }>;
   context?: ReactNode;
   actions?: ReactNode;
   rows: readonly Readonly<{
@@ -59,7 +60,7 @@ function weekRange(dates: readonly Date[]): string {
 }
 
 /** A seven-day presentation shell; consumers retain navigation, editors and writes. */
-export function WeekTable({ label, rowHeading, days, navigation, context, actions, rows, footer, density = "regular" }: WeekTableProps) {
+export function WeekTable({ label, rowHeading, days, navigation, context, actions, rows, footer, density = "regular", showDayNumbers = true }: WeekTableProps) {
   if (days.length !== 7) throw new Error("WeekTable requires seven consecutive dates");
   const dates = days.map(day => localDay(day.date));
   if (dates.some((date, index) => date.getTime() !== dates[0]!.getTime() + index * DAY_MS)) {
@@ -89,7 +90,8 @@ export function WeekTable({ label, rowHeading, days, navigation, context, action
       <div className="wb-week__navigation" role="group" aria-label={`${label}周导航`}>
         <button type="button" className="wb-iconbtn wb-week__previous" aria-label="上一周"
           disabled={navigation.previous.disabled} onClick={navigation.previous.onPress}><IconChevronRight size={18} /></button>
-        <strong className="wb-week__range">{range}</strong>
+        {navigation.range ? <button type="button" className="wb-week__range" aria-label={`选择周 · ${range}`}
+          disabled={navigation.range.disabled} onClick={navigation.range.onPress}>{range}</button> : <strong className="wb-week__range">{range}</strong>}
         <button type="button" className="wb-iconbtn" aria-label="下一周"
           disabled={navigation.next.disabled} onClick={navigation.next.onPress}><IconChevronRight size={18} /></button>
         {navigation.current && <button type="button" className="wb-action"
@@ -106,7 +108,7 @@ export function WeekTable({ label, rowHeading, days, navigation, context, action
         <thead><tr><th scope="col">{rowHeading}</th>{days.map((day, index) => <th key={day.date} scope="col"
           aria-current={day.today ? "date" : undefined}>
           <div className="wb-week__day">
-            <div className="wb-week__date"><span>{WEEKDAYS[dates[index]!.getUTCDay()]}</span>{" "}<time dateTime={day.date}>{dates[index]!.getUTCDate()}</time></div>
+            <div className="wb-week__date"><span>{WEEKDAYS[dates[index]!.getUTCDay()]}</span>{showDayNumbers ? <> <time dateTime={day.date}>{dates[index]!.getUTCDate()}</time></> : null}</div>
             {day.action != null && <> {day.action}</>}
           </div>
           {day.annotation}
