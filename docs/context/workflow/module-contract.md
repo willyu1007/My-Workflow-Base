@@ -83,7 +83,7 @@ export type ScenarioManifest = {
 };
 
 export type ScenarioRecordBinding = {
-  required_status: "draft" | "pilot" | "active" | "disabled" | "archived";
+  required_status: "draft" | "active" | "disabled" | "archived";
   display_name: string;
   owner_team: string;
   policy_version: number;

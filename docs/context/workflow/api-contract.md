@@ -254,7 +254,7 @@ export type ScenarioRecord = {
   scenario_id: string;
   scenario_key: string;
   display_name: string;
-  status: "draft" | "pilot" | "active" | "disabled" | "archived";
+  status: "draft" | "active" | "disabled" | "archived";
   owner_team: string;
   launch_phase: "dev" | "pilot" | "ga" | "disabled";
   allowed_user_classes: string[];
