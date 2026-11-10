@@ -94,6 +94,15 @@ Feedback issued in a native modal joins that dialog, retaining viewport-fixed
 placement and interactive dismissal. When the dialog closes, pending feedback
 returns to the remaining modal or the provider's ordinary page position.
 
+## Candidate 0.27.0-t131.1
+
+`WeekTable` accepts vertical `rowSpan`, an optional clickable `navigation.range`,
+and `showDayNumbers={false}`. Span occupancy is validated in both dimensions.
+`Menu` supports pointer-positioned controlled context menus with viewport avoidance.
+`SelectionList` accepts controlled `selectedIds` for multiple choices and
+`maxVisibleRows` for a bounded, scrollable picker; focus movement never selects.
+Existing single-selection, navigation and trigger behavior retain their defaults.
+
 ## Install
 
 Published to **GitHub Packages** as `@willyu1007/web-workbench`. GitHub Packages requires a
