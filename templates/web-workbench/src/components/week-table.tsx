@@ -25,6 +25,7 @@ export type WeekTableProps = Readonly<{
     cells: readonly Readonly<{
       date: string;
       span?: number;
+      rowSpan?: number;
       tone?: "default" | "subtle" | "changed";
       selected?: boolean;
       /** Let a single editor root fill the cell; shared CSS supplies its spacing. */
@@ -64,16 +65,22 @@ export function WeekTable({ label, rowHeading, days, navigation, context, action
   if (dates.some((date, index) => date.getTime() !== dates[0]!.getTime() + index * DAY_MS)) {
     throw new Error("WeekTable requires seven consecutive dates");
   }
-  for (const row of rows) {
-    let index = 0;
+  const occupied = rows.map(() => Array<boolean>(7).fill(false));
+  for (const [rowIndex, row] of rows.entries()) {
+    let column = 0;
     for (const cell of row.cells) {
-      const span = cell.span ?? 1;
-      if (!Number.isInteger(span) || span < 1 || index + span > 7 || days[index]?.date !== cell.date) {
-        throw new Error("WeekTable cells must cover the seven dates in order");
+      while (occupied[rowIndex]![column]) column++;
+      const columns = cell.span ?? 1, height = cell.rowSpan ?? 1;
+      if (!Number.isInteger(columns) || columns < 1 || column + columns > 7 || days[column]?.date !== cell.date ||
+        !Number.isInteger(height) || height < 1 || rowIndex + height > rows.length)
+        throw new Error("WeekTable cells must cover the grid within its bounds");
+      for (let r = rowIndex; r < rowIndex + height; r++) for (let c = column; c < column + columns; c++) {
+        if (occupied[r]![c]) throw new Error("WeekTable cells must not overlap");
+        occupied[r]![c] = true;
       }
-      index += span;
+      column += columns;
     }
-    if (index !== 7) throw new Error("WeekTable cells must cover the seven dates in order");
+    if (occupied[rowIndex]!.some(value => !value)) throw new Error("WeekTable cells must cover the seven dates in order");
   }
   const range = weekRange(dates);
 
@@ -106,7 +113,7 @@ export function WeekTable({ label, rowHeading, days, navigation, context, action
         </th>)}</tr></thead>
         <tbody>{rows.map(row => <tr key={row.id} className={row.accent ? "wb-week__row--accent" : undefined}>
           <th scope="row">{row.heading}</th>
-          {row.cells.map(cell => <td key={cell.date} colSpan={cell.span}
+          {row.cells.map(cell => <td key={cell.date} colSpan={cell.span} rowSpan={cell.rowSpan}
             className={`wb-week__cell wb-week__cell--${cell.tone ?? "default"}${cell.selected ? " wb-week__cell--selected" : ""}${cell.fill ? " wb-week__cell--fill" : ""}`}>
             <div className="wb-week__content">{cell.content}</div>
           </td>)}

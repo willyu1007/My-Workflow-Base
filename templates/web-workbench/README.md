@@ -69,10 +69,17 @@ chrome remains unclipped; only the rows scroll. Row content is non-interactive.
 
 `WeekTable` comes from `/primitives`. Pass seven consecutive `YYYY-MM-DD` dates
 and explicit navigation callbacks. Its title and date headers use those same
-dates without reading the current clock. Each row's ordered cells must cover all
-seven days; `span` is explicit, and `narrow` controls width only. A day's `action`
+dates without reading the current clock. Cells must cover the entire two-dimensional grid exactly once. `span` covers
+consecutive dates and `rowSpan` covers consecutive rows; omit cells already covered
+by an earlier row. Overlap, holes and out-of-bounds ranges are rejected. `narrow` controls width only. A day's `action`
 is an additional control beside the generated date, such as an existing `Menu`. Use `Menu compact` for icon triggers in narrow day
 headers; it keeps a 24px target without changing the popup or default Menu size.
+
+`Menu mode="context"` accepts controlled `open`/`onOpenChange` and viewport `point: {x, y}`.
+It uses the pointer (or keyboard target) position, flips at edges, and clamps to
+the viewport. Its portal shares outside-click, Escape and item-click dismissal
+with trigger menus; enabled menuitems support arrow/Home/End navigation and Escape
+restores the initiating element. Consumers provide actions and permissions.
 
 Cell `content` retains its own input/editor semantics. For an editor that owns
 the whole cell, pass `fill: true` with one root element: the shared stylesheet
