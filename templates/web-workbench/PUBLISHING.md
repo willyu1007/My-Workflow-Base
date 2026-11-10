@@ -1,9 +1,8 @@
 # Publishing & consuming `@willyu1007/web-workbench`
 
 This package ships **built output** (`dist/` = compiled JS + `.d.ts` + CSS). Consumers
-treat it as a normal dependency — no `transpilePackages`, no `preserveSymlinks`, no
-Turbopack-root widening. Those hacks only exist while consuming the package via a local
-cross-repo `link:` (see "Local dev" at the bottom).
+install a published release as a normal dependency. A registry install needs no
+`transpilePackages`, `preserveSymlinks`, or Turbopack-root widening.
 
 Target registry: **GitHub Packages** (`https://npm.pkg.github.com`), scope `@willyu1007`.
 Package visibility: **public**. The package was changed to public with owner
@@ -26,11 +25,14 @@ not support changing a public package back to private.
 3. **Build + publish** from `templates/web-workbench`:
 
    ```bash
-   pnpm install          # first time, to get react/next types for the build
-   pnpm publish           # prepublishOnly runs the build automatically
+   pnpm install --ignore-workspace --frozen-lockfile
+   pnpm publish           # prepublishOnly runs tests and the build
    ```
 
-   `pnpm publish` runs `prepublishOnly` → `pnpm build` (tsc → dist + copy CSS), then uploads.
+   The kit has its own lockfile and is not a root workspace member. Use
+   `--ignore-workspace` so installation follows that committed lockfile.
+   `pnpm publish` runs `prepublishOnly` → `pnpm test && pnpm build`, then uploads;
+   the build checks tokens, compiles TypeScript, and copies CSS and lint presets.
    Before publishing, verify that `publishConfig.access` remains `public`;
    `restricted` no longer matches the package's irreversible visibility or its
    cross-repository distribution contract.
@@ -68,19 +70,18 @@ not support changing a public package back to private.
    `insight`, `settings`, `hub`, `queue`, `record`, and `entry`. The root entry remains
    available only as a legacy compatibility barrel.
 
-4. **Remove the local-dev hacks** (they are only needed for the `link:` setup):
-   - `next.config.mjs`: delete the `turbopack.root` / `outputFileTracingRoot` block.
-   - `tsconfig.json`: delete `"preserveSymlinks": true`.
+4. **Remove obsolete local-link configuration** after switching to a registry release.
+   Remove `turbopack.root` / `outputFileTracingRoot` overrides in `next.config.mjs`
+   and `preserveSymlinks` in `tsconfig.json` only when they existed solely for that link.
+   The registry package lives under `node_modules`; its `react`/`next` peers resolve
+   to the app's own copies.
 
-   With a registry install the package's files live under `node_modules` normally and its
-   `react`/`next` peer deps resolve to the app's own copies — zero config.
+## Local development
 
-## Local dev (current The-Education setup, pre-publish)
-
-Before publishing, The-Education consumes the package via a cross-repo `link:` to this
-folder, resolving the built `dist`. Because the symlink's realpath is in a sibling repo:
-- `next.config.mjs` widens the Turbopack/tracing root so the symlink resolves.
-- `tsconfig.json` sets `preserveSymlinks` so tsc resolves the package's React to the app's.
-- After editing the package, run `pnpm build` here so the linked `dist` updates.
-
-Switch to the registry dependency (above) to drop all three.
+Use a published release for consumer development, with one UI-kit version per
+consumer repository. An unpinned cross-repository `file:` or `link:` dependency is
+unsupported. Any local dependency requires an exact upstream revision, logical
+source-hash pin evidence, and a consumer CI verifier; it is not release evidence
+by itself. Follow the repository's
+[Contract distribution](https://github.com/willyu1007/My-Workflow-Base/blob/main/docs/context/ecosystem/contract-distribution.md)
+rules rather than adding consumer-specific source or runtime forks.
