@@ -33,3 +33,29 @@ it("BA-42 seven dates drive cross-year headings, native editors and navigation",
   await user.click(screen.getByRole("button", { name: "上一周" }));
   expect(previous).toHaveBeenCalledOnce();
 });
+
+it("covers the grid with combined row and column spans without rendering covered cells", () => {
+  render(<WeekTable label="合并安排" rowHeading="时间段" days={days} navigation={{previous: {onPress() {}}, next: {onPress() {}}}}
+    rows={[
+      {id: "a", heading: "第一段", cells: [{date: days[0].date, rowSpan: 3, span: 2, content: "长活动"}, {date: days[2].date, span: 5, content: "其余"}]},
+      {id: "b", heading: "第二段", cells: [{date: days[2].date, span: 5, content: "中间"}]},
+      {id: "c", heading: "第三段", cells: [{date: days[2].date, span: 5, content: "末段"}]},
+    ]} />);
+  const merged = screen.getByRole("cell", {name: "长活动"});
+  expect(merged.getAttribute("rowspan")).toBe("3");
+  expect(merged.getAttribute("colspan")).toBe("2");
+  expect(screen.getAllByRole("cell")).toHaveLength(4);
+});
+
+it.each([0, -1, 1.5, 3])("rejects rowSpan %s outside the actual row bounds", rowSpan => {
+  expect(() => render(<WeekTable label="无效" rowHeading="时间段" days={days} navigation={{previous: {onPress() {}}, next: {onPress() {}}}}
+    rows={[{id: "a", heading: "一段", cells: [{date: days[0].date, span: 7, rowSpan, content: "越界"}]}]} />)).toThrow(/WeekTable/);
+});
+
+it("rejects a cell that overlaps a covered column on a later row", () => {
+  expect(() => render(<WeekTable label="重叠" rowHeading="时间段" days={days} navigation={{previous: {onPress() {}}, next: {onPress() {}}}}
+    rows={[
+      {id: "a", heading: "一", cells: [{date: days[0].date, content: "a"}, {date: days[1].date, rowSpan: 2, content: "b"}, {date: days[2].date, span: 5, content: "c"}]},
+      {id: "b", heading: "二", cells: [{date: days[0].date, span: 7, content: "错误"}]},
+    ]} />)).toThrow(/WeekTable/);
+});
