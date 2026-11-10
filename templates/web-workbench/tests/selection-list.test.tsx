@@ -40,3 +40,20 @@ it("BA-43 disabling the focused option recovers focus without selecting a value"
   expect(document.activeElement).toBe(screen.getByRole("option", { name: "第一项" }));
   expect(select).not.toHaveBeenCalled();
 });
+
+it("supports controlled multiple selection without selecting on focus", async () => {
+  const user = userEvent.setup(), select = vi.fn();
+  const props = {label: "候选活动", selectedId: null, selectedIds: ["a", "c"], onSelect: select,
+    empty: "暂无活动", items: [{id: "a", title: "画画"}, {id: "b", title: "撕纸"}, {id: "c", title: "拓印"}]};
+  const view = render(<SelectionList {...props}/>);
+  expect(screen.getByRole("listbox").getAttribute("aria-multiselectable")).toBe("true");
+  expect(screen.getAllByRole("option", {selected: true})).toHaveLength(2);
+  await user.tab();
+  await user.keyboard("{ArrowDown}");
+  expect(select).not.toHaveBeenCalled();
+  await user.keyboard(" ");
+  expect(select).toHaveBeenCalledExactlyOnceWith("b");
+  view.rerender(<SelectionList {...props} selectedIds={["b"]}/>);
+  expect(screen.getByRole("option", {name: "撕纸", selected: true})).toBeTruthy();
+  expect(screen.getAllByRole("option", {selected: false})).toHaveLength(2);
+});
