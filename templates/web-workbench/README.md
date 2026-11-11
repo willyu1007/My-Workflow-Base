@@ -94,7 +94,7 @@ Feedback issued in a native modal joins that dialog, retaining viewport-fixed
 placement and interactive dismissal. When the dialog closes, pending feedback
 returns to the remaining modal or the provider's ordinary page position.
 
-## Candidate 0.27.0-t131.1
+## Unpublished candidate 0.27.0-t131.2
 
 `WeekTable` accepts vertical `rowSpan`, an optional clickable `navigation.range`,
 and `showDayNumbers={false}`. Span occupancy is validated in both dimensions.
@@ -102,6 +102,11 @@ and `showDayNumbers={false}`. Span occupancy is validated in both dimensions.
 `SelectionList` accepts controlled `selectedIds` for multiple choices and
 `maxVisibleRows` for a bounded, scrollable picker; focus movement never selects.
 Existing single-selection, navigation and trigger behavior retain their defaults.
+For a controlled range, selected cells may pass `selectionEdges` (`top`, `right`,
+`bottom`, `left`). The kit supplies the light selection fill and draws only those
+outer edges; consumers compute the edges from their own range. Omit the property
+to retain the existing independent-cell selection. The border presentation adds no
+event target and leaves native editors, row spans and column spans intact.
 
 ## Install
 

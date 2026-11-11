@@ -29,6 +29,8 @@ export type WeekTableProps = Readonly<{
       rowSpan?: number;
       tone?: "default" | "subtle" | "changed";
       selected?: boolean;
+      /** Outer edges of a consumer-controlled range; omitted keeps the cell selection style. */
+      selectionEdges?: readonly ("top" | "right" | "bottom" | "left")[];
       /** Let a single editor root fill the cell; shared CSS supplies its spacing. */
       fill?: boolean;
       content: ReactNode;
@@ -116,6 +118,7 @@ export function WeekTable({ label, rowHeading, days, navigation, context, action
         <tbody>{rows.map(row => <tr key={row.id} className={row.accent ? "wb-week__row--accent" : undefined}>
           <th scope="row">{row.heading}</th>
           {row.cells.map(cell => <td key={cell.date} colSpan={cell.span} rowSpan={cell.rowSpan}
+            data-selection-edges={cell.selected && cell.selectionEdges ? cell.selectionEdges.join(" ") : undefined}
             className={`wb-week__cell wb-week__cell--${cell.tone ?? "default"}${cell.selected ? " wb-week__cell--selected" : ""}${cell.fill ? " wb-week__cell--fill" : ""}`}>
             <div className="wb-week__content">{cell.content}</div>
           </td>)}
