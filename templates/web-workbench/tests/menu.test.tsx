@@ -1,3 +1,4 @@
+import {StrictMode} from "react";
 import {fireEvent, render, screen} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {afterEach, beforeEach, expect, it, vi} from "vitest";
@@ -18,8 +19,8 @@ it("anchors a controlled context menu at the pointer and flips before overflowin
 it("moves keyboard focus among enabled items and restores the initiator on Escape", async () => {
   const initiator = document.createElement("button"); document.body.append(initiator); initiator.focus();
   const close = vi.fn(), user = userEvent.setup();
-  render(<Menu mode="context" label="单元格操作" point={{x: 12, y: 12}} open onOpenChange={close}>
-    <button role="menuitem">合并</button><button role="menuitem" disabled>拆分</button><button role="menuitem">清除</button></Menu>);
+  render(<StrictMode><Menu mode="context" label="单元格操作" point={{x: 12, y: 12}} open onOpenChange={close}>
+    <button role="menuitem">合并</button><button role="menuitem" disabled>拆分</button><button role="menuitem">清除</button></Menu></StrictMode>);
   expect(document.activeElement).toBe(screen.getByRole("menuitem", {name: "合并"}));
   await user.keyboard("{ArrowDown}");
   expect(document.activeElement).toBe(screen.getByRole("menuitem", {name: "清除"}));

@@ -94,7 +94,7 @@ Feedback issued in a native modal joins that dialog, retaining viewport-fixed
 placement and interactive dismissal. When the dialog closes, pending feedback
 returns to the remaining modal or the provider's ordinary page position.
 
-## Unpublished candidate 0.27.0-t131.2
+## Weekly range support (0.27.0-t131.2)
 
 `WeekTable` accepts vertical `rowSpan`, an optional clickable `navigation.range`,
 and `showDayNumbers={false}`. Span occupancy is validated in both dimensions.
@@ -314,3 +314,9 @@ are: [DECISIONS.md](./DECISIONS.md).
 ## Not yet in the kit (extract next if needed)
 
 - **`format` util** — date/relative helpers are adapter-side (and need a host "today").
+
+## Menu correction candidate 0.27.0-t131.3
+
+Context-menu Escape restores the original initiating element under React StrictMode
+effect replay. Disabled menu items use the shared disabled-opacity token and do not
+receive hover highlighting. No new menu variant or consumer styling is required.

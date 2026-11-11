@@ -20,7 +20,7 @@ export function Menu(props: MenuProps): React.ReactElement {
   useLayoutEffect(() => {
     if (!open) return;
     const active = document.activeElement;
-    initiator.current = active instanceof HTMLElement ? active : null;
+    if (!(active instanceof HTMLElement) || !pop.current?.contains(active)) initiator.current = active instanceof HTMLElement ? active : null;
     if (context) pop.current?.querySelector<HTMLElement>('[role="menuitem"]:not(:disabled)')?.focus();
   }, [open, context]);
 
