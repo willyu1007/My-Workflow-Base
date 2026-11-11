@@ -79,7 +79,9 @@ headers; it keeps a 24px target without changing the popup or default Menu size.
 It uses the pointer (or keyboard target) position, flips at edges, and clamps to
 the viewport. Its portal shares outside-click, Escape and item-click dismissal
 with trigger menus; enabled menuitems support arrow/Home/End navigation and Escape
-restores the initiating element. Consumers provide actions and permissions.
+restores the initiating element. Inside a native dialog, the context-menu portal
+stays in that dialog so its items remain interactive. Consumers provide actions
+and permissions.
 
 Cell `content` retains its own input/editor semantics. For an editor that owns
 the whole cell, pass `fill: true` with one root element: the shared stylesheet
@@ -320,3 +322,9 @@ are: [DECISIONS.md](./DECISIONS.md).
 Context-menu Escape restores the original initiating element under React StrictMode
 effect replay. Disabled menu items use the shared disabled-opacity token and do not
 receive hover highlighting. No new menu variant or consumer styling is required.
+
+## Modal menu correction candidate 0.27.0-t131.4
+
+Context menus mount in their own native dialog instead of the inert page behind
+it. Ordinary page menus keep their body portal. The public API, keyboard
+navigation, dismissal and viewport avoidance remain unchanged.
