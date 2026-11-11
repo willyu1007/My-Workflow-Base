@@ -73,6 +73,11 @@ button.wb-week__range:focus-visible { outline: 2px solid var(--mt-navy-300); out
 .wb-week__table .wb-week__cell--subtle { background: var(--bg-canvas); color: var(--fg-3); }
 .wb-week__table .wb-week__cell--changed { background: var(--mt-warning-bg); }
 .wb-week__cell--selected { box-shadow: inset 0 0 0 1px var(--mt-navy-300); }
+.wb-week__table .wb-week__cell--selected[data-selection-edges] { background: var(--mt-navy-50); box-shadow: none; }
+.wb-week__table .wb-week__cell--selected[data-selection-edges~="top"] { border-top: 1px solid var(--mt-navy-500); }
+.wb-week__table .wb-week__cell--selected[data-selection-edges~="right"] { border-right: 1px solid var(--mt-navy-500); }
+.wb-week__table .wb-week__cell--selected[data-selection-edges~="bottom"] { border-bottom: 1px solid var(--mt-navy-500); }
+.wb-week__table .wb-week__cell--selected[data-selection-edges~="left"] { border-left: 1px solid var(--mt-navy-500); }
 .wb-week__table tfoot td { height: 42px; padding: var(--sp-2) var(--sp-3); text-align: center; background: var(--bg-surface); border-bottom: 0; }
 .wb-week__table:not(:has(tfoot)) tbody tr:last-child > * { border-bottom: 0; }
 .wb-week--compact .wb-week__heading-column { width: 105px; }
