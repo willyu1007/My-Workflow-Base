@@ -11,6 +11,7 @@ type MenuProps = Readonly<{label: string; children: ReactNode}> & (
 /** One dismissal/focus model for trigger menus and pointer/keyboard context menus. */
 export function Menu(props: MenuProps): React.ReactElement {
   const [triggerOpen, setTriggerOpen] = useState(false);
+  const [host, setHost] = useState<HTMLElement | null>(null);
   const context = props.mode === "context";
   const open = context ? props.open : triggerOpen;
   const root = useRef<HTMLDivElement>(null), pop = useRef<HTMLDivElement>(null);
@@ -18,14 +19,19 @@ export function Menu(props: MenuProps): React.ReactElement {
   const setOpen = context ? props.onOpenChange : setTriggerOpen;
 
   useLayoutEffect(() => {
+    // A body portal is inert outside a native modal; use this menu's own dialog.
+    setHost(context && open ? root.current?.closest("dialog") ?? document.body : null);
+  }, [context, open]);
+
+  useLayoutEffect(() => {
     if (!open) return;
     const active = document.activeElement;
     if (!(active instanceof HTMLElement) || !pop.current?.contains(active)) initiator.current = active instanceof HTMLElement ? active : null;
     if (context) pop.current?.querySelector<HTMLElement>('[role="menuitem"]:not(:disabled)')?.focus();
-  }, [open, context]);
+  }, [open, context, host]);
 
   useLayoutEffect(() => {
-    if (!context || !open) return;
+    if (!context || !open || !host) return;
     const {x, y} = props.point;
     const position = () => {
       const element = pop.current; if (!element) return;
@@ -37,7 +43,7 @@ export function Menu(props: MenuProps): React.ReactElement {
     const observer = new ResizeObserver(position); if (pop.current) observer.observe(pop.current);
     window.addEventListener("resize", position);
     return () => {observer.disconnect(); window.removeEventListener("resize", position);};
-  }, [context, open, context ? props.point.x : 0, context ? props.point.y : 0]);
+  }, [context, open, host, context ? props.point.x : 0, context ? props.point.y : 0]);
 
   useEffect(() => {
     if (!open) return;
@@ -70,6 +76,6 @@ export function Menu(props: MenuProps): React.ReactElement {
   return <div className="wb-menu2" ref={root}>
     {!context && <button type="button" className={`wb-menu2__btn${props.compact ? " wb-menu2__btn--compact" : ""}${open ? " wb-menu2__btn--on" : ""}`}
       aria-haspopup="menu" aria-expanded={open} aria-label={props.label} onClick={() => setOpen(!open)}>{props.trigger}</button>}
-    {context && popup ? createPortal(popup, document.body) : popup}
+    {context && popup ? host && createPortal(popup, host) : popup}
   </div>;
 }
