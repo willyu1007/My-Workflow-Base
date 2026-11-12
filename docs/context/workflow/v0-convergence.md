@@ -21,9 +21,9 @@ Minimum canonical fields:
 - `scenario_id`
 - `scenario_key`
 - `display_name`
-- `status`: `draft`, `pilot`, `active`, `disabled`, `archived`
+- `status`: `draft`, `active`, `disabled`, `archived`
 - `owner_team`
-- `launch_phase`
+- `launch_phase` (release metadata; `pilot` is not a canonical lifecycle status)
 - `allowed_user_classes`
 - `current_manifest_version`
 - `current_manifest_hash`

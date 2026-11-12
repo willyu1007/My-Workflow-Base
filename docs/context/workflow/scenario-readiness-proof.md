@@ -21,7 +21,7 @@ This walkthrough is an example, not a base dependency.
 
 | Dimension | Example shape |
 |---|---|
-| `scenario_key` | `learning_review` |
+| `scenario_key` | `learning-review` |
 | Capability | `work_item_review` |
 | Entrypoint | `review_submission` |
 | Canonical context refs | `participant_group`, `work_item`, `rubric_or_policy`, `submission_ref` |
@@ -50,7 +50,7 @@ This sketch intentionally avoids education terms to test the base boundary.
 
 | Dimension | Example shape |
 |---|---|
-| `scenario_key` | `support_case_resolution` |
+| `scenario_key` | `support-case-resolution` |
 | Capability | `case_triage_and_response` |
 | Entrypoint | `draft_response_plan` |
 | Canonical context refs | `support_case`, `customer_account`, `policy_article`, `prior_resolution_ref` |

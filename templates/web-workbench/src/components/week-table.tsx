@@ -14,8 +14,9 @@ type WeekAction = Readonly<{ onPress: () => void; disabled?: boolean }>;
 export type WeekTableProps = Readonly<{
   label: string;
   rowHeading: ReactNode;
+  showDayNumbers?: boolean;
   days: readonly WeekTableDay[];
-  navigation: Readonly<{ previous: WeekAction; next: WeekAction; current?: WeekAction }>;
+  navigation: Readonly<{ previous: WeekAction; next: WeekAction; current?: WeekAction; range?: WeekAction }>;
   context?: ReactNode;
   actions?: ReactNode;
   rows: readonly Readonly<{
@@ -25,8 +26,11 @@ export type WeekTableProps = Readonly<{
     cells: readonly Readonly<{
       date: string;
       span?: number;
+      rowSpan?: number;
       tone?: "default" | "subtle" | "changed";
       selected?: boolean;
+      /** Outer edges of a consumer-controlled range; omitted keeps the cell selection style. */
+      selectionEdges?: readonly ("top" | "right" | "bottom" | "left")[];
       /** Let a single editor root fill the cell; shared CSS supplies its spacing. */
       fill?: boolean;
       content: ReactNode;
@@ -58,22 +62,28 @@ function weekRange(dates: readonly Date[]): string {
 }
 
 /** A seven-day presentation shell; consumers retain navigation, editors and writes. */
-export function WeekTable({ label, rowHeading, days, navigation, context, actions, rows, footer, density = "regular" }: WeekTableProps) {
+export function WeekTable({ label, rowHeading, days, navigation, context, actions, rows, footer, density = "regular", showDayNumbers = true }: WeekTableProps) {
   if (days.length !== 7) throw new Error("WeekTable requires seven consecutive dates");
   const dates = days.map(day => localDay(day.date));
   if (dates.some((date, index) => date.getTime() !== dates[0]!.getTime() + index * DAY_MS)) {
     throw new Error("WeekTable requires seven consecutive dates");
   }
-  for (const row of rows) {
-    let index = 0;
+  const occupied = rows.map(() => Array<boolean>(7).fill(false));
+  for (const [rowIndex, row] of rows.entries()) {
+    let column = 0;
     for (const cell of row.cells) {
-      const span = cell.span ?? 1;
-      if (!Number.isInteger(span) || span < 1 || index + span > 7 || days[index]?.date !== cell.date) {
-        throw new Error("WeekTable cells must cover the seven dates in order");
+      while (occupied[rowIndex]![column]) column++;
+      const columns = cell.span ?? 1, height = cell.rowSpan ?? 1;
+      if (!Number.isInteger(columns) || columns < 1 || column + columns > 7 || days[column]?.date !== cell.date ||
+        !Number.isInteger(height) || height < 1 || rowIndex + height > rows.length)
+        throw new Error("WeekTable cells must cover the grid within its bounds");
+      for (let r = rowIndex; r < rowIndex + height; r++) for (let c = column; c < column + columns; c++) {
+        if (occupied[r]![c]) throw new Error("WeekTable cells must not overlap");
+        occupied[r]![c] = true;
       }
-      index += span;
+      column += columns;
     }
-    if (index !== 7) throw new Error("WeekTable cells must cover the seven dates in order");
+    if (occupied[rowIndex]!.some(value => !value)) throw new Error("WeekTable cells must cover the seven dates in order");
   }
   const range = weekRange(dates);
 
@@ -82,7 +92,8 @@ export function WeekTable({ label, rowHeading, days, navigation, context, action
       <div className="wb-week__navigation" role="group" aria-label={`${label}周导航`}>
         <button type="button" className="wb-iconbtn wb-week__previous" aria-label="上一周"
           disabled={navigation.previous.disabled} onClick={navigation.previous.onPress}><IconChevronRight size={18} /></button>
-        <strong className="wb-week__range">{range}</strong>
+        {navigation.range ? <button type="button" className="wb-week__range" aria-label={`选择周 · ${range}`}
+          disabled={navigation.range.disabled} onClick={navigation.range.onPress}>{range}</button> : <strong className="wb-week__range">{range}</strong>}
         <button type="button" className="wb-iconbtn" aria-label="下一周"
           disabled={navigation.next.disabled} onClick={navigation.next.onPress}><IconChevronRight size={18} /></button>
         {navigation.current && <button type="button" className="wb-action"
@@ -99,14 +110,15 @@ export function WeekTable({ label, rowHeading, days, navigation, context, action
         <thead><tr><th scope="col">{rowHeading}</th>{days.map((day, index) => <th key={day.date} scope="col"
           aria-current={day.today ? "date" : undefined}>
           <div className="wb-week__day">
-            <div className="wb-week__date"><span>{WEEKDAYS[dates[index]!.getUTCDay()]}</span>{" "}<time dateTime={day.date}>{dates[index]!.getUTCDate()}</time></div>
+            <div className="wb-week__date"><span>{WEEKDAYS[dates[index]!.getUTCDay()]}</span>{showDayNumbers ? <> <time dateTime={day.date}>{dates[index]!.getUTCDate()}</time></> : null}</div>
             {day.action != null && <> {day.action}</>}
           </div>
           {day.annotation}
         </th>)}</tr></thead>
         <tbody>{rows.map(row => <tr key={row.id} className={row.accent ? "wb-week__row--accent" : undefined}>
           <th scope="row">{row.heading}</th>
-          {row.cells.map(cell => <td key={cell.date} colSpan={cell.span}
+          {row.cells.map(cell => <td key={cell.date} colSpan={cell.span} rowSpan={cell.rowSpan}
+            data-selection-edges={cell.selected && cell.selectionEdges ? cell.selectionEdges.join(" ") : undefined}
             className={`wb-week__cell wb-week__cell--${cell.tone ?? "default"}${cell.selected ? " wb-week__cell--selected" : ""}${cell.fill ? " wb-week__cell--fill" : ""}`}>
             <div className="wb-week__content">{cell.content}</div>
           </td>)}

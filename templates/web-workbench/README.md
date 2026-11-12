@@ -69,10 +69,19 @@ chrome remains unclipped; only the rows scroll. Row content is non-interactive.
 
 `WeekTable` comes from `/primitives`. Pass seven consecutive `YYYY-MM-DD` dates
 and explicit navigation callbacks. Its title and date headers use those same
-dates without reading the current clock. Each row's ordered cells must cover all
-seven days; `span` is explicit, and `narrow` controls width only. A day's `action`
+dates without reading the current clock. `navigation.range` makes that same range a week-picker trigger; `showDayNumbers={false}` keeps weekday headings without a second numeric line. Cells must cover the entire two-dimensional grid exactly once. `span` covers
+consecutive dates and `rowSpan` covers consecutive rows; omit cells already covered
+by an earlier row. Overlap, holes and out-of-bounds ranges are rejected. `narrow` controls width only. A day's `action`
 is an additional control beside the generated date, such as an existing `Menu`. Use `Menu compact` for icon triggers in narrow day
 headers; it keeps a 24px target without changing the popup or default Menu size.
+
+`Menu mode="context"` accepts controlled `open`/`onOpenChange` and viewport `point: {x, y}`.
+It uses the pointer (or keyboard target) position, flips at edges, and clamps to
+the viewport. Its portal shares outside-click, Escape and item-click dismissal
+with trigger menus; enabled menuitems support arrow/Home/End navigation and Escape
+restores the initiating element. Inside a native dialog, the context-menu portal
+stays in that dialog so its items remain interactive. Consumers provide actions
+and permissions.
 
 Cell `content` retains its own input/editor semantics. For an editor that owns
 the whole cell, pass `fill: true` with one root element: the shared stylesheet
@@ -86,6 +95,20 @@ consumer extension without requiring a patch of the next package release.
 Feedback issued in a native modal joins that dialog, retaining viewport-fixed
 placement and interactive dismissal. When the dialog closes, pending feedback
 returns to the remaining modal or the provider's ordinary page position.
+
+## Weekly range support (0.27.0-t131.2)
+
+`WeekTable` accepts vertical `rowSpan`, an optional clickable `navigation.range`,
+and `showDayNumbers={false}`. Span occupancy is validated in both dimensions.
+`Menu` supports pointer-positioned controlled context menus with viewport avoidance.
+`SelectionList` accepts controlled `selectedIds` for multiple choices and
+`maxVisibleRows` for a bounded, scrollable picker; focus movement never selects.
+Existing single-selection, navigation and trigger behavior retain their defaults.
+For a controlled range, selected cells may pass `selectionEdges` (`top`, `right`,
+`bottom`, `left`). The kit supplies the light selection fill and draws only those
+outer edges; consumers compute the edges from their own range. Omit the property
+to retain the existing independent-cell selection. The border presentation adds no
+event target and leaves native editors, row spans and column spans intact.
 
 ## Install
 
@@ -293,3 +316,15 @@ are: [DECISIONS.md](./DECISIONS.md).
 ## Not yet in the kit (extract next if needed)
 
 - **`format` util** — date/relative helpers are adapter-side (and need a host "today").
+
+## Menu correction candidate 0.27.0-t131.3
+
+Context-menu Escape restores the original initiating element under React StrictMode
+effect replay. Disabled menu items use the shared disabled-opacity token and do not
+receive hover highlighting. No new menu variant or consumer styling is required.
+
+## Modal menu correction candidate 0.27.0-t131.4
+
+Context menus mount in their own native dialog instead of the inert page behind
+it. Ordinary page menus keep their body portal. The public API, keyboard
+navigation, dismissal and viewport avoidance remain unchanged.

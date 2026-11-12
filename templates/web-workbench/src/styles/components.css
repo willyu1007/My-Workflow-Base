@@ -408,7 +408,8 @@
   font-size: 13px; color: var(--fg-1);
   cursor: pointer;
 }
-.mt-menu-item:hover { background: var(--mt-sand-2); }
+.mt-menu-item:not(:disabled):hover { background: var(--mt-sand-2); }
+.mt-menu-item:disabled { opacity: var(--state-disabled-opacity); cursor: not-allowed; }
 /* Reserved content indent (icons removed but the column is kept for future items). */
 .mt-menu-item--indent { padding-left: 24px; }
 .mt-menu-sep { height: 1px; background: var(--border-1); margin: 6px 4px; }
