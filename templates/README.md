@@ -19,12 +19,16 @@ not become a runtime dependency.
 2. Copy `host-runtime/packages/workflow-runtime` into the host repository.
 3. Copy `scenario-module` for each concrete scenario.
 4. Rename package names, import aliases, scenario keys, and fixture ids to the
-   host repository conventions.
-5. Implement repository adapters in the host product. Do not implement concrete
-   DB writes inside the copied scenario folder.
+   target repository conventions.
+5. Implement persistence adapters in the repository that owns the canonical facts:
+   shared platform/workflow facts in the host, scenario domain facts in the scenario
+   owner. Domain code depends on repository ports.
 
 ## Boundary
 
-The templates intentionally avoid database clients, queue clients, provider
-SDKs, and downstream SDKs. Host products wire those through repository and port
-implementations.
+Host runtime scaffolds use repository and port interfaces for persistence, queues,
+providers, and downstream services; the host supplies their implementations.
+
+The Scenario Starter includes a Prisma repository adapter and migration as an
+owner-side persistence example. Adopters keep scenario facts in the scenario owner
+and must not write host or other owners' canonical facts through this adapter.
