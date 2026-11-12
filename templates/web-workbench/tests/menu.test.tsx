@@ -34,6 +34,14 @@ it("preserves the ordinary trigger menu and closes on an item click", async () =
   await user.click(screen.getByRole("button", {name: "更多"})); expect(screen.getByRole("menu")).toBeTruthy();
   await user.click(screen.getByRole("menuitem", {name: "编辑"})); expect(screen.queryByRole("menu")).toBeNull();
 });
+it("starts upward trigger-menu navigation at the last enabled item", async () => {
+  const user = userEvent.setup();
+  render(<Menu label="更多" trigger="…"><button role="menuitem">第一项</button>
+    <button role="menuitem">第二项</button><button role="menuitem">最后一项</button></Menu>);
+  await user.click(screen.getByRole("button", {name: "更多"}));
+  await user.keyboard("{ArrowUp}");
+  expect(document.activeElement).toBe(screen.getByRole("menuitem", {name: "最后一项"}));
+});
 it("keeps a context menu inside its native dialog without changing focus or dismissal",async()=>{
   const selected=vi.fn(),user=userEvent.setup();
   function InDialog(){const[open,setOpen]=useState(false);return <dialog open aria-label="设置">
