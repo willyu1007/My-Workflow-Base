@@ -535,3 +535,15 @@ The existing Toast view, status region, timing and API stay shared. Native close
 moves pending feedback to the remaining modal or the original provider position;
 closing a toast leaves the edit open. Real-browser verification must cover the
 top layer, nested close and notify-then-close; jsdom does not establish these.
+
+## Controlled Scene navigation
+
+Some secondary routes share a pathname and differ only in query parameters.
+`SceneNav.activeHref` lets the consumer identify one exact item without teaching
+the kit how to parse domain queries. Omission preserves the existing pathname
+predicate, while an explicit empty or unmatched value selects nothing. Link
+destinations and native keyboard focus remain unchanged.
+
+`appearance="navy"` reuses `--mt-navy` and `--fg-on-navy` for the active link and
+its count. The surface appearance remains the default; this adds no tab-panel
+state, alternative navigation owner, or new color token.

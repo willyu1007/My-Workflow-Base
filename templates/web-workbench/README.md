@@ -61,6 +61,14 @@ still not published — consumers do not change token values, they consume them.
 
 ### Embedded selection and weekly tables
 
+`SceneNav` keeps its existing pathname matching unless the consumer supplies
+`activeHref`. That optional value selects only the exact item href, including
+query parameters; the consumer owns query interpretation and every link retains
+its full destination. An explicit empty or unmatched value selects no item.
+Use `appearance="navy"` for a primary navy selection with white text and counts;
+omitting it preserves the surface selection. These remain links with native
+keyboard navigation, not a separate tab-panel state owner.
+
 `SelectionList` comes from `/list`. The consumer owns `items`, `selectedId` and
 `onSelect`; moving keyboard focus never selects. The optional toolbar separates
 `filter` from `accessory`; `expanded` gives that accessory the whole bar without

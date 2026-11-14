@@ -53,6 +53,12 @@
 }
 .wb-segmented__count { font-size: 11px; font-family: var(--font-mono); color: var(--fg-3); }
 .wb-segmented__item--active .wb-segmented__count { color: var(--mt-orange-700); }
+.wb-segmented--navy .wb-segmented__item--active {
+  background: var(--mt-navy);
+  color: var(--fg-on-navy);
+  box-shadow: none;
+}
+.wb-segmented--navy .wb-segmented__item--active .wb-segmented__count { color: inherit; }
 
 /* ============================================================
    App shell — sidebar + topbar + content

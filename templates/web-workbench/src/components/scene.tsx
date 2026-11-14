@@ -61,34 +61,43 @@ export interface SceneNavItem {
 }
 
 /**
- * SceneNav — segmented secondary navigation, active by current route.
+ * SceneNav — segmented secondary navigation, active by pathname or explicit href.
  * Generalised from the assignment-workflow nav; driven by a plain item list so
  * any scenario can declare its own workflow steps in configuration.
  */
 export function SceneNav({
   items,
   ariaLabel,
+  activeHref,
+  appearance = "surface",
 }: {
   readonly items: readonly SceneNavItem[];
   readonly ariaLabel?: string;
+  /** Select one exact href, including its query. Omit to follow the current pathname. */
+  readonly activeHref?: string;
+  /** Surface selection by default; navy uses the shared primary contrast tokens. */
+  readonly appearance?: "surface" | "navy";
 }): React.ReactElement {
   const isActive = useActiveRoute();
 
   return (
-    <div className="wb-segmented" role="tablist" aria-label={ariaLabel}>
-      {items.map((t) => (
-        <Link
-          key={t.href}
-          href={t.href}
-          className={`wb-segmented__item${isActive(t.href) ? " wb-segmented__item--active" : ""}`}
-          aria-current={isActive(t.href) ? "page" : undefined}
-        >
-          {t.label}
-          {typeof t.count === "number" && t.count > 0 && (
-            <span className="wb-segmented__count">{t.count}</span>
-          )}
-        </Link>
-      ))}
+    <div className={`wb-segmented${appearance === "navy" ? " wb-segmented--navy" : ""}`} role="tablist" aria-label={ariaLabel}>
+      {items.map((t) => {
+        const active = activeHref === undefined ? isActive(t.href) : activeHref === t.href;
+        return (
+          <Link
+            key={t.href}
+            href={t.href}
+            className={`wb-segmented__item${active ? " wb-segmented__item--active" : ""}`}
+            aria-current={active ? "page" : undefined}
+          >
+            {t.label}
+            {typeof t.count === "number" && t.count > 0 && (
+              <span className="wb-segmented__count">{t.count}</span>
+            )}
+          </Link>
+        );
+      })}
     </div>
   );
 }
