@@ -95,9 +95,9 @@
     {
       "id": "T-082",
       "slug": "workbench-selection-week",
-      "status": "done",
-      "updated": "2026-11-03",
-      "dev_docs_path": "dev-docs/active/workbench-selection-week",
+      "status": "archived",
+      "updated": "2026-11-14",
+      "dev_docs_path": "dev-docs/archive/workbench-selection-week",
       "feature_id": "F-000"
     }
   ]
