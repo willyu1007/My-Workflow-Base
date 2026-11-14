@@ -62,6 +62,7 @@ export function Menu(props: MenuProps): React.ReactElement {
         event.preventDefault();
         const index = items.findIndex(item => item === document.activeElement);
         const next = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1
+          : index < 0 ? (event.key === "ArrowUp" ? items.length - 1 : 0)
           : (index + (event.key === "ArrowUp" ? -1 : 1) + items.length) % items.length;
         items[next]?.focus();
       }
