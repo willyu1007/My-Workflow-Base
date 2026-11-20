@@ -28,11 +28,21 @@ it("moves keyboard focus among enabled items and restores the initiator on Escap
   await user.keyboard("{Escape}"); expect(close).toHaveBeenCalledWith(false);
   expect(document.activeElement).toBe(initiator); initiator.remove();
 });
-it("preserves the ordinary trigger menu and closes on an item click", async () => {
+it("keeps a portalled trigger menu outside scrolling content and restores focus after selection", async () => {
   const user = userEvent.setup();
-  render(<Menu label="更多" trigger="…"><button role="menuitem">编辑</button></Menu>);
+  const selected=vi.fn();
+  render(<div data-testid="scroll" style={{overflow:"auto",width:116}}>
+    <Menu label="普通菜单" trigger="…"><button role="menuitem">普通编辑</button></Menu><Menu portal label="更多" trigger="…">
+    <button role="menuitem" onClick={selected}>编辑</button></Menu></div>);
+  await user.click(screen.getByRole("button",{name:"普通菜单"}));
+  expect(screen.getByTestId("scroll").contains(screen.getByRole("menu"))).toBe(true);
+  await user.click(screen.getByRole("menuitem",{name:"普通编辑"}));expect(screen.queryByRole("menu")).toBeNull();
   await user.click(screen.getByRole("button", {name: "更多"})); expect(screen.getByRole("menu")).toBeTruthy();
+  expect(screen.getByRole("menu").parentElement).toBe(document.body);
+  expect(screen.getByTestId("scroll").contains(screen.getByRole("menu"))).toBe(false);
   await user.click(screen.getByRole("menuitem", {name: "编辑"})); expect(screen.queryByRole("menu")).toBeNull();
+  expect(selected).toHaveBeenCalledTimes(1);
+  expect(document.activeElement).toBe(screen.getByRole("button",{name:"更多"}));
 });
 it("starts upward trigger-menu navigation at the last enabled item", async () => {
   const user = userEvent.setup();

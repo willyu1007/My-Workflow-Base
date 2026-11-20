@@ -334,5 +334,16 @@ receive hover highlighting. No new menu variant or consumer styling is required.
 ## Modal menu correction candidate 0.27.0-t131.4
 
 Context menus mount in their own native dialog instead of the inert page behind
-it. Ordinary page menus keep their body portal. The public API, keyboard
+it. Page-level context menus keep their body portal. The public API, keyboard
 navigation, dismissal and viewport avoidance remain unchanged.
+
+## Trigger menus inside scrolling content
+
+Use `<Menu portal label="Actions" trigger={…}>…</Menu>` when a trigger menu must
+escape an ancestor's scroll clipping. The popup mounts in its own native dialog
+or the document body, follows its trigger on scroll/resize, and stays within the
+viewport. Selection restores focus to the trigger before a consumer dialog opens.
+
+Trigger menus remain inline by default, preserving existing ancestor-scoped popup
+styles. A portalled popup uses the shared menu styles; it is outside those ancestor
+selectors.
